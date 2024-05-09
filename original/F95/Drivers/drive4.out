@@ -1,0 +1,115 @@
+ ********************************************************* 
+ * ODRPACK95 version 1.00 of 12-27-2005 (REAL (KIND=R8)) * 
+ ********************************************************* 
+
+
+ *** Initial summary for fit by method of ODR ***
+
+ --- Problem Size:
+            N =     5          (number with nonzero weight =     5)
+           NQ =     1
+            M =     1
+           NP =     3          (number unfixed =     3)
+
+ --- Control Values:
+          JOB = 00000
+              = ABCDE, where
+                       A=0 ==> fit is not a restart.
+                       B=0 ==> deltas are initialized to zero.
+                       C=0 ==> covariance matrix will be computed using
+                               derivatives re-evaluated at the solution.
+                       D=0 ==> derivatives are estimated by forward differences.
+                       E=0 ==> method is explicit ODR.
+       NDIGIT =    16          (estimated by ODRPACK95)
+       TAUFAC =     1.00E+00
+
+ --- Stopping Criteria:
+        SSTOL =     1.49E-08   (sum of squares stopping tolerance)
+       PARTOL =     3.67E-11   (parameter stopping tolerance)
+        MAXIT =    20          (maximum number of iterations)
+
+ --- Initial Weighted Sum of Squares        =                    7.88051339E+03
+         Sum of Squared Weighted Deltas     =   0.00000000E+00
+         Sum of Squared Weighted Epsilons   =   7.88051339E+03
+
+ --- Function Parameter Summary:
+
+       Index   BETA(K)    Fixed     Scale   LOWER(K)   UPPER(K)    Derivative
+                                                                    Step Size
+         (K)            (IFIXB)    (SCLB)                              (STPB)
+
+           1  1.10E+00       NO  1.15E-01  0.00E+000  1.00E+003   1.00000E-10
+           2  3.30E+00       NO  1.15E-01  0.00E+000  1.00E+003   1.00000E-10
+           3  8.70E+00       NO  1.15E-01  0.00E+000  1.00E+003   1.00000E-10
+
+ --- Explanatory Variable and Delta Weight Summary:
+
+       Index      X(I,J)  DELTA(I,J)    Fixed     Scale    Weight    Derivative
+                                                                      Step Size
+       (I,J)                          (IFIXX)    (SCLD)      (WD)        (STPD)
+
+         1,1   1.500E-01   0.000E+00       NO  2.00E+00  1.00E+00   1.00000E-10
+         N,1   5.000E-01   0.000E+00       NO  2.00E+00  1.00E+00   1.00000E-10
+
+ --- Response Variable and Epsilon Error Weight Summary:
+
+       Index      Y(I,L)      Weight
+       (I,L)                    (WE)
+
+         1,1   5.500E+01   1.000E+00    
+         N,1   2.000E+01   1.000E+00    
+
+ *** Iteration reports for fit by method of ODR ***
+
+
+         Cum.                 Act. Rel.   Pred. Rel.
+  It.  No. FN     Weighted   Sum-of-Sqs   Sum-of-Sqs              G-N
+ Num.   Evals   Sum-of-Sqs    Reduction    Reduction  TAU/PNORM  Step
+ ----  ------  -----------  -----------  -----------  ---------  ----
+
+    1      18  7.46451E+03   5.2789E-02   6.8844E-03  3.477E-01    NO       
+    3      34  6.01777E+03   1.2988E-01   6.6700E-02  1.288E-02    NO       
+    5      51  3.50755E+02   8.3664E-01   5.3435E-01  9.039E-04    NO       
+    7      69  4.60628E+00   9.8125E-01   1.0000E+00  6.899E-02    NO       
+    9      80  1.92487E-02   2.0557E-01   9.6602E-01  3.060E-02    NO       
+   11      91  1.68293E-03   1.1719E-01   5.6853E-01  1.445E-02    NO       
+   13     102  8.74764E-04   9.0923E-03   6.8671E-02  7.025E-03    NO       
+   15     113  8.24535E-04   2.4709E-04   3.3063E-03  3.231E-03    NO       
+   17     124  8.22080E-04   4.4982E-05   2.1480E-04  1.552E-03    NO       
+   19     135  8.21913E-04   2.2255E-05   3.2396E-05  1.534E-03    NO       
+
+ *** Final summary for fit by method of ODR ***
+
+ --- Stopping Conditions:
+         INFO =     4 ==> iteration limit reached.
+        NITER =    20          (number of iterations)
+         NFEV =   144          (number of function evaluations)
+        IRANK =     0          (rank deficiency)
+        RCOND =     1.29E-06   (inverse condition number)
+        ISTOP =     0          (returned by user from subroutine FCN)
+
+ --- Final Weighted Sums of Squares       =                     8.21894491E-04
+         Sum of Squared Weighted Deltas   =    8.21795389E-04
+         Sum of Squared Weighted Epsilons =    9.91019443E-08
+
+ --- Residual Standard Deviation          =                     2.02718338E-02
+         Degrees of Freedom               =    2
+
+ --- Estimated BETA(J), J = 1, ..., NP:
+
+                     BETA      LOWER     UPPER      S.D.  ___ 95% Confidence ___
+                                                    BETA         Interval
+
+       1   1.36730609E-02   0.00E+00  1.00E+03  6.66E-02  -2.73E-01 to  3.00E-01
+       2   2.04026365E-03   0.00E+00  1.00E+03  1.75E-02  -7.33E-02 to  7.73E-02
+       3   1.15908326E+01   0.00E+00  1.00E+03  9.15E+01  -3.82E+02 to  4.05E+02
+
+ --- Estimated EPSILON(I) and DELTA(I,*), I = 1, ..., N:
+
+         I    EPSILON(I,1)      DELTA(I,1)
+
+         1  7.15700272E-05  4.89549729E-03
+         2  4.67835795E-05  1.21582927E-04
+         3 -8.83462031E-05 -1.95233027E-02
+         4  2.69528524E-04  1.97344417E-02
+         5 -1.06490823E-04 -5.21604962E-03

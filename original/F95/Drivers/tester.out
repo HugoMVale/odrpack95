@@ -1,0 +1,96 @@
+ ********************************************************* 
+ * ODRPACK95 version 1.00 of 12-27-2005 (REAL (KIND=R8)) * 
+ ********************************************************* 
+
+
+ ERROR :  N is less than one.
+
+ ERROR :  M is less than one.
+
+ ERROR :  NP is less than one
+          or NP is greater than N.
+
+ ERROR :  NQ is less than one.
+ INFO =  11111
+ ********************************************************* 
+ * ODRPACK95 version 1.00 of 12-27-2005 (REAL (KIND=R8)) * 
+ ********************************************************* 
+
+
+ ERROR :  JOB requires the optional argument WORK and
+          WORK is not present or not associated.
+
+ ERROR :  JOB requires the optional argument IWORK and
+          IWORK is not present or not associated.
+ INFO =  70110
+ ********************************************************* 
+ * ODRPACK95 version 1.00 of 12-27-2005 (REAL (KIND=R8)) * 
+ ********************************************************* 
+
+
+ ERROR :  JOB requires the optional argument DELTA and
+          DELTA is not present or not associated.
+ INFO =  71000
+ ********************************************************* 
+ * ODRPACK95 version 1.00 of 12-27-2005 (REAL (KIND=R8)) * 
+ ********************************************************* 
+
+
+
+ *** Derivative checking report for fit by method of ODR ***
+
+
+     For response  1 of observation     1
+
+                               User                               
+                           Supplied     Relative    Derivative 
+        Derivative WRT        Value   Difference    Assessment 
+
+             BETA(  1)                              Small bounds (see note 9)
+             BETA(  2)    -1.35E+00     1.34E-08    Verified
+          DELTA( 1, 1)     6.74E+00     4.53E-08    Verified
+
+     Number of reliable digits in function results          16
+        (estimated by ODRPACK95)
+
+     Number of digits of agreement required between      
+     user supplied and finite difference derivative for  
+     user supplied derivative to be considered verified      4
+
+     Row number at which derivatives were checked            1
+
+       -values of the explanatory variables at this row
+
+          X( 1, 1)   1.00000000E+00
+ ********************************************************* 
+ * ODRPACK95 version 1.00 of 12-27-2005 (REAL (KIND=R8)) * 
+ ********************************************************* 
+
+
+ *** Final summary for fit by method of ODR ***
+
+ --- Stopping Conditions:
+         INFO =     1 ==> sum of squares convergence.
+        NITER =     8          (number of iterations)
+         NFEV =    33          (number of function evaluations)
+         NJEV =    10          (number of jacobian evaluations)
+        IRANK =     0          (rank deficiency)
+        RCOND =     2.84E-03   (inverse condition number)
+        ISTOP =     0          (returned by user from subroutine FCN)
+
+ --- Final Weighted Sums of Squares       =                     1.84844039E+05
+         Sum of Squared Weighted Deltas   =    4.76798800E-01
+         Sum of Squared Weighted Epsilons =    1.84843562E+05
+
+ --- Residual Standard Deviation          =                     3.04009900E+02
+         Degrees of Freedom               =    2
+
+ --- Estimated BETA(J), J = 1, ..., NP:
+
+                     BETA      LOWER     UPPER      S.D.  ___ 95% Confidence ___
+                                                    BETA         Interval
+
+       1  -2.00000000E+02  -2.00E+02 -2.00E+02  5.03E+07  -2.17E+08 to  2.17E+08
+       2  -5.00000000E+00  -5.00E+00  0.00E+00  1.50E+05  -6.45E+05 to  6.45E+05
+ INFO =  1
+ NO SUMMARY AVAILABLE

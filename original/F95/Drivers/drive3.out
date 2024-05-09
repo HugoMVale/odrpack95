@@ -1,0 +1,121 @@
+ ********************************************************* 
+ * ODRPACK95 version 1.00 of 12-27-2005 (REAL (KIND=R8)) * 
+ ********************************************************* 
+
+
+ *** Initial summary for fit by method of ODR ***
+
+ --- Problem Size:
+            N =    23          (number with nonzero weight =    21)
+           NQ =     2
+            M =     1
+           NP =     5          (number unfixed =     5)
+
+ --- Control Values:
+          JOB = 01010
+              = ABCDE, where
+                       A=0 ==> fit is not a restart.
+                       B=1 ==> deltas are initialized by user.
+                       C=0 ==> covariance matrix will be computed using
+                               derivatives re-evaluated at the solution.
+                       D=1 ==> derivatives are estimated by central differences.
+                       E=0 ==> method is explicit ODR.
+       NDIGIT =    15          (estimated by ODRPACK95)
+       TAUFAC =     1.00E+00
+
+ --- Stopping Criteria:
+        SSTOL =     1.49E-08   (sum of squares stopping tolerance)
+       PARTOL =     3.67E-11   (parameter stopping tolerance)
+        MAXIT =    50          (maximum number of iterations)
+
+ --- Initial Weighted Sum of Squares        =                    1.71064070E+03
+         Sum of Squared Weighted Deltas     =   2.01382943E-04
+         Sum of Squared Weighted Epsilons   =   1.71064050E+03
+
+ --- Function Parameter Summary:
+
+       Index   BETA(K)    Fixed     Scale   LOWER(K)   UPPER(K)    Derivative
+                                                                    Step Size
+         (K)            (IFIXB)    (SCLB)                              (STPB)
+
+           1  4.00E+00       NO  2.50E-01 -1.80E+308  1.80E+308   1.00000E-05
+           2  2.00E+00       NO  5.00E-01 -1.80E+308  1.80E+308   1.00000E-05
+           3  7.00E+00       NO  1.43E-01 -1.80E+308  1.80E+308   1.00000E-05
+           4  4.00E-01       NO  2.50E+00 -1.80E+308  1.80E+308   1.00000E-05
+           5  5.00E-01       NO  2.00E+00 -1.80E+308  1.80E+308   1.00000E-05
+
+ --- Explanatory Variable and Delta Weight Summary:
+
+       Index      X(I,J)  DELTA(I,J)    Fixed     Scale    Weight    Derivative
+                                                                      Step Size
+       (I,J)                          (IFIXX)    (SCLD)      (WD)        (STPD)
+
+         1,1   3.000E+01   0.000E+00      YES  3.33E-02  1.11E-07   1.00000E-05
+         N,1   1.500E+05   1.440E+05       NO  6.67E-06  4.44E-15   1.00000E-05
+
+ --- Response Variable and Epsilon Error Weight Summary:
+
+       Index      Y(I,L)      Weight
+       (I,L)                    (WE)
+
+         1,1   4.220E+00   5.596E+02    
+         N,1   2.759E+00   5.596E+02    
+ 
+         1,2   1.360E-01   8.397E+03    
+         N,2   1.390E-01   8.397E+03    
+
+ *** Final summary for fit by method of ODR ***
+
+ --- Stopping Conditions:
+         INFO =     1 ==> sum of squares convergence.
+        NITER =     8          (number of iterations)
+         NFEV =   121          (number of function evaluations)
+        IRANK =     0          (rank deficiency)
+        RCOND =     8.15E-03   (inverse condition number)
+        ISTOP =     0          (returned by user from subroutine FCN)
+
+ --- Final Weighted Sums of Squares       =                     4.20538922E-01
+         Sum of Squared Weighted Deltas   =    5.54021897E-04
+         Sum of Squared Weighted Epsilons =    4.19984900E-01
+
+ --- Residual Standard Deviation          =                     1.62122431E-01
+         Degrees of Freedom               =   16
+
+ --- Estimated BETA(J), J = 1, ..., NP:
+
+                     BETA      LOWER     UPPER      S.D.  ___ 95% Confidence ___
+                                                    BETA         Interval
+
+       1   4.37998803E+00  -1.80+308  1.80+308  1.31E-02   4.35E+00 to  4.41E+00
+       2   2.43330576E+00  -1.80+308  1.80+308  1.30E-02   2.41E+00 to  2.46E+00
+       3   8.00288459E+00  -1.80+308  1.80+308  1.17E-01   7.76E+00 to  8.25E+00
+       4   5.10114716E-01  -1.80+308  1.80+308  1.33E-02   4.82E-01 to  5.38E-01
+       5   5.17390233E-01  -1.80+308  1.80+308  2.89E-02   4.56E-01 to  5.79E-01
+
+ --- Estimated EPSILON(I) and DELTA(I,*), I = 1, ..., N:
+
+         I    EPSILON(I,1)    EPSILON(I,2)      DELTA(I,1)
+
+         1 -7.38558795E-03  1.25939187E-03  0.00000000E+00
+         2 -1.05614733E-03 -1.22846292E-03  0.00000000E+00
+         3 -2.70863920E-03 -2.14347329E-03  0.00000000E+00
+         4  4.68593517E-02 -4.25940138E-03  0.00000000E+00
+         5  8.08102389E-03 -3.47539194E-03  0.00000000E+00
+         6  1.53882522E-03  3.85293713E-04  3.03694400E+01
+         7  4.60535703E-03  1.19118896E-03  3.78986750E+01
+         8  4.50906164E-03  1.23570892E-03  6.22630487E+01
+         9 -1.00621895E-03 -2.91865043E-04  1.11186980E+02
+        10  1.05810802E-02  3.27284194E-03  1.15709877E+02
+        11  6.93622739E-03  2.43482106E-03  2.41436591E+02
+        12  3.95828012E-05  1.75905015E-05  9.61344532E+02
+        13 -3.77617796E-03 -2.42907814E-03  1.33029845E+03
+        14 -5.56734978E-04 -1.70123784E-03  2.07511566E+03
+        15  2.08263807E-03 -2.23723233E-03  2.90289532E+03
+        16 -7.50689916E-03  2.16462893E-03  5.21815818E+03
+        17 -1.56731844E-03  2.03367085E-04  7.54564636E+03
+        18 -5.93223182E-04  2.72069171E-05  1.74201021E+04
+        19  1.15260099E-04 -2.42126132E-07  2.42745472E+04
+        20  2.63641111E-04  5.18510321E-06  3.78492052E+04
+        21 -3.81011181E-04 -1.03963850E-05  5.53493280E+04
+        22 -3.36822612E-04 -1.26141392E-05  8.75791432E+04
+        23  2.87173883E-03  1.41199841E-04  1.29496300E+05

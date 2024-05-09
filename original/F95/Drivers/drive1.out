@@ -1,0 +1,127 @@
+ ********************************************************* 
+ * ODRPACK95 version 1.00 of 12-27-2005 (REAL (KIND=R8)) * 
+ ********************************************************* 
+
+
+
+ *** Derivative checking report for fit by method of ODR ***
+
+
+     For response  1 of observation     3
+
+                               User                               
+                           Supplied     Relative    Derivative 
+        Derivative WRT        Value   Difference    Assessment 
+
+             BETA(  1)     1.00E+00     0.00E+00    Verified
+             BETA(  2)     1.55E-01     1.66E-06    Verified
+             BETA(  3)     1.19E+02     2.94E-06    Verified
+          DELTA( 3, 1)    -2.39E+00     2.96E-06    Verified
+
+     Number of reliable digits in function results          16
+        (estimated by ODRPACK95)
+
+     Number of digits of agreement required between      
+     user supplied and finite difference derivative for  
+     user supplied derivative to be considered verified      4
+
+     Row number at which derivatives were checked            3
+
+       -values of the explanatory variables at this row
+
+          X( 3, 1)   5.00000000E+00
+ ********************************************************* 
+ * ODRPACK95 version 1.00 of 12-27-2005 (REAL (KIND=R8)) * 
+ ********************************************************* 
+
+
+ *** Initial summary for fit by method of ODR ***
+
+ --- Problem Size:
+            N =    12          (number with nonzero weight =    12)
+           NQ =     1
+            M =     1
+           NP =     3          (number unfixed =     3)
+
+ --- Control Values:
+          JOB = 00020
+              = ABCDE, where
+                       A=0 ==> fit is not a restart.
+                       B=0 ==> deltas are initialized to zero.
+                       C=0 ==> covariance matrix will be computed using
+                               derivatives re-evaluated at the solution.
+                       D=2 ==> derivatives are supplied by user.
+                               derivatives were checked.
+                               results appear correct.
+                       E=0 ==> method is explicit ODR.
+       NDIGIT =    16          (estimated by ODRPACK95)
+       TAUFAC =     1.00E+00
+
+ --- Stopping Criteria:
+        SSTOL =     1.49E-08   (sum of squares stopping tolerance)
+       PARTOL =     3.67E-11   (parameter stopping tolerance)
+        MAXIT =    50          (maximum number of iterations)
+
+ --- Initial Weighted Sum of Squares        =                    6.63720354E+05
+         Sum of Squared Weighted Deltas     =   0.00000000E+00
+         Sum of Squared Weighted Epsilons   =   6.63720354E+05
+
+ *** Iteration reports for fit by method of ODR ***
+
+
+         Cum.                 Act. Rel.   Pred. Rel.
+  It.  No. FN     Weighted   Sum-of-Sqs   Sum-of-Sqs              G-N
+ Num.   Evals   Sum-of-Sqs    Reduction    Reduction  TAU/PNORM  Step
+ ----  ------  -----------  -----------  -----------  ---------  ----
+
+    1      19  2.51166E+01   9.9996E-01   9.9997E-01  3.499E-01   YES       
+    2      20  2.14730E+01   1.4507E-01   1.5249E-01  6.900E-02   YES       
+    3      21  2.14463E+01   1.2418E-03   1.4631E-03  8.573E-03   YES       
+    4      22  2.14455E+01   3.7676E-05   4.7131E-05  2.016E-03   YES       
+    5      23  2.14455E+01   1.5116E-06   1.8950E-06  3.927E-04   YES       
+    6      24  2.14455E+01   6.2002E-08   7.7723E-08  8.017E-05   YES       
+    7      25  2.14455E+01   2.5359E-09   3.1790E-09  1.617E-05   YES       
+
+ *** Final summary for fit by method of ODR ***
+
+ --- Stopping Conditions:
+         INFO =     1 ==> sum of squares convergence.
+        NITER =     7          (number of iterations)
+         NFEV =    25          (number of function evaluations)
+         NJEV =     8          (number of jacobian evaluations)
+        IRANK =     0          (rank deficiency)
+        RCOND =     6.12E-03   (inverse condition number)
+        ISTOP =     0          (returned by user from subroutine FCN)
+
+ --- Final Weighted Sums of Squares       =                     2.14455017E+01
+         Sum of Squared Weighted Deltas   =    7.78974669E+00
+         Sum of Squared Weighted Epsilons =    1.36557550E+01
+
+ --- Residual Standard Deviation          =                     1.54364294E+00
+         Degrees of Freedom               =    9
+
+ --- Estimated BETA(J), J = 1, ..., NP:
+
+                     BETA      LOWER     UPPER      S.D.  ___ 95% Confidence ___
+                                                    BETA         Interval
+
+       1   1.26465481E+03  -1.80+308  1.80+308  1.03E+00   1.26E+03 to  1.27E+03
+       2  -5.40184100E+01  -1.80+308  1.80+308  1.58E+00  -5.76E+01 to -5.04E+01
+       3  -8.78497122E-02  -1.80+308  1.80+308  6.33E-03  -1.02E-01 to -7.35E-02
+
+ --- Estimated EPSILON(I) and DELTA(I,*), I = 1, ..., N:
+
+         I    EPSILON(I,1)      DELTA(I,1)
+
+         1 -3.45194935E-01  0.00000000E+00
+         2  1.05480506E+00  0.00000000E+00
+         3 -3.00719286E-02 -6.50838155E-02
+         4 -1.13916405E-01 -2.67201445E-01
+         5 -1.40250730E-01 -3.31357554E-01
+         6 -5.53155555E-01 -1.30641313E+00
+         7 -6.99564762E-01 -1.32525687E+00
+         8  1.88412530E+00  1.45885497E+00
+         9 -1.70916306E+00 -1.18803577E+00
+        10  1.80916198E+00  7.71243449E-01
+        11  1.90299896E-01  8.24139253E-02
+        12 -1.34707485E+00  0.00000000E+00
