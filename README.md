@@ -28,7 +28,7 @@ This project aims to modernize the original code, namely:
 
 ## Installation
 
-The easiest way to build/test the code and run the examples is by means of [`fpm`](https://fpm.fortran-lang.org/en/index.html). 
+The easiest way to build/test the code and run the examples is by means of [`fpm`](https://fpm.fortran-lang.org/). 
 
 To build the library, do:
 ```
