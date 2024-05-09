@@ -6914,7 +6914,7 @@ C  Set JPVT to indicate dropped, fixed and estimated parameters
   210 CONTINUE
       IF (REDOJ .OR. NITER.GE.1) THEN
          DO 220 I=0,NPP-1
-            J = WORK(WRK3+I) - 1
+            J = INT(WORK(WRK3+I)) - 1
             IF (I.LE.NPP-IRANK-1) THEN
                IWORK(JPVT+J) = 1
             ELSE 
