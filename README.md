@@ -20,7 +20,7 @@ variable.
 
 This project aims to modernize the original code, namely:
 
-* [ ] Modify the tests so they can be automatically run in the CI.
+* [x] Modify the tests so they can be automatically run in the CI.
 * [ ] Fix some warnings, e.g. "Fortran runtime warning: An array temporary was created".
 * [ ] Implement a C API.
 * [ ] Implement python bindings to the C API.
