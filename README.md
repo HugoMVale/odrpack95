@@ -1,7 +1,7 @@
 # odrpack95
 
-[![CI](https://github.com/HugoMVale/odrpack95/actions/workflows/CI.yml/badge.svg)](https://github.com/HugoMVale/ordpack95/actions)
-[![codecov](https://codecov.io/gh/HugoMVale/ordpack95/branch/main/graph/badge.svg?token=1XL5LQSO9P)](https://codecov.io/gh/HugoMVale/ordpack95)
+[![CI](https://github.com/HugoMVale/odrpack95/actions/workflows/CI.yml/badge.svg)](https://github.com/HugoMVale/odrpack95/actions)
+[![codecov](https://codecov.io/gh/HugoMVale/odrpack95/branch/main/graph/badge.svg?token=1XL5LQSO9P)](https://codecov.io/gh/HugoMVale/odrpack95)
 [![Language](https://img.shields.io/badge/-Fortran-734f96?logo=fortran&logoColor=white)](https://github.com/topics/fortran)
 
 ## Description
