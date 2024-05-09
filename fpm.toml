@@ -1,0 +1,20 @@
+name = "odrpack95"
+version = "0.1.0"
+license = "license"
+author = "HugoMVale"
+maintainer = "57530119+HugoMVale@users.noreply.github.com"
+copyright = "Copyright 2024, HugoMVale"
+
+[build]
+auto-executables = true
+auto-tests = true
+auto-examples = true
+module-naming = false
+
+[install]
+library = false
+
+[fortran]
+implicit-typing = false
+implicit-external = true
+source-form = "default"
