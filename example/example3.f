@@ -1,6 +1,6 @@
       PROGRAM EXAMPLE3
       USE ODRPACK95
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C  ODRPACK95 Argument Definitions
 C      ==> FCN      Name of the user supplied function subroutine
@@ -28,7 +28,7 @@ C      ==> STPB     Step sizes for finite difference derivatives wrt BETA
 C      ==> STPD     Step sizes for finite difference derivatives wrt DELTA
 C      ==> SCLB     Scale values for parameters BETA 
 C      ==> SCLD     Scale values for errors DELTA in explanatory variable
-C     <==> WORK     REAL (KIND=R8) work vector
+C     <==> WORK     REAL (KIND=wp) work vector
 C     <==  IWORK    Integer work vector
 C     <==  INFO     Stopping condition 
  
@@ -55,8 +55,8 @@ C  Variable declarations
       INTEGER        I,INFO,IPRINT,J,JOB,L,LUNERR,LUNRPT,M,MAXIT,N,
      &               NDIGIT,NP,NQ
       INTEGER        IFIXB(MAXNP),IFIXX(LDIFX,MAXM),IWORK(:)   
-      REAL (KIND=R8) PARTOL,SSTOL,TAUFAC
-      REAL (KIND=R8) BETA(MAXNP),DELTA(:,:),
+      REAL (KIND=wp) PARTOL,SSTOL,TAUFAC
+      REAL (KIND=wp) BETA(MAXNP),DELTA(:,:),
      &               SCLB(MAXNP),SCLD(LDSCLD,MAXM),
      &               STPB(MAXNP),STPD(LDSTPD,MAXM),
      &               WD(LDWD,LD2WD,MAXM),WE(LDWE,LD2WE,MAXNQ),
@@ -66,23 +66,23 @@ C  Variable declarations
 
 
 C  Specify default values for DODRC arguments
-      WE(1,1,1)  = -1.0E0_R8
-      WD(1,1,1)  = -1.0E0_R8
+      WE(1,1,1)  = -1.0E0_wp
+      WD(1,1,1)  = -1.0E0_wp
       IFIXB(1)   = -1
       IFIXX(1,1) = -1
       JOB        = -1
       NDIGIT     = -1
-      TAUFAC     = -1.0E0_R8
-      SSTOL      = -1.0E0_R8
-      PARTOL     = -1.0E0_R8
+      TAUFAC     = -1.0E0_wp
+      SSTOL      = -1.0E0_wp
+      PARTOL     = -1.0E0_wp
       MAXIT      = -1
       IPRINT     = -1
       LUNERR     = -1
       LUNRPT     = -1
-      STPB(1)    = -1.0E0_R8
-      STPD(1,1)  = -1.0E0_R8
-      SCLB(1)    = -1.0E0_R8
-      SCLD(1,1)  = -1.0E0_R8
+      STPB(1)    = -1.0E0_wp
+      STPD(1,1)  = -1.0E0_wp
+      SCLB(1)    = -1.0E0_wp
+      SCLD(1,1)  = -1.0E0_wp
  
 C  Set up ODRPACK95 report files
       LUNERR  =   9
@@ -113,41 +113,41 @@ C               Long final report
 
 C  Initialize DELTA, and specify first decade of frequencies as fixed
       DO 20 I=1,N
-         IF (X(I,1).LT.100.0E0_R8) THEN
-            DELTA(I,1) = 0.0E0_R8
+         IF (X(I,1).LT.100.0E0_wp) THEN
+            DELTA(I,1) = 0.0E0_wp
             IFIXX(I,1) = 0
-         ELSE IF (X(I,1).LE.150.0E0_R8) THEN
-            DELTA(I,1) = 0.0E0_R8
+         ELSE IF (X(I,1).LE.150.0E0_wp) THEN
+            DELTA(I,1) = 0.0E0_wp
             IFIXX(I,1) = 1
-         ELSE IF (X(I,1).LE.1000.0E0_R8) THEN
-            DELTA(I,1) = 25.0E0_R8
+         ELSE IF (X(I,1).LE.1000.0E0_wp) THEN
+            DELTA(I,1) = 25.0E0_wp
             IFIXX(I,1) = 1
-         ELSE IF (X(I,1).LE.10000.0E0_R8) THEN
-            DELTA(I,1) = 560.0E0_R8
+         ELSE IF (X(I,1).LE.10000.0E0_wp) THEN
+            DELTA(I,1) = 560.0E0_wp
             IFIXX(I,1) = 1
-         ELSE IF (X(I,1).LE.100000.0E0_R8) THEN
-            DELTA(I,1) = 9500.0E0_R8
+         ELSE IF (X(I,1).LE.100000.0E0_wp) THEN
+            DELTA(I,1) = 9500.0E0_wp
             IFIXX(I,1) = 1
          ELSE 
-            DELTA(I,1) = 144000.0E0_R8
+            DELTA(I,1) = 144000.0E0_wp
             IFIXX(I,1) = 1
          END IF
    20 CONTINUE
 
 C  Set weights
       DO 30 I=1,N
-         IF (X(I,1).EQ.100.0E0_R8 .OR. X(I,1).EQ.150.0E0_R8) THEN
-            WE(I,1,1) = 0.0E0_R8
-            WE(I,1,2) = 0.0E0_R8
-            WE(I,2,1) = 0.0E0_R8
-            WE(I,2,2) = 0.0E0_R8
+         IF (X(I,1).EQ.100.0E0_wp .OR. X(I,1).EQ.150.0E0_wp) THEN
+            WE(I,1,1) = 0.0E0_wp
+            WE(I,1,2) = 0.0E0_wp
+            WE(I,2,1) = 0.0E0_wp
+            WE(I,2,2) = 0.0E0_wp
          ELSE
-            WE(I,1,1) =   559.6E0_R8
-            WE(I,1,2) = -1634.0E0_R8
-            WE(I,2,1) = -1634.0E0_R8
-            WE(I,2,2) =  8397.0E0_R8
+            WE(I,1,1) =   559.6E0_wp
+            WE(I,1,2) = -1634.0E0_wp
+            WE(I,2,1) = -1634.0E0_wp
+            WE(I,2,2) =  8397.0E0_wp
          END IF
-         WD(I,1,1)    =  (1.0E-4_R8)/(X(I,1)**2)
+         WD(I,1,1)    =  (1.0E-4_wp)/(X(I,1)**2)
    30 CONTINUE
 
 C  Compute solution
@@ -202,16 +202,16 @@ C                    -1 Means current BETA and X+DELTA are
 C                       not acceptable;  ODRPACK95 should stop
 
 C  Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C  Input arguments, not to be changed by this routine:
       INTEGER          I,IDEVAL,ISTOP,LDIFX,LDM,LDN,LDNP,M,N,NP,NQ
-      REAL (KIND=R8) BETA(NP),XPLUSD(LDN,M)
+      REAL (KIND=wp) BETA(NP),XPLUSD(LDN,M)
       INTEGER          IFIXB(NP),IFIXX(LDIFX,M)
 C  Output arguments:
-      REAL (KIND=R8) F(LDN,NQ),FJACB(LDN,LDNP,NQ),FJACD(LDN,LDM,NQ)
+      REAL (KIND=wp) F(LDN,NQ),FJACB(LDN,LDNP,NQ),FJACD(LDN,LDM,NQ)
 C  Local variables
-      REAL (KIND=R8) FREQ,PI,OMEGA,CTHETA,STHETA,THETA,PHI,R
+      REAL (KIND=wp) FREQ,PI,OMEGA,CTHETA,STHETA,THETA,PHI,R
       INTRINSIC        ATAN2,EXP,SQRT
 
 
@@ -226,16 +226,16 @@ C        Do nothing.
 
 C  Check for unacceptable values for this problem
       DO 10 I=1,N
-         IF (XPLUSD(I,1).LT.0.0E0_R8) THEN
+         IF (XPLUSD(I,1).LT.0.0E0_wp) THEN
             ISTOP = 1
             RETURN
          END IF
    10 CONTINUE
       ISTOP = 0
 
-      PI = 3.141592653589793238462643383279E0_R8
+      PI = 3.141592653589793238462643383279E0_wp
 
-      THETA = PI*BETA(4)*0.5E0_R8
+      THETA = PI*BETA(4)*0.5E0_wp
       CTHETA = COS(THETA)
       STHETA = SIN(THETA)
 
@@ -243,7 +243,7 @@ C  Compute predicted values
       IF (MOD(IDEVAL,10).GE.1) THEN
          DO 100 I = 1,N
             FREQ  = XPLUSD(I,1)
-            OMEGA = (2.0E0_R8*PI*FREQ*EXP(-BETA(3)))**BETA(4)
+            OMEGA = (2.0E0_wp*PI*FREQ*EXP(-BETA(3)))**BETA(4)
             PHI   = ATAN2((OMEGA*STHETA),(1+OMEGA*CTHETA))
             R     = (BETA(1)-BETA(2)) * 
      &              SQRT((1+OMEGA*CTHETA)**2+

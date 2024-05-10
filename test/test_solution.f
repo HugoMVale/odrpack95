@@ -9,14 +9,14 @@ C***Purpose  EXERCISE FEATURES OF ODRPACK95 SOFTWARE
 C***End Prologue  DTEST
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalars in common
       INTEGER
      &   NTEST
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   TSTFAC
       INTEGER
      &   LUNERR,LUNRPT,LUNSUM
@@ -44,7 +44,7 @@ C            precision (PASSED=TRUE), or whether some of the results
 C            disagreed (PASSED=FALSE).
 C   TSTFAC:  The user-supplied factor for scaling the test tolerances 
 C            used to check for agreement between computed results and 
-C            results obtained using REAL (KIND=R8) version on cray
+C            results obtained using REAL (KIND=wp) version on cray
 C            YMP.  Values of TSTFAC greater than one increase the 
 C            test tolerances, making the tests easier to pass and 
 C            allowing small discrepancies between the computed and 
@@ -69,12 +69,12 @@ C         from exercise routine DODRX.
       OPEN(UNIT=LUNERR,FILE='./test/test_solution_report.txt')
       OPEN(UNIT=LUNSUM,FILE='./test/test_solution_summary.txt')
 
-C  Exercise REAL (KIND=R8) version of ODRPACK95
+C  Exercise REAL (KIND=wp) version of ODRPACK95
 C  (test reports generated on file 'RESULTS' and
 C   summarized in file 'SUMMARY')
 
       NTEST = 23
-      TSTFAC = 1.0E0_R8
+      TSTFAC = 1.0E0_wp
       CALL DODRX(TSTFAC,PASSED,LUNSUM)
 
       END
@@ -92,12 +92,12 @@ C***End Prologue  DODRX
 
 C...Used modules
       USE ODRPACK95
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Parameters
       INTEGER
      &   LDWD,LDWE,LD2WD,LD2WE,LIWORK,LWORK,MAXN,MAXM,MAXNP,MAXNQ,NTESTS
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BASE
       PARAMETER
      &   (MAXN=50, MAXM=3, MAXNP=10, MAXNQ=2, NTESTS=23,
@@ -107,10 +107,10 @@ C...Parameters
      &           2*MAXN*MAXNQ*MAXM + MAXNQ**2 +
      &           5*MAXNQ + MAXNQ*(MAXNP+MAXM) + LDWE*LD2WE*MAXNQ,
      &   LIWORK = 20+MAXNP+MAXNQ*(MAXNP+MAXM),
-     &   BASE = RADIX(1.0E0_R8))
+     &   BASE = RADIX(1.0E0_wp))
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   TSTFAC
       INTEGER
      &   LUNSUM
@@ -126,7 +126,7 @@ C...Local scalars
      &   I,INFO,IPRINT,ITEST,JOB,L,LDIFX,LDSCLD,LDSTPD,LDWD1,LDWE1,
      &   LDX,LDY,LD2WD1,LD2WE1,LIWMIN,LUN,LUNERR,LUNRPT,LWMIN,
      &   M,MAXIT,MSG,N,NDIGIT,NP,NQ
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BNRM,EPSMAC,EWRT,EWRT2,HUNDRD,ONE,P01,P2,PARTOL,SSTOL,
      &   TAUFAC,THREE,TSTTOL,TWO,WSS,WSSDEL,WSSEPS,ZERO
       LOGICAL
@@ -134,11 +134,11 @@ C...Local scalars
       CHARACTER TITLE*80
 
 C...Arrays in common
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   LOWER(MAXNP),UPPER(MAXNP)
 
 C...Local arrays
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(MAXNP),DELTA(:,:),DPYMP(2,NTESTS),
      &   SCLB(MAXNP),SCLD(MAXN,MAXM),
      &   STPB(MAXNP),STPD(MAXN,MAXM),
@@ -153,7 +153,7 @@ C...Pointers
      &   DELTA,IWORK,WORK
 
 C...External functions
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DDOT,DNRM2
       EXTERNAL
      &   DDOT,DNRM2
@@ -174,105 +174,105 @@ C...Common blocks
 C...Data statements
       DATA
      &   ZERO,P01,P2,ONE,TWO,THREE,HUNDRD
-     &   /0.0E0_R8,0.01E0_R8,0.2E0_R8,1.0E0_R8,2.0E0_R8,3.0E0_R8,
-     &   100.0E0_R8/
+     &   /0.0E0_wp,0.01E0_wp,0.2E0_wp,1.0E0_wp,2.0E0_wp,3.0E0_wp,
+     &   100.0E0_wp/
 
       DATA
      &   (DPYMP(I,1),I=1,2)
-     &   /2.762733195780256808978449342964E+04_R8,
-     &    7.532639569022918943695104672512E-04_R8/
+     &   /2.762733195780256808978449342964E+04_wp,
+     &    7.532639569022918943695104672512E-04_wp/
       DATA
      &   (DPYMP(I,2),I=1,2)
-     &   /2.762732630143673024399942947263E+04_R8,
-     &    7.538467722687131506874279314940E-04_R8/
+     &   /2.762732630143673024399942947263E+04_wp,
+     &    7.538467722687131506874279314940E-04_wp/
       DATA
      &   (DPYMP(I,3),I=1,2)
-     &   /1.069944100000000027940905194068E+09_R8,
-     &    1.212808593256056359629660672046E-05_R8/
+     &   /1.069944100000000027940905194068E+09_wp,
+     &    1.212808593256056359629660672046E-05_wp/
       DATA
      &   (DPYMP(I,4),I=1,2)
-     &   /1.069944100000000026623461142867E+09_R8,
-     &    5.452084633790606017572015067556E-07_R8/
+     &   /1.069944100000000026623461142867E+09_wp,
+     &    5.452084633790606017572015067556E-07_wp/
       DATA
      &   (DPYMP(I,5),I=1,2)
-     &   /1.426988156377258617521571734503E+00_R8,
-     &    1.084728687127432219753903919409E+00_R8/
+     &   /1.426988156377258617521571734503E+00_wp,
+     &    1.084728687127432219753903919409E+00_wp/
       DATA
      &   (DPYMP(I,6),I=1,2)
-     &   /4.261321829513978871872508874025E+00_R8,
-     &    1.477967210398420733565424329280E-02_R8/
+     &   /4.261321829513978871872508874025E+00_wp,
+     &    1.477967210398420733565424329280E-02_wp/
       DATA
      &   (DPYMP(I,7),I=1,2)
-     &   /4.261272307142888464011486769858E+00_R8,
-     &    1.477966125465374336804138554559E-02_R8/
+     &   /4.261272307142888464011486769858E+00_wp,
+     &    1.477966125465374336804138554559E-02_wp/
       DATA
      &   (DPYMP(I,8),I=1,2)
-     &   /4.371487317909745009110272283622E+01_R8,
-     &    1.144419474408286067112233592550E-03_R8/
+     &   /4.371487317909745009110272283622E+01_wp,
+     &    1.144419474408286067112233592550E-03_wp/
       DATA
      &   (DPYMP(I,9),I=1,2)
-     &   /3.099048849376848610380977303924E+00_R8,
-     &    8.824708863783850023783338218501E-02_R8/
+     &   /3.099048849376848610380977303924E+00_wp,
+     &    8.824708863783850023783338218501E-02_wp/
       DATA
      &   (DPYMP(I,10),I=1,2)
-     &   /9.469917836739932584221023234527E+00_R8,
-     &    4.205389215588104651198536809880E-01_R8/
+     &   /9.469917836739932584221023234527E+00_wp,
+     &    4.205389215588104651198536809880E-01_wp/
       DATA
      &   (DPYMP(I,11),I=1,2)
-     &   /3.950949253027682207109233363651E+01_R8,
-     &    6.651838750834910819636881506915E+01_R8/
+     &   /3.950949253027682207109233363651E+01_wp,
+     &    6.651838750834910819636881506915E+01_wp/
       DATA
      &   (DPYMP(I,12),I=1,2)
-     &   /3.950949253027682207109233363651E+01_R8,
-     &    6.651838750834910819636881506915E+01_R8/
+     &   /3.950949253027682207109233363651E+01_wp,
+     &    6.651838750834910819636881506915E+01_wp/
       DATA
      &   (DPYMP(I,13),I=1,2)
-     &   /1.414213562373095000000000000000E+00_R8,
-     &    5.250825926608277346013642256883E-26_R8/
+     &   /1.414213562373095000000000000000E+00_wp,
+     &    5.250825926608277346013642256883E-26_wp/
       DATA
      &   (DPYMP(I,14),I=1,2)
-     &   /1.414213562373095000000000000000E+00_R8,
-     &    8.159081600696301507018019048968E-26_R8/
+     &   /1.414213562373095000000000000000E+00_wp,
+     &    8.159081600696301507018019048968E-26_wp/
       DATA
      &   (DPYMP(I,15),I=1,2)
-     &   /1.486588477064952451556223422813E+00_R8,
-     &    1.841690442255357083922717720270E+03_R8/
+     &   /1.486588477064952451556223422813E+00_wp,
+     &    1.841690442255357083922717720270E+03_wp/
       DATA
      &   (DPYMP(I,16),I=1,2)
-     &   /2.001224625073357401561224833131E+02_R8,
-     &    0.000000000000000000000000000000E+00_R8/
+     &   /2.001224625073357401561224833131E+02_wp,
+     &    0.000000000000000000000000000000E+00_wp/
       DATA
      &   (DPYMP(I,17),I=1,2)
-     &   /2.000099997500125000000000000000E+02_R8,
-     &    0.000000000000000000000000000000E+00_R8/
+     &   /2.000099997500125000000000000000E+02_wp,
+     &    0.000000000000000000000000000000E+00_wp/
       DATA
      &   (DPYMP(I,18),I=1,2)
-     &   /1.414213562373095000000000000000E+00_R8,
-     &    5.816277809383742531415846947805E-26_R8/
+     &   /1.414213562373095000000000000000E+00_wp,
+     &    5.816277809383742531415846947805E-26_wp/
       DATA
      &   (DPYMP(I,19),I=1,2)
-     &   /2.000624902374255782433465356007E+02_R8,
-     &    4.568236947482152283374593507328E+30_R8/
+     &   /2.000624902374255782433465356007E+02_wp,
+     &    4.568236947482152283374593507328E+30_wp/
 
       DATA
      &   (DPYMP(I,20),I=1,2)
-     &   /2.000624902374255782433465356007E+02_R8,
-     &    1.848525209410256939008831977844E+05_R8/
+     &   /2.000624902374255782433465356007E+02_wp,
+     &    1.848525209410256939008831977844E+05_wp/
 
       DATA
      &   (DPYMP(I,21),I=1,2)
-     &   /2.000624902374255782433465356007E+02_R8,
-     &    1.848525209410256939008831977844E+05_R8/
+     &   /2.000624902374255782433465356007E+02_wp,
+     &    1.848525209410256939008831977844E+05_wp/
 
       DATA
      &   (DPYMP(I,22),I=1,2)
-     &   /2.731300056749532689792659000000E+00_R8,
-     &    3.378975642596100806258619000000E+05_R8/
+     &   /2.731300056749532689792659000000E+00_wp,
+     &    3.378975642596100806258619000000E+05_wp/
 
       DATA
      &   (DPYMP(I,23),I=1,2)
-     &   /2.675757304209387399396291584708E+00_R8,
-     &    5.174484505019630309341494012187E-02_R8/
+     &   /2.675757304209387399396291584708E+00_wp,
+     &    5.174484505019630309341494012187E-02_wp/
 
       DATA
      &   (IDPYMP(I),I=1,23)
@@ -283,10 +283,10 @@ C...Interface blocks
       INTERFACE
       SUBROUTINE DWGHT
      &   (N,M,WT,LDWT,LD2WT,T,WTT)
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
       INTEGER
      &   LDWT,LD2WT,M,N
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   T(:,:),WT(:,:,:),WTT(:,:)
       END SUBROUTINE
       END INTERFACE
@@ -300,7 +300,7 @@ C   BETA:    The function parameters.
 C   BNRM:    The norm of BETA.
 C   DELTA:   The error in the X data.
 C   DPYMP:   The floating point results from a cray YMP using
-C            REAL (KIND=R8).
+C            REAL (KIND=wp).
 C   EPSMAC:  The value of machine precision.
 C   EWRT:    A temporary variable for the denominator of the relative error 
 C            calculations (error with respect to).
@@ -308,16 +308,16 @@ C   EWRT2:   A temporary variable for the denominator of the relative error
 C            calculations (error with respect to).
 C   FAILED:  The variable designating whether the results of all of the
 C            demonstration runs agreed with those from the cray YMP
-C            using REAL (KIND=R8) (FAILED=FALSE) or whether some of
+C            using REAL (KIND=wp) (FAILED=FALSE) or whether some of
 C            the tests disagreed (FAILED=TRUE).
 C   FAILS:   The variable designating whether the results of an 
 C            individual demonstration run agreed with those from the
-C            cray YMP using REAL (KIND=R8) (FAILS=FALSE) or 
+C            cray YMP using REAL (KIND=wp) (FAILS=FALSE) or 
 C            disagree (FAILS=TRUE).
-C   HUNDRD:  The value 100.0E0_R8.
+C   HUNDRD:  The value 100.0E0_wp.
 C   I:       An index variable.
 C   IDPYMP:  The integer results from a cray YMP using
-C            REAL (KIND=R8).
+C            REAL (KIND=wp).
 C   IFIXB:   The values designating whether the elements of BETA are 
 C            fixed at their input values or not.
 C   IFIXX:   The values designating whether the elements of DELTA are 
@@ -364,13 +364,13 @@ C            supplied by the user.
 C   NP:      The number of function parameters.
 C   NTEST:   The number of tests to be run.
 C   NTESTS:  The number of different tests available.
-C   ONE:     The value 1.0E0_R8.
+C   ONE:     The value 1.0E0_wp.
 C   PASSED:  The variable designating whether the results of all of the
 C            demonstration runs agreed with those from the cray YMP
-C            using REAL (KIND=R8) (PASSED=TRUE), or whether some of
+C            using REAL (KIND=wp) (PASSED=TRUE), or whether some of
 C            the results disagreed (PASSED=FALSE).
-C   P01:     The value 0.01E0_R8.
-C   P2:      The value 0.2E0_R8.
+C   P01:     The value 0.01E0_wp.
+C   P2:      The value 0.2E0_wp.
 C   PARTOL:  The parameter convergence stopping criteria.
 C   SCLB:    The scaling values for BETA.
 C   SCLD:    The scaling values for DELTA.
@@ -380,25 +380,25 @@ C            short-call (SHORT=.TRUE.) or the long-call (SHORT=.FALSE.).
 C   SSTOL:   The sum-of-squares convergence stopping tolerance.
 C   TAUFAC:  The factor used to compute the initial trust region 
 C            diameter.
-C   THREE:   The value 3.0E0_R8.
+C   THREE:   The value 3.0E0_wp.
 C   TITLE:   The reference for the data set being analyzed.
 C   TSTFAC:  The user-supplied factor for scaling the test tolerances
 C            used to check for agreement between computed results and
-C            results obtained using REAL (KIND=R8) version on cray 
+C            results obtained using REAL (KIND=wp) version on cray 
 C            YMP.
 C   TSTTOL:  The test tolerance used in checking computed values for
 C            purposes of determining proper installation.
-C   TWO:     The value 2.0E0_R8.
+C   TWO:     The value 2.0E0_wp.
 C   WD:      The DELTA weights.
 C   WE:      The EPSILON weights.
-C   WORK:    The REAL (KIND=R8) work space.
-C   WRK:     The REAL (KIND=R8) work space for computing test results.
+C   WORK:    The REAL (KIND=wp) work space.
+C   WRK:     The REAL (KIND=wp) work space for computing test results.
 C   WSS:     The sum of the squared weighted errors.
 C   WSSDEL:  The sum of the squared weighted errors in X.
 C   WSSEPS:  The sum of the squared weighted errors in Y.
 C   X:       The explanatory variable.
 C   Y:       The response variable.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DODRX
@@ -733,39 +733,39 @@ C  variable fixing,  and weighting.
             LD2WE1 = LD2WE
             DO 105 I=1,N
 C  Initialize DELTA, and specify first decade of frequencies as fixed
-               IF (X(I,1).LT.100.0E0_R8) THEN
-                  DELTA(I,1) = 0.0E0_R8
+               IF (X(I,1).LT.100.0E0_wp) THEN
+                  DELTA(I,1) = 0.0E0_wp
                   IFIXX(I,1) = 0
-               ELSE IF (X(I,1).LE.150.0E0_R8) THEN
-                  DELTA(I,1) = 0.0E0_R8
+               ELSE IF (X(I,1).LE.150.0E0_wp) THEN
+                  DELTA(I,1) = 0.0E0_wp
                   IFIXX(I,1) = 1
-               ELSE IF (X(I,1).LE.1000.0E0_R8) THEN
-                  DELTA(I,1) = 25.0E0_R8
+               ELSE IF (X(I,1).LE.1000.0E0_wp) THEN
+                  DELTA(I,1) = 25.0E0_wp
                   IFIXX(I,1) = 1
-               ELSE IF (X(I,1).LE.10000.0E0_R8) THEN
-                  DELTA(I,1) = 560.0E0_R8
+               ELSE IF (X(I,1).LE.10000.0E0_wp) THEN
+                  DELTA(I,1) = 560.0E0_wp
                   IFIXX(I,1) = 1
-               ELSE IF (X(I,1).LE.100000.0E0_R8) THEN
-                  DELTA(I,1) = 9500.0E0_R8
+               ELSE IF (X(I,1).LE.100000.0E0_wp) THEN
+                  DELTA(I,1) = 9500.0E0_wp
                   IFIXX(I,1) = 1
                ELSE
-                  DELTA(I,1) = 144000.0E0_R8
+                  DELTA(I,1) = 144000.0E0_wp
                   IFIXX(I,1) = 1
                END IF
 
 C  Set weights
-               IF (X(I,1).EQ.100.0E0_R8 .OR. X(I,1).EQ.150.0E0_R8) THEN
-                  WE(I,1,1) = 0.0E0_R8
-                  WE(I,1,2) = 0.0E0_R8
-                  WE(I,2,1) = 0.0E0_R8
-                  WE(I,2,2) = 0.0E0_R8
+               IF (X(I,1).EQ.100.0E0_wp .OR. X(I,1).EQ.150.0E0_wp) THEN
+                  WE(I,1,1) = 0.0E0_wp
+                  WE(I,1,2) = 0.0E0_wp
+                  WE(I,2,1) = 0.0E0_wp
+                  WE(I,2,2) = 0.0E0_wp
                ELSE
-                  WE(I,1,1) =   559.6E0_R8
-                  WE(I,1,2) = -1634.0E0_R8
-                  WE(I,2,1) = -1634.0E0_R8
-                  WE(I,2,2) =  8397.0E0_R8
+                  WE(I,1,1) =   559.6E0_wp
+                  WE(I,1,2) = -1634.0E0_wp
+                  WE(I,2,1) = -1634.0E0_wp
+                  WE(I,2,2) =  8397.0E0_wp
                END IF
-               WD(I,1,1)    =  (1.0E-4_R8)/(X(I,1)**2)
+               WD(I,1,1)    =  (1.0E-4_wp)/(X(I,1)**2)
   105       CONTINUE
             JOB = 00210
             SHORT = .FALSE.
@@ -829,9 +829,9 @@ C  parameters start on bound, move away, hit bound, move away, find minimum.
             SHORT = .FALSE.
             ISODR = .TRUE.
             MAXIT = 100
-            BETA(1:2)  = (/ 200.0_R8, 5.0_R8 /)
-            LOWER(1:2) = (/ 0.1_R8, 0.0_R8 /)
-            UPPER(1:2) = (/ 200.0_R8, 5.0_R8 /)
+            BETA(1:2)  = (/ 200.0_wp, 5.0_wp /)
+            LOWER(1:2) = (/ 0.1_wp, 0.0_wp /)
+            UPPER(1:2) = (/ 200.0_wp, 5.0_wp /)
 
          ELSE IF (ITEST.EQ.14) THEN
 
@@ -853,8 +853,8 @@ C  bounds are never hit.
             SHORT = .FALSE.
             ISODR = .TRUE.
             MAXIT = 100
-            LOWER(1:2) = (/ 0.0_R8, 0.0_R8 /)
-            UPPER(1:2) = (/ 400.0_R8, 6.0_R8 /)
+            LOWER(1:2) = (/ 0.0_wp, 0.0_wp /)
+            UPPER(1:2) = (/ 400.0_wp, 6.0_wp /)
 
          ELSE IF (ITEST.EQ.15) THEN
 
@@ -876,10 +876,10 @@ C  minimum is on boundary.
             SHORT = .FALSE.
             ISODR = .TRUE.
             MAXIT = 1000
-            BETA(1:2) = (/ 200.0_R8, 3.0_R8 /)
-            LOWER(1:2) = (/ 1.1_R8, 0.0_R8 /)
-            UPPER(1:2) = (/ 400.0_R8, 6.0_R8 /)
-            TSTTOL = 500.0_R8
+            BETA(1:2) = (/ 200.0_wp, 3.0_wp /)
+            LOWER(1:2) = (/ 1.1_wp, 0.0_wp /)
+            UPPER(1:2) = (/ 400.0_wp, 6.0_wp /)
+            TSTTOL = 500.0_wp
 
          ELSE IF (ITEST.EQ.16) THEN
 
@@ -901,9 +901,9 @@ C  initial BETA is outside bounds.
             SHORT = .FALSE.
             ISODR = .TRUE.
             MAXIT = 1000
-            BETA(1:2) = (/ 200.0_R8, 7.0_R8 /)
-            LOWER(1:2) = (/ 1.1_R8, 0.0_R8 /)
-            UPPER(1:2) = (/ 200.0_R8, 5.0_R8 /)
+            BETA(1:2) = (/ 200.0_wp, 7.0_wp /)
+            LOWER(1:2) = (/ 1.1_wp, 0.0_wp /)
+            UPPER(1:2) = (/ 200.0_wp, 5.0_wp /)
 
          ELSE IF (ITEST.EQ.17) THEN
 
@@ -925,9 +925,9 @@ C  bounds are ill defined.
             SHORT = .FALSE.
             ISODR = .TRUE.
             MAXIT = 1000
-            BETA(1:2) = (/ 200.0_R8, 2.0_R8 /)
-            LOWER(1:2) = (/ 10.0_R8, 0.0_R8 /)
-            UPPER(1:2) = (/ 2.0_R8, 5.0_R8 /)
+            BETA(1:2) = (/ 200.0_wp, 2.0_wp /)
+            LOWER(1:2) = (/ 10.0_wp, 0.0_wp /)
+            UPPER(1:2) = (/ 2.0_wp, 5.0_wp /)
 
          ELSE IF (ITEST.EQ.18) THEN
 
@@ -949,9 +949,9 @@ C  parameters start on bound, move away, hit bound, move away, find minimum.
             SHORT = .FALSE.
             ISODR = .TRUE.
             MAXIT = 100
-            BETA(1:2)  = (/ 200.0_R8, 5.0_R8 /)
-            LOWER(1:2) = (/ 0.1_R8, 0.0_R8 /)
-            UPPER(1:2) = (/ 200.0_R8, 5.0_R8 /)
+            BETA(1:2)  = (/ 200.0_wp, 5.0_wp /)
+            LOWER(1:2) = (/ 0.1_wp, 0.0_wp /)
+            UPPER(1:2) = (/ 200.0_wp, 5.0_wp /)
 
          ELSE IF (ITEST.EQ.19) THEN
 
@@ -973,9 +973,9 @@ C  Parameters start on bound.
             SHORT = .FALSE.
             ISODR = .TRUE.
             MAXIT = 100
-            BETA(1:2)  = (/ 200.0_R8, 5.0_R8 /)
-            UPPER(1) = 200.0_R8
-            LOWER(2) = 5.0_R8
+            BETA(1:2)  = (/ 200.0_wp, 5.0_wp /)
+            UPPER(1) = 200.0_wp
+            LOWER(2) = 5.0_wp
             LOWER(1) = UPPER(1) - 400*UPPER(1)*EPSMAC 
      &                 + UPPER(1)*EPSMAC
 
@@ -1003,9 +1003,9 @@ C  Parameters start on bound.
             SHORT = .FALSE.
             ISODR = .TRUE.
             MAXIT = 100
-            BETA(1:2)  = (/ -200.0_R8, -5.0_R8 /)
-            UPPER(1) = -200.0_R8
-            LOWER(2) = -5.0_R8
+            BETA(1:2)  = (/ -200.0_wp, -5.0_wp /)
+            UPPER(1) = -200.0_wp
+            LOWER(2) = -5.0_wp
             LOWER(1) = UPPER(1) + 400*UPPER(1)*EPSMAC
             UPPER(2) = LOWER(2) - 400*LOWER(2)*EPSMAC
 
@@ -1029,9 +1029,9 @@ C  step sizes using forward differences.  Parameters start on bound.
             SHORT = .FALSE.
             ISODR = .TRUE.
             MAXIT = 100
-            BETA(1:2)  = (/ -200.0_R8, -5.0_R8 /)
-            UPPER(1) = -200.0_R8
-            LOWER(2) = -5.0_R8
+            BETA(1:2)  = (/ -200.0_wp, -5.0_wp /)
+            UPPER(1) = -200.0_wp
+            LOWER(2) = -5.0_wp
             LOWER(1) = UPPER(1) + UPPER(1)*EPSMAC 
             UPPER(2) = LOWER(2) - LOWER(2)*EPSMAC 
 
@@ -1057,9 +1057,9 @@ C  parameters and ensure that bounds and fixed parameters can be mixed.
             SHORT = .FALSE.
             ISODR = .TRUE.
             MAXIT = 100
-            BETA(1:2)  = (/ 2.5_R8, 1.5_R8 /)
-            LOWER(1:2) = (/ 2.5_R8, 1.1_R8 /)
-            UPPER(1:2) = (/ 10.0_R8, 5.0_R8 /)
+            BETA(1:2)  = (/ 2.5_wp, 1.5_wp /)
+            LOWER(1:2) = (/ 2.5_wp, 1.1_wp /)
+            UPPER(1:2) = (/ 10.0_wp, 5.0_wp /)
             IFIXB(1:2) = (/ 0, 1 /)
 
          ELSE IF (ITEST.EQ.23) THEN
@@ -1081,9 +1081,9 @@ C  Similar to test 22 but without bounds.
             SHORT = .FALSE.
             ISODR = .TRUE.
             MAXIT = 100
-            BETA(1:2)  = (/ 2.5_R8, 1.5_R8 /)
-            LOWER(1:2) = -HUGE(1.0_R8)
-            UPPER(1:2) = HUGE(1.0_R8)
+            BETA(1:2)  = (/ 2.5_wp, 1.5_wp /)
+            LOWER(1:2) = -HUGE(1.0_wp)
+            UPPER(1:2) = HUGE(1.0_wp)
             IFIXB(1:2) = (/ 0, 1 /)
 
          END IF
@@ -1127,7 +1127,7 @@ C  Compute solution
          END IF
 
 C  Compare results with those obtained on the cray ymp or the intel xeon running
-C  Linux using REAL (KIND=R8) version of ODRPACK95
+C  Linux using REAL (KIND=wp) version of ODRPACK95
 
          BNRM = DNRM2(NP,BETA,1)
          CALL DWGHT(N,M,WD,LDWD1,LD2WD1,RESHAPE(WORK(1:N*M),(/N,M/)),
@@ -1307,7 +1307,7 @@ C  Format statements
  2200 FORMAT (' Data Set Reference: ', A80)
  3100 FORMAT
      &   (/' Comparison of new results with',
-     &     ' REAL (KIND=R8) Cray YMP or Intel X86 (Linux) '/
+     &     ' REAL (KIND=wp) Cray YMP or Intel X86 (Linux) '/
      &     ' Result:'//
      &     '                         Norm of BETA',
      &     '        Sum of Squared WTD OBS Errors  INFO')
@@ -1353,7 +1353,7 @@ C***Purpose  Set up data for ODRPACK95 exerciser
 C***End Prologue  DODRXD
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Parameters
       INTEGER
@@ -1367,7 +1367,7 @@ C...Scalar arguments
       CHARACTER TITLE*80
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(*),X(LDX,*),Y(LDY,*)
 
 C...Scalars in common
@@ -1379,7 +1379,7 @@ C...Local scalars
      &   I,J,K,L
 
 C...Local arrays
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BDATA(MAXNP,MAXSET),XDATA(MAXN,MAXM,MAXSET),
      &   YDATA(MAXN,MAXNQ,MAXSET)
       INTEGER
@@ -1398,127 +1398,127 @@ C...Data statements
      &   /40, 1, 2, 1/
       DATA
      &   (BDATA(K,1),K=1,2)
-     &   /1.0E+0_R8, 1.0E+0_R8/
+     &   /1.0E+0_wp, 1.0E+0_wp/
       DATA
      &   YDATA( 1,1,1), XDATA( 1,1,1)
-     &   /-0.119569795672791172E+1_R8, -0.213701920211315155E-1_R8/
+     &   /-0.119569795672791172E+1_wp, -0.213701920211315155E-1_wp/
       DATA
      &   YDATA( 2,1,1), XDATA( 2,1,1)
-     &   /-0.128023349509594288E+1_R8, 0.494813247025012969E-1_R8/
+     &   /-0.128023349509594288E+1_wp, 0.494813247025012969E-1_wp/
       DATA
      &   YDATA( 3,1,1), XDATA( 3,1,1)
-     &   /-0.125270693343174591E+1_R8, 0.127889194935560226E+0_R8/
+     &   /-0.125270693343174591E+1_wp, 0.127889194935560226E+0_wp/
       DATA
      &   YDATA( 4,1,1), XDATA( 4,1,1)
-     &   /-0.996698267935287383E+0_R8, 0.128615394085645676E+0_R8/
+     &   /-0.996698267935287383E+0_wp, 0.128615394085645676E+0_wp/
       DATA
      &   YDATA( 5,1,1), XDATA( 5,1,1)
-     &   /-0.104681033065801934E+1_R8, 0.232544285655021667E+0_R8/
+     &   /-0.104681033065801934E+1_wp, 0.232544285655021667E+0_wp/
       DATA
      &   YDATA( 6,1,1), XDATA( 6,1,1)
-     &   /-0.146724952092847308E+1_R8, 0.268151108026504516E+0_R8/
+     &   /-0.146724952092847308E+1_wp, 0.268151108026504516E+0_wp/
       DATA
      &   YDATA( 7,1,1), XDATA( 7,1,1)
-     &   /-0.123366891873487528E+1_R8, 0.309041029810905456E+0_R8/
+     &   /-0.123366891873487528E+1_wp, 0.309041029810905456E+0_wp/
       DATA
      &   YDATA( 8,1,1), XDATA( 8,1,1)
-     &   /-0.165665097907185554E+1_R8, 0.405991539210081099E+0_R8/
+     &   /-0.165665097907185554E+1_wp, 0.405991539210081099E+0_wp/
       DATA
      &   YDATA( 9,1,1), XDATA( 9,1,1)
-     &   /-0.168476460930907119E+1_R8, 0.376611424833536147E+0_R8/
+     &   /-0.168476460930907119E+1_wp, 0.376611424833536147E+0_wp/
       DATA
      &   YDATA(10,1,1), XDATA(10,1,1)
-     &   /-0.198571971169224491E+1_R8, 0.475875890851020811E+0_R8/
+     &   /-0.198571971169224491E+1_wp, 0.475875890851020811E+0_wp/
       DATA
      &   YDATA(11,1,1), XDATA(11,1,1)
-     &   /-0.195691696638051344E+1_R8, 0.499246935397386550E+0_R8/
+     &   /-0.195691696638051344E+1_wp, 0.499246935397386550E+0_wp/
       DATA
      &   YDATA(12,1,1), XDATA(12,1,1)
-     &   /-0.211871342665769836E+1_R8, 0.536615037024021147E+0_R8/
+     &   /-0.211871342665769836E+1_wp, 0.536615037024021147E+0_wp/
       DATA
      &   YDATA(13,1,1), XDATA(13,1,1)
-     &   /-0.268642932558671020E+1_R8, 0.581830765902996060E+0_R8/
+     &   /-0.268642932558671020E+1_wp, 0.581830765902996060E+0_wp/
       DATA
      &   YDATA(14,1,1), XDATA(14,1,1)
-     &   /-0.281123260058024347E+1_R8, 0.684512710422277446E+0_R8/
+     &   /-0.281123260058024347E+1_wp, 0.684512710422277446E+0_wp/
       DATA
      &   YDATA(15,1,1), XDATA(15,1,1)
-     &   /-0.328704486581785920E+1_R8, 0.660219819694757458E+0_R8/
+     &   /-0.328704486581785920E+1_wp, 0.660219819694757458E+0_wp/
       DATA
      &   YDATA(16,1,1), XDATA(16,1,1)
-     &   /-0.423062993461887032E+1_R8, 0.766990323960781092E+0_R8/
+     &   /-0.423062993461887032E+1_wp, 0.766990323960781092E+0_wp/
       DATA
      &   YDATA(17,1,1), XDATA(17,1,1)
-     &   /-0.512043906552226903E+1_R8, 0.808270426690578456E+0_R8/
+     &   /-0.512043906552226903E+1_wp, 0.808270426690578456E+0_wp/
       DATA
      &   YDATA(18,1,1), XDATA(18,1,1)
-     &   /-0.731032616379005535E+1_R8, 0.897410020083189004E+0_R8/
+     &   /-0.731032616379005535E+1_wp, 0.897410020083189004E+0_wp/
       DATA
      &   YDATA(19,1,1), XDATA(19,1,1)
-     &   /-0.109002759485608993E+2_R8, 0.959199774116277687E+0_R8/
+     &   /-0.109002759485608993E+2_wp, 0.959199774116277687E+0_wp/
       DATA
      &   YDATA(20,1,1), XDATA(20,1,1)
-     &   /-0.251810238510370206E+2_R8, 0.914675474762916558E+0_R8/
+     &   /-0.251810238510370206E+2_wp, 0.914675474762916558E+0_wp/
       DATA
      &   YDATA(21,1,1), XDATA(21,1,1)
-     &   /0.100123028650879944E+3_R8, 0.997759691476821892E+0_R8/
+     &   /0.100123028650879944E+3_wp, 0.997759691476821892E+0_wp/
       DATA
      &   YDATA(22,1,1), XDATA(22,1,1)
-     &   /0.168225085871915048E+2_R8, 0.107136870384216308E+1_R8/
+     &   /0.168225085871915048E+2_wp, 0.107136870384216308E+1_wp/
       DATA
      &   YDATA(23,1,1), XDATA(23,1,1)
-     &   /0.894830510866913009E+1_R8, 0.108033321037888526E+1_R8/
+     &   /0.894830510866913009E+1_wp, 0.108033321037888526E+1_wp/
       DATA
      &   YDATA(24,1,1), XDATA(24,1,1)
-     &   /0.645853815227747004E+1_R8, 0.116064198672771453E+1_R8/
+     &   /0.645853815227747004E+1_wp, 0.116064198672771453E+1_wp/
       DATA
      &   YDATA(25,1,1), XDATA(25,1,1)
-     &   /0.498218564760117328E+1_R8, 0.119080889359116553E+1_R8/
+     &   /0.498218564760117328E+1_wp, 0.119080889359116553E+1_wp/
       DATA
      &   YDATA(26,1,1), XDATA(26,1,1)
-     &   /0.382971664718710476E+1_R8, 0.129418875187635420E+1_R8/
+     &   /0.382971664718710476E+1_wp, 0.129418875187635420E+1_wp/
       DATA
      &   YDATA(27,1,1), XDATA(27,1,1)
-     &   /0.344116492497344184E+1_R8, 0.135594148099422453E+1_R8/
+     &   /0.344116492497344184E+1_wp, 0.135594148099422453E+1_wp/
       DATA
      &   YDATA(28,1,1), XDATA(28,1,1)
-     &   /0.276840496973858949E+1_R8, 0.135302808716893195E+1_R8/
+     &   /0.276840496973858949E+1_wp, 0.135302808716893195E+1_wp/
       DATA
      &   YDATA(29,1,1), XDATA(29,1,1)
-     &   /0.259521665196956666E+1_R8, 0.137994666010141371E+1_R8/
+     &   /0.259521665196956666E+1_wp, 0.137994666010141371E+1_wp/
       DATA
      &   YDATA(30,1,1), XDATA(30,1,1)
-     &   /0.205996022794557661E+1_R8, 0.147630019545555113E+1_R8/
+     &   /0.205996022794557661E+1_wp, 0.147630019545555113E+1_wp/
       DATA
      &   YDATA(31,1,1), XDATA(31,1,1)
-     &   /0.197939614345337836E+1_R8, 0.153450708076357840E+1_R8/
+     &   /0.197939614345337836E+1_wp, 0.153450708076357840E+1_wp/
       DATA
      &   YDATA(32,1,1), XDATA(32,1,1)
-     &   /0.156739340562905589E+1_R8, 0.152805351451039313E+1_R8/
+     &   /0.156739340562905589E+1_wp, 0.152805351451039313E+1_wp/
       DATA
      &   YDATA(33,1,1), XDATA(33,1,1)
-     &   /0.159032057073028366E+1_R8, 0.157147316247224806E+1_R8/
+     &   /0.159032057073028366E+1_wp, 0.157147316247224806E+1_wp/
       DATA
      &   YDATA(34,1,1), XDATA(34,1,1)
-     &   /0.173102268158937949E+1_R8, 0.166649596005678175E+1_R8/
+     &   /0.173102268158937949E+1_wp, 0.166649596005678175E+1_wp/
       DATA
      &   YDATA(35,1,1), XDATA(35,1,1)
-     &   /0.155512561664824758E+1_R8, 0.166505665838718412E+1_R8/
+     &   /0.155512561664824758E+1_wp, 0.166505665838718412E+1_wp/
       DATA
      &   YDATA(36,1,1), XDATA(36,1,1)
-     &   /0.149635994944133260E+1_R8, 0.175214128553867338E+1_R8/
+     &   /0.149635994944133260E+1_wp, 0.175214128553867338E+1_wp/
       DATA
      &   YDATA(37,1,1), XDATA(37,1,1)
-     &   /0.147487601463073568E+1_R8, 0.180567992463707922E+1_R8/
+     &   /0.147487601463073568E+1_wp, 0.180567992463707922E+1_wp/
       DATA
      &   YDATA(38,1,1), XDATA(38,1,1)
-     &   /0.117244575233306998E+1_R8, 0.184624404296278952E+1_R8/
+     &   /0.117244575233306998E+1_wp, 0.184624404296278952E+1_wp/
       DATA
      &   YDATA(39,1,1), XDATA(39,1,1)
-     &   /0.910931336069172580E+0_R8, 0.195568727388978002E+1_R8/
+     &   /0.910931336069172580E+0_wp, 0.195568727388978002E+1_wp/
       DATA
      &   YDATA(40,1,1), XDATA(40,1,1)
-     &   /0.126172980914513272E+1_R8, 0.199326394036412237E+1_R8/
+     &   /0.126172980914513272E+1_wp, 0.199326394036412237E+1_wp/
 
       DATA
      &   TDATA(2)
@@ -1528,207 +1528,207 @@ C...Data statements
      &   /50, 2, 3, 1/
       DATA
      &   (BDATA(K,2),K=1,3)
-     &   /-1.0E+0_R8, 1.0E+0_R8, 1.0E+0_R8/
+     &   /-1.0E+0_wp, 1.0E+0_wp, 1.0E+0_wp/
       DATA
      &   YDATA( 1,1,2), XDATA( 1,1,2), XDATA( 1,2,2)
-     &   /0.680832777217942900E+0_R8,
-     &   0.625474598833994800E-1_R8, 0.110179064209783100E+0_R8/
+     &   /0.680832777217942900E+0_wp,
+     &   0.625474598833994800E-1_wp, 0.110179064209783100E+0_wp/
       DATA
      &   YDATA( 2,1,2), XDATA( 2,1,2), XDATA( 2,2,2)
-     &   /0.122183594595302200E+1_R8,
-     &   0.202500343620642400E+0_R8, -0.196140862891327600E-1_R8/
+     &   /0.122183594595302200E+1_wp,
+     &   0.202500343620642400E+0_wp, -0.196140862891327600E-1_wp/
       DATA
      &   YDATA( 3,1,2), XDATA( 3,1,2), XDATA( 3,2,2)
-     &   /0.118958678734608200E+1_R8,
-     &   0.164943738599876500E+0_R8, 0.166514874750996600E+0_R8/
+     &   /0.118958678734608200E+1_wp,
+     &   0.164943738599876500E+0_wp, 0.166514874750996600E+0_wp/
       DATA
      &   YDATA( 4,1,2), XDATA( 4,1,2), XDATA( 4,2,2)
-     &   /0.146982623764094600E+1_R8,
-     &   0.304874137610506100E+0_R8, 0.612908688041490500E-2_R8/
+     &   /0.146982623764094600E+1_wp,
+     &   0.304874137610506100E+0_wp, 0.612908688041490500E-2_wp/
       DATA
      &   YDATA( 5,1,2), XDATA( 5,1,2), XDATA( 5,2,2)
-     &   /0.167775338189355300E+1_R8,
-     &   0.532727445580665100E+0_R8, 0.938248787552444600E-1_R8/
+     &   /0.167775338189355300E+1_wp,
+     &   0.532727445580665100E+0_wp, 0.938248787552444600E-1_wp/
       DATA
      &   YDATA( 6,1,2), XDATA( 6,1,2), XDATA( 6,2,2)
-     &   /0.202485721906026200E+1_R8,
-     &   0.508823707598910200E+0_R8, 0.499605775020505400E-2_R8/
+     &   /0.202485721906026200E+1_wp,
+     &   0.508823707598910200E+0_wp, 0.499605775020505400E-2_wp/
       DATA
      &   YDATA( 7,1,2), XDATA( 7,1,2), XDATA( 7,2,2)
-     &   /0.258912851935938800E+1_R8,
-     &   0.704227041878554000E+0_R8, 0.819354849092326200E-1_R8/
+     &   /0.258912851935938800E+1_wp,
+     &   0.704227041878554000E+0_wp, 0.819354849092326200E-1_wp/
       DATA
      &   YDATA( 8,1,2), XDATA( 8,1,2), XDATA( 8,2,2)
-     &   /0.366894203254154800E+1_R8,
-     &   0.592077736111512000E+0_R8, 0.127113960672389100E-1_R8/
+     &   /0.366894203254154800E+1_wp,
+     &   0.592077736111512000E+0_wp, 0.127113960672389100E-1_wp/
       DATA
      &   YDATA( 9,1,2), XDATA( 9,1,2), XDATA( 9,2,2)
-     &   /0.574609583351347300E+1_R8,
-     &   0.104940945646421600E+1_R8, 0.258095243658316100E-1_R8/
+     &   /0.574609583351347300E+1_wp,
+     &   0.104940945646421600E+1_wp, 0.258095243658316100E-1_wp/
       DATA
      &   YDATA(10,1,2), XDATA(10,1,2), XDATA(10,2,2)
-     &   /0.127676424026489300E+2_R8,
-     &    0.979382517558619200E+0_R8, 0.124280755181027900E+0_R8/
+     &   /0.127676424026489300E+2_wp,
+     &    0.979382517558619200E+0_wp, 0.124280755181027900E+0_wp/
       DATA
      &   YDATA(11,1,2), XDATA(11,1,2), XDATA(11,2,2)
-     &   /0.123473079693623100E+1_R8,
-     &    0.637870453165538700E-1_R8, 0.304856401137196400E+0_R8/
+     &   /0.123473079693623100E+1_wp,
+     &    0.637870453165538700E-1_wp, 0.304856401137196400E+0_wp/
       DATA
      &   YDATA(12,1,2), XDATA(12,1,2), XDATA(12,2,2)
-     &   /0.142256120864082800E+1_R8,
-     &    0.176123312906025700E+0_R8, 0.262387028078896900E+0_R8/
+     &   /0.142256120864082800E+1_wp,
+     &    0.176123312906025700E+0_wp, 0.262387028078896900E+0_wp/
       DATA
      &   YDATA(13,1,2), XDATA(13,1,2), XDATA(13,2,2)
-     &   /0.169889534013024700E+1_R8,
-     &    0.310965082300263000E+0_R8, 0.226430765474758800E+0_R8/
+     &   /0.169889534013024700E+1_wp,
+     &    0.310965082300263000E+0_wp, 0.226430765474758800E+0_wp/
       DATA
      &   YDATA(14,1,2), XDATA(14,1,2), XDATA(14,2,2)
-     &   /0.173485577901204400E+1_R8,
-     &    0.311394269116782100E+0_R8, 0.271375840410281800E+0_R8/
+     &   /0.173485577901204400E+1_wp,
+     &    0.311394269116782100E+0_wp, 0.271375840410281800E+0_wp/
       DATA
      &   YDATA(15,1,2), XDATA(15,1,2), XDATA(15,2,2)
-     &   /0.277761263972834600E+1_R8,
-     &    0.447076126190612500E+0_R8, 0.255000858902618300E+0_R8/
+     &   /0.277761263972834600E+1_wp,
+     &    0.447076126190612500E+0_wp, 0.255000858902618300E+0_wp/
       DATA
      &   YDATA(16,1,2), XDATA(16,1,2), XDATA(16,2,2)
-     &   /0.339163324662617300E+1_R8,
-     &    0.384786230998211100E+0_R8, 0.154958003178364000E+0_R8/
+     &   /0.339163324662617300E+1_wp,
+     &    0.384786230998211100E+0_wp, 0.154958003178364000E+0_wp/
       DATA
      &   YDATA(17,1,2), XDATA(17,1,2), XDATA(17,2,2)
-     &   /0.589615137312147500E+1_R8,
-     &    0.649093176450780500E+0_R8, 0.258301685463773200E+0_R8/
+     &   /0.589615137312147500E+1_wp,
+     &    0.649093176450780500E+0_wp, 0.258301685463773200E+0_wp/
       DATA
      &   YDATA(18,1,2), XDATA(18,1,2), XDATA(18,2,2)
-     &   /0.124415625214576800E+2_R8,
-     &    0.685612005372525500E+0_R8, 0.107391260603228600E+0_R8/
+     &   /0.124415625214576800E+2_wp,
+     &    0.685612005372525500E+0_wp, 0.107391260603228600E+0_wp/
       DATA
      &   YDATA(19,1,2), XDATA(19,1,2), XDATA(19,2,2)
-     &   /-0.498491739153861600E+2_R8,
-     &    0.968747139425088400E+0_R8, 0.151932526135740700E+0_R8/
+     &   /-0.498491739153861600E+2_wp,
+     &    0.968747139425088400E+0_wp, 0.151932526135740700E+0_wp/
       DATA
      &   YDATA(20,1,2), XDATA(20,1,2), XDATA(20,2,2)
-     &   /-0.832795509000618600E+1_R8,
-     &    0.869789367989532900E+0_R8, 0.625507500586400000E-1_R8/
+     &   /-0.832795509000618600E+1_wp,
+     &    0.869789367989532900E+0_wp, 0.625507500586400000E-1_wp/
       DATA
      &   YDATA(21,1,2), XDATA(21,1,2), XDATA(21,2,2)
-     &   /0.184934617774239900E+1_R8,
-     &    -0.465309930332736600E-2_R8, 0.546795662595375200E+0_R8/
+     &   /0.184934617774239900E+1_wp,
+     &    -0.465309930332736600E-2_wp, 0.546795662595375200E+0_wp/
       DATA
      &   YDATA(22,1,2), XDATA(22,1,2), XDATA(22,2,2)
-     &   /0.175192979176839200E+1_R8,
-     &    0.604753397196646000E-2_R8, 0.230905749473922700E+0_R8/
+     &   /0.175192979176839200E+1_wp,
+     &    0.604753397196646000E-2_wp, 0.230905749473922700E+0_wp/
       DATA
      &   YDATA(23,1,2), XDATA(23,1,2), XDATA(23,2,2)
-     &   /0.253949381238535800E+1_R8,
-     &    0.239418809621756000E+0_R8, 0.190752069681170700E+0_R8/
+     &   /0.253949381238535800E+1_wp,
+     &    0.239418809621756000E+0_wp, 0.190752069681170700E+0_wp/
       DATA
      &   YDATA(24,1,2), XDATA(24,1,2), XDATA(24,2,2)
-     &   /0.373500774928501700E+1_R8,
-     &    0.456662468911699800E+0_R8, 0.328870615170984400E+0_R8/
+     &   /0.373500774928501700E+1_wp,
+     &    0.456662468911699800E+0_wp, 0.328870615170984400E+0_wp/
       DATA
      &   YDATA(25,1,2), XDATA(25,1,2), XDATA(25,2,2)
-     &   /0.548408128950331000E+1_R8,
-     &    0.371115320522079500E+0_R8, 0.439978556640660500E+0_R8/
+     &   /0.548408128950331000E+1_wp,
+     &    0.371115320522079500E+0_wp, 0.439978556640660500E+0_wp/
       DATA
      &   YDATA(26,1,2), XDATA(26,1,2), XDATA(26,2,2)
-     &   /0.125256880521774300E+2_R8,
-     &    0.586442107042503000E+0_R8, 0.490689043752286700E+0_R8/
+     &   /0.125256880521774300E+2_wp,
+     &    0.586442107042503000E+0_wp, 0.490689043752286700E+0_wp/
       DATA
      &   YDATA(27,1,2), XDATA(27,1,2), XDATA(27,2,2)
-     &   /-0.493587797164916600E+2_R8,
-     &    0.579796274973298000E+0_R8, 0.521860998203383100E+0_R8/
+     &   /-0.493587797164916600E+2_wp,
+     &    0.579796274973298000E+0_wp, 0.521860998203383100E+0_wp/
       DATA
      &   YDATA(28,1,2), XDATA(28,1,2), XDATA(28,2,2)
-     &   /-0.801158974965412700E+1_R8,
-     &    0.805008094903899900E+0_R8, 0.292283538955391600E+0_R8/
+     &   /-0.801158974965412700E+1_wp,
+     &    0.805008094903899900E+0_wp, 0.292283538955391600E+0_wp/
       DATA
      &   YDATA(29,1,2), XDATA(29,1,2), XDATA(29,2,2)
-     &   /-0.437399487061934100E+1_R8,
-     &    0.637242340835710000E+0_R8, 0.402261740352486000E+0_R8/
+     &   /-0.437399487061934100E+1_wp,
+     &    0.637242340835710000E+0_wp, 0.402261740352486000E+0_wp/
       DATA
      &   YDATA(30,1,2), XDATA(30,1,2), XDATA(30,2,2)
-     &   /-0.297800103425979600E+1_R8,
-     &    0.982132817936118700E+0_R8, 0.392546836419047000E+0_R8/
+     &   /-0.297800103425979600E+1_wp,
+     &    0.982132817936118700E+0_wp, 0.392546836419047000E+0_wp/
       DATA
      &   YDATA(31,1,2), XDATA(31,1,2), XDATA(31,2,2)
-     &   /0.271811057454661300E+1_R8,
-     &    -0.223515657121262700E-1_R8, 0.650479019708978800E+0_R8/
+     &   /0.271811057454661300E+1_wp,
+     &    -0.223515657121262700E-1_wp, 0.650479019708978800E+0_wp/
       DATA
      &   YDATA(32,1,2), XDATA(32,1,2), XDATA(32,2,2)
-     &   /0.377035865613392400E+1_R8,
-     &    0.136081427545033600E+0_R8, 0.753020101897661800E+0_R8/
+     &   /0.377035865613392400E+1_wp,
+     &    0.136081427545033600E+0_wp, 0.753020101897661800E+0_wp/
       DATA
      &   YDATA(33,1,2), XDATA(33,1,2), XDATA(33,2,2)
-     &   /0.560111053917143100E+1_R8,
-     &    0.145367053019870600E+0_R8, 0.611153532003093100E+0_R8/
+     &   /0.560111053917143100E+1_wp,
+     &    0.145367053019870600E+0_wp, 0.611153532003093100E+0_wp/
       DATA
      &   YDATA(34,1,2), XDATA(34,1,2), XDATA(34,2,2)
-     &   /0.128152376174926800E+2_R8,
-     &    0.308221919576435500E+0_R8, 0.455217283290423900E+0_R8/
+     &   /0.128152376174926800E+2_wp,
+     &    0.308221919576435500E+0_wp, 0.455217283290423900E+0_wp/
       DATA
      &   YDATA(35,1,2), XDATA(35,1,2), XDATA(35,2,2)
-     &   /-0.498709177732467200E+2_R8,
-     &    0.432658769133528300E+0_R8, 0.678607663414113000E+0_R8/
+     &   /-0.498709177732467200E+2_wp,
+     &    0.432658769133528300E+0_wp, 0.678607663414113000E+0_wp/
       DATA
      &   YDATA(36,1,2), XDATA(36,1,2), XDATA(36,2,2)
-     &   /-0.815797696908314300E+1_R8,
-     &    0.477785501079980300E+0_R8, 0.536178207572157000E+0_R8/
+     &   /-0.815797696908314300E+1_wp,
+     &    0.477785501079980300E+0_wp, 0.536178207572157000E+0_wp/
       DATA
      &   YDATA(37,1,2), XDATA(37,1,2), XDATA(37,2,2)
-     &   /-0.440240491195158600E+1_R8,
-     &    0.727986827616619000E+0_R8, 0.668497920573493900E+0_R8/
+     &   /-0.440240491195158600E+1_wp,
+     &    0.727986827616619000E+0_wp, 0.668497920573493900E+0_wp/
       DATA
      &   YDATA(38,1,2), XDATA(38,1,2), XDATA(38,2,2)
-     &   /-0.276723957061767500E+1_R8,
-     &    0.745950385588265100E+0_R8, 0.786077589007263700E+0_R8/
+     &   /-0.276723957061767500E+1_wp,
+     &    0.745950385588265100E+0_wp, 0.786077589007263700E+0_wp/
       DATA
      &   YDATA(39,1,2), XDATA(39,1,2), XDATA(39,2,2)
-     &   /-0.223203667288734800E+1_R8,
-     &    0.732537503527113500E+0_R8, 0.582625164046828400E+0_R8/
+     &   /-0.223203667288734800E+1_wp,
+     &    0.732537503527113500E+0_wp, 0.582625164046828400E+0_wp/
       DATA
      &   YDATA(40,1,2), XDATA(40,1,2), XDATA(40,2,2)
-     &   /-0.169728270310622000E+1_R8,
-     &    0.967352361433846300E+0_R8, 0.460779396016832800E+0_R8/
+     &   /-0.169728270310622000E+1_wp,
+     &    0.967352361433846300E+0_wp, 0.460779396016832800E+0_wp/
       DATA
      &   YDATA(41,1,2), XDATA(41,1,2), XDATA(41,2,2)
-     &   /0.551015652153227000E+1_R8,
-     &    0.129761784310891100E-1_R8, 0.700009537931860000E+0_R8/
+     &   /0.551015652153227000E+1_wp,
+     &    0.129761784310891100E-1_wp, 0.700009537931860000E+0_wp/
       DATA
      &   YDATA(42,1,2), XDATA(42,1,2), XDATA(42,2,2)
-     &   /0.128036180496215800E+2_R8,
-     &    0.170163243950629700E+0_R8, 0.853131830764348700E+0_R8/
+     &   /0.128036180496215800E+2_wp,
+     &    0.170163243950629700E+0_wp, 0.853131830764348700E+0_wp/
       DATA
      &   YDATA(43,1,2), XDATA(43,1,2), XDATA(43,2,2)
-     &   /-0.498257683396339000E+2_R8,
-     &    0.162768461906274000E+0_R8, 0.865315129048175000E+0_R8/
+     &   /-0.498257683396339000E+2_wp,
+     &    0.162768461906274000E+0_wp, 0.865315129048175000E+0_wp/
       DATA
      &   YDATA(44,1,2), XDATA(44,1,2), XDATA(44,2,2)
-     &   /-0.877334550221761900E+1_R8,
-     &    0.222914807946165800E+0_R8, 0.797511758502094500E+0_R8/
+     &   /-0.877334550221761900E+1_wp,
+     &    0.222914807946165800E+0_wp, 0.797511758502094500E+0_wp/
       DATA
      &   YDATA(45,1,2), XDATA(45,1,2), XDATA(45,2,2)
-     &   /-0.453820192156867600E+1_R8,
-     &    0.402910095604624900E+0_R8, 0.761492958727023100E+0_R8/
+     &   /-0.453820192156867600E+1_wp,
+     &    0.402910095604624900E+0_wp, 0.761492958727023100E+0_wp/
       DATA
      &   YDATA(46,1,2), XDATA(46,1,2), XDATA(46,2,2)
-     &   /-0.297499315738677900E+1_R8,
-     &    0.233770812593443200E+0_R8, 0.896000095844223500E+0_R8/
+     &   /-0.297499315738677900E+1_wp,
+     &    0.233770812593443200E+0_wp, 0.896000095844223500E+0_wp/
       DATA
      &   YDATA(47,1,2), XDATA(47,1,2), XDATA(47,2,2)
-     &   /-0.212743255978538900E+1_R8,
-     &    0.646528693486914700E+0_R8, 0.968574333700755700E+0_R8/
+     &   /-0.212743255978538900E+1_wp,
+     &    0.646528693486914700E+0_wp, 0.968574333700755700E+0_wp/
       DATA
      &   YDATA(48,1,2), XDATA(48,1,2), XDATA(48,2,2)
-     &   /-0.209703205365401000E+1_R8,
-     &    0.802811658568969400E+0_R8, 0.904866450476711600E+0_R8/
+     &   /-0.209703205365401000E+1_wp,
+     &    0.802811658568969400E+0_wp, 0.904866450476711600E+0_wp/
       DATA
      &   YDATA(49,1,2), XDATA(49,1,2), XDATA(49,2,2)
-     &   /-0.155287292042086200E+1_R8,
-     &    0.837137859891222900E+0_R8, 0.835684424990021900E+0_R8/
+     &   /-0.155287292042086200E+1_wp,
+     &    0.837137859891222900E+0_wp, 0.835684424990021900E+0_wp/
       DATA
      &   YDATA(50,1,2), XDATA(50,1,2), XDATA(50,2,2)
-     &   /-0.161356673770480700E+1_R8,
-     &    0.103165980756526600E+1_R8, 0.793902191912346100E+0_R8/
+     &   /-0.161356673770480700E+1_wp,
+     &    0.103165980756526600E+1_wp, 0.793902191912346100E+0_wp/
 
       DATA
      &   TDATA(3)
@@ -1738,143 +1738,143 @@ C...Data statements
      &   /44, 1, 9, 1/
       DATA
      &   (BDATA(K,3),K=1,9)
-     &   /0.281887509408440189E-5_R8,
-     &   -0.231290549212363845E-2_R8, 0.583035555572801965E+1_R8,
-     &    0.000000000000000000E+0_R8, 0.406910776203121026E+8_R8,
-     &    0.138001105225000000E-2_R8, 0.596038513209999999E-1_R8,
-     &    0.670582099359999998E+1_R8, 0.106994410000000000E+10_R8/
+     &   /0.281887509408440189E-5_wp,
+     &   -0.231290549212363845E-2_wp, 0.583035555572801965E+1_wp,
+     &    0.000000000000000000E+0_wp, 0.406910776203121026E+8_wp,
+     &    0.138001105225000000E-2_wp, 0.596038513209999999E-1_wp,
+     &    0.670582099359999998E+1_wp, 0.106994410000000000E+10_wp/
       DATA
      &   YDATA( 1,1,3), XDATA( 1,1,3)
-     &   /0.988227696721327788E+0_R8, 0.25E-8_R8/
+     &   /0.988227696721327788E+0_wp, 0.25E-8_wp/
       DATA
      &   YDATA( 2,1,3), XDATA( 2,1,3)
-     &   /0.988268083998559958E+0_R8, 0.64E-8_R8/
+     &   /0.988268083998559958E+0_wp, 0.64E-8_wp/
       DATA
      &   YDATA( 3,1,3), XDATA( 3,1,3)
-     &   /0.988341022958438831E+0_R8, 1.0E-8_R8/
+     &   /0.988341022958438831E+0_wp, 1.0E-8_wp/
       DATA
      &   YDATA( 4,1,3), XDATA( 4,1,3)
-     &   /0.988380557606306446E+0_R8, 0.9E-7_R8/
+     &   /0.988380557606306446E+0_wp, 0.9E-7_wp/
       DATA
      &   YDATA( 5,1,3), XDATA( 5,1,3)
-     &   /0.988275062411751338E+0_R8, 1.0E-6_R8/
+     &   /0.988275062411751338E+0_wp, 1.0E-6_wp/
       DATA
      &   YDATA( 6,1,3), XDATA( 6,1,3)
-     &   /0.988326680176446987E+0_R8, 0.4E-5_R8/
+     &   /0.988326680176446987E+0_wp, 0.4E-5_wp/
       DATA
      &   YDATA( 7,1,3), XDATA( 7,1,3)
-     &   /0.988306058860433439E+0_R8, 0.9E-5_R8/
+     &   /0.988306058860433439E+0_wp, 0.9E-5_wp/
       DATA
      &   YDATA( 8,1,3), XDATA( 8,1,3)
-     &   /0.988292880079125555E+0_R8, 0.16E-4_R8/
+     &   /0.988292880079125555E+0_wp, 0.16E-4_wp/
       DATA
      &   YDATA( 9,1,3), XDATA( 9,1,3)
-     &   /0.988305279259496905E+0_R8, 0.36E-4_R8/
+     &   /0.988305279259496905E+0_wp, 0.36E-4_wp/
       DATA
      &   YDATA(10,1,3), XDATA(10,1,3)
-     &   /0.988278142019574202E+0_R8, 0.64E-4_R8/
+     &   /0.988278142019574202E+0_wp, 0.64E-4_wp/
       DATA
      &   YDATA(11,1,3), XDATA(11,1,3)
-     &   /0.988224953369819946E+0_R8, 1.0E-4_R8/
+     &   /0.988224953369819946E+0_wp, 1.0E-4_wp/
       DATA
      &   YDATA(12,1,3), XDATA(12,1,3)
-     &   /0.988111989169778223E+0_R8, 0.144E-3_R8/
+     &   /0.988111989169778223E+0_wp, 0.144E-3_wp/
       DATA
      &   YDATA(13,1,3), XDATA(13,1,3)
-     &   /0.988045627103840613E+0_R8, 0.225E-3_R8/
+     &   /0.988045627103840613E+0_wp, 0.225E-3_wp/
       DATA
      &   YDATA(14,1,3), XDATA(14,1,3)
-     &   /0.987913715667047655E+0_R8, 0.400E-3_R8/
+     &   /0.987913715667047655E+0_wp, 0.400E-3_wp/
       DATA
      &   YDATA(15,1,3), XDATA(15,1,3)
-     &   /0.987841994238525678E+0_R8, 0.625E-3_R8/
+     &   /0.987841994238525678E+0_wp, 0.625E-3_wp/
       DATA
      &   YDATA(16,1,3), XDATA(16,1,3)
-     &   /0.987638450432434270E+0_R8, 0.900E-3_R8/
+     &   /0.987638450432434270E+0_wp, 0.900E-3_wp/
       DATA
      &   YDATA(17,1,3), XDATA(17,1,3)
-     &   /0.987587364331771395E+0_R8, 0.1225E-2_R8/
+     &   /0.987587364331771395E+0_wp, 0.1225E-2_wp/
       DATA
      &   YDATA(18,1,3), XDATA(18,1,3)
-     &   /0.987576264149633684E+0_R8, 0.1600E-2_R8/
+     &   /0.987576264149633684E+0_wp, 0.1600E-2_wp/
       DATA
      &   YDATA(19,1,3), XDATA(19,1,3)
-     &   /0.987539209110983643E+0_R8, 0.2025E-2_R8/
+     &   /0.987539209110983643E+0_wp, 0.2025E-2_wp/
       DATA
      &   YDATA(20,1,3), XDATA(20,1,3)
-     &   /0.987621143807705698E+0_R8, 0.25E-2_R8/
+     &   /0.987621143807705698E+0_wp, 0.25E-2_wp/
       DATA
      &   YDATA(21,1,3), XDATA(21,1,3)
-     &   /0.988023229785526217E+0_R8, 0.36E-2_R8/
+     &   /0.988023229785526217E+0_wp, 0.36E-2_wp/
       DATA
      &   YDATA(22,1,3), XDATA(22,1,3)
-     &   /0.988558376710994197E+0_R8, 0.49E-2_R8/
+     &   /0.988558376710994197E+0_wp, 0.49E-2_wp/
       DATA
      &   YDATA(23,1,3), XDATA(23,1,3)
-     &   /0.989304775352439885E+0_R8, 0.64E-2_R8/
+     &   /0.989304775352439885E+0_wp, 0.64E-2_wp/
       DATA
      &   YDATA(24,1,3), XDATA(24,1,3)
-     &   /0.990210452265710472E+0_R8, 0.81E-2_R8/
+     &   /0.990210452265710472E+0_wp, 0.81E-2_wp/
       DATA
      &   YDATA(25,1,3), XDATA(25,1,3)
-     &   /0.991095950592263900E+0_R8, 1.00E-2_R8/
+     &   /0.991095950592263900E+0_wp, 1.00E-2_wp/
       DATA
      &   YDATA(26,1,3), XDATA(26,1,3)
-     &   /0.991475677297119272E+0_R8, 0.11025E-1_R8/
+     &   /0.991475677297119272E+0_wp, 0.11025E-1_wp/
       DATA
      &   YDATA(27,1,3), XDATA(27,1,3)
-     &   /0.991901306250746771E+0_R8, 0.12100E-1_R8/
+     &   /0.991901306250746771E+0_wp, 0.12100E-1_wp/
       DATA
      &   YDATA(28,1,3), XDATA(28,1,3)
-     &   /0.992619222425303263E+0_R8, 0.14400E-1_R8/
+     &   /0.992619222425303263E+0_wp, 0.14400E-1_wp/
       DATA
      &   YDATA(29,1,3), XDATA(29,1,3)
-     &   /0.993617037631973475E+0_R8, 0.16900E-1_R8/
+     &   /0.993617037631973475E+0_wp, 0.16900E-1_wp/
       DATA
      &   YDATA(30,1,3), XDATA(30,1,3)
-     &   /0.994727321698030676E+0_R8, 0.19600E-1_R8/
+     &   /0.994727321698030676E+0_wp, 0.19600E-1_wp/
       DATA
      &   YDATA(31,1,3), XDATA(31,1,3)
-     &   /0.996523114720326189E+0_R8, 0.25600E-1_R8/
+     &   /0.996523114720326189E+0_wp, 0.25600E-1_wp/
       DATA
      &   YDATA(32,1,3), XDATA(32,1,3)
-     &   /0.998036909563764020E+0_R8, 0.32400E-1_R8/
+     &   /0.998036909563764020E+0_wp, 0.32400E-1_wp/
       DATA
      &   YDATA(33,1,3), XDATA(33,1,3)
-     &   /0.999151968626971372E+0_R8, 0.40000E-1_R8/
+     &   /0.999151968626971372E+0_wp, 0.40000E-1_wp/
       DATA
      &   YDATA(34,1,3), XDATA(34,1,3)
-     &   /0.100017083706131769E+1_R8, 0.50625E-1_R8/
+     &   /0.100017083706131769E+1_wp, 0.50625E-1_wp/
       DATA
      &   YDATA(35,1,3), XDATA(35,1,3)
-     &   /0.100110046382923523E+1_R8, 0.75625E-1_R8/
+     &   /0.100110046382923523E+1_wp, 0.75625E-1_wp/
       DATA
      &   YDATA(36,1,3), XDATA(36,1,3)
-     &   /0.100059103180404652E+1_R8, 0.12250E+0_R8/
+     &   /0.100059103180404652E+1_wp, 0.12250E+0_wp/
       DATA
      &   YDATA(37,1,3), XDATA(37,1,3)
-     &   /0.999211829791257561E+0_R8, 0.16000E+0_R8/
+     &   /0.999211829791257561E+0_wp, 0.16000E+0_wp/
       DATA
      &   YDATA(38,1,3), XDATA(38,1,3)
-     &   /0.994711451526761862E+0_R8, 0.25000E+0_R8/
+     &   /0.994711451526761862E+0_wp, 0.25000E+0_wp/
       DATA
      &   YDATA(39,1,3), XDATA(39,1,3)
-     &   /0.989844132928847109E+0_R8, 0.33640E+0_R8/
+     &   /0.989844132928847109E+0_wp, 0.33640E+0_wp/
       DATA
      &   YDATA(40,1,3), XDATA(40,1,3)
-     &   /0.987234104554490439E+0_R8, 0.38440E+0_R8/
+     &   /0.987234104554490439E+0_wp, 0.38440E+0_wp/
       DATA
      &   YDATA(41,1,3), XDATA(41,1,3)
-     &   /0.980928240178404887E+0_R8, 0.49E+0_R8/
+     &   /0.980928240178404887E+0_wp, 0.49E+0_wp/
       DATA
      &   YDATA(42,1,3), XDATA(42,1,3)
-     &   /0.970888680366055576E+0_R8, 0.64E+0_R8/
+     &   /0.970888680366055576E+0_wp, 0.64E+0_wp/
       DATA
      &   YDATA(43,1,3), XDATA(43,1,3)
-     &   /0.960043769857327398E+0_R8, 0.81E+0_R8/
+     &   /0.960043769857327398E+0_wp, 0.81E+0_wp/
       DATA
      &   YDATA(44,1,3), XDATA(44,1,3)
-     &   /0.947277159259551068E+0_R8, 1.00E+0_R8/
+     &   /0.947277159259551068E+0_wp, 1.00E+0_wp/
 
       DATA
      &   TDATA(4)
@@ -1884,46 +1884,46 @@ C...Data statements
      &   /13, 2, 3, 1/
       DATA
      &   (BDATA(K,4),K=1,3)
-     &   /3.0E+0_R8, 3.0E+0_R8, -0.5E+0_R8/
+     &   /3.0E+0_wp, 3.0E+0_wp, -0.5E+0_wp/
       DATA
      &   YDATA( 1,1,4), XDATA( 1,1,4), XDATA( 1,2,4)
-     &   /2.93E+0_R8, 0.0E+0_R8, 0.0E+0_R8/
+     &   /2.93E+0_wp, 0.0E+0_wp, 0.0E+0_wp/
       DATA
      &   YDATA( 2,1,4), XDATA( 2,1,4), XDATA( 2,2,4)
-     &   /1.95E+0_R8, 0.0E+0_R8, 1.0E+0_R8/
+     &   /1.95E+0_wp, 0.0E+0_wp, 1.0E+0_wp/
       DATA
      &   YDATA( 3,1,4), XDATA( 3,1,4), XDATA( 3,2,4)
-     &   /0.81E+0_R8, 0.0E+0_R8, 2.0E+0_R8/
+     &   /0.81E+0_wp, 0.0E+0_wp, 2.0E+0_wp/
       DATA
      &   YDATA( 4,1,4), XDATA( 4,1,4), XDATA( 4,2,4)
-     &   /0.58E+0_R8, 0.0E+0_R8, 3.0E+0_R8/
+     &   /0.58E+0_wp, 0.0E+0_wp, 3.0E+0_wp/
       DATA
      &   YDATA( 5,1,4), XDATA( 5,1,4), XDATA( 5,2,4)
-     &   /5.90E+0_R8, 1.0E+0_R8, 0.0E+0_R8/
+     &   /5.90E+0_wp, 1.0E+0_wp, 0.0E+0_wp/
       DATA
      &   YDATA( 6,1,4), XDATA( 6,1,4), XDATA( 6,2,4)
-     &   /4.74E+0_R8, 1.0E+0_R8, 1.0E+0_R8/
+     &   /4.74E+0_wp, 1.0E+0_wp, 1.0E+0_wp/
       DATA
      &   YDATA( 7,1,4), XDATA( 7,1,4), XDATA( 7,2,4)
-     &   /4.18E+0_R8, 1.0E+0_R8, 2.0E+0_R8/
+     &   /4.18E+0_wp, 1.0E+0_wp, 2.0E+0_wp/
       DATA
      &   YDATA( 8,1,4), XDATA( 8,1,4), XDATA( 8,2,4)
-     &   /4.05E+0_R8, 1.0E+0_R8, 2.0E+0_R8/
+     &   /4.05E+0_wp, 1.0E+0_wp, 2.0E+0_wp/
       DATA
      &   YDATA( 9,1,4), XDATA( 9,1,4), XDATA( 9,2,4)
-     &   /9.03E+0_R8, 2.0E+0_R8, 0.0E+0_R8/
+     &   /9.03E+0_wp, 2.0E+0_wp, 0.0E+0_wp/
       DATA
      &   YDATA(10,1,4), XDATA(10,1,4), XDATA(10,2,4)
-     &   /7.85E+0_R8, 2.0E+0_R8, 1.0E+0_R8/
+     &   /7.85E+0_wp, 2.0E+0_wp, 1.0E+0_wp/
       DATA
      &   YDATA(11,1,4), XDATA(11,1,4), XDATA(11,2,4)
-     &   /7.22E+0_R8, 2.0E+0_R8, 2.0E+0_R8/
+     &   /7.22E+0_wp, 2.0E+0_wp, 2.0E+0_wp/
       DATA
      &   YDATA(12,1,4), XDATA(12,1,4), XDATA(12,2,4)
-     &   /8.50E+0_R8, 2.5E+0_R8, 2.0E+0_R8/
+     &   /8.50E+0_wp, 2.5E+0_wp, 2.0E+0_wp/
       DATA
      &   YDATA(13,1,4), XDATA(13,1,4), XDATA(13,2,4)
-     &   /9.81E+0_R8, 2.9E+0_R8, 1.8E+0_R8/
+     &   /9.81E+0_wp, 2.9E+0_wp, 1.8E+0_wp/
 
       DATA
      &   TDATA(5)
@@ -1933,31 +1933,31 @@ C...Data statements
      &   /8, 2, 2, 1/
       DATA
      &   (BDATA(K,5),K=1,2)
-     &   /0.01155E+0_R8, 5000.0E+0_R8/
+     &   /0.01155E+0_wp, 5000.0E+0_wp/
       DATA
      &   YDATA(1,1,5), XDATA(1,1,5), XDATA(1,2,5)
-     &   /0.912E+0_R8,  109.0E+0_R8, 600.0E+0_R8/
+     &   /0.912E+0_wp,  109.0E+0_wp, 600.0E+0_wp/
       DATA
      &   YDATA(2,1,5), XDATA(2,1,5), XDATA(2,2,5)
-     &   /0.382E+0_R8,   65.0E+0_R8, 640.0E+0_R8/
+     &   /0.382E+0_wp,   65.0E+0_wp, 640.0E+0_wp/
       DATA
      &   YDATA(3,1,5), XDATA(3,1,5), XDATA(3,2,5)
-     &   /0.397E+0_R8, 1180.0E+0_R8, 600.0E+0_R8/
+     &   /0.397E+0_wp, 1180.0E+0_wp, 600.0E+0_wp/
       DATA
      &   YDATA(4,1,5), XDATA(4,1,5), XDATA(4,2,5)
-     &   /0.376E+0_R8,   66.0E+0_R8, 640.0E+0_R8/
+     &   /0.376E+0_wp,   66.0E+0_wp, 640.0E+0_wp/
       DATA
      &   YDATA(5,1,5), XDATA(5,1,5), XDATA(5,2,5)
-     &   /0.342E+0_R8, 1270.0E+0_R8, 600.0E+0_R8/
+     &   /0.342E+0_wp, 1270.0E+0_wp, 600.0E+0_wp/
       DATA
      &   YDATA(6,1,5), XDATA(6,1,5), XDATA(6,2,5)
-     &   /0.358E+0_R8,   69.0E+0_R8, 640.0E+0_R8/
+     &   /0.358E+0_wp,   69.0E+0_wp, 640.0E+0_wp/
       DATA
      &   YDATA(7,1,5), XDATA(7,1,5), XDATA(7,2,5)
-     &   /0.348E+0_R8, 1230.0E+0_R8, 600.0E+0_R8/
+     &   /0.348E+0_wp, 1230.0E+0_wp, 600.0E+0_wp/
       DATA
      &   YDATA(8,1,5), XDATA(8,1,5), XDATA(8,2,5)
-     &   /0.376E+0_R8,   68.0E+0_R8, 640.0E+0_R8/
+     &   /0.376E+0_wp,   68.0E+0_wp, 640.0E+0_wp/
 
       DATA
      &   TDATA(6)
@@ -1967,49 +1967,49 @@ C...Data statements
      &   /14, 1, 3, 1/
       DATA
      &   (BDATA(K,6),K=1,3)
-     &   /25.0E+0_R8, 30.0E+0_R8, 6.0E+0_R8/
+     &   /25.0E+0_wp, 30.0E+0_wp, 6.0E+0_wp/
       DATA
      &   YDATA( 1,1,6), XDATA( 1,1,6)
-     &   /26.38E+0_R8,  1.0E+0_R8/
+     &   /26.38E+0_wp,  1.0E+0_wp/
       DATA
      &   YDATA( 2,1,6), XDATA( 2,1,6)
-     &   /25.79E+0_R8,  2.0E+0_R8/
+     &   /25.79E+0_wp,  2.0E+0_wp/
       DATA
      &   YDATA( 3,1,6), XDATA( 3,1,6)
-     &   /25.29E+0_R8,  3.0E+0_R8/
+     &   /25.29E+0_wp,  3.0E+0_wp/
       DATA
      &   YDATA( 4,1,6), XDATA( 4,1,6)
-     &   /24.86E+0_R8,  4.0E+0_R8/
+     &   /24.86E+0_wp,  4.0E+0_wp/
       DATA
      &   YDATA( 5,1,6), XDATA( 5,1,6)
-     &   /24.46E+0_R8,  5.0E+0_R8/
+     &   /24.46E+0_wp,  5.0E+0_wp/
       DATA
      &   YDATA( 6,1,6), XDATA( 6,1,6)
-     &   /24.10E+0_R8,  6.0E+0_R8/
+     &   /24.10E+0_wp,  6.0E+0_wp/
       DATA
      &   YDATA( 7,1,6), XDATA( 7,1,6)
-     &   /23.78E+0_R8,  7.0E+0_R8/
+     &   /23.78E+0_wp,  7.0E+0_wp/
       DATA
      &   YDATA( 8,1,6), XDATA( 8,1,6)
-     &   /23.50E+0_R8,  8.0E+0_R8/
+     &   /23.50E+0_wp,  8.0E+0_wp/
       DATA
      &   YDATA( 9,1,6), XDATA( 9,1,6)
-     &   /23.24E+0_R8,  9.0E+0_R8/
+     &   /23.24E+0_wp,  9.0E+0_wp/
       DATA
      &   YDATA(10,1,6), XDATA(10,1,6)
-     &   /23.00E+0_R8, 10.0E+0_R8/
+     &   /23.00E+0_wp, 10.0E+0_wp/
       DATA
      &   YDATA(11,1,6), XDATA(11,1,6)
-     &   /22.78E+0_R8, 11.0E+0_R8/
+     &   /22.78E+0_wp, 11.0E+0_wp/
       DATA
      &   YDATA(12,1,6), XDATA(12,1,6)
-     &   /22.58E+0_R8, 12.0E+0_R8/
+     &   /22.58E+0_wp, 12.0E+0_wp/
       DATA
      &   YDATA(13,1,6), XDATA(13,1,6)
-     &   /22.39E+0_R8, 13.0E+0_R8/
+     &   /22.39E+0_wp, 13.0E+0_wp/
       DATA
      &   YDATA(14,1,6), XDATA(14,1,6)
-     &   /22.22E+0_R8, 14.0E+0_R8/
+     &   /22.22E+0_wp, 14.0E+0_wp/
 
       DATA
      &   TDATA(7)
@@ -2019,67 +2019,67 @@ C...Data statements
      &   /20, 2, 5, 1/
       DATA
      &   (BDATA(K,7),K=1,5)
-     &   /-1.0E+0_R8, -3.0E+0_R8, 0.09E+0_R8, 0.02E+0_R8, 0.08E+0_R8/
+     &   /-1.0E+0_wp, -3.0E+0_wp, 0.09E+0_wp, 0.02E+0_wp, 0.08E+0_wp/
       DATA
      &   YDATA( 1,1,7), XDATA( 1,1,7), XDATA( 1,2,7)
-     &   /0.0E+0_R8,  0.50E+0_R8, -0.12E+0_R8/
+     &   /0.0E+0_wp,  0.50E+0_wp, -0.12E+0_wp/
       DATA
      &   YDATA( 2,1,7), XDATA( 2,1,7), XDATA( 2,2,7)
-     &   /0.0E+0_R8,  1.20E+0_R8, -0.60E+0_R8/
+     &   /0.0E+0_wp,  1.20E+0_wp, -0.60E+0_wp/
       DATA
      &   YDATA( 3,1,7), XDATA( 3,1,7), XDATA( 3,2,7)
-     &   /0.0E+0_R8,  1.60E+0_R8, -1.00E+0_R8/
+     &   /0.0E+0_wp,  1.60E+0_wp, -1.00E+0_wp/
       DATA
      &   YDATA( 4,1,7), XDATA( 4,1,7), XDATA( 4,2,7)
-     &   /0.0E+0_R8,  1.86E+0_R8, -1.40E+0_R8/
+     &   /0.0E+0_wp,  1.86E+0_wp, -1.40E+0_wp/
       DATA
      &   YDATA( 5,1,7), XDATA( 5,1,7), XDATA( 5,2,7)
-     &   /0.0E+0_R8,  2.12E+0_R8, -2.54E+0_R8/
+     &   /0.0E+0_wp,  2.12E+0_wp, -2.54E+0_wp/
       DATA
      &   YDATA( 6,1,7), XDATA( 6,1,7), XDATA( 6,2,7)
-     &   /0.0E+0_R8,  2.36E+0_R8, -3.36E+0_R8/
+     &   /0.0E+0_wp,  2.36E+0_wp, -3.36E+0_wp/
       DATA
      &   YDATA( 7,1,7), XDATA( 7,1,7), XDATA( 7,2,7)
-     &   /0.0E+0_R8,  2.44E+0_R8, -4.00E+0_R8/
+     &   /0.0E+0_wp,  2.44E+0_wp, -4.00E+0_wp/
       DATA
      &   YDATA( 8,1,7), XDATA( 8,1,7), XDATA( 8,2,7)
-     &   /0.0E+0_R8,  2.36E+0_R8, -4.75E+0_R8/
+     &   /0.0E+0_wp,  2.36E+0_wp, -4.75E+0_wp/
       DATA
      &   YDATA( 9,1,7), XDATA( 9,1,7), XDATA( 9,2,7)
-     &   /0.0E+0_R8,  2.06E+0_R8, -5.25E+0_R8/
+     &   /0.0E+0_wp,  2.06E+0_wp, -5.25E+0_wp/
       DATA
      &   YDATA(10,1,7), XDATA(10,1,7), XDATA(10,2,7)
-     &   /0.0E+0_R8,  1.74E+0_R8, -5.64E+0_R8/
+     &   /0.0E+0_wp,  1.74E+0_wp, -5.64E+0_wp/
       DATA
      &   YDATA(11,1,7), XDATA(11,1,7), XDATA(11,2,7)
-     &   /0.0E+0_R8,  1.34E+0_R8, -5.97E+0_R8/
+     &   /0.0E+0_wp,  1.34E+0_wp, -5.97E+0_wp/
       DATA
      &   YDATA(12,1,7), XDATA(12,1,7), XDATA(12,2,7)
-     &   /0.0E+0_R8,  0.90E+0_R8, -6.32E+0_R8/
+     &   /0.0E+0_wp,  0.90E+0_wp, -6.32E+0_wp/
       DATA
      &   YDATA(13,1,7), XDATA(13,1,7), XDATA(13,2,7)
-     &   /0.0E+0_R8, -0.28E+0_R8, -6.44E+0_R8/
+     &   /0.0E+0_wp, -0.28E+0_wp, -6.44E+0_wp/
       DATA
      &   YDATA(14,1,7), XDATA(14,1,7), XDATA(14,2,7)
-     &   /0.0E+0_R8, -0.78E+0_R8, -6.44E+0_R8/
+     &   /0.0E+0_wp, -0.78E+0_wp, -6.44E+0_wp/
       DATA
      &   YDATA(15,1,7), XDATA(15,1,7), XDATA(15,2,7)
-     &   /0.0E+0_R8, -1.36E+0_R8, -6.41E+0_R8/
+     &   /0.0E+0_wp, -1.36E+0_wp, -6.41E+0_wp/
       DATA
      &   YDATA(16,1,7), XDATA(16,1,7), XDATA(16,2,7)
-     &   /0.0E+0_R8, -1.90E+0_R8, -6.25E+0_R8/
+     &   /0.0E+0_wp, -1.90E+0_wp, -6.25E+0_wp/
       DATA
      &   YDATA(17,1,7), XDATA(17,1,7), XDATA(17,2,7)
-     &   /0.0E+0_R8, -2.50E+0_R8, -5.88E+0_R8/
+     &   /0.0E+0_wp, -2.50E+0_wp, -5.88E+0_wp/
       DATA
      &   YDATA(18,1,7), XDATA(18,1,7), XDATA(18,2,7)
-     &   /0.0E+0_R8, -2.88E+0_R8, -5.50E+0_R8/
+     &   /0.0E+0_wp, -2.88E+0_wp, -5.50E+0_wp/
       DATA
      &   YDATA(19,1,7), XDATA(19,1,7), XDATA(19,2,7)
-     &   /0.0E+0_R8, -3.18E+0_R8, -5.24E+0_R8/
+     &   /0.0E+0_wp, -3.18E+0_wp, -5.24E+0_wp/
       DATA
      &   YDATA(20,1,7), XDATA(20,1,7), XDATA(20,2,7)
-     &   /0.0E+0_R8, -3.44E+0_R8, -4.86E+0_R8/
+     &   /0.0E+0_wp, -3.44E+0_wp, -4.86E+0_wp/
 
       DATA
      &   TDATA(8)
@@ -2089,76 +2089,76 @@ C...Data statements
      &   /23, 1, 5, 2/
       DATA
      &   (BDATA(K,8),K=1,5)
-     &   /4.0E+0_R8, 2.0E+0_R8, 7.0E+0_R8, 0.40E+0_R8, 0.50E+0_R8/
+     &   /4.0E+0_wp, 2.0E+0_wp, 7.0E+0_wp, 0.40E+0_wp, 0.50E+0_wp/
       DATA
      &   YDATA( 1,1,8), YDATA( 1,2,8), XDATA( 1,1,8)
-     &   /4.220E+0_R8, 0.136E+0_R8,     30.0E+0_R8/
+     &   /4.220E+0_wp, 0.136E+0_wp,     30.0E+0_wp/
       DATA
      &   YDATA( 2,1,8), YDATA( 2,2,8), XDATA( 2,1,8)
-     &   /4.167E+0_R8, 0.167E+0_R8,     50.0E+0_R8/
+     &   /4.167E+0_wp, 0.167E+0_wp,     50.0E+0_wp/
       DATA
      &   YDATA( 3,1,8), YDATA( 3,2,8), XDATA( 3,1,8)
-     &   /4.132E+0_R8, 0.188E+0_R8,     70.0E+0_R8/
+     &   /4.132E+0_wp, 0.188E+0_wp,     70.0E+0_wp/
       DATA
      &   YDATA( 4,1,8), YDATA( 4,2,8), XDATA( 4,1,8)
-     &   /4.038E+0_R8, 0.212E+0_R8,    100.0E+0_R8/
+     &   /4.038E+0_wp, 0.212E+0_wp,    100.0E+0_wp/
       DATA
      &   YDATA( 5,1,8), YDATA( 5,2,8), XDATA( 5,1,8)
-     &   /4.019E+0_R8, 0.236E+0_R8,    150.0E+0_R8/
+     &   /4.019E+0_wp, 0.236E+0_wp,    150.0E+0_wp/
       DATA
      &   YDATA( 6,1,8), YDATA( 6,2,8), XDATA( 6,1,8)
-     &   /3.956E+0_R8, 0.257E+0_R8,    200.0E+0_R8/
+     &   /3.956E+0_wp, 0.257E+0_wp,    200.0E+0_wp/
       DATA
      &   YDATA( 7,1,8), YDATA( 7,2,8), XDATA( 7,1,8)
-     &   /3.884E+0_R8, 0.276E+0_R8,    300.0E+0_R8/
+     &   /3.884E+0_wp, 0.276E+0_wp,    300.0E+0_wp/
       DATA
      &   YDATA( 8,1,8), YDATA( 8,2,8), XDATA( 8,1,8)
-     &   /3.784E+0_R8, 0.297E+0_R8,    500.0E+0_R8/
+     &   /3.784E+0_wp, 0.297E+0_wp,    500.0E+0_wp/
       DATA
      &   YDATA( 9,1,8), YDATA( 9,2,8), XDATA( 9,1,8)
-     &   /3.713E+0_R8, 0.309E+0_R8,    700.0E+0_R8/
+     &   /3.713E+0_wp, 0.309E+0_wp,    700.0E+0_wp/
       DATA
      &   YDATA(10,1,8), YDATA(10,2,8), XDATA(10,1,8)
-     &   /3.633E+0_R8, 0.311E+0_R8,   1000.0E+0_R8/
+     &   /3.633E+0_wp, 0.311E+0_wp,   1000.0E+0_wp/
       DATA
      &   YDATA(11,1,8), YDATA(11,2,8), XDATA(11,1,8)
-     &   /3.540E+0_R8, 0.314E+0_R8,   1500.0E+0_R8/
+     &   /3.540E+0_wp, 0.314E+0_wp,   1500.0E+0_wp/
       DATA
      &   YDATA(12,1,8), YDATA(12,2,8), XDATA(12,1,8)
-     &   /3.433E+0_R8, 0.311E+0_R8,   2000.0E+0_R8/
+     &   /3.433E+0_wp, 0.311E+0_wp,   2000.0E+0_wp/
       DATA
      &   YDATA(13,1,8), YDATA(13,2,8), XDATA(13,1,8)
-     &   /3.358E+0_R8, 0.305E+0_R8,   3000.0E+0_R8/
+     &   /3.358E+0_wp, 0.305E+0_wp,   3000.0E+0_wp/
       DATA
      &   YDATA(14,1,8), YDATA(14,2,8), XDATA(14,1,8)
-     &   /3.258E+0_R8, 0.289E+0_R8,   5000.0E+0_R8/
+     &   /3.258E+0_wp, 0.289E+0_wp,   5000.0E+0_wp/
       DATA
      &   YDATA(15,1,8), YDATA(15,2,8), XDATA(15,1,8)
-     &   /3.193E+0_R8, 0.277E+0_R8,   7000.0E+0_R8/
+     &   /3.193E+0_wp, 0.277E+0_wp,   7000.0E+0_wp/
       DATA
      &   YDATA(16,1,8), YDATA(16,2,8), XDATA(16,1,8)
-     &   /3.128E+0_R8, 0.255E+0_R8,  10000.0E+0_R8/
+     &   /3.128E+0_wp, 0.255E+0_wp,  10000.0E+0_wp/
       DATA
      &   YDATA(17,1,8), YDATA(17,2,8), XDATA(17,1,8)
-     &   /3.059E+0_R8, 0.240E+0_R8,  15000.0E+0_R8/
+     &   /3.059E+0_wp, 0.240E+0_wp,  15000.0E+0_wp/
       DATA
      &   YDATA(18,1,8), YDATA(18,2,8), XDATA(18,1,8)
-     &   /2.984E+0_R8, 0.218E+0_R8,  20000.0E+0_R8/
+     &   /2.984E+0_wp, 0.218E+0_wp,  20000.0E+0_wp/
       DATA
      &   YDATA(19,1,8), YDATA(19,2,8), XDATA(19,1,8)
-     &   /2.934E+0_R8, 0.202E+0_R8,  30000.0E+0_R8/
+     &   /2.934E+0_wp, 0.202E+0_wp,  30000.0E+0_wp/
       DATA
      &   YDATA(20,1,8), YDATA(20,2,8), XDATA(20,1,8)
-     &   /2.876E+0_R8, 0.182E+0_R8,  50000.0E+0_R8/
+     &   /2.876E+0_wp, 0.182E+0_wp,  50000.0E+0_wp/
       DATA
      &   YDATA(21,1,8), YDATA(21,2,8), XDATA(21,1,8)
-     &   /2.838E+0_R8, 0.168E+0_R8,  70000.0E+0_R8/
+     &   /2.838E+0_wp, 0.168E+0_wp,  70000.0E+0_wp/
       DATA
      &   YDATA(22,1,8), YDATA(22,2,8), XDATA(22,1,8)
-     &   /2.798E+0_R8, 0.153E+0_R8, 100000.0E+0_R8/
+     &   /2.798E+0_wp, 0.153E+0_wp, 100000.0E+0_wp/
       DATA
      &   YDATA(23,1,8), YDATA(23,2,8), XDATA(23,1,8)
-     &   /2.759E+0_R8, 0.139E+0_R8, 150000.0E+0_R8/
+     &   /2.759E+0_wp, 0.139E+0_wp, 150000.0E+0_wp/
 
       DATA
      &   TDATA(9)
@@ -2168,19 +2168,19 @@ C...Data statements
      &   /4, 1, 2, 1/
       DATA
      &   (BDATA(K,9),K=1,2)
-     &   /200.0_R8, 5.0_R8/
+     &   /200.0_wp, 5.0_wp/
       DATA
      &   YDATA( 1,1,9), XDATA( 1,1,9)
-     &   /2.718281828459045_R8, 1.0_R8/
+     &   /2.718281828459045_wp, 1.0_wp/
       DATA
      &   YDATA( 2,1,9), XDATA( 2,1,9)
-     &   /7.389056098930650_R8, 2.0_R8/
+     &   /7.389056098930650_wp, 2.0_wp/
       DATA
      &   YDATA( 3,1,9), XDATA( 3,1,9)
-     &   /148.4131591025766_R8, 5.0_R8/
+     &   /148.4131591025766_wp, 5.0_wp/
       DATA
      &   YDATA( 4,1,9), XDATA( 4,1,9)
-     &   /403.4287934927353_R8, 6.0_R8/
+     &   /403.4287934927353_wp, 6.0_wp/
 
       DATA
      &   TDATA(10)
@@ -2190,19 +2190,19 @@ C...Data statements
      &   /4, 1, 2, 1/
       DATA
      &   (BDATA(K,10),K=1,2)
-     &   /200.0_R8, 5.0_R8/
+     &   /200.0_wp, 5.0_wp/
       DATA
      &   YDATA( 1,1,10), XDATA( 1,1,10)
-     &   /2.718281828459045_R8, 1.0_R8/
+     &   /2.718281828459045_wp, 1.0_wp/
       DATA
      &   YDATA( 2,1,10), XDATA( 2,1,10)
-     &   /7.389056098930650_R8, 2.0_R8/
+     &   /7.389056098930650_wp, 2.0_wp/
       DATA
      &   YDATA( 3,1,10), XDATA( 3,1,10)
-     &   /148.4131591025766_R8, 5.0_R8/
+     &   /148.4131591025766_wp, 5.0_wp/
       DATA
      &   YDATA( 4,1,10), XDATA( 4,1,10)
-     &   /403.4287934927353_R8, 6.0_R8/
+     &   /403.4287934927353_wp, 6.0_wp/
 
 C...Variable definitions (alphabetically)
 C   BDATA:   The function parameter for each data set.
@@ -2274,14 +2274,14 @@ C***Purpose  Compute jacobian matricies for ODRPACK95 exerciser
 C***End Prologue  DODRXF
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   IDEVAL,ISTOP,LDIFX,LDM,LDN,LDNP,M,N,NP,NQ
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),F(LDN,NQ),FJACB(LDN,LDNP,NQ),FJACD(LDN,LDM,NQ),
      &   XPLUSD(LDN,M)
       INTEGER
@@ -2295,11 +2295,11 @@ C...Scalars in common
      &   SETNO
 
 C...Arrays in common
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   LOWER(MAXNP),UPPER(MAXNP)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   CTHETA,FAC1,FAC2,FAC3,FAC4,FREQ,
      &   OMEGA,ONE,PHI,PI,R,STHETA,THETA,ZERO
       INTEGER
@@ -2316,7 +2316,7 @@ C...Common blocks
 C...Data statements
       DATA
      &   ZERO,ONE
-     &   /0.0E0_R8,1.0E0_R8/
+     &   /0.0E0_wp,1.0E0_wp/
 
 C...Variable definitions (alphabetically)
 C   BETA:    Current values of parameters
@@ -2346,10 +2346,10 @@ C   M:       The number of columns of data in the explanatory variable.
 C   N:       The number of observations.
 C   NP:      The number of function parameters.
 C   NQ:      The number of responses per observation.
-C   ONE:     The value 1.0E0_R8.
+C   ONE:     The value 1.0E0_wp.
 C   SETNO:   The number of the data set being analyzed.
 C   XPLUSD:  Current value of explanatory variable, i.e., X + DELTA
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DODRXF
@@ -2381,7 +2381,7 @@ C  Check for BETA outside bounds.  Return with error if BETA outside bounds.
 
 C  Setno. 1:  Boggs, Byrd and Schnabel, 1985, example 1
 
-         IF (BETA(1).LE.1.01E0_R8) THEN
+         IF (BETA(1).LE.1.01E0_wp) THEN
             ISTOP = 0
 
             IF (MOD(IDEVAL,10).NE.0) THEN
@@ -2507,13 +2507,13 @@ C  Setno. 5:  Draper and Smith, 1981, exercise i, page 521-522
          IF (MOD(IDEVAL,10).NE.0) THEN
             DO 500 I=1,N
                F(I,1) = EXP(-BETA(1)*XPLUSD(I,1)*
-     &                EXP(-BETA(2)*(ONE/XPLUSD(I,2) - ONE/620.0E0_R8)))
+     &                EXP(-BETA(2)*(ONE/XPLUSD(I,2) - ONE/620.0E0_wp)))
   500       CONTINUE
          END IF
 
          IF (MOD(IDEVAL/10,10).NE.0) THEN
             DO 510 I=1,N
-               FAC1 = ONE/XPLUSD(I,2) - ONE/620.0E0_R8
+               FAC1 = ONE/XPLUSD(I,2) - ONE/620.0E0_wp
                FAC2 = EXP(-BETA(2)*FAC1)
                FAC3 = BETA(1)*XPLUSD(I,1)
                FAC4 = EXP(-FAC3*FAC2)
@@ -2567,7 +2567,7 @@ C             N.B.  this derivative is intentionally coded incorrectly
                F(I,1) = BETA(3)*(XPLUSD(I,1)-BETA(1))**2 +
      &                  2*BETA(4)*(XPLUSD(I,1)-BETA(1))*
      &                            (XPLUSD(I,2)-BETA(2)) +
-     &                  BETA(5)*(XPLUSD(I,2)-BETA(2))**2 - 1.0E0_R8
+     &                  BETA(5)*(XPLUSD(I,2)-BETA(2))**2 - 1.0E0_wp
   700       CONTINUE
          END IF
 
@@ -2592,7 +2592,7 @@ C  Setno. 8:  Bates and Watts, 1988, table A1.13, pages 280-281
 C             N.B.  This derivative is intentionally coded incorrectly
 
          DO 800 I=1,N
-            IF (XPLUSD(I,1).LT.0.0E0_R8) THEN
+            IF (XPLUSD(I,1).LT.0.0E0_wp) THEN
                ISTOP = 1
                RETURN
             END IF
@@ -2600,13 +2600,13 @@ C             N.B.  This derivative is intentionally coded incorrectly
          ISTOP = 0
  
          IF (MOD(IDEVAL,10).NE.0) THEN
-            PI = 3.141592653589793238462643383279E0_R8
-            THETA = PI*BETA(4)*0.5E0_R8
+            PI = 3.141592653589793238462643383279E0_wp
+            THETA = PI*BETA(4)*0.5E0_wp
             CTHETA = COS(THETA)
             STHETA = SIN(THETA)
             DO 810 I=1,N
                FREQ   = XPLUSD(I,1)
-               OMEGA  = (2.0E0_R8*PI*FREQ*EXP(-BETA(3)))**BETA(4)
+               OMEGA  = (2.0E0_wp*PI*FREQ*EXP(-BETA(3)))**BETA(4)
                PHI    = ATAN2((OMEGA*STHETA),(1+OMEGA*CTHETA))
                R      = (BETA(1)-BETA(2)) *
      &                  SQRT((1+OMEGA*CTHETA)**2+(OMEGA*STHETA)**2)**
@@ -2671,21 +2671,21 @@ C  Setno. 10:  Zwolak, Watson, and Tyson, 2005.
 
           IF (MOD(IDEVAL,10).NE.0) THEN
              DO I=1,N
-                F(I,1) = BETA(1)/2.0_R8*EXP(BETA(2)*XPLUSD(I,1))
+                F(I,1) = BETA(1)/2.0_wp*EXP(BETA(2)*XPLUSD(I,1))
              END DO
           END IF
 
           IF (MOD(IDEVAL/10,10).NE.0) THEN
              DO I=1,N
-                FJACB(I,1,1) = EXP(BETA(2)*XPLUSD(I,1))/2.0_R8
-                FJACB(I,2,1) = BETA(1)/2.0_R8*XPLUSD(I,1)*EXP(BETA(2)*
+                FJACB(I,1,1) = EXP(BETA(2)*XPLUSD(I,1))/2.0_wp
+                FJACB(I,2,1) = BETA(1)/2.0_wp*XPLUSD(I,1)*EXP(BETA(2)*
      &             XPLUSD(I,1))
              END DO
           END IF
 
           IF (MOD(IDEVAL/100,10).NE.0) THEN
              DO I=1,N
-                FJACD(I,1,1) = BETA(1)/2.0_R8*BETA(2)*EXP(BETA(2)*
+                FJACD(I,1,1) = BETA(1)/2.0_wp*BETA(2)*EXP(BETA(2)*
      &             XPLUSD(I,1))
              END DO
           END IF
@@ -2708,7 +2708,7 @@ C***Routines Called  NONE
 C***End Prologue  DODRXW
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER

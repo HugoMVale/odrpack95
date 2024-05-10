@@ -1,6 +1,6 @@
       PROGRAM EXAMPLE2
       USE ODRPACK95
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C  ODRPACK95 Argument Definitions
 C      ==> FCN      Name of the user supplied function subroutine
@@ -17,7 +17,7 @@ C      ==> JOB      Task to be performed
 C      ==> IPRINT   Print control
 C      ==> LUNERR   Logical unit for error reports
 C      ==> LUNRPT   Logical unit for computation reports
-C     <==> WORK     REAL (KIND=R8) work vector
+C     <==> WORK     REAL (KIND=wp) work vector
 C     <==  IWORK    Integer work vector
 C     <==  INFO     Stopping condition 
  
@@ -42,7 +42,7 @@ C  Parameter declarations and specifications
 C  Variable declarations 
       INTEGER        I,INFO,IPRINT,J,JOB,LUNERR,LUNRPT,M,N,NP,NQ
       INTEGER        IWORK(:)   
-      REAL (KIND=R8) BETA(MAXNP),
+      REAL (KIND=wp) BETA(MAXNP),
      &               WD(LDWD,LD2WD,MAXM),WE(LDWE,LD2WE,MAXNQ),
      &               WORK(:),X(LDX,MAXM),Y(LDY,MAXNQ)
       EXTERNAL       FCN
@@ -53,8 +53,8 @@ C  Allocate work arrays
       ALLOCATE(IWORK(LIWORK),WORK(LWORK))
 
 C  Specify default values for DODR arguments
-      WE(1,1,1)  = -1.0E0_R8
-      WD(1,1,1)  = -1.0E0_R8
+      WE(1,1,1)  = -1.0E0_wp
+      WD(1,1,1)  = -1.0E0_wp
       JOB        = -1
       IPRINT     = -1
       LUNERR     = -1
@@ -127,14 +127,14 @@ C                    -1 Means current BETA and X+DELTA are
 C                       not acceptable;  ODRPACK95 should stop
 
 C  Used Modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C  Input arguments, not to be changed by this routine:
       INTEGER          I,IDEVAL,ISTOP,L,LDIFX,LDM,LDN,LDNP,M,N,NP,NQ
-      REAL (KIND=R8) BETA(NP),XPLUSD(LDN,M)
+      REAL (KIND=wp) BETA(NP),XPLUSD(LDN,M)
       INTEGER          IFIXB(NP),IFIXX(LDIFX,M)
 C  Output arguments:
-      REAL (KIND=R8) F(LDN,NQ),FJACB(LDN,LDNP,NQ),FJACD(LDN,LDM,NQ)
+      REAL (KIND=wp) F(LDN,NQ),FJACB(LDN,LDNP,NQ),FJACD(LDN,LDM,NQ)
 
 
 C  Do something with FJACD, FJACB, IFIXB and IFIXX to avoid warnings that they 
@@ -147,7 +147,7 @@ C        Do nothing.
 
 
 C  Check for unacceptable values for this problem
-      IF (BETA(1) .GT. 0.0E0_R8) THEN
+      IF (BETA(1) .GT. 0.0E0_wp) THEN
          ISTOP = 1
          RETURN
       ELSE
@@ -161,7 +161,7 @@ C  Compute predicted values
                F(I,L) = BETA(3)*(XPLUSD(I,1)-BETA(1))**2 +
      &                  2*BETA(4)*(XPLUSD(I,1)-BETA(1))*
      &                            (XPLUSD(I,2)-BETA(2)) +
-     &                  BETA(5)*(XPLUSD(I,2)-BETA(2))**2 - 1.0E0_R8
+     &                  BETA(5)*(XPLUSD(I,2)-BETA(2))**2 - 1.0E0_wp
   100       CONTINUE
   110    CONTINUE
       END IF

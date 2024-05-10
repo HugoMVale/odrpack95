@@ -9,7 +9,7 @@ C***PURPOSE  EXCERCISE ERROR REPORTING OF THE F90 VERSION OF ODRPACK95
 C***END PROLOGUE  TESTER
 
 C...USED MODULES
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
       USE ODRPACK95
 
 C...LOCAL SCALARS
@@ -20,7 +20,7 @@ C...LOCAL BOOLEANS
       LOGICAL PASSED
 
 C...LOCAL ARRAYS
-      REAL (KIND=R8) 
+      REAL (KIND=wp) 
      &   BETA(:),Y(:,:),X(:,:),UPPER(2),LOWER(2)
 
 C...ALLOCATABLE ARRAYS
@@ -49,9 +49,9 @@ C  ERROR IN PROBLEM SIZE
       NQ = 0
       NP = 0
       ALLOCATE(BETA(NP),Y(N,NQ),X(N,M))
-      Y(:,:) = 0.0_R8
-      X(:,:) = 0.0_R8
-      BETA(:) = 0.0_R8
+      Y(:,:) = 0.0_wp
+      X(:,:) = 0.0_wp
+      BETA(:) = 0.0_wp
 
       CALL ODR(FCN,N,M,NP,NQ,BETA,Y,X,IPRINT=1,INFO=INFO,
      &   LUNRPT=LUN,LUNERR=LUN)
@@ -68,9 +68,9 @@ C  ERROR IN JOB SPECIFICATION WITH WORK AND IWORK
       NP = 1
       DEALLOCATE(BETA,Y,X)
       ALLOCATE(BETA(NP),Y(N,NQ),X(N,M))
-      Y(:,:) = 0.0_R8
-      X(:,:) = 0.0_R8
-      BETA(:) = 0.0_R8
+      Y(:,:) = 0.0_wp
+      X(:,:) = 0.0_wp
+      BETA(:) = 0.0_wp
 
       CALL ODR(FCN,N,M,NP,NQ,BETA,Y,X,IPRINT=1,INFO=INFO,JOB=10000,
      &   LUNRPT=LUN,LUNERR=LUN)
@@ -87,9 +87,9 @@ C  ERROR IN JOB SPECIFICATION WITH DELTA
       NP = 1
       DEALLOCATE(BETA,Y,X)
       ALLOCATE(BETA(NP),Y(N,NQ),X(N,M))
-      Y(:,:) = 0.0_R8
-      X(:,:) = 0.0_R8
-      BETA(:) = 0.0_R8
+      Y(:,:) = 0.0_wp
+      X(:,:) = 0.0_wp
+      BETA(:) = 0.0_wp
 
       CALL ODR(FCN,N,M,NP,NQ,BETA,Y,X,IPRINT=1,INFO=INFO,JOB=1000,
      &   LUNRPT=LUN,LUNERR=LUN)
@@ -106,12 +106,12 @@ C  BOUNDS TOO SMALL FOR DERIVATIVE CHECKER WHEN DERIVATIVES DON'T AGREE.
       NP = 2
       DEALLOCATE(BETA,Y,X)
       ALLOCATE(BETA(NP),Y(N,NQ),X(N,M))
-      BETA(:) = (/ -200.0_R8, -5.0_R8 /)
-      UPPER(1:2) = (/ -200.0_R8, 0.0_R8 /)
-      LOWER(1:2) = (/ -200.000029802322_R8, -5.0_R8 /)
-      Y(:,1) = (/ 2.718281828459045_R8, 7.389056098930650_R8,
-     &148.4131591025766_R8, 403.4287934927353_R8 /)
-      X(:,1) = (/ 1.0_R8, 2.0_R8, 5.0_R8, 6.0_R8 /)
+      BETA(:) = (/ -200.0_wp, -5.0_wp /)
+      UPPER(1:2) = (/ -200.0_wp, 0.0_wp /)
+      LOWER(1:2) = (/ -200.000029802322_wp, -5.0_wp /)
+      Y(:,1) = (/ 2.718281828459045_wp, 7.389056098930650_wp,
+     &148.4131591025766_wp, 403.4287934927353_wp /)
+      X(:,1) = (/ 1.0_wp, 2.0_wp, 5.0_wp, 6.0_wp /)
 
       CALL ODR(FCN,N,M,NP,NQ,BETA,Y,X,IPRINT=1,INFO=INFO,JOB=0020,
      &   LUNRPT=LUN,LUNERR=LUN,LOWER=LOWER,UPPER=UPPER)
@@ -145,9 +145,9 @@ C    &       "SYSTEM ERROR: COULD NOT ALLOCATE MEMORY, TESTER ",
 C    &       "FAILED TO RUN."
 C         STOP
 C     END IF
-C     Y(:,:) = 0.0_R8
-C     X(:,:) = 0.0_R8
-C     BETA(:) = 0.0_R8
+C     Y(:,:) = 0.0_wp
+C     X(:,:) = 0.0_wp
+C     BETA(:) = 0.0_wp
 C
 C     CALL ODR(FCN,N,M,NP,NQ,BETA,Y,X,IPRINT=1,INFO=INFO,
 C    &   LUNRPT=LUN,LUNERR=LUN)
@@ -180,21 +180,21 @@ C***PURPOSE  DUMMY ROUTINE FOR ODRPACK95 ERROR EXERCISER
 C***END PROLOGUE  FCN
 
 C...USED MODULES
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...SCALAR ARGUMENTS
       INTEGER
      &   IDEVAL,ISTOP,LDIFX,LDM,LDN,LDNP,M,N,NP,NQ
 
 C...ARRAY ARGUMENTS
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),F(LDN,NQ),FJACB(LDN,LDNP,NQ),FJACD(LDN,LDM,NQ),
      &   XPLUSD(LDN,M)
       INTEGER
      &   IFIXB(NP),IFIXX(LDIFX,M)
 
 C...ARRAYS IN COMMON
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   LOWER(2),UPPER(2)
 
 C...LOCAL SCALARS

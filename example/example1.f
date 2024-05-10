@@ -1,7 +1,7 @@
 
       PROGRAM EXAMPLE1
       USE ODRPACK95
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C  ODRPACK95 Argument Definitions
 C      ==> FCN      Name of the user supplied function subroutine
@@ -22,14 +22,14 @@ C      ==> TAUFAC   Trust region initialization factor
 C      ==> SSTOL    Sum of squares convergence criterion
 C      ==> PARTOL   Parameter convergence criterion
 C      ==> MAXIT    Maximum number of iterations
-C      ==> IPRINT   Print control 
+C      ==> IPRINT   Print control
 c      ==> LUNERR   Logical unit for error reports 
 C      ==> LUNRPT   Logical unit for computation reports 
 C      ==> STPB     Step sizes for finite difference derivatives wrt BETA
 C      ==> STPD     Step sizes for finite difference derivatives wrt DELTA
 C      ==> SCLB     Scale values for parameters BETA
 C      ==> SCLD     Scale values for errors delta in explanatory variable 
-C     <==> WORK     REAL (KIND=R8) work vector
+C     <==> WORK     REAL (KIND=wp) work vector
 C     <==  IWORK    Integer work vector
 C     <==  INFO     Stopping condition 
  
@@ -56,8 +56,8 @@ C  Variable Declarations
       INTEGER        I,INFO,IPRINT,J,JOB,L,LUNERR,LUNRPT,M,MAXIT,N,
      &               NDIGIT,NP,NQ
       INTEGER        IFIXB(MAXNP),IFIXX(LDIFX,MAXM),IWORK(:)
-      REAL (KIND=R8) PARTOL,SSTOL,TAUFAC
-      REAL (KIND=R8) BETA(MAXNP),SCLB(MAXNP),SCLD(LDSCLD,MAXM),
+      REAL (KIND=wp) PARTOL,SSTOL,TAUFAC
+      REAL (KIND=wp) BETA(MAXNP),SCLB(MAXNP),SCLD(LDSCLD,MAXM),
      &               STPB(MAXNP),STPD(LDSTPD,MAXM),
      &               WD(LDWD,LD2WD,MAXM),WE(LDWE,LD2WE,MAXNQ),
      &               WORK(:),X(LDX,MAXM),Y(LDY,MAXNQ)
@@ -69,23 +69,23 @@ C  Allocate work arrays
       ALLOCATE(IWORK(LIWORK),WORK(LWORK))
 
 C  Specify default values for ODR arguments
-      WE(1,1,1)  = -1.0E0_R8
-      WD(1,1,1)  = -1.0E0_R8
+      WE(1,1,1)  = -1.0E0_wp
+      WD(1,1,1)  = -1.0E0_wp
       IFIXB(1)   = -1
       IFIXX(1,1) = -1
       JOB        = -1
       NDIGIT     = -1
-      TAUFAC     = -1.0E0_R8
-      SSTOL      = -1.0E0_R8
-      PARTOL     = -1.0E0_R8
+      TAUFAC     = -1.0E0_wp
+      SSTOL      = -1.0E0_wp
+      PARTOL     = -1.0E0_wp
       MAXIT      = -1
       IPRINT     = -1
       LUNERR     = -1
       LUNRPT     = -1
-      STPB(1)    = -1.0E0_R8
-      STPD(1,1)  = -1.0E0_R8
-      SCLB(1)    = -1.0E0_R8
-      SCLD(1,1)  = -1.0E0_R8
+      STPB(1)    = -1.0E0_wp
+      STPD(1,1)  = -1.0E0_wp
+      SCLB(1)    = -1.0E0_wp
+      SCLD(1,1)  = -1.0E0_wp
 
 C  Set up ODRPACK95 report files
       LUNERR  =   9
@@ -98,7 +98,7 @@ C  Read problem data, and set nondefault value for argument IFIXX
       READ (5,FMT=*) (BETA(I),I=1,NP)
       DO 10 I=1,N
          READ (5,FMT=*) (X(I,J),J=1,M),(Y(I,L),L=1,NQ)
-         IF (X(I,1).EQ.0.0E0_R8 .OR. X(I,1).EQ.100.0E0_R8) THEN
+         IF (X(I,1).EQ.0.0E0_wp .OR. X(I,1).EQ.100.0E0_wp) THEN
             IFIXX(I,1) = 0
          ELSE
             IFIXX(I,1) = 1
@@ -167,14 +167,14 @@ C                    -1 means current BETA and X+DELTA are
 C                       not acceptable; ODRPACK95 should stop
 
 C  Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C  Input arguments, not to be changed by this routine:
       INTEGER          I,IDEVAL,ISTOP,L,LDIFX,LDM,LDN,LDNP,M,N,NP,NQ
-      REAL (KIND=R8) BETA(NP),XPLUSD(LDN,M)
+      REAL (KIND=wp) BETA(NP),XPLUSD(LDN,M)
       INTEGER          IFIXB(NP),IFIXX(LDIFX,M)
 C  Output arguments:
-      REAL (KIND=R8) F(LDN,NQ),FJACB(LDN,LDNP,NQ),FJACD(LDN,LDM,NQ)
+      REAL (KIND=wp) F(LDN,NQ),FJACB(LDN,LDNP,NQ),FJACD(LDN,LDM,NQ)
 C  Local variables
       INTRINSIC        EXP
 
@@ -187,7 +187,7 @@ C        Do nothing.
 
 
 C  Check for unacceptable values for this problem
-      IF (BETA(1) .LT. 0.0E0_R8) THEN
+      IF (BETA(1) .LT. 0.0E0_wp) THEN
          ISTOP = 1
          RETURN
       ELSE
@@ -199,7 +199,7 @@ C  Compute predicted values
          DO 110 L = 1,NQ
             DO 100 I = 1,N
                F(I,L) = BETA(1) + 
-     &                  BETA(2)*(EXP(BETA(3)*XPLUSD(I,1)) - 1.0E0_R8)**2
+     &                  BETA(2)*(EXP(BETA(3)*XPLUSD(I,1)) - 1.0E0_wp)**2
   100       CONTINUE
   110    CONTINUE
       END IF
@@ -208,10 +208,10 @@ C  Compute derivatives with respect to BETA
       IF (MOD(IDEVAL/10,10).GE.1) THEN
          DO 210 L = 1,NQ
             DO 200 I = 1,N
-               FJACB(I,1,L) = 1.0E0_R8
-               FJACB(I,2,L) = (EXP(BETA(3)*XPLUSD(I,1)) - 1.0E0_R8)**2
+               FJACB(I,1,L) = 1.0E0_wp
+               FJACB(I,2,L) = (EXP(BETA(3)*XPLUSD(I,1)) - 1.0E0_wp)**2
                FJACB(I,3,L) = BETA(2)*2*
-     &                        (EXP(BETA(3)*XPLUSD(I,1)) - 1.0E0_R8)*
+     &                        (EXP(BETA(3)*XPLUSD(I,1)) - 1.0E0_wp)*
      &                        EXP(BETA(3)*XPLUSD(I,1))*XPLUSD(I,1)
   200       CONTINUE
   210    CONTINUE
@@ -222,7 +222,7 @@ C  Compute derivatives with respect to DELTA
          DO 310 L = 1,NQ
             DO 300 I = 1,N
                FJACD(I,1,L) = BETA(2)*2*
-     &                        (EXP(BETA(3)*XPLUSD(I,1)) - 1.0E0_R8)*
+     &                        (EXP(BETA(3)*XPLUSD(I,1)) - 1.0E0_wp)*
      &                        EXP(BETA(3)*XPLUSD(I,1))*BETA(3)
   300       CONTINUE
   310    CONTINUE

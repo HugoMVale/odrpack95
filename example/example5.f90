@@ -1,14 +1,14 @@
 PROGRAM EXAMPLE5
    USE ODRPACK95
-   USE REAL_PRECISION
-   REAL (KIND=R8), ALLOCATABLE :: BETA(:),L(:),U(:),X(:,:),Y(:,:)
+   use odrpack95_kinds, only: wp
+   REAL (KIND=wp), ALLOCATABLE :: BETA(:),L(:),U(:),X(:,:),Y(:,:)
    INTEGER :: NP,N,M,NQ
    INTERFACE
       SUBROUTINE FCN(N,M,NP,NQ,LDN,LDM,LDNP,BETA,XPLUSD,IFIXB,IFIXX,LDIFX,&
          IDEVAL,F,FJACB,FJACD,ISTOP)
-         USE REAL_PRECISION
+         import :: wp
          INTEGER :: IDEVAL,ISTOP,LDIFX,LDM,LDN,LDNP,M,N,NP,NQ
-         REAL (KIND=R8) :: BETA(NP),F(LDN,NQ),FJACB(LDN,LDNP,NQ), &
+         REAL (KIND=wp) :: BETA(NP),F(LDN,NQ),FJACB(LDN,LDNP,NQ), &
             FJACD(LDN,LDM,NQ),XPLUSD(LDN,M)
          INTEGER :: IFIXB(NP),IFIXX(LDIFX,M)
       END SUBROUTINE FCN
@@ -19,11 +19,11 @@ PROGRAM EXAMPLE5
    M  = 1
    NQ = 1
    ALLOCATE(BETA(NP),L(NP),U(NP),X(N,M),Y(N,NQ))
-   BETA(1:2) = (/ 2.0_R8, 0.5_R8 /)
-   L(1:2)    = (/ 0.0_R8, 0.0_R8 /)
-   U(1:2)    = (/ 10.0_R8, 0.9_R8 /)
-   X(1:4,1)  = (/ 0.982_R8, 1.998_R8, 4.978_R8, 6.01_R8 /)
-   Y(1:4,1)  = (/ 2.7_R8, 7.4_R8, 148.0_R8, 403.0_R8 /)
+   BETA(1:2) = (/ 2.0_wp, 0.5_wp /)
+   L(1:2)    = (/ 0.0_wp, 0.0_wp /)
+   U(1:2)    = (/ 10.0_wp, 0.9_wp /)
+   X(1:4,1)  = (/ 0.982_wp, 1.998_wp, 4.978_wp, 6.01_wp /)
+   Y(1:4,1)  = (/ 2.7_wp, 7.4_wp, 148.0_wp, 403.0_wp /)
    CALL ODR(FCN,N,M,NP,NQ,BETA,Y,X,LOWER=L,UPPER=U)
 END PROGRAM EXAMPLE5
 
@@ -31,10 +31,10 @@ END PROGRAM EXAMPLE5
 SUBROUTINE FCN(N,M,NP,NQ,LDN,LDM,LDNP,BETA,XPLUSD,IFIXB,IFIXX,LDIFX,&
    IDEVAL,F,FJACB,FJACD,ISTOP)
 
-   USE REAL_PRECISION
+   use odrpack95_kinds, only: wp
 
    INTEGER :: IDEVAL,ISTOP,LDIFX,LDM,LDN,LDNP,M,N,NP,NQ, I
-   REAL (KIND=R8) :: BETA(NP),F(LDN,NQ),FJACB(LDN,LDNP,NQ), &
+   REAL (KIND=wp) :: BETA(NP),F(LDN,NQ),FJACB(LDN,LDNP,NQ), &
       FJACD(LDN,LDM,NQ),XPLUSD(LDN,M)
    INTEGER :: IFIXB(NP),IFIXX(LDIFX,M)
 
