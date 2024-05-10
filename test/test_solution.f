@@ -65,9 +65,9 @@ C         from exercise routine DODRX.
       LUNERR = 18
       LUNSUM = 19
 
-      OPEN(UNIT=LUNRPT,FILE='./test/REPORT.txt')
-      OPEN(UNIT=LUNERR,FILE='./test/REPORT.txt')
-      OPEN(UNIT=LUNSUM,FILE='./test/SUMMARY.txt')
+      OPEN(UNIT=LUNRPT,FILE='./test/test_solution_report.txt')
+      OPEN(UNIT=LUNERR,FILE='./test/test_solution_report.txt')
+      OPEN(UNIT=LUNSUM,FILE='./test/test_solution_summary.txt')
 
 C  Exercise REAL (KIND=R8) version of ODRPACK95
 C  (test reports generated on file 'RESULTS' and
@@ -1247,9 +1247,9 @@ C  Linux using REAL (KIND=R8) version of ODRPACK95
       END IF
 
       IF (PASSED) THEN
-         stop "Tests passed. See report."
+         stop "Solution tests passed. See report."
       ELSE
-         error stop "Tests failed. See report."
+         error stop "Solution tests failed. See report."
       END IF
 
 C  Format statements
