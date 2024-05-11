@@ -4,7 +4,7 @@ C***Begin Prologue  DASUM
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A3A
-C***Keywords  Add,BLAS,REAL (KIND=R8),Linear Algebra,Magnitude,Sum,
+C***Keywords  Add,BLAS,REAL (KIND=wp),Linear Algebra,Magnitude,Sum,
 C             Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
@@ -16,11 +16,11 @@ C                B L A S  Subprogram
 C    Description of parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL (KIND=R8) vector with N elements
+C       DX  REAL (KIND=wp) vector with N elements
 C     INCX  Storage spacing between elements of DX
 C     --Output--
-C    DASUM  REAL (KIND=R8) result (Zero IF N .LE. 0)
-C     Returns sum of magnitudes of Real (Kind=R8) DX.
+C    DASUM  REAL (KIND=wp) result (Zero IF N .LE. 0)
+C     Returns sum of magnitudes of Real (Kind=wp) DX.
 C     DASUM = Sum from 0 to N-1 of DABS(DX(1+I*INCX))
 C***References  Lawson C.L., Hanson R.J., Kincaid D.R., Krogh F.T.,
 C                 *Basic Linear Algebra Subprograms For FORTRAN Usage*,
@@ -30,18 +30,18 @@ C***Routines called  (none)
 C***End Prologue  DASUM
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   INCX,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DX(*)
 
 C...Result
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DASUMR
 
 C...Local scalars
@@ -56,7 +56,7 @@ C...Intrinsic functions
 C***First executable statement  DASUM
 
 
-      DASUMR = 0.E0_R8
+      DASUMR = 0.E0_wp
       IF(N.LE.0)RETURN
       IF(INCX.EQ.1)GOTO 20
 
@@ -91,7 +91,7 @@ C***Begin Prologue  DAXPY
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A7
-C***Keywords  BLAS,REAL (KIND=R8),Linear Algebra,Triad,Vector
+C***Keywords  BLAS,REAL (KIND=wp),Linear Algebra,Triad,Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
 C           Kincaid, D. R., (U. of Texas)
@@ -102,14 +102,14 @@ C                B L A S  Subprogram
 C    Description of parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DA  REAL (KIND=R8) scalar multiplier
-C       DX  REAL (KIND=R8) vector with N elements
+C       DA  REAL (KIND=wp) scalar multiplier
+C       DX  REAL (KIND=wp) vector with N elements
 C     INCX  Storage spacing between elements of DX
-C       DY  REAL (KIND=R8) vector with N elements
+C       DY  REAL (KIND=wp) vector with N elements
 C     INCY  Storage spacing between elements of DY
 C     --Output--
-C       DY  REAL (KIND=R8) result (unchanged IF N .LE. 0)
-C     Overwrite REAL (KIND=R8) DY with REAL (KIND=R8) DA*DX + DY.
+C       DY  REAL (KIND=wp) result (unchanged IF N .LE. 0)
+C     Overwrite REAL (KIND=wp) DY with REAL (KIND=wp) DA*DX + DY.
 C     For I = 0 to N-1, replace  DY(LY+I*INCY) with DA*DX(LX+I*INCX) +
 C       DY(LY+I*INCY), where LX = 1 IF INCX .GE. 0, ELSE LX = (-INCX)*N
 C       and LY is defined in a similar way using INCY.
@@ -121,16 +121,16 @@ C***Routines called  (none)
 C***End Prologue  DAXPY
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DA
       INTEGER
      &   INCX,INCY,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DX(*),DY(*)
 
 C...Local scalars
@@ -145,7 +145,7 @@ C...Intrinsic functions
 C***First executable statement  DAXPY
 
 
-      IF(N.LE.0.OR.DA.EQ.0.E0_R8) RETURN
+      IF(N.LE.0.OR.DA.EQ.0.E0_wp) RETURN
       IF(INCX.EQ.INCY) THEN
         IF(INCX-1.LT.0) THEN
           GOTO 5
@@ -205,7 +205,7 @@ C***Begin Prologue  DCHEX
 C***Date Written   780814   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D7B
-C***Keywords  Cholesky Decomposition,REAL (KIND=R8),Exchange,
+C***Keywords  Cholesky Decomposition,REAL (KIND=wp),Exchange,
 C             Linear Algebra,LINPACK,Matrix,Positive Definite
 C***Author  Stewart, G. W., (U. of Maryland)
 C***Purpose  Updates the Cholesky Factorization  A=TRANS(R)*R  of a
@@ -235,7 +235,7 @@ C     of plane rotations of the form
 C                           (    C(I)       S(I) )
 C                           (                    ) ,
 C                           (    -S(I)      C(I) )
-C     where C(I) is REAL (KIND=R8).  The rows these rotations operate
+C     where C(I) is REAL (KIND=wp).  The rows these rotations operate
 C     on are described below.
 C     There are two types of permutations, which are determined
 C     By the value of JOB.
@@ -250,7 +250,7 @@ C                1,...,K-1,K+1,K+2,...,L,K,L+1,...,P.
 C         U is the product of L-K rotations U(I), where U(I)
 C         Acts in the (K+I-1,K+I)-plane.
 C     On entry
-C         R      REAL (KIND=R8)(LDR,P), where LDR .GE. P.
+C         R      REAL (KIND=wp)(LDR,P), where LDR .GE. P.
 C                R contains the upper triangular factor
 C                that is to be updated.  Elements of R
 C                below the diagonal are not referenced.
@@ -263,7 +263,7 @@ C                K is the first column to be permuted.
 C         L      INTEGER.
 C                L is the last column to be permuted.
 C                L must be strictly greater than K.
-C         Z      REAL (KIND=R8)(LDZ,N)Z), where LDZ .GE. P.
+C         Z      REAL (KIND=wp)(LDZ,N)Z), where LDZ .GE. P.
 C                Z is an array of NZ P-vectors into which the
 C                transformation U is multiplied.  Z is
 C                not referenced if NZ = 0.
@@ -278,9 +278,9 @@ C                       JOB = 2  Left circular shift.
 C     On return
 C         R      Contains the updated factor.
 C         Z      Contains the updated matrix Z.
-C         C      REAL (KIND=R8)(P).
+C         C      REAL (KIND=wp)(P).
 C                C contains the cosines of the transforming rotations.
-C         S      REAL (KIND=R8)(P).
+C         S      REAL (KIND=wp)(P).
 C                S contains the sines of the transforming rotations.
 C     LINPACK.  This version dated 08/14/78 .
 C     G. W. Stewart, University of Maryland, Argonne National Lab.
@@ -290,18 +290,18 @@ C***Routines called  DROTG
 C***End Prologue  DCHEX
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   JOB,K,L,LDR,LDZ,NZ,P
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   C(*),R(LDR,*),S(*),Z(LDZ,*)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   T,T1
       INTEGER
      &   I,II,IL,IU,J,JJ,KM1,KP1,LM1,LMK
@@ -346,7 +346,7 @@ C        Reorder the columns.
             DO 30 I = 1, J
                R(I,J+1) = R(I,J)
    30       CONTINUE
-            R(J+1,J+1) = 0.0E0_R8
+            R(J+1,J+1) = 0.0E0_wp
    40    CONTINUE
          IF (K .EQ. 1) GO TO 60
             DO 50 I = 1, KM1
@@ -411,7 +411,7 @@ C        Reorder the columns
             R(I,L) = S(II)
   170    CONTINUE
          DO 180 I = KP1, L
-            R(I,L) = 0.0E0_R8
+            R(I,L) = 0.0E0_wp
   180    CONTINUE
 
 C        Reduction loop.
@@ -457,7 +457,7 @@ C***Begin Prologue  DCOPY
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A5
-C***Keywords  BLAS,Copy,REAL (KIND=R8),Linear Algebra,Vector
+C***Keywords  BLAS,Copy,REAL (KIND=wp),Linear Algebra,Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
 C           Kincaid, D. R., (U. of Texas)
@@ -468,13 +468,13 @@ C                B L A S  Subprogram
 C    Description of parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL (KIND=R8) vector with N elements
+C       DX  REAL (KIND=wp) vector with N elements
 C     INCX  Storage spacing between elements of DX
-C       DY  REAL (KIND=R8) vector with N elements
+C       DY  REAL (KIND=wp) vector with N elements
 C     INCY  Storage spacing between elements of DY
 C     --Output--
 C       DY  Copy of vector DX (unchanged if N .LE. 0)
-C     Copy REAL (KIND=R8) DX to REAL (KIND=R8) DY.
+C     Copy REAL (KIND=wp) DX to REAL (KIND=wp) DY.
 C     For I = 0 to N-1, copy DX(LX+I*INCX) to DY(LY+I*INCY),
 C     where LX = 1 if INCX .GE. 0, else LX = (-INCX)*N, and LY is
 C     defined in a similar way using INCY.
@@ -486,14 +486,14 @@ C***Routines called  (none)
 C***End Prologue  DCOPY
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   INCX,INCY,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DX(*),DY(*)
 
 C...Local scalars
@@ -571,7 +571,7 @@ C***Begin Prologue  DDOT
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A4
-C***Keywords  BLAS,REAL (KIND=R8),Inner Product,Linear Algebra,Vector
+C***Keywords  BLAS,REAL (KIND=wp),Inner Product,Linear Algebra,Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
 C           Kincaid, D. R., (U. of Texas)
@@ -582,13 +582,13 @@ C                B L A S  Subprogram
 C    Description of parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL (KIND=R8) vector with N elements
+C       DX  REAL (KIND=wp) vector with N elements
 C     INCX  Storage spacing between elements of DX
-C       DY  REAL (KIND=R8) vector with N elements
+C       DY  REAL (KIND=wp) vector with N elements
 C     INCY  Storage spacing between elements of DY
 C     --Output--
-C     DDOT  REAL (KIND=R8) dot product (zero if N .LE. 0)
-C     returns the dot product of REAL (KIND=R8) DX and DY.
+C     DDOT  REAL (KIND=wp) dot product (zero if N .LE. 0)
+C     returns the dot product of REAL (KIND=wp) DX and DY.
 C     DDOT = SUM for I = 0 to N-1 of  DX(LX+I*INCX) * DY(LY+I*INCY)
 C     where LX = 1 if INCX .GE. 0, else LX = (-INCX)*N, and LY is
 C     defined in a similar way using INCY.
@@ -600,18 +600,18 @@ C***Routines called  (none)
 C***End Prologue  DDOT
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   INCX,INCY,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DX(*),DY(*)
 
 C...Result
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DDOTR
 
 C...Local scalars
@@ -626,7 +626,7 @@ C...Intrinsic functions
 C***First executable statement  DDOT
 
 
-      DDOTR = 0.E0_R8
+      DDOTR = 0.E0_wp
       IF(N.LE.0)RETURN
       IF(INCX.EQ.INCY) THEN
         IF(INCX-1.LT.0) THEN
@@ -685,7 +685,7 @@ C***Begin Prologue  DNRM2
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A3B
-C***Keywords  BLAS,REAL (KIND=R8),Euclidean,L2,Length,Linear Algebra,
+C***Keywords  BLAS,REAL (KIND=wp),Euclidean,L2,Length,Linear Algebra,
 C             Norm,Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
@@ -697,10 +697,10 @@ C                B L A S  Subprogram
 C    Description of parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL (KIND=R8) vector with N elements
+C       DX  REAL (KIND=wp) vector with N elements
 C     INCX  Storage spacing between elements of DX
 C     --Output--
-C    DNRM2  REAL (KIND=R8) result (zero if N .LE. 0)
+C    DNRM2  REAL (KIND=wp) result (zero if N .LE. 0)
 C     Euclidean norm of the N-vector stored in DX() with storage
 C     increment INCX .
 C     If    N .LE. 0 return with result = 0.
@@ -726,14 +726,14 @@ C     From the environmental parameters listed in the IMSL converter
 C     document the limiting values are as follows..
 C     CUTLO, S.P.   U/EPS = 2**(-102) for  Honeywell.  Close seconds are
 C                   UNIVAC and DEC at 2**(-103)
-C                   thus CUTLO = 2**(-51) = 4.44089E-16_R8
+C                   thus CUTLO = 2**(-51) = 4.44089E-16_wp
 C     CUTHI, S.P.   V = 2**127 for UNIVAC, Honeywell, and DEC.
-C                   thus CUTHI = 2**(63.5) = 1.30438E19_R8
+C                   thus CUTHI = 2**(63.5) = 1.30438E19_wp
 C     CUTLO, D.P.   U/EPS = 2**(-67) for Honeywell and DEC.
-C                   thus CUTLO = 2**(-33.5) = 8.23181E-11_R8
-C     CUTHI, D.P.   Same as S.P.  CUTHI = 1.30438E19_R8
-C     DATA CUTLO, CUTHI / 8.232E-11_R8,  1.304E19_R8 /
-C     DATA CUTLO, CUTHI / 4.441E-16_R8,  1.304E19_R8 /
+C                   thus CUTLO = 2**(-33.5) = 8.23181E-11_wp
+C     CUTHI, D.P.   Same as S.P.  CUTHI = 1.30438E19_wp
+C     DATA CUTLO, CUTHI / 8.232E-11_wp,  1.304E19_wp /
+C     DATA CUTLO, CUTHI / 4.441E-16_wp,  1.304E19_wp /
 C***References  Lawson C.L., Hanson R.J., Kincaid D.R., Krogh F.T.,
 C                 *Basic Linear Algebra Subprograms for FORTRAN Usage*,
 C                 Algorithm No. 539, Transactions on Mathematical
@@ -742,22 +742,22 @@ C***Routines called  (none)
 C***End Prologue  DNRM2
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   INCX,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DX(*)
 
 C...Result
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DNRM2R
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   CUTHI,CUTLO,HITEST,ONE,SUM,XMAX,ZERO
       INTEGER
      &   I,J,NEXT,NN
@@ -768,9 +768,9 @@ C...Intrinsic functions
 
 C...Data statements
       DATA
-     &   ZERO,ONE/0.0E0_R8,1.0E0_R8/
+     &   ZERO,ONE/0.0E0_wp,1.0E0_wp/
       DATA
-     &   CUTLO,CUTHI/8.232E-11_R8,1.304E19_R8/
+     &   CUTLO,CUTHI/8.232E-11_wp,1.304E19_wp/
 
 
 C***First executable statement  DNRM2
@@ -865,7 +865,7 @@ C***Begin Prologue  DPODI
 C***Date Written   780814   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D2B1B,D3B1B
-C***Keywords  Determinant,REAL (KIND=R8),Factor,Inverse,
+C***Keywords  Determinant,REAL (KIND=wp),Factor,Inverse,
 C             Linear Algebra,LINPACK,Matrix,Positive Definite
 C***AUTHOR  Moler, C. B., (U. of New Mexico)
 C***PURPOSE  Computes the determinant and inverse of a certain double 
@@ -873,10 +873,10 @@ C            precision symmetric positive definite matrix (see abstract)
 C            using the factors computed by DPOCO, DPOFA or DQRDC.
 C***Description
 C     DPODI computes the determinant and inverse of a certain
-C     REAL (KIND=R8) symmetric positive definite matrix (see below)
+C     REAL (KIND=wp) symmetric positive definite matrix (see below)
 C     using the factors computed by DPOCO, DPOFA or DQRDC.
 C     On entry
-C        A       REAL (KIND=R8)(LDA, N)
+C        A       REAL (KIND=wp)(LDA, N)
 C                The output  A  from DPOCO or DPOFA
 C                or the output  X  from DQRDC.
 C        LDA     INTEGER
@@ -895,7 +895,7 @@ C                DPODI produces the upper half of inverse(trans(X)*X)
 C                where trans(x) is the transpose.
 C                Elements of  A  below the diagonal are unchanged.
 C                If the units digit of JOB is zero,  A  is unchanged.
-C        DET     REAL (KIND=R8)(2)
+C        DET     REAL (KIND=wp)(2)
 C                Determinant of  A  or of  trans(X)*X  if requested.
 C                Otherwise not referenced.
 C                Determinant = DET(1) * 10.0**DET(2)
@@ -914,16 +914,16 @@ C***Routines called  DAXPY,DSCAL
 C***End Prologue  DPODI
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER JOB,LDA,N
 
 C...Array arguments
-      REAL (KIND=R8) A(LDA,*),DET(*)
+      REAL (KIND=wp) A(LDA,*),DET(*)
 
 C...Local scalars
-      REAL (KIND=R8) S,T
+      REAL (KIND=wp) S,T
       INTEGER I,J,JM1,K,KP1
 
 C...External subroutines
@@ -937,21 +937,21 @@ C***First executable statement  DPODI
 
 
       IF (JOB/10 .EQ. 0) GO TO 70
-         DET(1) = 1.0E0_R8
-         DET(2) = 0.0E0_R8
-         S = 10.0E0_R8
+         DET(1) = 1.0E0_wp
+         DET(2) = 0.0E0_wp
+         S = 10.0E0_wp
          DO 50 I = 1, N
             DET(1) = A(I,I)**2*DET(1)
 C        ...Exit
-            IF (DET(1) .EQ. 0.0E0_R8) GO TO 60
-   10       IF (DET(1) .GE. 1.0E0_R8) GO TO 20
+            IF (DET(1) .EQ. 0.0E0_wp) GO TO 60
+   10       IF (DET(1) .GE. 1.0E0_wp) GO TO 20
                DET(1) = S*DET(1)
-               DET(2) = DET(2) - 1.0E0_R8
+               DET(2) = DET(2) - 1.0E0_wp
             GO TO 10
    20       CONTINUE
    30       IF (DET(1) .LT. S) GO TO 40
                DET(1) = DET(1)/S
-               DET(2) = DET(2) + 1.0E0_R8
+               DET(2) = DET(2) + 1.0E0_wp
             GO TO 30
    40       CONTINUE
    50    CONTINUE
@@ -962,14 +962,14 @@ C     Compute inverse(R)
 
       IF (MOD(JOB,10) .EQ. 0) GO TO 140
          DO 100 K = 1, N
-            A(K,K) = 1.0E0_R8/A(K,K)
+            A(K,K) = 1.0E0_wp/A(K,K)
             T = -A(K,K)
             CALL DSCAL(K-1,T,A(1,K),1)
             KP1 = K + 1
             IF (N .LT. KP1) GO TO 90
             DO 80 J = KP1, N
                T = A(K,J)
-               A(K,J) = 0.0E0_R8
+               A(K,J) = 0.0E0_wp
                CALL DAXPY(K,T,A(1,K),1,A(1,J),1)
    80       CONTINUE
    90       CONTINUE
@@ -997,7 +997,7 @@ C***Begin Prologue  DQRDC
 C***Date Written   780814   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D5
-C***Keywords  Decomposition,REAL (KIND=R8),Linear Algebra,LINPACK,
+C***Keywords  Decomposition,REAL (KIND=wp),Linear Algebra,LINPACK,
 C             Matrix,Orthogonal Triangular
 C***Author  Stewart, G. W., (U. of Maryland)
 C***Purpose  Uses Householder Transformations to Compute the QR Factori-
@@ -1008,7 +1008,7 @@ C     factorization of an N by P matrix X.  Column pivoting
 C     based on the 2-norms of the reduced columns may be 
 C     performed at the user's option.
 C     On Entry
-C        X       REAL (KIND=R8)(LDX,P), where LDX .GE. N.
+C        X       REAL (KIND=wp)(LDX,P), where LDX .GE. N.
 C                X contains the matrix whose decomposition is to be
 C                computed.
 C        LDX     INTEGER.
@@ -1035,7 +1035,7 @@ C                reduction, if X(K) is occupied by a free column
 C                it is interchanged with the free column of largest
 C                reduced norm.  JPVT is not referenced if
 C                JOB .EQ. 0.
-C        WORK    REAL (KIND=R8)(P).
+C        WORK    REAL (KIND=wp)(P).
 C                WORK is a work array.  WORK is not referenced if
 C                JOB .EQ. 0.
 C        JOB     INTEGER.
@@ -1051,7 +1051,7 @@ C                can be recovered.  Note that if pivoting has
 C                been requested, the decomposition is not that
 C                of the original matrix X but that of X
 C                with its columns permuted as described by JPVT.
-C        QRAUX   REAL (KIND=R8)(P).
+C        QRAUX   REAL (KIND=wp)(P).
 C                QRAUX contains further information required to recover
 C                the orthogonal part of the decomposition.
 C        JPVT    JPVT(K) contains the index of the column of the
@@ -1065,20 +1065,20 @@ C***Routines Called  DAXPY,DDOT,DNRM2,DSCAL,DSWAP
 C***End Prologue  DQRDC
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   JOB,LDX,N,P
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   QRAUX(*),WORK(*),X(LDX,*)
       INTEGER
      &   JPVT(*)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   MAXNRM,NRMXL,T,TT
       INTEGER
      &   J,JJ,JP,L,LP1,LUP,MAXJ,PL,PU
@@ -1086,7 +1086,7 @@ C...Local scalars
      &   NEGJ,SWAPJ
 
 C...External functions
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DDOT,DNRM2
       EXTERNAL
      &   DDOT,DNRM2
@@ -1156,7 +1156,7 @@ C     Perform the Householder Reduction of X.
 C           LOCATE THE COLUMN OF LARGEST NORM AND BRING IT
 C           INTO THE PIVOT POSITION.
 
-            MAXNRM = 0.0E0_R8
+            MAXNRM = 0.0E0_wp
             MAXJ = L
             DO 100 J = L, PU
                IF (QRAUX(J) .LE. MAXNRM) GO TO 90
@@ -1173,16 +1173,16 @@ C           INTO THE PIVOT POSITION.
                JPVT(L) = JP
   110       CONTINUE
   120    CONTINUE
-         QRAUX(L) = 0.0E0_R8
+         QRAUX(L) = 0.0E0_wp
          IF (L .EQ. N) GO TO 190
 
 C           Compute the Householder Transformation for column L.
 
             NRMXL = DNRM2(N-L+1,X(L,L),1)
-            IF (NRMXL .EQ. 0.0E0_R8) GO TO 180
-               IF (X(L,L) .NE. 0.0E0_R8) NRMXL = DSIGN(NRMXL,X(L,L))
-               CALL DSCAL(N-L+1,1.0E0_R8/NRMXL,X(L,L),1)
-               X(L,L) = 1.0E0_R8 + X(L,L)
+            IF (NRMXL .EQ. 0.0E0_wp) GO TO 180
+               IF (X(L,L) .NE. 0.0E0_wp) NRMXL = DSIGN(NRMXL,X(L,L))
+               CALL DSCAL(N-L+1,1.0E0_wp/NRMXL,X(L,L),1)
+               X(L,L) = 1.0E0_wp + X(L,L)
 
 C              Apply the transformation to the remaining columns,
 C              updating the norms.
@@ -1193,12 +1193,12 @@ C              updating the norms.
                   T = -DDOT(N-L+1,X(L,L),1,X(L,J),1)/X(L,L)
                   CALL DAXPY(N-L+1,T,X(L,L),1,X(L,J),1)
                   IF (J .LT. PL .OR. J .GT. PU) GO TO 150
-                  IF (QRAUX(J) .EQ. 0.0E0_R8) GO TO 150
-                     TT = 1.0E0_R8 - (DABS(X(L,J))/QRAUX(J))**2
-                     TT = DMAX1(TT,0.0E0_R8)
+                  IF (QRAUX(J) .EQ. 0.0E0_wp) GO TO 150
+                     TT = 1.0E0_wp - (DABS(X(L,J))/QRAUX(J))**2
+                     TT = DMAX1(TT,0.0E0_wp)
                      T = TT
-                     TT = 1.0E0_R8 + 0.05E0_R8*TT*(QRAUX(J)/WORK(J))**2
-                     IF (TT .EQ. 1.0E0_R8) GO TO 130
+                     TT = 1.0E0_wp + 0.05E0_wp*TT*(QRAUX(J)/WORK(J))**2
+                     IF (TT .EQ. 1.0E0_wp) GO TO 130
                         QRAUX(J) = QRAUX(J)*DSQRT(T)
                      GO TO 140
   130                CONTINUE
@@ -1224,7 +1224,7 @@ C***Begin Prologue  DQRSL
 C***Date Written   780814   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D9,D2A1
-C***Keywords  REAL (KIND=R8),Linear Algebra,LINPACK,Matrix,
+C***Keywords  REAL (KIND=wp),Linear Algebra,LINPACK,Matrix,
 C             Orthogonal Triangular,Solve
 C***Author  Stewart, G. W., (U. Of Maryland)
 C***Purpose  Applies the output of DQRDC to compute coordinate
@@ -1244,7 +1244,7 @@ C                       (0)
 C     This information is contained in coded form in the arrays
 C     X and QRAUX.
 C     On Entry
-C        X      REAL (KIND=R8)(LDX,P).
+C        X      REAL (KIND=wp)(LDX,P).
 C               X contains the output of DQRDC.
 C        LDX    INTEGER.
 C               LDX is the leading dimension of the array X.
@@ -1255,9 +1255,9 @@ C        K      INTEGER.
 C               K is the number of columns of the matrix XK.  K
 C               must not be greater than min(N,P), where P is the
 C               same as in the calling sequence to DQRDC.
-C        QRAUX  REAL (KIND=R8)(P).
+C        QRAUX  REAL (KIND=wp)(P).
 C               QRAUX contains the auxiliary output from DQRDC.
-C        Y      REAL (KIND=R8)(N)
+C        Y      REAL (KIND=wp)(N)
 C               Y contains an N-vector that is to be manipulated
 C               by DQRSL.
 C        JOB    INTEGER.
@@ -1274,26 +1274,26 @@ C               automatically triggers the computation of QTY, for
 C               which an array must be provided in the calling
 C               sequence.
 C     On Return
-C        QY     REAL (KIND=R8)(N).
+C        QY     REAL (KIND=wp)(N).
 C               QY contains Q*Y, if its computation has been
 C               requested.
-C        QTY    REAL (KIND=R8)(N).
+C        QTY    REAL (KIND=wp)(N).
 C               QTY contains trans(Q)*Y, if its computation has
 C               been requested.  Here trans(Q) is the
 C               transpose of the matrix Q.
-C        B      REAL (KIND=R8)(K)
+C        B      REAL (KIND=wp)(K)
 C               B contains the solution of the least squares problem
 C                    Minimize NORM2(Y - XK*B),
 C               if its computation has been requested.  (Note that
 C               if pivoting was requested in DQRDC, the J-th
 C               component of B will be associated with column JPVT(J)
 C               of the original matrix X that was input into DQRDC.)
-C        RSD    REAL (KIND=R8)(N).
+C        RSD    REAL (KIND=wp)(N).
 C               RSD contains the least squares residual Y - XK*B,
 C               if its computation has been requested.  RSD is
 C               also the orthogonal projection of Y onto the
 C               orthogonal complement of the column space of XK.
-C        XB     REAL (KIND=R8)(N).
+C        XB     REAL (KIND=wp)(N).
 C               XB contains the least squares approximation XK*B,
 C               if its computation has been requested.  XB is also
 C               the orthogonal projection of Y onto the column space
@@ -1334,19 +1334,19 @@ C***Routines Called  DAXPY,DCOPY,DDOT
 C***End Prologue  DQRSL
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   INFO,JOB,K,LDX,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   B(*),QRAUX(*),QTY(*),QY(*),RSD(*),X(LDX,*),XB(*),
      &   Y(*)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   T,TEMP
       INTEGER
      &   I,J,JJ,JU,KP1
@@ -1354,7 +1354,7 @@ C...Local scalars
      &   CB,CQTY,CQY,CR,CXB
 
 C...External functions
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DDOT
       EXTERNAL
      &   DDOT
@@ -1389,14 +1389,14 @@ C     Special action when N=1.
          IF (CQTY) QTY(1) = Y(1)
          IF (CXB) XB(1) = Y(1)
          IF (.NOT.CB) GO TO 30
-            IF (X(1,1) .NE. 0.0E0_R8) GO TO 10
+            IF (X(1,1) .NE. 0.0E0_wp) GO TO 10
                INFO = 1
             GO TO 20
    10       CONTINUE
                B(1) = Y(1)/X(1,1)
    20       CONTINUE
    30    CONTINUE
-         IF (CR) RSD(1) = 0.0E0_R8
+         IF (CR) RSD(1) = 0.0E0_wp
       GO TO 250
    40 CONTINUE
 
@@ -1410,7 +1410,7 @@ C           Compute QY.
 
             DO 60 JJ = 1, JU
                J = JU - JJ + 1
-               IF (QRAUX(J) .EQ. 0.0E0_R8) GO TO 50
+               IF (QRAUX(J) .EQ. 0.0E0_wp) GO TO 50
                   TEMP = X(J,J)
                   X(J,J) = QRAUX(J)
                   T = -DDOT(N-J+1,X(J,J),1,QY(J),1)/X(J,J)
@@ -1424,7 +1424,7 @@ C           Compute QY.
 C           Compute trans(Q)*Y.
 
             DO 90 J = 1, JU
-               IF (QRAUX(J) .EQ. 0.0E0_R8) GO TO 80
+               IF (QRAUX(J) .EQ. 0.0E0_wp) GO TO 80
                   TEMP = X(J,J)
                   X(J,J) = QRAUX(J)
                   T = -DDOT(N-J+1,X(J,J),1,QTY(J),1)/X(J,J)
@@ -1442,12 +1442,12 @@ C        Set up to compute B, RSD, or XB.
          IF (CR .AND. K .LT. N) CALL DCOPY(N-K,QTY(KP1),1,RSD(KP1),1)
          IF (.NOT.CXB .OR. KP1 .GT. N) GO TO 120
             DO 110 I = KP1, N
-               XB(I) = 0.0E0_R8
+               XB(I) = 0.0E0_wp
   110       CONTINUE
   120    CONTINUE
          IF (.NOT.CR) GO TO 140
             DO 130 I = 1, K
-               RSD(I) = 0.0E0_R8
+               RSD(I) = 0.0E0_wp
   130       CONTINUE
   140    CONTINUE
          IF (.NOT.CB) GO TO 190
@@ -1456,7 +1456,7 @@ C           Compute B.
 
             DO 170 JJ = 1, K
                J = K - JJ + 1
-               IF (X(J,J) .NE. 0.0E0_R8) GO TO 150
+               IF (X(J,J) .NE. 0.0E0_wp) GO TO 150
                   INFO = J
 C           ......EXIT
                   GO TO 180
@@ -1475,7 +1475,7 @@ C           Compute RSD or XB as required.
 
             DO 230 JJ = 1, JU
                J = JU - JJ + 1
-               IF (QRAUX(J) .EQ. 0.0E0_R8) GO TO 220
+               IF (QRAUX(J) .EQ. 0.0E0_wp) GO TO 220
                   TEMP = X(J,J)
                   X(J,J) = QRAUX(J)
                   IF (.NOT.CR) GO TO 200
@@ -1510,9 +1510,9 @@ C                B L A S  Subprogram
 C    Description of Parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL (KIND=R8) vector with N elements
+C       DX  REAL (KIND=wp) vector with N elements
 C     INCX  Storage spacing between elements of DX
-C       DY  REAL (KIND=R8) vector with N elements
+C       DY  REAL (KIND=wp) vector with N elements
 C     INCY  Storage spacing between elements of DY
 C       DC  D.P. element of rotation matrix
 C       DS  D.P. element of rotation matrix
@@ -1532,27 +1532,27 @@ C***Routines Called  (NONE)
 C***End Prologue  DROT
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DC,DS
       INTEGER
      &   INCX,INCY,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DX(*),DY(*)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ONE,W,Z,ZERO
       INTEGER
      &   I,KX,KY,NSTEPS
 
 C...Data statements
       DATA
-     &   ZERO,ONE/0.E0_R8,1.E0_R8/
+     &   ZERO,ONE/0.E0_wp,1.E0_wp/
 
 
 C***First executable statement  DROT
@@ -1605,13 +1605,13 @@ C***Description
 C                B L A S  Subprogram
 C    Description of Parameters
 C     --Input--
-C       DA  REAL (KIND=R8) scalar
-C       DB  REAL (KIND=R8) scalar
+C       DA  REAL (KIND=wp) scalar
+C       DB  REAL (KIND=wp) scalar
 C     --Output--
-C       DA  REAL (KIND=R8) result R
-C       DB  REAL (KIND=R8) result Z
-C       DC  REAL (KIND=R8) result
-C       DS  REAL (KIND=R8) result
+C       DA  REAL (KIND=wp) result R
+C       DB  REAL (KIND=wp) result Z
+C       DC  REAL (KIND=wp) result
+C       DS  REAL (KIND=wp) result
 C     Designed By C. L. Lawson, JPL, 1977 Sept 08
 C     Construct the Givens Transformation
 C         ( DC  DS )
@@ -1621,7 +1621,7 @@ C     which zeros the second entry of the 2-vector  (DA,DB)**T .
 C     the quantity R = (+/-)DSQRT(DA**2 + DB**2) overwrites DA in
 C     storage.  The value of DB is overwritten by a value Z which
 C     allows DC and DS to be recovered by the following algorithm.
-C           If Z=1  set  DC=0.E0_R8  and  DS=1.E0_R8
+C           If Z=1  set  DC=0.E0_wp  and  DS=1.E0_wp
 C           If DABS(Z) .LT. 1  set  DC=DSQRT(1-Z**2)  and  DS=Z
 C           If DABS(Z) .GT. 1  set  DC=1/Z  and  DS=DSQRT(1-DC**2)
 C     Normally, the subprogram DROT(N,DX,INCX,DY,INCY,DC,DS) will
@@ -1634,14 +1634,14 @@ C***Routines Called  (None)
 C***End Prologue  DROTG
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DA,DB,DC,DS
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   R,U,V
 
 C...Intrinsic functions
@@ -1661,7 +1661,7 @@ C     *** Here DABS(DA) .GT. DABS(DB) ***
 
 C     Note that U and R have the sign of DA
 
-      R = DSQRT(.25E0_R8 + V**2) * U
+      R = DSQRT(.25E0_wp + V**2) * U
 
 C     Note that DC is positive
 
@@ -1673,29 +1673,29 @@ C     Note that DC is positive
 
 C *** Here DABS(DA) .LE. DABS(DB) ***
 
-   10 IF (DB .EQ. 0.E0_R8) GO TO 20
+   10 IF (DB .EQ. 0.E0_wp) GO TO 20
       U = DB + DB
       V = DA / U
 
 C     Note that U and R have the sign of DB
 C     (R is immediately stored in DA)
 
-      DA = DSQRT(.25E0_R8 + V**2) * U
+      DA = DSQRT(.25E0_wp + V**2) * U
 
 C     Note that DS is positive
 
       DS = DB / DA
       DC = V * (DS + DS)
-      IF (DC .EQ. 0.E0_R8) GO TO 15
-      DB = 1.E0_R8 / DC
+      IF (DC .EQ. 0.E0_wp) GO TO 15
+      DB = 1.E0_wp / DC
       RETURN
-   15 DB = 1.E0_R8
+   15 DB = 1.E0_wp
       RETURN
 
-C *** Here DA = DB = 0.E0_R8 ***
+C *** Here DA = DB = 0.E0_wp ***
 
-   20 DC = 1.E0_R8
-      DS = 0.E0_R8
+   20 DC = 1.E0_wp
+      DS = 0.E0_wp
       RETURN
 
       END
@@ -1716,12 +1716,12 @@ C                B L A S  Subprogram
 C    Description of Parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DA  REAL (KIND=R8) scale factor
-C       DX  REAL (KIND=R8) vector with N elements
+C       DA  REAL (KIND=wp) scale factor
+C       DX  REAL (KIND=wp) vector with N elements
 C     INCX  Storage spacing between elements of DX
 C     --Output--
-C       DX  REAL (KIND=R8) result (unchanged if N.LE.0)
-C     Replace REAL (KIND=R8) DX by REAL (KIND=R8) DA*DX.
+C       DX  REAL (KIND=wp) result (unchanged if N.LE.0)
+C     Replace REAL (KIND=wp) DX by REAL (KIND=wp) DA*DX.
 C     For I = 0 to N-1, replace DX(1+I*INCX) with  DA * DX(1+I*INCX)
 C***References  Lawson C.L., Hanson R.J., Kincaid D.R., Krogh F.T.,
 C                 *Basic Linear Algebra Subprograms for FORTRAN Usage*,
@@ -1731,16 +1731,16 @@ C***Routines Called  (None)
 C***End Prologue  DSCAL
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DA
       INTEGER
      &   INCX,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DX(*)
 
 C...Local scalars
@@ -1793,7 +1793,7 @@ C***Begin Prologue  DSWAP
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A5
-C***Keywords  BLAS,REAL (KIND=R8),Interchange,Linear Algebra,Vector
+C***Keywords  BLAS,REAL (KIND=wp),Interchange,Linear Algebra,Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
 C           Kincaid, D. R., (U. of Texas)
@@ -1804,14 +1804,14 @@ C                B L A S  Subprogram
 C    Description of Parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL (KIND=R8) vector with N elements
+C       DX  REAL (KIND=wp) vector with N elements
 C     INCX  Storage spacing between elements of DX
-C       DY  REAL (KIND=R8) vector with N elements
+C       DY  REAL (KIND=wp) vector with N elements
 C     INCY  Storage spacing between elements of DY
 C     --Output--
 C       DX  Input vector DY (unchanged if N .LE. 0)
 C       DY  Input vector DX (unchanged if N .LE. 0)
-C     Interchange REAL (KIND=R8) DX and REAL (KIND=R8) DY.
+C     Interchange REAL (KIND=wp) DX and REAL (KIND=wp) DY.
 C     For I = 0 TO N-1, interchange  DX(LX+I*INCX) and DY(LY+I*INCY),
 C     where LX = 1 if INCX .GE. 0, else LX = (-INCX)*N, and LY is
 C     defined in a similar way using INCY.
@@ -1823,18 +1823,18 @@ C***Routines Called  (None)
 C***End Prologue  DSWAP
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   INCX,INCY,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DX(*),DY(*)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DTEMP1,DTEMP2,DTEMP3
       INTEGER
      &   I,IX,IY,M,MP1,NS
@@ -1918,16 +1918,16 @@ C***Begin Prologue  DTRCO
 C***Date Written   780814   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D2A3
-C***Keywords  Condition,REAL (KIND=R8),Factor,Linear Algebra,LINPACK,
+C***Keywords  Condition,REAL (KIND=wp),Factor,Linear Algebra,LINPACK,
 C             Matrix,Triangular
 C***Author  Moler, C. B., (U. of New Mexico)
-C***Purpose  Estimates the condition of a REAL (KIND=R8) triangular
+C***Purpose  Estimates the condition of a REAL (KIND=wp) triangular
 C            matrix.
 C***Description
-C     DTRCO estimates the condition of a REAL (KIND=R8) triangular
+C     DTRCO estimates the condition of a REAL (KIND=wp) triangular
 C     matrix.
 C     On Entry
-C        T       REAL (KIND=R8)(LDT,N)
+C        T       REAL (KIND=wp)(LDT,N)
 C                T contains the triangular matrix.  The zero
 C                elements of the matrix are not referenced, and
 C                the corresponding elements of the array can be
@@ -1940,7 +1940,7 @@ C        JOB     INTEGER
 C                = 0         T  is lower triangular.
 C                = NONZERO   T  is upper triangular.
 C     On Return
-C        RCOND   REAL (KIND=R8)
+C        RCOND   REAL (KIND=wp)
 C                An estimate of the reciprocal condition of  T .
 C                for the system  T*X = B , relative perturbations
 C                in  T  and  B  of size  EPSILON  may cause
@@ -1951,7 +1951,7 @@ C                is true, then  T  may be singular to working
 C                precision.  In particular,  RCOND  is zero  if
 C                exact singularity is detected or the estimate
 C                underflows.
-C        Z       REAL (KIND=R8)(N)
+C        Z       REAL (KIND=wp)(N)
 C                A work vector whose contents are usually unimportant.
 C                If  T  is close to a singular matrix, then  Z  is
 C                an approximate null vector in the sense that
@@ -1964,20 +1964,20 @@ C***Routines Called  DASUM,DAXPY,DSCAL
 C***End Prologue  DTRCO
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   RCOND
       INTEGER
      &   JOB,LDT,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   T(LDT,*),Z(*)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   EK,S,SM,TNORM,W,WK,WKM,YNORM
       INTEGER
      &   I1,J,J1,J2,K,KK,L
@@ -1985,7 +1985,7 @@ C...Local scalars
      &   LOWER
 
 C...External functions
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DASUM
       EXTERNAL
      &   DASUM
@@ -2006,7 +2006,7 @@ C***First executable statement  DTRCO
 
 C     Compute 1-norm of T
 
-      TNORM = 0.0E0_R8
+      TNORM = 0.0E0_wp
       DO 10 J = 1, N
          L = J
          IF (LOWER) L = N + 1 - J
@@ -2024,14 +2024,14 @@ C     The vectors are frequently rescaled to avoid overflow.
 
 C     Solve trans(T)*Y = E
 
-      EK = 1.0E0_R8
+      EK = 1.0E0_wp
       DO 20 J = 1, N
-         Z(J) = 0.0E0_R8
+         Z(J) = 0.0E0_wp
    20 CONTINUE
       DO 100 KK = 1, N
          K = KK
          IF (LOWER) K = N + 1 - KK
-         IF (Z(K) .NE. 0.0E0_R8) EK = DSIGN(EK,-Z(K))
+         IF (Z(K) .NE. 0.0E0_wp) EK = DSIGN(EK,-Z(K))
          IF (DABS(EK-Z(K)) .LE. DABS(T(K,K))) GO TO 30
             S = DABS(T(K,K))/DABS(EK-Z(K))
             CALL DSCAL(N,S,Z,1)
@@ -2041,13 +2041,13 @@ C     Solve trans(T)*Y = E
          WKM = -EK - Z(K)
          S = DABS(WK)
          SM = DABS(WKM)
-         IF (T(K,K) .EQ. 0.0E0_R8) GO TO 40
+         IF (T(K,K) .EQ. 0.0E0_wp) GO TO 40
             WK = WK/T(K,K)
             WKM = WKM/T(K,K)
          GO TO 50
    40    CONTINUE
-            WK = 1.0E0_R8
-            WKM = 1.0E0_R8
+            WK = 1.0E0_wp
+            WKM = 1.0E0_wp
    50    CONTINUE
          IF (KK .EQ. N) GO TO 90
             J1 = K + 1
@@ -2069,10 +2069,10 @@ C     Solve trans(T)*Y = E
    90    CONTINUE
          Z(K) = WK
   100 CONTINUE
-      S = 1.0E0_R8/DASUM(N,Z,1)
+      S = 1.0E0_wp/DASUM(N,Z,1)
       CALL DSCAL(N,S,Z,1)
 
-      YNORM = 1.0E0_R8
+      YNORM = 1.0E0_wp
 
 C     Solve T*Z = Y
 
@@ -2084,8 +2084,8 @@ C     Solve T*Z = Y
             CALL DSCAL(N,S,Z,1)
             YNORM = S*YNORM
   110    CONTINUE
-         IF (T(K,K) .NE. 0.0E0_R8) Z(K) = Z(K)/T(K,K)
-         IF (T(K,K) .EQ. 0.0E0_R8) Z(K) = 1.0E0_R8
+         IF (T(K,K) .NE. 0.0E0_wp) Z(K) = Z(K)/T(K,K)
+         IF (T(K,K) .EQ. 0.0E0_wp) Z(K) = 1.0E0_wp
          I1 = 1
          IF (LOWER) I1 = K + 1
          IF (KK .GE. N) GO TO 120
@@ -2094,12 +2094,12 @@ C     Solve T*Z = Y
   120    CONTINUE
   130 CONTINUE
 C     Make ZNORM = 1.0
-      S = 1.0E0_R8/DASUM(N,Z,1)
+      S = 1.0E0_wp/DASUM(N,Z,1)
       CALL DSCAL(N,S,Z,1)
       YNORM = S*YNORM
 
-      IF (TNORM .NE. 0.0E0_R8) RCOND = YNORM/TNORM
-      IF (TNORM .EQ. 0.0E0_R8) RCOND = 0.0E0_R8
+      IF (TNORM .NE. 0.0E0_wp) RCOND = YNORM/TNORM
+      IF (TNORM .EQ. 0.0E0_wp) RCOND = 0.0E0_wp
       RETURN
       END
 *DTRSL
@@ -2108,7 +2108,7 @@ C***Begin Prologue  DTRSL
 C***Date Written   780814   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D2A3
-C***Keywords  REAL (KIND=R8),Linear Algebra,LINPACK,Matrix,Solve,
+C***Keywords  REAL (KIND=wp),Linear Algebra,LINPACK,Matrix,Solve,
 C             Triangular
 C***Author  Stewart, G. W., (U. of Maryland)
 C***Purpose  Solves systems of the form  T*X=B or  trans(T)*X=B  where T
@@ -2121,7 +2121,7 @@ C                   trans(T) * X = B
 C     where T is a triangular matrix of order N.  Here trans(T)
 C     denotes the transpose of the matrix T.
 C     On Entry
-C         T         REAL (KIND=R8)(LDT,N)
+C         T         REAL (KIND=wp)(LDT,N)
 C                   T contains the matrix of the system.  The zero
 C                   elements of the matrix are not referenced, and
 C                   the corresponding elements of the array can be
@@ -2130,7 +2130,7 @@ C         LDT       INTEGER
 C                   LDT is the leading dimension of the array T.
 C         N         INTEGER
 C                   N is the order of the system.
-C         B         REAL (KIND=R8)(N).
+C         B         REAL (KIND=wp)(N).
 C                   B contains the right hand side of the system.
 C         JOB       INTEGER
 C                   JOB specifies what kind of system is to be solved.
@@ -2154,24 +2154,24 @@ C***Routines Called  DAXPY,DDOT
 C***End Prologue  DTRSL
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   INFO,JOB,LDT,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   B(*),T(LDT,*)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   TEMP
       INTEGER
      &   CASE,J,JJ
 
 C...External functions
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DDOT
       EXTERNAL
      &   DDOT
@@ -2194,7 +2194,7 @@ C        Check for zero diagonal elements.
 
          DO 10 INFO = 1, N
 C     ......Exit
-            IF (T(INFO,INFO) .EQ. 0.0E0_R8) GO TO 150
+            IF (T(INFO,INFO) .EQ. 0.0E0_wp) GO TO 150
    10    CONTINUE
          INFO = 0
 
@@ -2268,7 +2268,7 @@ C***Begin Prologue  IDAMAX
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A2
-C***Keywords  BLAS,REAL (KIND=R8),Linear Algebra,Maximum Component,
+C***Keywords  BLAS,REAL (KIND=wp),Linear Algebra,Maximum Component,
 C             Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
@@ -2280,11 +2280,11 @@ C                B L A S  Subprogram
 C    Description of parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL (KIND=R8) vector with N elements
+C       DX  REAL (KIND=wp) vector with N elements
 C     INCX  Storage spacing between elements of DX
 C     --Output--
 C   IDAMAX  Smallest index (zero if N .LE. 0)
-C     Find smallest index of maximum magnitude of REAL (KIND=R8) DX.
+C     Find smallest index of maximum magnitude of REAL (KIND=wp) DX.
 C     IDAMAX =  first I, I = 1 to N, to minimize  ABS(DX(1-INCX+I*INCX)
 C***References  Lawson C.L., Hanson R.J., Kincaid D.R., Krogh F.T.,
 C                 *Basic Linear Algebra Subprograms for FORTRAN Usage*,
@@ -2294,14 +2294,14 @@ C***Routines Called  (None)
 C***End Prologue  IDAMAX
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   INCX,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DX(*)
 
 C...Result
@@ -2309,7 +2309,7 @@ C...Result
      &   IDAMAXR
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DMAX,XMAG
       INTEGER
      &   I,II,NS

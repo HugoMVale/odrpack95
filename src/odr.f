@@ -7,11 +7,11 @@ C***Revision Date N/A
 C***Purpose: Define the interface to the ODR subroutine
 C***End Prologue ODRPACK95
 
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C   A temporary work array for holding return values before copying to a lower
 C   rank array.
-      REAL (KIND=R8), ALLOCATABLE :: TEMPRET(:,:)
+      REAL (KIND=wp), ALLOCATABLE :: TEMPRET(:,:)
 
       CONTAINS
 *ODR
@@ -57,7 +57,7 @@ C             and
 C             Applied and Computational Mathematics Division
 C             National Institute of Standards and Technology
 C             Boulder, CO 80303-3328
-C***Purpose  REAL (KIND=R8) driver routine for finding 
+C***Purpose  REAL (KIND=wp) driver routine for finding 
 C            the weighted explicit or implicit orthogonal distance  
 C            regression (ODR) or ordinary linear or nonlinear least  
 C            squares (OLS) solution (long call statement)
@@ -82,16 +82,16 @@ C***Routines Called  DODCNT
 C***End Prologue  ODR
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   PARTOL,SSTOL,TAUFAC
       INTEGER
      &   INFO,IPRINT,JOB,LUNERR,LUNRPT,M,MAXIT,N,NDIGIT,NP,NQ
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(:),DELTA(:,:),LOWER(:),SCLB(:),SCLD(:,:),
      &   STPB(:),STPD(:,:),UPPER(:),WD(:,:,:),WE(:,:,:),
      &   WORK(:),X(:,:),Y(:,:)
@@ -113,7 +113,7 @@ C...Pointers
      &   DELTA,IWORK,WORK
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   NEGONE,ZERO,LTAUFAC,LSSTOL,LPARTOL
       INTEGER
      &   LDWE,LD2WE,LDWD,LD2WD,LDIFX,LDSCLD,LDSTPD,
@@ -123,7 +123,7 @@ C...Local scalars
      &   HEAD
 
 C...Local arrays
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   LDELTA(:,:),LLOWER(NP),LWE(N,NQ,NQ),LWD(N,M,M),
      &   LSTPB(NP),LSTPD(N,M),LSCLB(NP),
      &   LSCLD(N,M),LUPPER(NP),LWORK(:),WD1(1,1,1)
@@ -145,7 +145,7 @@ C...External subroutines
 C...Data statements
       DATA
      &   NEGONE,ZERO
-     &   /-1.0E0_R8,0.0E0_R8/
+     &   /-1.0E0_wp,0.0E0_wp/
 
 C...Routine names used as subprogram arguments
 C   FCN:     The user-supplied subroutine for evaluating the model.
@@ -184,9 +184,9 @@ C   TAUFAC:  The factor used to compute the initial trust region
 C            diameter.
 C   UPPER:   The upper bound on BETA.
 C   WD:      The DELTA weights.
-C   WD1:     A dummy array used when WD(1,1,1)=0.0E0_R8.
+C   WD1:     A dummy array used when WD(1,1,1)=0.0E0_wp.
 C   WE:      The EPSILON weights.
-C   WORK:    The REAL (KIND=R8) work space.
+C   WORK:    The REAL (KIND=wp) work space.
 C   X:       The explanatory variable.
 C   Y:       The dependent variable.  Unused when the model is implicit.
 
@@ -352,7 +352,7 @@ C  Allocate the work arrays
 
       ALLOCATE(LWORK(LENWORK),TEMPRET(MAX(N,NP),MAX(NQ,M)),STAT=LINFO3)
       ALLOCATE(LIWORK(LENIWORK),STAT=LINFO2)
-      LWORK(:) = 0.0_R8
+      LWORK(:) = 0.0_wp
       LIWORK(:) = 0
       IF (PRESENT(DELTA)) THEN
          IF (.NOT.ASSOCIATED(DELTA)) THEN
@@ -416,7 +416,7 @@ C  report errors as necessary
          IF (SIZE(IFIXB).LT.NP) THEN
             LINFO1 = LINFO1 + 64
          END IF
-         IF (IFIXB(1).LT.0.0_R8) THEN
+         IF (IFIXB(1).LT.0.0_wp) THEN
             LIFIXB(1) = IFIXB(1)
          ELSE
             LIFIXB(1:NP) = IFIXB(1:NP)
@@ -435,7 +435,7 @@ C  report errors as necessary
          IF (LDIFX.GT.N) THEN
             LDIFX = N
          END IF
-         IF (IFIXX(1,1).LT.0.0_R8) THEN
+         IF (IFIXX(1,1).LT.0.0_wp) THEN
             LIFIXX(1,1) = IFIXX(1,1)
          ELSE
             LIFIXX(1:LDIFX,1:M) = IFIXX(1:LDIFX,1:M)
@@ -470,7 +470,7 @@ C  report errors as necessary
          IF (SIZE(SCLB).LT.NP) THEN
             LINFO1 = LINFO1 + 1024
          END IF
-         IF (SCLB(1).LE.0.0_R8) THEN
+         IF (SCLB(1).LE.0.0_wp) THEN
             LSCLB(1) = SCLB(1)
          ELSE
             LSCLB(1:NP) = SCLB(1:NP)
@@ -489,7 +489,7 @@ C  report errors as necessary
          IF (LDSCLD.GT.N) THEN
             LDSCLD = N
          END IF
-         IF (SCLD(1,1).LE.0.0_R8) THEN
+         IF (SCLD(1,1).LE.0.0_wp) THEN
             LSCLD(1,1) = SCLD(1,1)
          ELSE
             LSCLD(1:LDSCLD,1:M) = SCLD(1:LDSCLD,1:M)
@@ -504,7 +504,7 @@ C  report errors as necessary
          IF (SIZE(STPB).LT.NP) THEN
             LINFO1 = LINFO1 + 256
          END IF
-         IF (STPB(1).LE.0.0_R8) THEN
+         IF (STPB(1).LE.0.0_wp) THEN
             LSTPB(1) = STPB(1)
          ELSE
             LSTPB(1:NP) = STPB(1:NP)
@@ -523,7 +523,7 @@ C  report errors as necessary
          IF (LDSTPD.GT.N) THEN
             LDSTPD = N
          END IF
-         IF (STPD(1,1).LE.0.0_R8) THEN
+         IF (STPD(1,1).LE.0.0_wp) THEN
             LSTPD(1,1) = STPD(1,1)
          ELSE
             LSTPD(1:LDSTPD,1:M) = STPD(1:LDSTPD,1:M)
@@ -550,7 +550,7 @@ C  report errors as necessary
          IF (LD2WE.GT.NQ) THEN
             LD2WE = NQ
          END IF
-         IF (WE(1,1,1).LT.0.0_R8) THEN
+         IF (WE(1,1,1).LT.0.0_wp) THEN
             LWE(1,1,1) = WE(1,1,1)
          ELSE
             LWE(1:LDWE,1:LD2WE,1:NQ) = WE(1:LDWE,1:LD2WE,1:NQ)
@@ -573,7 +573,7 @@ C  report errors as necessary
          IF (LD2WD.GT.M) THEN
             LD2WD = M
          END IF
-         IF (WD(1,1,1).LE.0.0_R8) THEN
+         IF (WD(1,1,1).LE.0.0_wp) THEN
             LWD(1,1,1) = WD(1,1,1)
          ELSE
             LWD(1:LDWD,1:LD2WD,1:M) = WD(1:LDWD,1:LD2WD,1:M)
@@ -739,10 +739,10 @@ C***Purpose  Access or store values in the work arrays
 C***End Prologue  DACESS
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ACTRS,ALPHA,ETA,OLMAVG,PARTOL,PNORM,PRERS,RCOND,
      &   RNORMS,RVAR,SSTOL,TAU,TAUFAC
       INTEGER
@@ -754,7 +754,7 @@ C...Scalar arguments
      &   ACCESS,ISODR
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   WORK(LWORK),WSS(3)
       INTEGER
      &   IWORK(LIWORK)
@@ -904,7 +904,7 @@ C   UI:      The starting location in array WORK of array U.
 C   VCV:     The starting location in array WORK of array VCV.
 C   VCVI:    The starting location in array WORK of array VCV.
 C   WE1I:    The starting location in array WORK of array WE1.
-C   WORK:    The REAL (KIND=R8) work space.
+C   WORK:    The REAL (KIND=wp) work space.
 C   WRK1:    The starting location in array WORK of array WRK1.
 C   WRK1I:   The starting location in array WORK of array WRK1.
 C   WRK2:    The starting location in array WORK of array WRK2.
@@ -941,7 +941,7 @@ C  Find starting locations within integer workspace
      &            BOUNDI,
      &            LIWKMN)
 
-C  Find starting locations within REAL (KIND=R8) work space
+C  Find starting locations within REAL (KIND=wp) work space
 
       CALL DWINF(N,M,NP,NQ,LDWE,LD2WE,ISODR,
      &           DELTAI,EPSI,XPLUSI,FNI,SDI,VCVI,
@@ -1055,20 +1055,20 @@ C***Purpose  Compute E = WD + ALPHA*TT**2
 C***End Prologue  DESUBI
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ALPHA
       INTEGER
      &   LDTT,LDWD,LD2WD,M,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   E(M,M),TT(LDTT,M),WD(LDWD,LD2WD,M)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ZERO
       INTEGER
      &   I,J,J1,J2
@@ -1080,7 +1080,7 @@ C...External subroutines
 C...Data statements
       DATA
      &   ZERO
-     &   /0.0E0_R8/
+     &   /0.0E0_wp/
 
 C...Variable Definitions (alphabetically)
 C   ALPHA:  The Levenberg-Marquardt parameter.
@@ -1096,7 +1096,7 @@ C   N:      The number of observations.
 C   NP:     The number of responses per observation.
 C   TT:     The scaling values used for DELTA.
 C   WD:     The squared DELTA weights, D**2.
-C   ZERO:   The value 0.0E0_R8.
+C   ZERO:   The value 0.0E0_wp.
 
 
 C***First executable statement  DESUBI
@@ -1219,16 +1219,16 @@ C            (Adapted from STARPAC subroutine ETAFUN)
 C***End Prologue  DETAF
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   EPSMAC,ETA
       INTEGER
      &   INFO,ISTOP,LDIFX,M,N,NETA,NFEV,NP,NQ,NROW
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),LOWER(NP),PARTMP(NP),PV0(N,NQ),UPPER(NP),
      &   WRK1(N,M,NQ),WRK2(N,NQ),WRK6(N,NP,NQ),WRK7(-2:2,NQ),XPLUSD(N,M)
       INTEGER
@@ -1239,20 +1239,20 @@ C...Subroutine arguments
      &   FCN
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   A,B,FAC,HUNDRD,ONE,P1,P2,P5,SHIFT,STP,TWO,ZERO
       INTEGER
      &   J,K,L,SBK
 
 C...Local arrays
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   PARPTS(-2:2,NP)
 
 C...Data statements
       DATA
      &   ZERO,P1,P2,P5,ONE,TWO,HUNDRD
-     &   /0.0E0_R8,0.1E0_R8,0.2E0_R8,0.5E0_R8,1.0E0_R8,2.0E0_R8,
-     &   1.0E2_R8/
+     &   /0.0E0_wp,0.1E0_wp,0.2E0_wp,0.5E0_wp,1.0E0_wp,2.0E0_wp,
+     &   1.0E2_wp/
 
 C...Routine names used as subprogram arguments
 C   FCN:      The user supplied subroutine for evaluating the model.
@@ -1264,7 +1264,7 @@ C   BETA:    The function parameters.
 C   EPSMAC:  The value of machine precision.
 C   ETA:     The noise in the model results.
 C   FAC:     A factor used in the computations.
-C   HUNDRD:  The value 1.0E2_R8.
+C   HUNDRD:  The value 1.0E2_wp.
 C   IFIXB:   The values designating whether the elements of BETA are
 C            fixed at their input values or not.
 C   IFIXX:   The values designating whether the elements of X are
@@ -1283,10 +1283,10 @@ C   NFEV:    The number of function evaluations.
 C   NP:      The number of function parameters.
 C   NQ:      The number of responses per observation.
 C   NROW:    The row number at which the derivative is to be checked.
-C   ONE:     The value 1.0E0_R8.
-C   P1:      The value 0.1E0_R8.
-C   P2:      The value 0.2E0_R8.
-C   P5:      The value 0.5E0_R8.
+C   ONE:     The value 1.0E0_wp.
+C   P1:      The value 0.1E0_wp.
+C   P2:      The value 0.2E0_wp.
+C   P5:      The value 0.5E0_wp.
 C   PARPTS:  The points that PARTMP will take on during FCN evaluations.
 C   PARTMP:  The model parameters.
 C   PV0:     The original predicted values.
@@ -1299,7 +1299,7 @@ C   WRK2:    A work array of (N BY NQ) elements.
 C   WRK6:    A work array of (N BY NP BY NQ) elements.
 C   WRK7:    A work array of (5 BY NQ) elements.
 C   XPLUSD:  The values of X + DELTA.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DETAF
@@ -1425,7 +1425,7 @@ C***Purpose  Compute the weighted Jacobians wrt BETA and DELTA
 C***End Prologue  DEVJAC
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
       USE ODRPACK95, ONLY : TEMPRET
 
 C...Scalar arguments
@@ -1436,7 +1436,7 @@ C...Scalar arguments
      &   ANAJAC,CDJAC,ISODR
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),BETAC(NP),DELTA(N,M),FJACB(N,NP,NQ),FJACD(N,M,NQ),
      &   FN(N,NQ),LOWER(NP),SSF(NP),STP(N),STPB(NP),STPD(LDSTPD,M),
      &   TT(LDTT,M),UPPER(NP),
@@ -1452,7 +1452,7 @@ C...Subroutine arguments
 C...Local scalars
       INTEGER
      &   IDEVAL,J,K,K1,L
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ZERO
       LOGICAL
      &   ERROR
@@ -1462,23 +1462,23 @@ C...External subroutines
      &   DIFIX,DJACCD,DJACFD,DUNPAC,DXPY
 
 C...External functions
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DDOT
       EXTERNAL
      &   DDOT
 
 C...Data statements
       DATA ZERO
-     &   /0.0E0_R8/
+     &   /0.0E0_wp/
 
 C...Interface blocks
       INTERFACE
       SUBROUTINE DWGHT
      &   (N,M,WT,LDWT,LD2WT,T,WTT)
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
       INTEGER
      &   LDWT,LD2WT,M,N
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   T(:,:),WT(:,:,:),WTT(:,:)
       END SUBROUTINE
       END INTERFACE
@@ -1546,7 +1546,7 @@ C   WRK3:    A work array of (NP) elements.
 C   WRK6:    A work array of (N BY NP BY NQ) elements.
 C   X:       The independent variable.
 C   XPLUSD:  The values of X + DELTA.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DEVJAC
@@ -1663,26 +1663,26 @@ C                 *LINPACK Users Guide*, SIAM, 1979.
 C***End PROLOGUE  DFCTR
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER INFO,LDA,N
       LOGICAL OKSEMI
 
 C...Array arguments
-      REAL (KIND=R8) A(LDA,N)
+      REAL (KIND=wp) A(LDA,N)
 
 C...Local scalars
-      REAL (KIND=R8) XI,S,T,TEN,ZERO
+      REAL (KIND=wp) XI,S,T,TEN,ZERO
       INTEGER J,K
 
 C...External functions
       EXTERNAL DDOT
-      REAL (KIND=R8) DDOT
+      REAL (KIND=wp) DDOT
  
       DATA
      &   ZERO,TEN
-     &   /0.0E0_R8,10.0E0_R8/
+     &   /0.0E0_wp,10.0E0_wp/
 
 C...Variable Definitions (alphabetically)
 C   A:       The array to be factored.  Upon return, A contains the
@@ -1700,9 +1700,9 @@ C   N:       The number of rows and columns of data in array A.
 C   OKSEMI:  The indicating whether the factored array can be positive 
 C            semidefinite (OKSEMI=TRUE) or whether it must be found to
 C            be positive definite (OKSEMI=FALSE).
-C   TEN:     The value 10.0E0_R8.
+C   TEN:     The value 10.0E0_wp.
 C   XI:      A value used to test for non positive semidefiniteness.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DFCTR
@@ -1766,7 +1766,7 @@ C            ODRPACK95 reference guide
 C***End Prologue  DFCTRW
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
@@ -1776,12 +1776,12 @@ C...Scalar arguments
      &   ISODR
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   WE(LDWE,LD2WE,NQ),WE1(LDWE,LD2WE,NQ),WD(LDWD,LD2WD,M),
      &   WRK0(NQ,NQ),WRK4(M,M)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ZERO
       INTEGER
      &   I,INF,J,J1,J2,L,L1,L2
@@ -1795,7 +1795,7 @@ C...External subroutines
 C...Data statements
       DATA
      &   ZERO
-     &   /0.0E0_R8/
+     &   /0.0E0_wp/
 
 C...Variable Definitions (alphabetically)
 C   I:       An indexing variable.
@@ -1826,7 +1826,7 @@ C   WE1:     The factored EPSILON weights, S.T. trans(WE1)*WE1 = WE.
 C   WD:      The (squared) DELTA weights.
 C   WRK0:    A work array of (NQ BY NQ) elements.
 C   WRK4:    A work array of (M BY M) elements.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DFCTRW
@@ -2134,28 +2134,28 @@ C***Purpose  Set relative step size for finite difference derivatives
 C***End Prologue  DHSTEP
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   I,ITYPE,J,LDSTP,NETA
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   STP(LDSTP,J)
 
 C...Result
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DHSTEPR
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   TEN,THREE,TWO,ZERO
  
 C...Data statements
       DATA
      &   ZERO,TWO,THREE,TEN
-     &   /0.0E0_R8,2.0E0_R8,3.0E0_R8,10.0E0_R8/
+     &   /0.0E0_wp,2.0E0_wp,3.0E0_wp,10.0E0_wp/
  
 C...Variable Definitions (alphabetically)
 C   I:       An identifier for selecting user supplied step sizes.
@@ -2166,10 +2166,10 @@ C   J:       An identifier for selecting user supplied step sizes.
 C   LDSTP:   The leading dimension of array STP.
 C   NETA:    The number of good digits in the function results.
 C   STP:     The step size for the finite difference derivative.
-C   TEN:     The value 10.0E0_R8.
-C   THREE:   The value 3.0E0_R8.
-C   TWO:     The value 2.0E0_R8.
-C   ZERO:    The value 0.0E0_R8.
+C   TEN:     The value 10.0E0_wp.
+C   THREE:   The value 3.0E0_wp.
+C   TWO:     The value 2.0E0_wp.
+C   ZERO:    The value 0.0E0_wp.
 
 
 
@@ -2210,20 +2210,20 @@ C***Purpose  Set elements of T to zero according to IFIX
 C***End Prologue  DIFIX
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   LDIFIX,LDT,LDTFIX,M,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   T(LDT,M),TFIX(LDTFIX,M)
       INTEGER
      &   IFIX(LDIFIX,M)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ZERO
       INTEGER
      &   I,J
@@ -2231,7 +2231,7 @@ C...Local scalars
 C...Data statements
       DATA
      &   ZERO
-     &   /0.0E0_R8/
+     &   /0.0E0_wp/
 
 C...Variable Definitions (alphabetically)
 C   I:       An indexing variable.
@@ -2246,7 +2246,7 @@ C   N:       The number of rows of data in the array.
 C   T:       The array being set to zero according to the elements 
 C            of IFIX.
 C   TFIX:    The resulting array.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DIFIX
@@ -2303,10 +2303,10 @@ C***Purpose  Initialize work vectors as necessary
 C***End Prologue  DINIWK
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   PARTOL,SSTOL,TAUFAC
       INTEGER
      &   BOUNDI,DELTAI,EPSMAI,IPRINI,IPRINT,JOB,JOBI,LDIFX,
@@ -2315,14 +2315,14 @@ C...Scalar arguments
      &   UPPERI
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),LOWER(NP),SCLB(NP),SCLD(LDSCLD,M),UPPER(NP),
      &   WORK(LWORK),X(LDX,M)
       INTEGER
      &   IFIXX(LDIFX,M),IWORK(LIWORK)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ONE,THREE,TWO,ZERO
       INTEGER
      &   I,J 
@@ -2338,7 +2338,7 @@ C...External subroutines
 C...Data statements
       DATA
      &   ZERO,ONE,TWO,THREE
-     &   /0.0E0_R8,1.0E0_R8,2.0E0_R8,3.0E0_R8/
+     &   /0.0E0_wp,1.0E0_wp,2.0E0_wp,3.0E0_wp/
 
 C...Variable Definitions (alphabetically)
 C   ANAJAC:  The variable designating whether the Jacobians are 
@@ -2387,7 +2387,7 @@ C   MAXIT:   The maximum number of iterations allowed.
 C   MAXITI:  The location in array IWORK of variable MAXIT.
 C   N:       The number of observations.
 C   NP:      The number of function parameters.
-C   ONE:     The value 1.0E0_R8.
+C   ONE:     The value 1.0E0_wp.
 C   PARTLI:  The location in array work of variable partol.
 C   PARTOL:  The parameter convergence stopping criteria.
 C   REDOJ:   The variable designating whether the Jacobian matrix is to 
@@ -2403,12 +2403,12 @@ C   SSTOLI:  The location in array WORK of variable SSTOL.
 C   TAUFAC:  The factor used to compute the initial trust region 
 C            diameter.
 C   TAUFCI:  The location in array WORK of variable TAUFAC.
-C   THREE:   The value 3.0E0_R8.
+C   THREE:   The value 3.0E0_wp.
 C   TTI:     The starting location in array WORK of the ARRAY TT.
-C   TWO:     The value 2.0E0_R8.
-C   WORK:    The REAL (KIND=R8) work space.
+C   TWO:     The value 2.0E0_wp.
+C   WORK:    The REAL (KIND=wp) work space.
 C   X:       The independent variable.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DINIWK
@@ -2678,7 +2678,7 @@ C            Jacobian wrt the estimated BETAS and wrt the DELTAS
 C***End Prologue  DJACCD
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
@@ -2687,7 +2687,7 @@ C...Scalar arguments
      &   ISODR
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),DELTA(N,M),FJACB(N,NP,NQ),FJACD(N,M,NQ),FN(N,NQ),
      &   LOWER(NP),
      &   SSF(NP),STP(N),STPB(NP),STPD(LDSTPD,M),TT(LDTT,M),
@@ -2702,7 +2702,7 @@ C...Subroutine arguments
      &   FCN
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETAK,ONE,TYPJ,ZERO
       INTEGER
      &   I,J,K,L
@@ -2714,7 +2714,7 @@ C...External subroutines
      &   DZERO
 
 C...External functions
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DHSTEP,DERSTEP
       EXTERNAL
      &   DHSTEP,DERSTEP
@@ -2722,7 +2722,7 @@ C...External functions
 C...Data statements
       DATA
      &   ZERO,ONE
-     &   /0.0E0_R8,1.0E0_R8/
+     &   /0.0E0_wp,1.0E0_wp/
 
 C...Routine names used as subprogram arguments
 C   FCN:     The user supplied subroutine for evaluating the model.
@@ -2761,7 +2761,7 @@ C   N:       The number of observations.
 C   NETA:    The number of good digits in the function results.
 C   NFEV:    The number of function evaluations.
 C   NP:      The number of function parameters.
-C   ONE:     The value 1.0E0_R8.
+C   ONE:     The value 1.0E0_wp.
 C   SETZRO:  The variable designating whether the derivative wrt some 
 C            DELTA needs to be set to zero (SETZRO=TRUE) or not
 C            (SETZRO=FALSE).
@@ -2781,7 +2781,7 @@ C   WRK1:    A work array of (N BY M BY NQ) elements.
 C   WRK2:    A work array of (N BY NQ) elements.
 C   WRK3:    A work array of (NP) elements.
 C   WRK6:    A WORK ARRAY OF (N BY NP BY NQ) elements.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DJACCD
@@ -3006,28 +3006,28 @@ C***         MOVE BETA AWAY FROM BOUNDS SO THAT DERIVATIVES CAN BE CALCULATED.
 C***END PROLOGUE  MBFB
 
 C...USED MODULES
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...SCALAR ARGUMENTS
       INTEGER
      &   NETA,NP
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ETA
 
 C...ARRAY ARGUMENTS
       INTEGER 
      &   INTERVAL(NP)
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),LOWER(NP),SSF(NP),STPB(NP),UPPER(NP)
 
 C...LOCAL SCALARS
       INTEGER
      &   K
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   H,H0,H1,HC,HC0,HC1,HUNDRED,ONE,STPR,STPL,TEN,THREE,TYPJ,ZERO
 
 C...EXTERNAL FUNCTIONS
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DHSTEP
       EXTERNAL
      &   DHSTEP
@@ -3035,7 +3035,7 @@ C...EXTERNAL FUNCTIONS
 C...DATA STATEMENTS
       DATA
      &   ZERO,ONE,TEN,HUNDRED,THREE
-     &   /0.0E0_R8,1.0E0_R8,10.0E0_R8,100.0E0_R8,3.0E0_R8/
+     &   /0.0E0_wp,1.0E0_wp,10.0E0_wp,100.0E0_wp,3.0E0_wp/
 
 C...VARIABLE DEFINITIONS (ALPHABETICALLY)
 C   BETA:    BETA for the jacobian checker.  BETA will be moved far enough from
@@ -3046,12 +3046,12 @@ C   H1:      Default relative step size for forward differences.
 C   HC:      Relative step size for center differences.
 C   HC0:     Initial relative step size for center differences.
 C   HC1:     Default relative step size for center differences.
-C   HUNDRED: 100.0E0_R8
+C   HUNDRED: 100.0E0_wp
 C   INTERVAL: Specifies which difference methods and step sizes are supported by
 C            the current intervale UPPER-LOWER.
 C   K:       Index variable for BETA.
 C   NETA:    Number of good digits in the function results.
-C   ONE:     The value 1.0E0_R8.
+C   ONE:     The value 1.0E0_wp.
 C   SSF:     The scale used for the BETA'S.
 C   STPB:    The relative step used for computing finite difference derivatives
 C            with respect to BETA.
@@ -3059,10 +3059,10 @@ C   STPL:    Maximum step to the left of BETA (-) the derivative checker will
 C            use.
 C   STPR:    Maximum step to the right of BETA (+) the derivative checker will
 C            use.
-C   TEN:     10.0E0_R8
-C   THREE:   3.0E0_R8
+C   TEN:     10.0E0_wp
+C   THREE:   3.0E0_wp
 C   TYPJ:    The typical size of the J-th unkonwn BETA.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
       INTERVAL(:) = 111
       DO K=1,NP
@@ -3131,28 +3131,28 @@ C***Purpose  Compute step size for center and forward difference calculations
 C***End Prologue  DERSTEP
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   ITYPE,K,NETA
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETAK
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   SSF(K),STPB(K)
 
 C...Result
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DERSTEPR
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ONE,TYPJ,ZERO
 
 C...External functions
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DHSTEP
       EXTERNAL
      &   DHSTEP
@@ -3160,19 +3160,19 @@ C...External functions
 C...Data statements
       DATA
      &   ZERO,ONE
-     &   /0.0E0_R8,1.0E0_R8/
+     &   /0.0E0_wp,1.0E0_wp/
 
 C...Variable definitions (alphabetically)
 C   BETAK:   The K-th function parameter.
 C   ITYPE:   0 - calc foward difference step, 1 - calc center difference step.
 C   K:       Index into beta where BETAK resides.
 C   NETA:    Number of good digits in the function results.
-C   ONE:     The value 1.0E0_R8.
+C   ONE:     The value 1.0E0_wp.
 C   SSF:     The scale used for the BETA'S.
 C   STPB:    The relative step used for computing finite difference derivatives
 C            with respect to BETA.
 C   TYPJ:    The typical size of the J-th unkonwn BETA.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DERSTEP
@@ -3210,7 +3210,7 @@ C            Jacobian wrt the estimated BETAS and wrt the DELTAS
 C***End Prologue  DJACFD
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
@@ -3219,7 +3219,7 @@ C...Scalar arguments
      &   ISODR
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),DELTA(N,M),FJACB(N,NP,NQ),FJACD(N,M,NQ),FN(N,NQ),
      &   LOWER(NP),
      &   SSF(NP),STP(N),STPB(NP),STPD(LDSTPD,M),TT(LDTT,M),
@@ -3234,7 +3234,7 @@ C...Subroutine arguments
      &   FCN
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETAK,ONE,STEP,TYPJ,ZERO
       INTEGER
      &   I,J,K,L
@@ -3246,7 +3246,7 @@ C...External subroutines
      &   DZERO
 
 C...External functions
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DHSTEP,DERSTEP
       EXTERNAL
      &   DHSTEP,DERSTEP
@@ -3254,7 +3254,7 @@ C...External functions
 C...Data statements
       DATA
      &   ZERO,ONE
-     &   /0.0E0_R8,1.0E0_R8/
+     &   /0.0E0_wp,1.0E0_wp/
 
 C...Routine names used as subprogram arguments
 C   FCN:     The user supplied subroutine for evaluating the model.
@@ -3290,7 +3290,7 @@ C   N:       The number of observations.
 C   NETA:    The number of good digits in the function results.
 C   NFEV:    The number of function evaluations.
 C   NP:      The number of function parameters.
-C   ONE:     The value 1.0E0_R8.
+C   ONE:     The value 1.0E0_wp.
 C   SETZRO:  The variable designating whether the derivative wrt some 
 C            DELTA needs to be set to zero (SETZRO=TRUE) or not
 C            (SETZRO=FALSE).
@@ -3309,7 +3309,7 @@ C   WRK1:    A work array of (N by M by NQ) elements.
 C   WRK2:    A work array of (N BY NQ) elements.
 C   WRK3:    A work array of (NP) elements.
 C   WRK6:    A work array of (N BY NP BY NQ) elements.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DJACFD
@@ -3493,10 +3493,10 @@ C            (adapted from STARPAC subroutine DCKCNT)
 C***End Prologue  DJCK
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   EPSMAC,ETA
       INTEGER
      &   ISTOP,LDIFX,LDSTPD,LDTT,
@@ -3505,7 +3505,7 @@ C...Scalar arguments
      &   ISODR
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),BETAJ(NP),DIFF(NQ,NP+M),FJACB(N,NP,NQ),FJACD(N,M,NQ),
      &   PV0I(N,NQ),SSF(NP),STPB(NP),STPD(LDSTPD,M),TT(LDTT,M),
      &   WRK1(N,M,NQ),WRK2(N,NQ),WRK6(N,NP,NQ),XPLUSD(N,M)
@@ -3518,7 +3518,7 @@ C...Subroutine arguments
      &   FCN
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DIFFJ,H0,HC0,ONE,P5,PV,TOL,TYPJ,ZERO
       INTEGER
      &   IDEVAL,J,LQ,MSGB1,MSGD1
@@ -3526,7 +3526,7 @@ C...Local scalars
      &   ISFIXD,ISWRTB
 
 C...Local arrays
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   PV0(N,NQ)
 
 C...External subroutines
@@ -3534,7 +3534,7 @@ C...External subroutines
      &   DJCKM
 
 C...External functions
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DHSTEP
       EXTERNAL
      &   DHSTEP
@@ -3542,7 +3542,7 @@ C...External functions
 C...Data statements
       DATA
      &   ZERO,P5,ONE
-     &   /0.0E0_R8,0.5E0_R8,1.0E0_R8/
+     &   /0.0E0_wp,0.5E0_wp,1.0E0_wp/
 
 C...Routine names used as subprogram arguments
 C   FCN:     The user supplied subroutine for evaluating the model.
@@ -3599,8 +3599,8 @@ C   NROW:    The row number of the explanatory variable array at which
 C            the derivative is checked.
 C   NTOL:    The number of digits of agreement required between the
 C            numerical derivatives and the user supplied derivatives.
-C   ONE:     The value 1.0E0_R8.
-C   P5:      The value 0.5E0_R8.
+C   ONE:     The value 1.0E0_wp.
+C   P5:      The value 0.5E0_wp.
 C   PV:      The scalar in which the predicted value from the model for
 C            row   NROW   is stored.
 C   PV0:     The predicted values using the current parameter estimates
@@ -3617,7 +3617,7 @@ C   WRK1:    A work array of (N BY M BY NQ) elements.
 C   WRK2:    A work array of (N BY NQ) elements.
 C   WRK6:    A work array of (N BY NP BY NQ) elements.
 C   XPLUSD:  The values of X + DELTA.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DJCK
@@ -3625,7 +3625,7 @@ C***First executable statement  DJCK
 
 C  Set tolerance for checking derivatives
 
-      TOL  = ETA**(0.25E0_R8)
+      TOL  = ETA**(0.25E0_wp)
       NTOL = MAX(ONE,P5-LOG10(TOL))
 
 
@@ -3814,10 +3814,10 @@ C            (adapted from STARPAC subroutine DCKCRV)
 C***End prologue  DJCKC
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   D,DIFFJ,EPSMAC,ETA,FD,HC,PV,PVPSTP,STP0,TOL,TYPJ
       INTEGER
      &   ISTOP,J,LDIFX,LQ,M,N,NFEV,NP,NQ,NROW
@@ -3825,7 +3825,7 @@ C...Scalar arguments
      &   ISWRTB
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),WRK1(N,M,NQ),WRK2(N,NQ),WRK6(N,NP,NQ),XPLUSD(N,M)
       INTEGER
      &   IFIXB(NP),IFIXX(LDIFX,M),MSG(NQ,J)
@@ -3835,7 +3835,7 @@ C...Subroutine arguments
      &   FCN
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   CURVE,ONE,PVMCRV,PVPCRV,P01,STP,STPCRV,TEN,TWO
 
 C...External subroutines
@@ -3845,7 +3845,7 @@ C...External subroutines
 C...Data statements
       DATA
      &   P01,ONE,TWO,TEN
-     &   /0.01E0_R8,1.0E0_R8,2.0E0_R8,10.0E0_R8/
+     &   /0.01E0_wp,1.0E0_wp,2.0E0_wp,10.0E0_wp/
 
 C...Routine names used as subprogram arguments
 C   FCN:     The user supplied subroutine for evaluating the model.
@@ -3880,7 +3880,7 @@ C   NP:      The number of function parameters.
 C   NQ:      The number of responses per observation.
 C   NROW:    The row number of the explanatory variable array at which 
 C            the derivative is to be checked.
-C   ONE:     The value 1.0E0_R8.
+C   ONE:     The value 1.0E0_wp.
 C   PV:      The predicted value of the model for row   NROW   .
 C   PVMCRV:  The predicted value for row    NROW   of the model
 C            based on the current parameter estimates for all but the 
@@ -3891,13 +3891,13 @@ C            Jth parameter value, which is BETA(J)+STPCRV.
 C   PVPSTP:  The predicted value for row    NROW   of the model
 C            based on the current parameter estimates for all but the 
 C            Jth parameter value, which is BETA(J) + STP0.
-C   P01:     The value 0.01E0_R8.
+C   P01:     The value 0.01E0_wp.
 C   STP0:    The initial step size for the finite difference derivative.
 C   STP:     A step size for the finite difference derivative.
 C   STPCRV:  The step size selected to check for curvature in the model.
-C   TEN:     The value 10.0E0_R8.
+C   TEN:     The value 10.0E0_wp.
 C   TOL:     The agreement tolerance.
-C   TWO:     The value 2.0E0_R8.
+C   TWO:     The value 2.0E0_wp.
 C   TYPJ:    The typical size of the J-th unknown BETA or DELTA.
 C   WRK1:    A work array of (N BY M BY NQ) elements.
 C   WRK2:    A work array of (N BY NQ) elements.
@@ -4053,10 +4053,10 @@ C            (adapted from STARPAC subroutine DCKFPA)
 C***End Prologue  DJCKF
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   CURVE,D,DIFFJ,ETA,FD,PV,PVPSTP,STP0,TOL,TYPJ
       INTEGER
      &   ISTOP,J,LDIFX,LQ,M,N,NFEV,NP,NQ,NROW
@@ -4064,7 +4064,7 @@ C...Scalar arguments
      &   ISWRTB
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),WRK1(N,M,NQ),WRK2(N,NQ),WRK6(N,NP,NQ),XPLUSD(N,M)
       INTEGER
      &   IFIXB(NP),IFIXX(LDIFX,M),MSG(NQ,J)
@@ -4074,7 +4074,7 @@ C...Subroutine arguments
      &   FCN
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   HUNDRD,ONE,P1,STP,TWO
       LOGICAL
      &   LARGE
@@ -4086,7 +4086,7 @@ C...External subroutines
 C...Data statements
       DATA
      &   P1,ONE,TWO,HUNDRD
-     &   /0.1E0_R8,1.0E0_R8,2.0E0_R8,100.0E0_R8/
+     &   /0.1E0_wp,1.0E0_wp,2.0E0_wp,100.0E0_wp/
 
 C...Routine names used as subprogram arguments
 C   FCN:     The user supplied subroutine for evaluating the model.
@@ -4100,7 +4100,7 @@ C            finite difference derivatives for the derivative being
 C            checked.
 C   ETA:     The relative noise in the model
 C   FD:      The forward difference derivative wrt the Jth parameter.
-C   HUNDRD:  The value 100.0E0_R8.
+C   HUNDRD:  The value 100.0E0_wp.
 C   IFIXB:   The values designating whether the elements of BETA are
 C            fixed at their input values or not.
 C   IFIXX:   The values designating whether the elements of X are
@@ -4122,15 +4122,15 @@ C   NP:      The number of function parameters.
 C   NQ:      The number of responses per observation.
 C   NROW:    The row number of the explanatory variable array at which 
 C            the derivative is to be checked.
-C   ONE:     The value 1.0E0_R8.
+C   ONE:     The value 1.0E0_wp.
 C   PV:      The predicted value for row   NROW   .
 C   PVPSTP:  The predicted value for row    NROW   of the model
 C            based on the current parameter estimates for all but the 
 C            Jth parameter value, which is BETA(J) + STP0.
-C   P1:      The value 0.1E0_R8.
+C   P1:      The value 0.1E0_wp.
 C   STP0:    The step size for the finite difference derivative.
 C   TOL:     The agreement tolerance.
-C   TWO:     The value 2.0E0_R8.
+C   TWO:     The value 2.0E0_wp.
 C   TYPJ:    The typical size of the J-th unknown BETA or DELTA.
 C   WRK1:    A work array of (N BY M BY NQ) elements.
 C   WRK2:    A work array of (N BY NQ) elements.
@@ -4221,10 +4221,10 @@ C            (adapted from STARPAC subroutine DCKMN)
 C***End prologue  DJCKM
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   D,DIFFJ,EPSMAC,ETA,H0,HC0,PV,TOL,TYPJ
       INTEGER
      &   ISTOP,J,LDIFX,LQ,M,MSG1,N,NFEV,NP,NQ,NROW
@@ -4232,7 +4232,7 @@ C...Scalar arguments
      &   ISWRTB
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),WRK1(N,M,NQ),WRK2(N,NQ),WRK6(N,NP,NQ),XPLUSD(N,M)
       INTEGER
      &   IFIXB(NP),IFIXX(LDIFX,M),INTERVAL(NP),MSG(NQ,J)
@@ -4242,7 +4242,7 @@ C...Subroutine arguments
      &   FCN
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BIG,FD,H,HC,H1,HC1,HUNDRD,ONE,PVPSTP,P01,P1,STP0,
      &   TEN,THREE,TOL2,TWO,ZERO
       INTEGER
@@ -4255,11 +4255,11 @@ C...External subroutines
 C...Data statements
       DATA
      &   ZERO,P01,P1,ONE,TWO,THREE,TEN,HUNDRD
-     &   /0.0E0_R8,0.01E0_R8,0.1E0_R8,1.0E0_R8,2.0E0_R8,3.0E0_R8,
-     &   1.0E1_R8,1.0E2_R8/
+     &   /0.0E0_wp,0.01E0_wp,0.1E0_wp,1.0E0_wp,2.0E0_wp,3.0E0_wp,
+     &   1.0E1_wp,1.0E2_wp/
       DATA
      &   BIG,TOL2
-     &   /1.0E19_R8,5.0E-2_R8/
+     &   /1.0E19_wp,5.0E-2_wp/
 
 C...Routine names used as subprogram arguments
 C   FCN:     The user supplied subroutine for evaluating the model.
@@ -4280,7 +4280,7 @@ C   H1:      The default relative step size for forward differences.
 C   HC:      The relative step size for central differences.
 C   HC0:     The initial relative step size for central differences.
 C   HC1:     The default relative step size for central differences.
-C   HUNDRD:  The value 100.0E0_R8.
+C   HUNDRD:  The value 100.0E0_wp.
 C   IFIXB:   The values designating whether the elements of BETA are
 C            fixed at their input values or not.
 C   IFIXX:   The values designating whether the elements of X are
@@ -4303,17 +4303,17 @@ C   NP:      The number of function parameters.
 C   NQ:      The number of responses per observation.
 C   NROW:    The row number of the explanatory variable array at which 
 C            the derivative is to be checked.
-C   ONE:     The value 1.0E0_R8.
+C   ONE:     The value 1.0E0_wp.
 C   PV:      The predicted value from the model for row   NROW   .
 C   PVPSTP:  The predicted value for row    NROW   of the model
 C            Using the current parameter estimates for all but the Jth 
 C            parameter value, which is BETA(J) + STP0.
-C   P01:     The value 0.01E0_R8.
-C   P1:      The value 0.1E0_R8.
+C   P01:     The value 0.01E0_wp.
+C   P1:      The value 0.1E0_wp.
 C   STP0:    The initial step size for the finite difference derivative.
-C   TEN:     The value 10.0E0_R8.
-C   THREE:   The value 3.0E0_R8.
-C   TWO:     The value 2.0E0_R8.
+C   TEN:     The value 10.0E0_wp.
+C   THREE:   The value 3.0E0_wp.
+C   TWO:     The value 2.0E0_wp.
 C   TOL:     The agreement tolerance.
 C   TOL2:    A minimum agreement tolerance.
 C   TYPJ:    The typical size of the J-th unknown BETA or DELTA.
@@ -4321,7 +4321,7 @@ C   WRK1:    A work array of (N BY M BY NQ) elements.
 C   WRK2:    A work array of (N BY NQ) elements.
 C   WRK6:    A work array of (N BY NP BY NQ) elements.
 C   XPLUSD:  The values of X + DELTA.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DJCKM
@@ -4473,10 +4473,10 @@ C            (adapted from STARPAC subroutine DCKZRO)
 C***End Prologue  DJCKZ
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   D,DIFFJ,EPSMAC,FD,PV,PVPSTP,STP0,TOL,TYPJ
       INTEGER
      &   ISTOP,J,LDIFX,LQ,M,N,NFEV,NP,NQ,NROW
@@ -4484,7 +4484,7 @@ C...Scalar arguments
      &   ISWRTB
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),WRK1(N,M,NQ),WRK2(N,NQ),WRK6(N,NP,NQ),XPLUSD(N,M)
       INTEGER
      &   IFIXB(NP),IFIXX(LDIFX,M),MSG(NQ,J)
@@ -4494,7 +4494,7 @@ C...Subroutine arguments
      &   FCN
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   CD,ONE,PVMSTP,THREE,TWO,ZERO
 
 C...External subroutines
@@ -4504,7 +4504,7 @@ C...External subroutines
 C...Data statements
       DATA
      &   ZERO,ONE,TWO,THREE
-     &   /0.0E0_R8,1.0E0_R8,2.0E0_R8,3.0E0_R8/
+     &   /0.0E0_wp,1.0E0_wp,2.0E0_wp,3.0E0_wp/
 
 C...Routine names used as subprogram arguments
 C   FCN:     THE USER SUPPLIED SUBROUTINE FOR EVALUATING THE MODEL.
@@ -4537,7 +4537,7 @@ C   NP:      The number of function parameters.
 C   NQ:      The number of responses per observation.
 C   NROW:    The row number of the explanatory variable array at which 
 C            The derivative is to be checked.
-C   ONE:     The value 1.0E0_R8.
+C   ONE:     The value 1.0E0_wp.
 C   PV:      The predicted value from the model for row   NROW   .
 C   PVMSTP:  The predicted value for row    NROW   of the model
 C            using the current parameter estimates for all but the 
@@ -4546,15 +4546,15 @@ C   PVPSTP:  The predicted value for row    NROW   of the model
 C            using the current parameter estimates for all but the 
 C            JTH parameter value, which is BETA(J) + STP0.
 C   STP0:    The initial step size for the finite difference derivative.
-C   THREE:   The value 3.0E0_R8.
-C   TWO:     The value 2.0E0_R8.
+C   THREE:   The value 3.0E0_wp.
+C   TWO:     The value 2.0E0_wp.
 C   TOL:     The agreement tolerance.
 C   TYPJ:    The typical size of the J-th unknown BETA or DELTA.
 C   WRK1:    A work array of (N BY M BY NQ) elements.
 C   WRK2:    A work array of (N BY NQ) elements.
 C   WRK6:    A work array of (N BY NP BY NQ) elements.
 C   XPLUSD:  The values of X + DELTA.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DJCKZ
@@ -4634,7 +4634,7 @@ C            nonzero values of argument INFO
 C***End Prologue  DODCHK
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
@@ -4644,7 +4644,7 @@ C...Scalar arguments
      &   ANAJAC,IMPLCT,ISODR
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),LOWER(NP),SCLB(NP),SCLD(LDSCLD,M),STPB(NP),
      &   STPD(LDSTPD,M),UPPER(NP)
       INTEGER
@@ -4892,24 +4892,24 @@ C***Refer to  ODR
 C***Routines Called  DODDRV
 C***Date Written   860529   (YYMMDD)
 C***Revision Date  920304   (YYMMDD)
-C***Purpose  REAL (KIND=R8) driver routine for finding
+C***Purpose  REAL (KIND=wp) driver routine for finding
 C            the weighted explicit or implicit orthogonal distance 
 C            regression (ODR) or ordinary linear or nonlinear least 
 C            squares (OLS) solution
 C***End Prologue  DODCNT
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   PARTOL,SSTOL,TAUFAC
       INTEGER
      &   INFO,IPRINT,JOB,LDIFX,LDSCLD,LDSTPD,LDWD,LDWE,LDX,LDY,
      &   LD2WD,LD2WE,LIWORK,LUNERR,LUNRPT,LWORK,M,MAXIT,N,NDIGIT,NP,NQ
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),LOWER(NP),SCLB(NP),SCLD(LDSCLD,M),STPB(NP),
      &   STPD(LDSTPD,M),UPPER(NP),WD(LDWD,LD2WD,M),
      &   WE(LDWE,LD2WE,NQ),WORK(LWORK),X(LDX,M),Y(LDY,NQ)
@@ -4921,7 +4921,7 @@ C...Subroutine arguments
      &   FCN
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   CNVTOL,ONE,PCHECK,PFAC,PSTART,THREE,TSTIMP,ZERO
       INTEGER
      &   IPRNTI,IPR1,IPR2,IPR2F,IPR3,JOBI,JOB1,JOB2,JOB3,JOB4,JOB5,
@@ -4930,7 +4930,7 @@ C...Local scalars
      &   DONE,FSTITR,HEAD,IMPLCT,PRTPEN
 
 C...Local arrays
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   PNLTY(1,1,1)
 
 C...External subroutines
@@ -4942,7 +4942,7 @@ C...External functions
 C...Data statements
       DATA
      &   PCHECK,PSTART,PFAC,ZERO,ONE,THREE
-     &   /1.0E3_R8,1.0E1_R8,1.0E1_R8,0.0E0_R8,1.0E0_R8,3.0E0_R8/
+     &   /1.0E3_wp,1.0E1_wp,1.0E1_wp,0.0E0_wp,1.0E0_wp,3.0E0_wp/
 
 C...Routine names used as subprogram arguments
 C   FCN:     The user-supplied subroutine for evaluating the model.
@@ -5009,7 +5009,7 @@ C   NDIGIT:  The number of accurate digits in the function results, as
 C            supplied by the user.
 C   NP:      The number of function parameters.
 C   NQ:      The number of responses per observation.
-C   ONE:     The value 1.0E0_R8.
+C   ONE:     The value 1.0E0_wp.
 C   PARTOL:  The user supplied parameter convergence stopping tolerance.
 C   PCHECK:  The value designating the minimum penalty parameter allowed
 C            before the implicit problem can be considered solved.
@@ -5028,16 +5028,16 @@ C            Derivatives with respect to DELTA.
 C   SSTOL:   The sum-of-squares convergence stopping tolerance.
 C   TAUFAC:  The factor used to compute the initial trust region 
 C            diameter.
-C   THREE:   The value 3.0E0_R8.
+C   THREE:   The value 3.0E0_wp.
 C   TSTIMP:  The relative change in the parameters between the initial
 C            values and the solution.
 C   UPPER:   The upper bound for BETA.
 C   WD:      The DELTA weights.
 C   WE:      The EPSILON weights.
-C   WORK:    The REAL (KIND=R8) work space.
+C   WORK:    The REAL (KIND=wp) work space.
 C   X:       The independent variable.
 C   Y:       The dependent variable.  Unused when the model is implicit.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DODCNT
@@ -5168,11 +5168,11 @@ C            (ODR) or ordinary linear or nonlinear least squares (OLS)
 C***End Prologue  DODDRV
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
       USE ODRPACK95, ONLY : TEMPRET
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   PARTOL,SSTOL,TAUFAC,TSTIMP
       INTEGER
      &   INFO,IPRINT,JOB,LDIFX,LDSCLD,LDSTPD,LDWD,LDWE,LDX,LDY,
@@ -5182,7 +5182,7 @@ C...Scalar arguments
      &   FSTITR,HEAD,PRTPEN
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),LOWER(NP),SCLB(NP),SCLD(LDSCLD,M),STPB(NP),
      &   STPD(LDSTPD,M),UPPER(NP),WE(LDWE,LD2WE,NQ),
      &   WD(LDWD,LD2WD,M),WORK(LWORK),X(LDX,M),Y(LDY,NQ)
@@ -5194,7 +5194,7 @@ C...Subroutine arguments
      &   FCN
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   EPSMAC,ETA,P5,ONE,TEN,ZERO
       INTEGER
      &   ACTRSI,ALPHAI,BETACI,BETANI,BETASI,BETA0I,BOUNDI,DELTAI,DELTNI,
@@ -5213,13 +5213,13 @@ C...Local scalars
      &   ANAJAC,CDJAC,CHKJAC,DOVCV,IMPLCT,INITD,ISODR,REDOJ,RESTRT
 
 C...Local arrays
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETAJ(NP)
       INTEGER
      &   INTERVAL(NP)
 
 C...External functions
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DDOT,DNRM2,DERSTEP
       EXTERNAL
      &   DDOT,DNRM2,DERSTEP
@@ -5232,16 +5232,16 @@ C...External subroutines
 C...Data statements
       DATA
      &   ZERO,P5,ONE,TEN
-     &   /0.0E0_R8,0.5E0_R8,1.0E0_R8,10.0E0_R8/
+     &   /0.0E0_wp,0.5E0_wp,1.0E0_wp,10.0E0_wp/
 
 C...Interface blocks
       INTERFACE
       SUBROUTINE DWGHT
      &   (N,M,WT,LDWT,LD2WT,T,WTT)
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
       INTEGER
      &   LDWT,LD2WT,M,N
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   T(:,:),WT(:,:,:),WTT(:,:)
       END SUBROUTINE
       END INTERFACE
@@ -5366,7 +5366,7 @@ C            set by DJCK.
 C   NTOLI:   The location in array IWORK of variable NTOL.
 C   OLMAVI:  The location in array WORK of variable OLMAVG.
 C   OMEGAI:  The starting location in array WORK of array OMEGA.
-C   ONE:     The value 1.0E0_R8.
+C   ONE:     The value 1.0E0_wp.
 C   PARTLI:  The location in array WORK of variable PARTOL.
 C   PARTOL:  The parameter convergence stopping tolerance.
 C   PNORM:   The norm of the scaled estimated parameters.
@@ -5375,7 +5375,7 @@ C   PRERSI:  The location in array WORK of variable PRERS.
 C   PRTPEN:  The variable designating whether the penalty parameter is 
 C            to be printed in the iteration report (PRTPEN=TRUE) or not 
 C            (PRTPEN=FALSE).
-C   P5:      The value 0.5E0_R8.
+C   P5:      The value 0.5E0_wp.
 C   QRAUXI:  The starting location in array WORK of array QRAUX.
 C   RCONDI:  The location in array WORK of variable RCOND.
 C   REDOJ:   The variable designating whether the Jacobian matrix is to 
@@ -5399,7 +5399,7 @@ C   TAUFAC:  The factor used to compute the initial trust region
 C            diameter.
 C   TAUFCI:  The location in array WORK of variable TAUFAC.
 C   TAUI:    The location in array WORK of variable TAU.
-C   TEN:     The value 10.0E0_R8.
+C   TEN:     The value 10.0E0_wp.
 C   TI:      The starting location in array WORK of array T.
 C   TSTIMP:  The relative change in the parameters between the initial
 C            values and the solution.
@@ -5410,7 +5410,7 @@ C   VCVI:    The starting location in array WORK of array VCV.
 C   WD:      The DELTA weights.
 C   WE:      The EPSILON weights.
 C   WE1I:    The starting location in array WORK of array WE1.
-C   WORK:    The REAL (KIND=R8) work space.
+C   WORK:    The REAL (KIND=wp) work space.
 C   WRK:     The starting location in array WORK of array WRK,
 C            equivalenced to WRK1 and WRK2.
 C   WRK1I:   The starting location in array WORK of array WRK1.
@@ -5426,7 +5426,7 @@ C   WSSEPI:  The location in array WORK of variable WSSEPS.
 C   X:       The explanatory variable.
 C   XPLUSI:  The starting location in array WORK of array XPLUSD.
 C   Y:       The dependent variable.  Unused when the model is implicit.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DODDRV
@@ -5449,7 +5449,7 @@ C  (invalid values of M, NP and/or NQ are handled reasonably by DIWINF)
      &            BOUNDI,
      &            LIWKMN)
 
-C  Set starting locations within REAL (KIND=R8) work space
+C  Set starting locations within REAL (KIND=wp) work space
 C  (invalid values of N, M, NP, NQ, LDWE and/or LD2WE 
 C  are handled reasonably by DWINF)
 
@@ -5840,11 +5840,11 @@ C            algorithm
 C***End Prologue  DODLM
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
       USE ODRPACK95, ONLY : TEMPRET
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ALPHA2,EPSFCN,RCOND,TAU
       INTEGER
      &   IRANK,ISTOPC,LDTT,LDWD,LD2WD,LWRK,M,N,NLMS,NP,NPP,NQ
@@ -5852,7 +5852,7 @@ C...Scalar arguments
      &   ISODR
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DELTA(N,M),F(N,NQ),FJACB(N,NP,NQ),FJACD(N,M,NQ),
      &   OMEGA(NQ,NQ),QRAUX(NP),S(NP),SS(NP),
      &   T(N,M),TFJACB(N,NQ,NP),TT(LDTT,M),U(NP),WD(LDWD,LD2WD,M),
@@ -5861,7 +5861,7 @@ C...Array arguments
      &   JPVT(NP)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ALPHA1,ALPHAN,BOT,P001,P1,PHI1,PHI2,SA,TOP,ZERO
       INTEGER
      &   I,IWRK,J,K,L
@@ -5869,7 +5869,7 @@ C...Local scalars
      &   FORVCV
 
 C...External functions
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DDOT,DNRM2
       EXTERNAL
      &   DDOT,DNRM2
@@ -5881,16 +5881,16 @@ C...External subroutines
 C...Data statements
       DATA
      &   ZERO,P001,P1
-     &   /0.0E0_R8,0.001E0_R8,0.1E0_R8/
+     &   /0.0E0_wp,0.001E0_wp,0.1E0_wp/
 
 C...Interface blocks
       INTERFACE
       SUBROUTINE DWGHT
      &   (N,M,WT,LDWT,LD2WT,T,WTT)
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
       INTEGER
      &   LDWT,LD2WT,M,N
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   T(:,:),WT(:,:,:),WTT(:,:)
       END SUBROUTINE
       END INTERFACE
@@ -5932,8 +5932,8 @@ C   NPP:     The number of function parameters being estimated.
 C   NQ:      The number of responses per observation.
 C   OMEGA:   The array (I-FJACD*INV(P)*trans(FJACD))**(-1/2)  where
 C            P = trans(FJACD)*FJACD + D**2 + ALPHA*TT**2
-C   P001:    The value 0.001E0_R8
-C   P1:      The value 0.1E0_R8
+C   P001:    The value 0.001E0_wp
+C   P1:      The value 0.1E0_wp
 C   PHI1:    The previous difference between the norm of the scaled step
 C            and the trust region diameter.
 C   PHI2:    The current difference between the norm of the scaled step
@@ -5958,7 +5958,7 @@ C   WRK2:    A work array of (N by NQ) elements.
 C   WRK3:    A work array of (NP) elements.
 C   WRK4:    A work array of (M by M) elements.
 C   WRK5:    A work array of (M) elements.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DODLM
@@ -6121,7 +6121,7 @@ C***Purpose  Iteratively compute least squares solution
 C***End Prologue  DODMN
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
       USE ODRPACK95, ONLY : TEMPRET
 
 C...Scalar arguments
@@ -6130,7 +6130,7 @@ C...Scalar arguments
      &   LIWORK,LWORK,LWRK,M,N,NP,NQ
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),BETAC(NP),BETAN(NP),BETAS(NP),
      &   DELTA(N,M),DELTAN(N,M),DELTAS(N,M),
      &   F(N,NQ),FJACB(N,NP,NQ),FJACD(N,M,NQ),FN(N,NQ),FS(N,NQ),
@@ -6151,7 +6151,7 @@ C...Subroutine arguments
      &   FCN
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ACTRED,ACTRS,ALPHA,DIRDER,ETA,OLMAVG,ONE,
      &   P0001,P1,P25,P5,P75,PARTOL,PNORM,PRERED,PRERS,
      &   RATIO,RCOND,RNORM,RNORMN,RNORMS,RSS,RVAR,SSTOL,TAU,TAUFAC,
@@ -6166,11 +6166,11 @@ C...Local scalars
      &   IMPLCT,INITD,INTDBL,ISODR,LSTEP,REDOJ,RESTRT
 
 C...Local arrays
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   LOWERU(NP),UPPERU(NP),WSS(3)
 
 C...External functions
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DDOT,DNRM2
       EXTERNAL
      &   DDOT,DNRM2
@@ -6183,8 +6183,8 @@ C...External subroutines
 C...Data statements
       DATA
      &   ZERO,P0001,P1,P25,P5,P75,ONE
-     &   /0.0E0_R8,0.00010E0_R8,0.10E0_R8,0.250E0_R8,
-     &   0.50E0_R8,0.750E0_R8,1.0E0_R8/
+     &   /0.0E0_wp,0.00010E0_wp,0.10E0_wp,0.250E0_wp,
+     &   0.50E0_wp,0.750E0_wp,1.0E0_wp/
       DATA
      &   LUDFLT
      &   /6/
@@ -6193,10 +6193,10 @@ C...Interface blocks
       INTERFACE
       SUBROUTINE DWGHT
      &   (N,M,WT,LDWT,LD2WT,T,WTT)
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
       INTEGER
      &   LDWT,LD2WT,M,N
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   T(:,:),WT(:,:,:),WTT(:,:)
       END SUBROUTINE
       END INTERFACE
@@ -6326,12 +6326,12 @@ C   NQ:      The number of responses per observation.
 C   OLMAVG:  The average number of Levenberg-Marquardt steps per 
 C            iteration.
 C   OMEGA:   The starting location in WORK of array OMEGA.
-C   ONE:     The value 1.0E0_R8.
-C   P0001:   The value 0.0001E0_R8.
-C   P1:      The value 0.1E0_R8.
-C   P25:     The value 0.25E0_R8.
-C   P5:      The value 0.5E0_R8.
-C   P75:     The value 0.75E0_R8.
+C   ONE:     The value 1.0E0_wp.
+C   P0001:   The value 0.0001E0_wp.
+C   P1:      The value 0.1E0_wp.
+C   P25:     The value 0.25E0_wp.
+C   P5:      The value 0.5E0_wp.
+C   P75:     The value 0.75E0_wp.
 C   PARTOL:  The parameter convergence stopping tolerance.
 C   PNORM:   The norm of the scaled estimated parameters.
 C   PRERED:  The predicted relative reduction in the sum-of-squares.
@@ -6377,7 +6377,7 @@ C   VCV:     The starting location in array WORK of array VCV.
 C   WE:      The EPSILON weights.
 C   WE1:     The square root of the EPSILON weights.
 C   WD:      The DELTA weights.
-C   WORK:    The REAL (KIND=R8) work space.
+C   WORK:    The REAL (KIND=wp) work space.
 C   WSS:     The sum-of-squares of the weighted EPSILONS and DELTAS,
 C            the sum-of-squares of the weighted DELTAS, and
 C            the sum-of-squares of the weighted EPSILONS.
@@ -6391,7 +6391,7 @@ C   WRK6:    The starting location in array WORK of array WRK6.
 C   X:       The explanatory variable.
 C   XPLUSD:  The values of X + DELTA.
 C   Y:       The dependent variable.  Unused when the model is implicit.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DODMN
@@ -7048,10 +7048,10 @@ C***Purpose  Generate initial summary report
 C***End Prologue  DODPC1
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   PARTOL,PNLTY,SSTOL,TAUFAC,WSS,WSSDEL,WSSEPS
       INTEGER
      &   IPR,JOB,LDIFX,LDSTPD,LDTT,LDWD,LDWE,LDX,LDY,LD2WD,LD2WE,
@@ -7060,7 +7060,7 @@ C...Scalar arguments
      &   ANAJAC,CDJAC,CHKJAC,DOVCV,IMPLCT,INITD,ISODR,REDOJ,RESTRT
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),DELTA(N,M),LOWER(NP),SSF(NP),STPB(NP),STPD(LDSTPD,M),
      &   TT(LDTT,M),UPPER(NP),WD(LDWD,LD2WD,M),WE(LDWE,LD2WE,NQ),
      &   X(LDX,M),Y(LDY,NQ)
@@ -7068,7 +7068,7 @@ C...Array arguments
      &   IFIXB(NP),IFIXX(LDIFX,M),MSGB(NQ,NP),MSGD(NQ,M)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   TEMP1,TEMP2,TEMP3,ZERO
       INTEGER
      &   I,ITEMP,J,JOB1,JOB2,JOB3,JOB4,JOB5,L
@@ -7077,7 +7077,7 @@ C...Local arrays
       CHARACTER TEMPC0*2,TEMPC1*5,TEMPC2*13
 
 C...External functions
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DHSTEP
       EXTERNAL
      &   DHSTEP
@@ -7085,7 +7085,7 @@ C...External functions
 C...Data statements
       DATA
      &   ZERO
-     &   /0.0E0_R8/
+     &   /0.0E0_wp/
 
 C...Variable Definitions (alphabetically)
 C   ANAJAC:  The variable designating whether the Jacobians are computed
@@ -7165,9 +7165,9 @@ C            diameter.
 C   TEMPC0:  A temporary CHARACTER*2 value.
 C   TEMPC1:  A temporary CHARACTER*5 value.
 C   TEMPC2:  A temporary CHARACTER*13 value.
-C   TEMP1:   A temporary REAL (KIND=R8) value.
-C   TEMP2:   A temporary REAL (KIND=R8) value.
-C   TEMP3:   A temporary REAL (KIND=R8) value.
+C   TEMP1:   A temporary REAL (KIND=wp) value.
+C   TEMP2:   A temporary REAL (KIND=wp) value.
+C   TEMP3:   A temporary REAL (KIND=wp) value.
 C   TT:      The scaling values for DELTA.
 C   WD:      The DELTA weights.
 C   WE:      The EPSILON weights.
@@ -7176,7 +7176,7 @@ C   WSSDEL:  The sum-of-squares of the weighted DELTAS.
 C   WSSEPS:  The sum-of-squares of the weighted EPSILONS.
 C   X:       The explanatory variable.
 C   Y:       The response variable.  Unused when the model is implicit.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DODPC1
@@ -7684,10 +7684,10 @@ C***Purpose  Generate iteration reports
 C***End Prologue  DODPC2
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ACTRED,ALPHA,PNLTY,PNORM,PRERED,TAU,WSS
       INTEGER
      &   IPR,LUNRPT,NFEV,NITER,NP
@@ -7695,11 +7695,11 @@ C...Scalar arguments
      &   FSTITR,IMPLCT,PRTPEN
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   RATIO,ZERO
       INTEGER
      &   J,K,L
@@ -7708,7 +7708,7 @@ C...Local scalars
 C...Data statements
       DATA
      &   ZERO
-     &   /0.0E0_R8/
+     &   /0.0E0_wp/
 
 C...Variable Definitions (alphabetically)
 C   ACTRED:  The actual relative reduction in the sum-of-squares.
@@ -7737,7 +7737,7 @@ C            (PRTPEN=FALSE).
 C   RATIO:   The ratio of TAU to PNORM.
 C   TAU:     The trust region diameter.
 C   WSS:     The sum-of-squares of the weighted EPSILONS and DELTAS.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DODPC2
@@ -7866,10 +7866,10 @@ C***Purpose  Generate final summary report
 C***End Prologue  DODPC3
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   PNLTY,RCOND,RVAR,WSS,WSSDEL,WSSEPS
       INTEGER
      &   IDF,INFO,IPR,IRANK,ISTOP,LUNRPT,M,
@@ -7878,20 +7878,20 @@ C...Scalar arguments
      &   ANAJAC,DIDVCV,DOVCV,IMPLCT,ISODR,REDOJ
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),DELTA(N,M),F(N,NQ),LOWER(NP),UPPER(NP),SDBETA(NP)
       INTEGER
      &   IFIXB2(NP)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   TVAL
       INTEGER
      &   D1,D2,D3,D4,D5,I,J,K,L,NPLM1
       CHARACTER FMT1*90
 
 C...External functions
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DPPT
       EXTERNAL
      &   DPPT
@@ -8057,7 +8057,7 @@ C  if, full rank, their standard errors
       WRITE (LUNRPT,3000)
       IF (DIDVCV) THEN
          WRITE (LUNRPT,7300)
-         TVAL = DPPT(0.975E0_R8,IDF)
+         TVAL = DPPT(0.975E0_wp,IDF)
          DO 10 J=1,NP
             IF (IFIXB2(J).GE.1) THEN
                WRITE (LUNRPT,8400) J,BETA(J),
@@ -8423,10 +8423,10 @@ C***Purpose  Generate computation reports
 C***End Prologue  DODPCR
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ACTRED,ALPHA,PARTOL,PNORM,PRERED,RCOND,RVAR,
      &   SSTOL,TAU,TAUFAC
       INTEGER
@@ -8437,7 +8437,7 @@ C...Scalar arguments
      &   DIDVCV,FSTITR,HEAD,PRTPEN
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),DELTA(N,M),F(N,NQ),LOWER(NP),SDBETA(NP),SSF(NP),
      &   STPB(NP),STPD(LDSTPD,M),TT(LDTT,M),UPPER(NP),
      &   WD(LDWD,LD2WD,M),WE(LDWE,LD2WE,NQ),WSS(3),X(LDX,M),Y(LDY,NQ)
@@ -8445,7 +8445,7 @@ C...Array arguments
      &   IFIXB(NP),IFIXX(LDIFX,M),MSGB(NQ*NP+1),MSGD(NQ*M+1)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   PNLTY
       LOGICAL
      &   ANAJAC,CDJAC,CHKJAC,DOVCV,IMPLCT,INITD,ISODR,REDOJ,RESTRT
@@ -9152,7 +9152,7 @@ C***Purpose  Generate the derivative checking report
 C***End Prologue  DODPE2
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
@@ -9161,7 +9161,7 @@ C...Scalar arguments
      &   ISODR
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DIFF(NQ,NP+M),FJACB(N,NP,NQ),FJACD(N,M,NQ),XPLUSD(N,M)
       INTEGER
      &   MSGB(NQ,NP),MSGD(NQ,M)
@@ -9523,7 +9523,7 @@ C***Purpose  Controlling routine for printing error reports
 C***End Prologue  DODPER
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
@@ -9533,7 +9533,7 @@ C...Scalar arguments
      &   ISODR
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DIFF(NQ,NP+M),FJACB(N,NP,NQ),FJACD(N,M,NQ),XPLUSD(N,M)
       INTEGER
      &   MSGB(NQ*NP+1),MSGD(NQ*M+1)
@@ -9719,7 +9719,7 @@ C   Format statements
 
  1000 FORMAT (
      &   ' ********************************************************* '/
-     &   ' * ODRPACK95 version 1.00 of 12-27-2005 (REAL (KIND=R8)) * '/
+     &   ' * ODRPACK95 version 1.00 of 12-27-2005 (REAL (KIND=wp)) * '/
      &   ' ********************************************************* '/)
       END SUBROUTINE
 *DODSTP
@@ -9741,11 +9741,11 @@ C***Purpose  Compute locally constrained steps S and T, and PHI(ALPHA)
 C***End Prologue  DODSTP
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
       USE ODRPACK95, ONLY : TEMPRET
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ALPHA,EPSFCN,PHI,RCOND
       INTEGER
      &   IRANK,ISTOPC,LDTT,LDWD,LD2WD,LWRK,M,N,NP,NPP,NQ
@@ -9753,7 +9753,7 @@ C...Scalar arguments
      &   ISODR
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DELTA(N,M),F(N,NQ),FJACB(N,NP,NQ),FJACD(N,M,NQ),
      &   OMEGA(NQ,NQ),QRAUX(NP),S(NP),SS(NP),
      &   T(N,M),TFJACB(N,NQ,NP),TT(LDTT,M),U(NP),WD(LDWD,LD2WD,M),
@@ -9762,7 +9762,7 @@ C...Array arguments
      &   KPVT(NP)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   CO,ONE,SI,TEMP,ZERO
       INTEGER
      &   I,IMAX,INF,IPVT,J,K,K1,K2,KP,L
@@ -9770,11 +9770,11 @@ C...Local scalars
      &   ELIM,FORVCV
 
 C...LOCAL ARRAYS
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DUM(2)
 
 C...External functions
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DNRM2
       INTEGER
      &   IDAMAX
@@ -9789,16 +9789,16 @@ C...External subroutines
 C...Data statements
       DATA
      &   ZERO,ONE
-     &   /0.0E0_R8,1.0E0_R8/
+     &   /0.0E0_wp,1.0E0_wp/
 
 C...Interface blocks
       INTERFACE
       SUBROUTINE DWGHT
      &   (N,M,WT,LDWT,LD2WT,T,WTT)
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
       INTEGER
      &   LDWT,LD2WT,M,N
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   T(:,:),WT(:,:,:),WTT(:,:)
       END SUBROUTINE
       END INTERFACE
@@ -9848,7 +9848,7 @@ C            OMEGA*trans(OMEGA) = inv(I+FJACD*inv(E)*trans(FJACD))
 C                               = (I-FJACD*inv(P)*trans(FJACD)) 
 C            where E = D**2 + ALPHA*TT**2
 C                  P = trans(FJACD)*FJACD + D**2 + ALPHA*TT**2
-C   ONE:     The value 1.0E0_R8.
+C   ONE:     The value 1.0E0_wp.
 C   PHI:     The difference between the norm of the scaled step
 C            And the trust region diameter.
 C   QRAUX:   The array required to recover the orthogonal part of the
@@ -9870,7 +9870,7 @@ C   WRK2:    A work array of (N by NQ) elements.
 C   WRK3:    A work array of (NP) elements.
 C   WRK4:    A work array of (M by M) elements.
 C   WRK5:    A work array of (M) elements.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DODSTP
@@ -10167,10 +10167,10 @@ C***Purpose  Compute covariance matrix of estimated parameters
 C***End Prologue  DODVCV
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   EPSFCN,RCOND,RSS,RVAR
       INTEGER
      &   IDF,IRANK,ISTOPC,LDTT,LDWD,LD2WD,LWRK,M,N,NP,NPP,NQ
@@ -10178,7 +10178,7 @@ C...Scalar arguments
      &   ISODR
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DELTA(N,M),F(N,NQ),
      &   FJACB(N,NP,NQ),FJACD(N,M,NQ),
      &   OMEGA(NQ,NQ),QRAUX(NP),S(NP),SD(NP),SS(NP),SSF(NP),
@@ -10189,7 +10189,7 @@ C...Array arguments
      &   IFIXB(NP),JPVT(NP)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   TEMP,ZERO
       INTEGER
      &   I,IUNFIX,J,JUNFIX,KP,L
@@ -10203,7 +10203,7 @@ C...External subroutines
 C...Data statements
       DATA
      &   ZERO
-     &   /0.0E0_R8/
+     &   /0.0E0_wp/
 
 C...Variable definitions (alphabetically)
 C   DELTA:   The estimated errors in the explanatory variables.
@@ -10270,7 +10270,7 @@ C   WRK3:    A work array of (NP) elements.
 C   WRK4:    A work array of (M by M) elements.
 C   WRK5:    A work array of (M) elements.
 C   WRK6:    A work array of (N*NQ by P) elements.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DODVCV
@@ -10418,14 +10418,14 @@ C***Purpose  Select the unfixed elements of V2 and return them in V1
 C***End Prologue  DPACK
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   N1,N2
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   V1(N2),V2(N2)
       INTEGER
      &   IFIX(N2)
@@ -10489,7 +10489,7 @@ C            normal (Gaussian) distribution with mean 0 and standard
 C            deviation 1, and with probability density function
 C            F(X) = (1/SQRT(2*PI))*EXP(-X*X/2).
 C            (Adapted from DATAPAC subroutine TPPF, with modifications
-C            to facilitate conversion to REAL (KIND=R8) automatically)
+C            to facilitate conversion to REAL (KIND=wp) automatically)
 C***Description
 C               --The coding as presented below is essentially 
 C                 identical to that presented by Odeh and Evans
@@ -10525,40 +10525,40 @@ C                 Statisticians, Volume 1, 1954, Pages 104-113.
 C***End Prologue  DPPNML
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   P
 
 C...Result
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DPPNMLR
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ADEN,ANUM,HALF,ONE,P0,P1,P2,P3,P4,Q0,Q1,Q2,Q3,Q4,R,T,TWO,ZERO
 
 C...Data statements
       DATA 
      &   P0,P1,P2,P3,P4
-     &   /-0.322232431088E0_R8,-1.0E0_R8,-0.342242088547E0_R8,
-     &    -0.204231210245E-1_R8,-0.453642210148E-4_R8/ 
+     &   /-0.322232431088E0_wp,-1.0E0_wp,-0.342242088547E0_wp,
+     &    -0.204231210245E-1_wp,-0.453642210148E-4_wp/ 
       DATA 
      &   Q0,Q1,Q2,Q3,Q4
-     &   /0.993484626060E-1_R8,0.588581570495E0_R8, 
-     &    0.531103462366E0_R8,0.103537752850E0_R8,0.38560700634E-2_R8/ 
+     &   /0.993484626060E-1_wp,0.588581570495E0_wp, 
+     &    0.531103462366E0_wp,0.103537752850E0_wp,0.38560700634E-2_wp/ 
       DATA 
      &   ZERO,HALF,ONE,TWO
-     &   /0.0E0_R8,0.5E0_R8,1.0E0_R8,2.0E0_R8/
+     &   /0.0E0_wp,0.5E0_wp,1.0E0_wp,2.0E0_wp/
 
 C...Variable Definitions (alphabetically)
 C   ADEN:    A value used in the approximation.
 C   ANUM:    A value used in the approximation.
-C   HALF:    The value 0.5E0_R8.
-C   ONE:     The value 1.0E0_R8.
+C   HALF:    The value 0.5E0_wp.
+C   ONE:     The value 1.0E0_wp.
 C   P:       The probability at which the percent point is to be 
-C            evaluated.  P must be between 0.0E0_R8 and 1.0E0_R8, exclusive. 
+C            evaluated.  P must be between 0.0E0_wp and 1.0E0_wp, exclusive. 
 C   P0:      A parameter used in the approximation.
 C   P1:      A parameter used in the approximation.
 C   P2:      A parameter used in the approximation.
@@ -10571,8 +10571,8 @@ C   Q3:      A parameter used in the approximation.
 C   Q4:      A parameter used in the approximation.
 C   R:       The probability at which the percent point is evaluated.
 C   T:       A value used in the approximation.
-C   TWO:     The value 2.0E0_R8.
-C   ZERO:    The value 0.0E0_R8.
+C   TWO:     The value 2.0E0_wp.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DPPT
@@ -10613,7 +10613,7 @@ C             (Updated         --November  1975.)
 C***Purpose  Compute the percent point function value for the
 C            student's T distribution with IDF degrees of freedom.
 C            (Adapted from DATAPAC subroutine TPPF, with modifications
-C            to facilitate conversion to REAL (KIND=R8) automatically)
+C            to facilitate conversion to REAL (KIND=wp) automatically)
 C***Description
 C              --For IDF = 1 AND IDF = 2, the percent point function
 C                for the T distribution exists in simple closed form
@@ -10634,20 +10634,20 @@ C                 Pages 120-123.
 C***End Prologue  DPPT
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   P
       INTEGER
      &   IDF
 
 C...Result
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DPPTR
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ARG,B21,B31,B32,B33,B34,B41,B42,B43,B44,B45,
      &   B51,B52,B53,B54,B55,B56,C,CON,D1,D3,D5,D7,D9,DF,EIGHT,FIFTN,
      &   HALF,ONE,PI,PPFN,S,TERM1,TERM2,TERM3,TERM4,TERM5,THREE,TWO,
@@ -10656,7 +10656,7 @@ C...Local scalars
      &   IPASS,MAXIT
 
 C...External functions
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DPPNML
       EXTERNAL 
      &   DPPNML
@@ -10664,21 +10664,21 @@ C...External functions
 C...Data statements
       DATA 
      &   B21 
-     &   /4.0E0_R8/
+     &   /4.0E0_wp/
       DATA 
      &   B31, B32, B33, B34 
-     &   /96.0E0_R8,5.0E0_R8,16.0E0_R8,3.0E0_R8/
+     &   /96.0E0_wp,5.0E0_wp,16.0E0_wp,3.0E0_wp/
       DATA 
      &   B41, B42, B43, B44, B45
-     &  /384.0E0_R8,3.0E0_R8,19.0E0_R8,17.0E0_R8,-15.0E0_R8/ 
+     &  /384.0E0_wp,3.0E0_wp,19.0E0_wp,17.0E0_wp,-15.0E0_wp/ 
       DATA 
      &   B51,B52,B53,B54,B55,B56
-     &   /9216.0E0_R8,79.0E0_R8,776.0E0_R8,1482.0E0_R8,-1920.0E0_R8,
-     &   -945.0E0_R8/ 
+     &   /9216.0E0_wp,79.0E0_wp,776.0E0_wp,1482.0E0_wp,-1920.0E0_wp,
+     &   -945.0E0_wp/ 
       DATA 
      &   ZERO,HALF,ONE,TWO,THREE,EIGHT,FIFTN
-     &   /0.0E0_R8,0.5E0_R8,1.0E0_R8,2.0E0_R8,3.0E0_R8,8.0E0_R8,
-     &   15.0E0_R8/
+     &   /0.0E0_wp,0.5E0_wp,1.0E0_wp,2.0E0_wp,3.0E0_wp,8.0E0_wp,
+     &   15.0E0_wp/
 
 C...Variable definitions (alphabetically)
 C   ARG:    A value used in the approximation.
@@ -10706,15 +10706,15 @@ C   D3:     A value used in the approximation.
 C   D5:     A value used in the approximation.
 C   D7:     A value used in the approximation.
 C   D9:     A value used in the approximation.
-C   EIGHT:  The value 8.0E0_R8.
-C   FIFTN:  The value 15.0E0_R8.
-C   HALF:   The value 0.5E0_R8.
+C   EIGHT:  The value 8.0E0_wp.
+C   FIFTN:  The value 15.0E0_wp.
+C   HALF:   The value 0.5E0_wp.
 C   IDF:    The (positive integer) degrees of freedom.
 C   IPASS:  A value used in the approximation.
 C   MAXIT:  The maximum number of iterations allowed for the approx.
-C   ONE:    The value 1.0E0_R8.
+C   ONE:    The value 1.0E0_wp.
 C   P:      The probability at which the percent point is to be
-C           evaluated.  P must lie between 0.0DO and 1.0E0_R8, exclusive.
+C           evaluated.  P must lie between 0.0DO and 1.0E0_wp, exclusive.
 C   PI:     The value of pi.
 C   PPFN:   The normal percent point value.
 C   S:      A value used in the approximation.
@@ -10723,16 +10723,16 @@ C   TERM2:  A value used in the approximation.
 C   TERM3:  A value used in the approximation.
 C   TERM4:  A value used in the approximation.
 C   TERM5:  A value used in the approximation.
-C   THREE:  The value 3.0E0_R8.
-C   TWO:    The value 2.0E0_R8.
+C   THREE:  The value 3.0E0_wp.
+C   TWO:    The value 2.0E0_wp.
 C   Z:      A value used in the approximation.
-C   ZERO:   The value 0.0E0_R8.
+C   ZERO:   The value 0.0E0_wp.
 
 
 C***First executable statement  DPPT
 
 
-      PI = 3.141592653589793238462643383279E0_R8
+      PI = 3.141592653589793238462643383279E0_wp
       DF = IDF
       MAXIT = 5
 
@@ -10848,16 +10848,16 @@ C***Purpose  Compute the NROW-th function value using BETA(J) + STP
 C***End Prologue  DPVB
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   PVB,STP
       INTEGER
      &   ISTOP,J,LDIFX,LQ,M,N,NFEV,NP,NQ,NROW
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),WRK1(N,M,NQ),WRK2(N,NQ),WRK6(N,NP,NQ),XPLUSD(N,M)
       INTEGER
      &   IFIXB(NP),IFIXX(LDIFX,M)
@@ -10867,7 +10867,7 @@ C...Subroutine arguments
      &   FCN
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETAJ
 
 C...Routine names used as subprogram arguments
@@ -10940,16 +10940,16 @@ C            X(NROW,J) + DELTA(NROW,J) + STP
 C***End Prologue  DPVD
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   PVD,STP
       INTEGER
      &   ISTOP,J,LDIFX,LQ,M,N,NFEV,NP,NQ,NROW
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),WRK1(N,M,NQ),WRK2(N,NQ),WRK6(N,NP,NQ),XPLUSD(N,M)
       INTEGER
      &   IFIXB(NP),IFIXX(LDIFX,M)
@@ -10959,7 +10959,7 @@ C...Subroutine arguments
      &   FCN
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   XPDJ
 
 C...Routine names used as subprogram arguments
@@ -11026,18 +11026,18 @@ C***Purpose  Scale T by the inverse of SCL, I.E., compute T/SCL
 C***End Prologue  DSCALE
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   LDT,LDSCL,LDSCLT,M,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   T(LDT,M),SCL(LDSCL,M),SCLT(LDSCLT,M)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ONE,TEMP,ZERO
       INTEGER
      &   I,J
@@ -11045,7 +11045,7 @@ C...Local scalars
 C...Data statements
       DATA
      &   ONE,ZERO
-     &   /1.0E0_R8,0.0E0_R8/
+     &   /1.0E0_wp,0.0E0_wp/
 
 C...Variable Definitions (alphabetically)
 C   I:       An indexing variable.
@@ -11055,12 +11055,12 @@ C   LDSCLT:  The leading dimension of array SCLT.
 C   LDT:     The leading dimension of array T.
 C   M:       The number of columns of data in T.
 C   N:       The number of rows of data in T.
-C   ONE:     The value 1.0E0_R8.
+C   ONE:     The value 1.0E0_wp.
 C   SCL:     The scale values.
 C   SCLT:    The inversely scaled matrix.
 C   T:       The array to be inversely scaled by SCL.
 C   TEMP:    A temporary scalar.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DSCALE
@@ -11107,18 +11107,18 @@ C            algorithm given in the ODRPACK95 reference guide
 C***End Prologue  DSCLB
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   NP
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BETA(NP),SSF(NP)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   BMAX,BMIN,ONE,TEN,ZERO
       INTEGER
      &   K
@@ -11128,7 +11128,7 @@ C...Local scalars
 C...Data statements
       DATA
      &   ZERO,ONE,TEN
-     &   /0.0E0_R8,1.0E0_R8,10.0E0_R8/
+     &   /0.0E0_wp,1.0E0_wp,10.0E0_wp/
 
 C...Variable Definitions (alphabetically)
 C   BETA:    The function parameters.
@@ -11139,10 +11139,10 @@ C   BMAX:    The largest nonzero magnitude.
 C   BMIN:    The smallest nonzero magnitude.
 C   K:       An indexing variable.
 C   NP:      The number of function parameters.
-C   ONE:     The value 1.0E0_R8.
+C   ONE:     The value 1.0E0_wp.
 C   SSF:     The scaling values for BETA.
-C   TEN:     The value 10.0E0_R8.
-C   ZERO:    The value 0.0E0_R8.
+C   TEN:     The value 10.0E0_wp.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DSCLB
@@ -11201,18 +11201,18 @@ C            algorithm given in the ODRPACK95 reference guide
 C***End Prologue  DSCLD
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   LDTT,LDX,M,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   TT(LDTT,M),X(LDX,M)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ONE,TEN,XMAX,XMIN,ZERO
       INTEGER
      &   I,J
@@ -11222,7 +11222,7 @@ C...Local scalars
 C...Data statements
       DATA
      &   ZERO,ONE,TEN
-     &   /0.0E0_R8,1.0E0_R8,10.0E0_R8/
+     &   /0.0E0_wp,1.0E0_wp,10.0E0_wp/
 
 C...Variable Definitions (alphabetically)
 C   BIGDIF:  The variable designating whether there is a significant 
@@ -11234,12 +11234,12 @@ C   LDTT:    The leading dimension of array TT.
 C   LDX:     The leading dimension of array X.
 C   M:       The number of columns of data in the independent variable.
 C   N:       The number of observations.
-C   ONE:     The value 1.0E0_R8.
+C   ONE:     The value 1.0E0_wp.
 C   TT:      THE SCALING VALUES FOR DELTA.
 C   X:       The independent variable.
 C   XMAX:    The largest nonzero magnitude.
 C   XMIN:    THE SMALLEST NONZERO MAGNITUDE.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DSCLD
@@ -11298,14 +11298,14 @@ C***Purpose  Select the row at which the derivative will be checked
 C***End Prologue  DSETN
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   LDX,M,N,NROW
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   X(LDX,M)
 
 C...Local scalars
@@ -11359,24 +11359,24 @@ C                 *LINPACK Users Guide*, SIAM, 1979.
 C***End Prologue  DSOLVE
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   JOB,LDT,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   B(N),T(LDT,N)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   TEMP,ZERO
       INTEGER
      &   J1,J,JN
 
 C...External functions
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   DDOT
       EXTERNAL
      &   DDOT
@@ -11388,7 +11388,7 @@ C...External subroutines
 C...Data statements
       DATA
      &   ZERO
-     &   /0.0E0_R8/
+     &   /0.0E0_wp/
 
 C...Variable Definitions (alphabetically)
 C   B:       On input:  the right hand side;  On exit:  the solution
@@ -11403,7 +11403,7 @@ C            4   Solve trans(T)*X=B, T upper triangular.
 C   LDT:     The leading dimension of array T.
 C   N:       The number of rows and columns of data in array T.
 C   T:       The upper or lower tridiagonal system.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DSOLVE
@@ -11500,14 +11500,14 @@ C            unfixed
 C***End Prologue  DUNPAC
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   N2
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   V1(N2),V2(N2)
       INTEGER
      &   IFIX(N2)
@@ -11564,18 +11564,18 @@ C***Purpose  Compute  V*E*trans(V) for the (INDX)TH M by NQ array in V
 C***End Prologue  DVEVTR
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   INDX,LDE,LDV,LDVE,LDVEV,LD2V,LD2VE,M,NQ
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   E(LDE,M),V(LDV,LD2V,NQ),VE(LDVE,LD2VE,M),VEV(LDVEV,NQ),WRK5(M)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ZERO
       INTEGER
      &   J,L1,L2
@@ -11587,7 +11587,7 @@ C...External subroutines
 C...Data statements
       DATA
      &   ZERO
-     &   /0.0E0_R8/
+     &   /0.0E0_wp/
 
 C...Variable Definitions (alphabetically)
 C   INDX:    The row in V in which the M by NQ array is stored.
@@ -11606,7 +11606,7 @@ C   V:       An array of NQ by M matrices.
 C   VE:      The NQ by M array VE = V * inv(E)
 C   VEV:     The NQ by NQ array VEV = V * inv(ETE) * trans(V).
 C   WRK5:    An M work vector.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DVEVTR
@@ -11648,18 +11648,18 @@ C***Purpose  Scale matrix T using WT, i.e., compute WTT = WT*T
 C***End Prologue  DWGHT
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   LDWT,LD2WT,M,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   T(:,:),WT(:,:,:),WTT(:,:)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   TEMP,ZERO
       INTEGER
      &   I,J,K
@@ -11667,7 +11667,7 @@ C...Local scalars
 C...Data statements
       DATA
      &   ZERO
-     &   /0.0E0_R8/
+     &   /0.0E0_wp/
 
 C...Variable Definitions (alphabetically)
 C   I:       An indexing variable.
@@ -11683,7 +11683,7 @@ C   WT:      The weights.
 C   WTT:     The results of weighting array T by WT.
 C            Array WTT can be the same as T only if the arrays in WT 
 C            are upper triangular with zeros below the diagonal.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DWGHT
@@ -11762,7 +11762,7 @@ C***Refer to  ODR
 C***Routines Called  (NONE)
 C***Date Written   860529   (YYMMDD)
 C***Revision Date  920619   (YYMMDD)
-C***Purpose  Set storage locations within REAL (KIND=R8) work space
+C***Purpose  Set storage locations within REAL (KIND=wp) work space
 C***End Prologue  DWINF
 
 C...Scalar arguments
@@ -11992,14 +11992,14 @@ C***Purpose  Compute XMY = X - Y
 C***End Prologue  DXMY
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   LDX,LDXMY,LDY,M,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   X(LDX,M),XMY(LDXMY,M),Y(LDY,M)
 
 C...Local scalars
@@ -12042,14 +12042,14 @@ C***Purpose  Compute XPY = X + Y
 C***End Prologue  DXPY
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   LDX,LDXPY,LDY,M,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   X(LDX,M),XPY(LDXPY,M),Y(LDY,M)
 
 C...Local scalars
@@ -12092,18 +12092,18 @@ C***Purpose  Set A = ZERO
 C***End Prologue  DZERO
 
 C...Used modules
-      USE REAL_PRECISION
+      use odrpack95_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
      &   LDA,M,N
 
 C...Array arguments
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   A(LDA,M)
 
 C...Local scalars
-      REAL (KIND=R8)
+      REAL (KIND=wp)
      &   ZERO
       INTEGER
      &   I,J
@@ -12111,7 +12111,7 @@ C...Local scalars
 C...Data statements
       DATA
      &   ZERO
-     &   /0.0E0_R8/
+     &   /0.0E0_wp/
 
 C...Variable Definitions (alphabetically)
 C   A:       The array to be set to zero.
@@ -12120,7 +12120,7 @@ C   J:       An indexing variable.
 C   LDA:     The leading dimension of array A.
 C   M:       The number of columns to be set to zero.
 C   N:       The number of rows to be set to zero.
-C   ZERO:    The value 0.0E0_R8.
+C   ZERO:    The value 0.0E0_wp.
 
 
 C***First executable statement  DZERO
