@@ -245,8 +245,7 @@ subroutine fcn                                                                &
         if (mod(ideval/10,10) .ne. 0) then
            do i = 1,n
               fjacb(i,1,1) = exp(beta(2)*xplusd(i,1))
-              fjacb(i,2,1) = beta(1)*xplusd(i,1)*exp(beta(2)*                 &
-               xplusd(i,1))
+              fjacb(i,2,1) = beta(1)*xplusd(i,1)*exp(beta(2)*xplusd(i,1))
            enddo
         endif
 
