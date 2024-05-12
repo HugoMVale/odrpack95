@@ -1,6 +1,7 @@
 PROGRAM EXAMPLE5
    USE ODRPACK95
    use odrpack95_kinds, only: wp
+   implicit none
    REAL (KIND=wp), ALLOCATABLE :: BETA(:),L(:),U(:),X(:,:),Y(:,:)
    INTEGER :: NP,N,M,NQ
    INTERFACE

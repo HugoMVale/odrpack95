@@ -2,6 +2,7 @@
       PROGRAM EXAMPLE1
       USE ODRPACK95
       use odrpack95_kinds, only: wp
+      implicit none
 
 C  ODRPACK95 Argument Definitions
 C      ==> FCN      Name of the user supplied function subroutine
