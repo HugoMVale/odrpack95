@@ -1,21 +1,18 @@
 module odrpack95
-!***Begin Prologue  ODRPACK95
-!***Refer to  ODR
-!***Date Written  20040524 (YYYYMMDD)
-!***Revision Date N/A
-!***Purpose: Define the interface to the ODR subroutine
-!***End Prologue ODRPACK95
-!
-        use odrpack95_kinds,only: wp
-!
-!       A temporary work array for holding return values before copying to a lower
-!       rank array.
-        real(kind = wp),allocatable :: tempret(:,:)
-!
-        contains
-!ODR
+   
+   use odrpack95_kinds, only: wp
+   implicit none
+   private
+
+   public :: odr, tempret
+
+   ! A temporary work array for holding return values before copying to a lower rank array.
+   real(kind=wp), allocatable :: tempret(:,:)
+
+   contains
+
 subroutine odr                                                                &
-         ( fcn,                                                               &
+         (fcn,                                                               &
          n, m, np, nq,                                                        &
          beta,                                                                &
          y, x,                                                                &
@@ -30,711 +27,659 @@ subroutine odr                                                                &
          work, iwork,                                                         &
          info,                                                                &
          lower, upper)
-!***Begin Prologue  ODR
-!***Date Written   860529   (YYMMDD)
-!***Revision Date  20040301 (YYYYMMDD)
-!***Category No.  G2E,I1B1
-!***Keywords  Orthogonal distance regression,
-!       Nonlinear least squares,
-!       Measurement error models,
-!       Errors in variables
-!***Author  Boggs, Paul T.
-!       Applied and Computational Mathematics Division
-!       National Institute of Standards and Technology
-!       Gaithersburg, MD 20899
-!       Byrd, Richard H.
-!       Department of Computer Science
-!       University of Colorado, Boulder, CO 80309
-!       Rogers, Janet E.
-!       Applied and Computational Mathematics Division
-!       National Institute of Standards and Technology
-!       Boulder, CO 80303-3328
-!       Schnabel, Robert B.
-!       Department of Computer Science
-!       University of Colorado, Boulder, CO 80309
-!       and
-!       Applied and Computational Mathematics Division
-!       National Institute of Standards and Technology
-!       Boulder, CO 80303-3328
-!***Purpose  REAL (KIND=wp) driver routine for finding
-!       the weighted explicit or implicit orthogonal distance
-!       regression (ODR) or ordinary linear or nonlinear least
-!       squares (OLS) solution (long call statement)
-!***Description
-!       For details, see ODRPACK95 User's Reference Guide.
-!***References  Boggs, P. T., R. H. Byrd, J. R. Donaldson, and
-!       R. B. Schnabel (1989),
-!       "Algorithm 676 --- ODRPACK: Software for Weighted
-!       Orthogonal Distance Regression,"
-!       ACM Trans. Math. Software., 15(4):348-364.
-!       Boggs, P. T., R. H. Byrd, J. E. Rogers, and
-!       R. B. Schnabel (1992),
-!       "User's Reference Guide for ODRPACK Version 2.01,
-!       Software for Weighted Orthogonal Distance Regression,"
-!       National Institute of Standards and Technology
-!       Internal Report Number 92-4834.
-!       Boggs, P. T., R. H. Byrd, and R. B. Schnabel (1987),
-!       "A Stable and Efficient Algorithm for Nonlinear
-!       Orthogonal Distance Regression,"
-!       SIAM J. Sci. Stat. Comput., 8(6):1052-1078.
-!***Routines Called  DODCNT
-!***End Prologue  ODR
-!
-!...Used modules
-        use odrpack95_kinds,only: wp
-!
-!...Scalar arguments
-        real(kind = wp)                                                       &
-         partol, sstol, taufac
-        integer                                                               &
-         info, iprint, job, lunerr, lunrpt, m, maxit, n, ndigit, np, nq
-!
-!...Array arguments
-        real(kind = wp)                                                       &
-         beta(:), delta(:,:), lower(:), sclb(:), scld(:,:),                   &
-         stpb(:), stpd(:,:), upper(:), wd(:,:,:), we(:,:,:),                  &
-         work(:), x(:,:), y(:,:)
-        integer                                                               &
-         ifixb(:), ifixx(:,:), iwork(:)
-!
-!...Subroutine arguments
-        external                                                              &
-         fcn
-!
-!...Optional arguments
-        optional                                                              &
-         delta, ifixb, ifixx, info, iprint, iwork, job, lower, lunerr,        &
-         lunrpt, maxit, ndigit, partol, sclb, scld, sstol, stpb,              &
-         stpd, taufac, upper, we, wd, work
-!
-!...Pointers
-        pointer                                                               &
-         delta, iwork, work
-!
-!...Local scalars
-        real(kind = wp)                                                       &
-         negone, zero, ltaufac, lsstol, lpartol
-        integer                                                               &
-         ldwe, ld2we, ldwd, ld2wd, ldifx, ldscld, ldstpd,                     &
-         ljob, lndigit, lmaxit, liprint, llunerr, llunrpt, linfo,             &
-         lenwork, leniwork, linfo1, linfo2, linfo3, linfo4, linfo5
-        logical                                                               &
-         head
-!
-!...Local arrays
-        real(kind = wp)                                                       &
-         ldelta(:,:), llower( np), lwe( n, nq, nq), lwd( n, m, m),            &
-         lstpb( np), lstpd( n, m), lsclb( np),                                &
-         lscld( n, m), lupper( np), lwork(:), wd1(1,1,1)
-        integer                                                               &
-         lifixb( np), liwork(:), lifixx( n, m)
-!
-!...Pointer
-        pointer                                                               &
-         ldelta, liwork, lwork
-!
-!...Saved variables
-        save                                                                  &
-         ldelta, liwork, lwork
-!
-!...External subroutines
-        external                                                              &
-         dodcnt
-!
-!...Data statements
-        data                                                                  &
-         negone, zero                                                         &
-         /-1.0E0_wp,0.0E0_wp/
-!
-!...Routine names used as subprogram arguments
-!       FCN:     The user-supplied subroutine for evaluating the model.
-!
-!...Variable definitions (alphabetically)
-!       BETA:    The function parameters.
-!       DELTA:   The initial error in the X data
-!       IFIXB:   The values designating whether the elements of BETA are
-!       fixed at their input values or not.
-!       IFIXX:   The values designating whether the elements of X are
-!       fixed at their input values or not.
-!       INFO:    The variable designating why the computations were stopped.
-!       IPRINT:  The print control variable.
-!       IWORK:   The integer work space.
-!       JOB:     The variable controlling problem initialization and
-!       computational method.
-!       LOWER:   The lower bound on BETA.
-!       LUNERR:  The logical unit number for error messages.
-!       LUNRPT:  The logical unit number for computation reports.
-!       M:       The number of columns of data in the explanatory variable.
-!       MAXIT:   The maximum number of iterations allowed.
-!       N:       The number of observations.
-!       NDIGIT:  The number of accurate digits in the function results, as
-!       supplied by the user.
-!       NP:      The number of function parameters.
-!       NQ:      The number of responses per observation.
-!       PARTOL:  The parameter convergence stopping tolerance.
-!       SCLB:    The scaling values for BETA.
-!       SCLD:    The scaling values for DELTA.
-!       STPB:    The relative step for computing finite difference
-!       derivatives with respect to BETA.
-!       STPD:    The relative step for computing finite difference
-!       derivatives with respect to DELTA.
-!       SSTOL:   The sum-of-squares convergence stopping tolerance.
-!       TAUFAC:  The factor used to compute the initial trust region
-!       diameter.
-!       UPPER:   The upper bound on BETA.
-!       WD:      The DELTA weights.
-!       WD1:     A dummy array used when WD(1,1,1)=0.0E0_wp.
-!       WE:      The EPSILON weights.
-!       WORK:    The REAL (KIND=wp) work space.
-!       X:       The explanatory variable.
-!       Y:       The dependent variable.  Unused when the model is implicit.
-!
-!
-!***First executable statement  ODR
-!
-!
+!! Date Written:   860529   (YYMMDD)
+!! Revision Date:  20040301 (YYYYMMDD)
+!! Category No.:  G2E,I1B1
+!! Keywords:  Orthogonal distance regression,
+!!   Nonlinear least squares,
+!!   Measurement error models,
+!!   Errors in variables
+!! Authors:  
+!!   Boggs, Paul T.
+!!     Applied and Computational Mathematics Division
+!!     National Institute of Standards and Technology
+!!     Gaithersburg, MD 20899
+!!   Byrd, Richard H.
+!!     Department of Computer Science
+!!     University of Colorado, Boulder, CO 80309
+!!   Rogers, Janet E.
+!!     Applied and Computational Mathematics Division
+!!     National Institute of Standards and Technology
+!!     Boulder, CO 80303-3328
+!!   Schnabel, Robert B.
+!!     Department of Computer Science
+!!     University of Colorado, Boulder, CO 80309
+!!     and
+!!     Applied and Computational Mathematics Division
+!!     National Institute of Standards and Technology
+!!     Boulder, CO 80303-3328
+!! Purpose:  REAL (KIND=wp) driver routine for finding the weighted explicit or implicit
+!!   orthogonal distance regression (ODR) or ordinary linear or nonlinear least squares (OLS)
+!!   solution (long call statement)
+!! Description:
+!!   For details, see ODRPACK95 User's Reference Guide.
+!! References:
+!!   Boggs, P. T., R. H. Byrd, J. R. Donaldson, and R. B. Schnabel (1989),
+!!     "Algorithm 676 --- ODRPACK: Software for Weighted Orthogonal Distance Regression,"
+!!     ACM Trans. Math. Software., 15(4):348-364.
+!!       Boggs, P. T., R. H. Byrd, J. E. Rogers, and
+!!   R. B. Schnabel (1992),
+!!     "User's Reference Guide for ODRPACK Version 2.01,
+!!     Software for Weighted Orthogonal Distance Regression,"
+!!     National Institute of Standards and Technology
+!!     Internal Report Number 92-4834.
+!!  Boggs, P. T., R. H. Byrd, and R. B. Schnabel (1987),
+!!    "A Stable and Efficient Algorithm for Nonlinear Orthogonal Distance Regression,"
+!!    SIAM J. Sci. Stat. Comput., 8(6):1052-1078.
+
+   use odrpack95_kinds, only: wp, negone, zero
+
+   real(kind=wp), intent(in), optional :: partol
+      !! The parameter convergence stopping tolerance.
+   real(kind=wp), intent(in), optional :: sstol
+      !! The sum-of-squares convergence stopping tolerance.
+   real(kind=wp), intent(in), optional :: taufac
+      !! The factor used to compute the initial trust region diameter.
+   
+   integer, intent(out), optional :: info
+      !! The variable designating why the computations were stopped.
+   integer, intent(in), optional :: iprint
+      !! The print control variable.
+   integer, intent(in), optional :: job
+      !! The variable controlling problem initialization and computational method.
+   integer, intent(in), optional :: lunerr
+      !! The logical unit number for error messages.
+   integer, intent(in), optional :: lunrpt
+      !! The logical unit number for computation reports.
+   integer, intent(in) :: m
+      !! The number of columns of data in the independent variable.
+   integer, intent(in), optional :: maxit
+      !! The maximum number of iterations allowed.
+   integer, intent(in) :: n
+      !! The number of observations.
+   integer, intent(in), optional :: ndigit
+      !! The number of accurate digits in the function results, as supplied by the user.
+   integer, intent(in) :: np
+      !! The number of function parameters.
+   integer, intent(in) :: nq
+      !! The number of responses per observation.
+
+   real(kind=wp), intent(inout) :: beta(:)
+      !! The function parameters.
+   real(kind=wp), intent(inout), optional :: delta(:,:)
+      !! The initial error in the `x` data.
+   real(kind=wp), intent(in), optional :: lower(:)
+      !! The lower bound on `beta`.
+   real(kind=wp), intent(in), optional :: upper(:)
+      !!The upper bound on `beta`.
+   real(kind=wp), intent(in), optional :: sclb(:)
+      !! The scaling values for `beta`.
+   real(kind=wp), intent(in), optional :: scld(:,:)
+      !! The scaling values for `delta`.
+   real(kind=wp), intent(in), optional :: stpb(:)
+      !! The relative step for computing finite difference derivatives with respect to `beta`.
+   real(kind=wp), intent(in), optional :: stpd(:,:)
+      !! The relative step for computing finite difference derivatives with respect to `delta`.
+   real(kind=wp), intent(in), optional :: wd(:,:,:)
+      !! The `delta` weights.
+   real(kind=wp), intent(in), optional :: we(:,:,:)
+      !! The `epsilon` weights.
+   real(kind=wp), intent(inout), optional :: work(:)
+      !! The real work space.
+   real(kind=wp), intent(in) :: x(:,:)
+      !! The explanatory variable.
+   real(kind=wp), intent(in) :: y(:,:)
+      !! The dependent variable. Unused when the model is implicit.
+
+   integer, intent(in), optional :: ifixb(:)
+      !! The values designating whether the elements of `beta` are fixed at their input values or not.
+   integer, intent(in), optional :: ifixx(:,:)
+      !! The values designating whether the elements of `x` are fixed at their input values or not.
+   integer, intent(out), optional :: iwork(:)
+      !! The integer work space.
+
+   ! TODO: interface
+   external :: fcn
+      !! The user-supplied subroutine for evaluating the model.
+
+   ! TODO: why pointers?
+   pointer :: delta, iwork, work
+
+   ! Local variables
+   real(kind= wp) :: ltaufac, lsstol, lpartol
+   integer :: ldwe, ld2we, ldwd, ld2wd, ldifx, ldscld, ldstpd, ljob, lndigit, lmaxit, &
+              liprint, llunerr, llunrpt, linfo, lenwork, leniwork, linfo1, linfo2, linfo3, &
+              linfo4, linfo5
+   logical :: head
+
+   real(kind=wp) :: ldelta(:,:), llower( np), lwe( n, nq, nq), lwd( n, m, m), lstpb( np), &
+                    lstpd( n, m), lsclb( np), lscld( n, m), lupper( np), lwork(:), wd1(1,1,1)
+   integer :: lifixb( np), liwork(:), lifixx( n, m)
+
+   ! TODO: why pointers?
+   pointer :: ldelta, liwork, lwork
+
+   ! TODO: check if can be removed
+   save :: ldelta, liwork, lwork
+
+   ! TODO: interface or inside module?
+   external :: dodcnt
+
 !  Set LINFO to zero indicating no errors have been found thus far
-!
-        linfo = 0
-        linfo1 = 0
-        linfo2 = 0
-        linfo3 = 0
-        linfo4 = 0
-        linfo5 = 0
-!
+   linfo = 0
+   linfo1 = 0
+   linfo2 = 0
+   linfo3 = 0
+   linfo4 = 0
+   linfo5 = 0
+
 !  Set all scalar variable defaults except JOB
-!
-        ldwe = 1
-        ld2we = 1
-        ldwd = 1
-        ld2wd = 1
-        ldifx = 1
-        ldscld = 1
-        ldstpd = 1
-        liprint = -1
-        llunerr = -1
-        llunrpt = -1
-        lmaxit = -1
-        lndigit = -1
-        lpartol = negone
-        lsstol = negone
-        ltaufac = negone
-        head = .true.
-!
+   ldwe = 1
+   ld2we = 1
+   ldwd = 1
+   ld2wd = 1
+   ldifx = 1
+   ldscld = 1
+   ldstpd = 1
+   liprint = -1
+   llunerr = -1
+   llunrpt = -1
+   lmaxit = -1
+   lndigit = -1
+   lpartol = negone
+   lsstol = negone
+   ltaufac = negone
+   head = .true.
+
 !  Check for the option arguments for printing (so error messages can be
 !  printed appropriately from here on out
-!
-        if (present( iprint)) then
-           liprint = iprint
-        endif
-!
-        if (present( lunrpt)) then
-           llunrpt = lunrpt
-        endif
-        if ( llunrpt .lt. 0) then
-           llunrpt = 6
-        endif
-!
-        if (present( lunerr)) then
-           llunerr = lunerr
-        endif
-        if ( llunerr .lt. 0) then
-           llunerr = 6
-        endif
-!
+   if (present(iprint)) then
+      liprint = iprint
+   endif
+
+   if (present(lunrpt)) then
+      llunrpt = lunrpt
+   endif
+   if (llunrpt .lt. 0) then
+      llunrpt = 6
+   endif
+
+   if (present(lunerr)) then
+      llunerr = lunerr
+   endif
+   if (llunerr .lt. 0) then
+      llunerr = 6
+   endif
+
 !  Ensure the problem size is valid
-!
-        if ( n .le. 0) then
-           linfo5 = 1
-           linfo4 = 1
-        endif
-!
-        if ( m .le. 0) then
-           linfo5 = 1
-           linfo3 = 1
-        endif
-!
-        if ( np .le. 0) then
-           linfo5 = 1
-           linfo2 = 1
-        endif
-!
-        if ( nq .le. 0) then
-           linfo5 = 1
-           linfo1 = 1
-        endif
-!
-        if ( linfo5 .ne. 0) then
-           linfo = 10000* linfo5+1000* linfo4+100* linfo3+10* linfo2+ linfo1
-           if ( llunerr .gt. 0 .and. liprint .ne. 0) then
-              call dodphd( head, llunrpt)
-              call dodpe1(                                                    &
-               llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1,        &
-               n, m, nq,                                                      &
-               ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd,                      &
-               lenwork, leniwork                                              &
-               )
-           endif
-           if (present( info)) then
-              info = linfo
-           endif
-           return
-        endif
-!
+   if (n .le. 0) then
+      linfo5 = 1
+      linfo4 = 1
+   endif
+
+   if (m .le. 0) then
+      linfo5 = 1
+      linfo3 = 1
+   endif
+
+   if (np .le. 0) then
+      linfo5 = 1
+      linfo2 = 1
+   endif
+
+   if (nq .le. 0) then
+      linfo5 = 1
+      linfo1 = 1
+   endif
+
+   if (linfo5 .ne. 0) then
+      linfo = 10000*linfo5 + 1000*linfo4 + 100*linfo3 + 10*linfo2 + linfo1
+      if (llunerr .gt. 0 .and. liprint .ne. 0) then
+         call dodphd(head, llunrpt)
+         call dodpe1(                                                   &
+         llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1,        &
+         n, m, nq,                                                      &
+         ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd,                      &
+         lenwork, leniwork                                              &
+         )
+      endif
+      if (present(info)) then
+         info = linfo
+      endif
+      return
+   endif
+
 !  Define LJOB and check that necessary arguments are passed for JOB
-!
-        if (present( job)) then
-           ljob = job
-           if (mod( job,10000)/1000 .ge. 1) then
-              if (.not. present( delta)) then
-                 linfo5 = 7
-                 linfo4 = 1
-              elseif (.not. associated( delta)) then
-                 linfo5 = 7
-                 linfo4 = 1
-              endif
-           endif
-           if ( job .ge. 10000) then
-              if (.not. present( iwork)) then
-                 linfo5 = 7
-                 linfo2 = 1
-              elseif (.not. associated( iwork)) then
-                 linfo5 = 7
-                 linfo2 = 1
-              endif
-           endif
-           if ( job .ge. 10000) then
-              if (.not. present( work)) then
-                 linfo5 = 7
-                 linfo3 = 1
-              elseif (.not. associated( work)) then
-                 linfo5 = 7
-                 linfo3 = 1
-              endif
-           endif
-        else
-           ljob = -1
-        endif
-!
-        if ( linfo5 .ne. 0) then
-           linfo = 10000* linfo5+1000* linfo4+100* linfo3+10* linfo2+ linfo1
-           if ( llunerr .gt. 0 .and. liprint .ne. 0) then
-              call dodphd( head, llunrpt)
-              call dodpe1(                                                    &
-               llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1,        &
-               n, m, nq,                                                      &
-               ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd,                      &
-               lenwork, leniwork                                              &
-               )
-           endif
-           if (present( info)) then
-              info = linfo
-           endif
-           return
-        endif
-!
+   if (present(job)) then
+      ljob = job
+      if (mod(job,10000)/1000 .ge. 1) then
+         if (.not. present(delta)) then
+            linfo5 = 7
+            linfo4 = 1
+         elseif (.not. associated(delta)) then
+            linfo5 = 7
+            linfo4 = 1
+         endif
+      endif
+      if ( job .ge. 10000) then
+         if (.not. present(iwork)) then
+            linfo5 = 7
+            linfo2 = 1
+         elseif (.not. associated(iwork)) then
+            linfo5 = 7
+            linfo2 = 1
+         endif
+      endif
+      if ( job .ge. 10000) then
+         if (.not. present(work)) then
+            linfo5 = 7
+            linfo3 = 1
+         elseif (.not. associated(work)) then
+            linfo5 = 7
+            linfo3 = 1
+         endif
+      endif
+   else
+      ljob = -1
+   endif
+
+   if (linfo5 .ne. 0) then
+      linfo = 10000*linfo5 + 1000*linfo4 + 100*linfo3 + 10*linfo2 + linfo1
+      if (llunerr .gt. 0 .and. liprint .ne. 0) then
+         call dodphd(head, llunrpt)
+         call dodpe1(                                                   &
+         llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1,        &
+         n, m, nq,                                                      &
+         ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd,                      &
+         lenwork, leniwork                                              &
+         )
+      endif
+      if (present(info)) then
+         info = linfo
+      endif
+      return
+   endif
+
 !  Determine the size of WORK
-!
-        if ( ljob .lt. 0 .or. mod( ljob,10) .le. 1) then
-           lenwork = 18+13* np+ np**2+ m+ m**2+4* n* nq+6* n* m+2* n* nq* np+ &
-            2* n* nq* m+ nq**2+5* nq+ nq*( np+ m)+ n* nq* nq
-        else
-           lenwork = 18+13* np+ np**2+ m+ m**2+4* n* nq+2* n* m+2* n* nq* np+ &
-            5* nq+ nq*( np+ m)+ n* nq* nq
-        endif
-!
+   if (ljob .lt. 0 .or. mod(ljob,10) .le. 1) then
+      lenwork = 18 + 13*np + np**2 + m + m**2 + 4*n*nq + 6*n*m + 2*n*nq*np + &
+                2*n*nq*m + nq**2 + 5*nq + nq*(np + m) + n*nq*nq
+   else
+      lenwork = 18 + 13*np + np**2 + m + m**2 + 4*n*nq + 2*n*m + 2*n*nq*np + &
+                5*nq+ nq*(np + m) + n*nq*nq
+   endif
+
 !  Determine the size of IWORK
-!
-        leniwork = 20+2* np+ nq*( np+ m)
-!
+   leniwork = 20 + 2*np + nq*(np + m)
+
 !  Allocate the work arrays
-!
-        allocate( lwork( lenwork), tempret(max( n, np),max( nq, m)),stat =    &
-         linfo3)
-        allocate( liwork( leniwork),stat = linfo2)
-        lwork(:) = 0.0_wp
-        liwork(:) = 0
-        if (present( delta)) then
-           if (.not. associated( delta)) then
-              allocate( ldelta( n, m),stat = linfo4)
-           endif
-        endif
-        if ( linfo4 .ne. 0 .or. linfo3 .ne. 0 .or. linfo2 .ne. 0) then
-           linfo5 = 8
-        endif
-!
-        if ( linfo5 .ne. 0) then
-           linfo = 10000*mod( linfo5,10)+1000*mod( linfo4,10)+                &
-            100*mod( linfo3,10)+10*mod( linfo2,10)+mod( linfo1,10)
-           if ( llunerr .gt. 0 .and. liprint .ne. 0) then
-              call dodphd( head, llunrpt)
-              call dodpe1(                                                    &
-               llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1,        &
-               n, m, nq,                                                      &
-               ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd,                      &
-               lenwork, leniwork                                              &
-               )
-           endif
-           if (present( info)) then
-              info = linfo
-           endif
-           return
-        endif
-!
+   allocate(lwork(lenwork), tempret(max(n, np), max(nq, m)), stat=linfo3)
+   allocate(liwork(leniwork), stat=linfo2)
+   lwork = zero
+   liwork = 0
+   if (present(delta)) then
+      if (.not. associated(delta)) then
+         allocate(ldelta(n, m), stat=linfo4)
+      endif
+   endif
+   if (linfo4 .ne. 0 .or. linfo3 .ne. 0 .or. linfo2 .ne. 0) then
+      linfo5 = 8
+   endif
+
+   if (linfo5 .ne. 0) then
+      linfo = 10000*mod(linfo5,10) + 1000*mod(linfo4,10) +                &
+              100*mod(linfo3,10) + 10*mod(linfo2,10) + mod(linfo1,10)
+      if (llunerr .gt. 0 .and. liprint .ne. 0) then
+         call dodphd( head, llunrpt)
+         call dodpe1(                                                      &
+            llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1,        &
+            n, m, nq,                                                      &
+            ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd,                      &
+            lenwork, leniwork)
+      endif
+      if (present(info)) then
+         info = linfo
+      endif
+      return
+   endif
+
 !  Set array variable defaults except IWORK
-!
-        lwork(1: n* m) = zero
-        lifixb(1) = -1
-        lifixx(1,1) = -1
-        llower(1: np) = -huge( zero)
-        lsclb(1) = negone
-        lscld(1,1) = negone
-        lstpb(1) = negone
-        lstpd(1,1) = negone
-        lupper(1: np) = huge( zero)
-        lwe(1,1,1) = negone
-        lwd(1,1,1) = negone
-!
+   lwork(1: n* m) = zero
+   lifixb(1) = -1
+   lifixx(1,1) = -1
+   llower(1: np) = -huge(zero)
+   lsclb(1) = negone
+   lscld(1,1) = negone
+   lstpb(1) = negone
+   lstpd(1,1) = negone
+   lupper(1: np) = huge(zero)
+   lwe(1,1,1) = negone
+   lwd(1,1,1) = negone
+
 !  Check the size of required arguments and return errors if they are too small
-!
-        if (size( beta) .lt. np) then
-           linfo1 = linfo1+1
-        endif
-!
-        if (any(size( y) .lt. (/ n, nq/))) then
-           linfo1 = linfo1+2
-        endif
-!
-        if (any(size( x) .lt. (/ n, m/))) then
-           linfo1 = linfo1+4
-        endif
-!
+   if (size(beta) .lt. np) then
+      linfo1 = linfo1+1
+   endif
+
+   if (any(size(y) .lt. (/ n, nq/))) then
+      linfo1 = linfo1 + 2
+   endif
+
+   if (any(size(x) .lt. (/ n, m/))) then
+      linfo1 = linfo1 + 4
+   endif
+
 !  Check the presence of optional arguments and copy their values internally or
 !  report errors as necessary
-!
-        if (present( ifixb)) then
-           if (size( ifixb) .lt. np) then
-              linfo1 = linfo1+64
-           endif
-           if ( ifixb(1) .lt. 0.0_wp) then
-!-----------------------------^------------------------------------------------
-!!! FPT - 3085 Objects of .EQ., .NE. .GT. etc. are of different data types
-!------------------------------------------------------------------------------
-              lifixb(1) = ifixb(1)
-           else
-              lifixb(1: np) = ifixb(1: np)
-           endif
-        endif
-!
-        if (present( ifixx)) then
-           ldifx = size( ifixx,1)
-           if (any(size( ifixx) .le. (/0,0/))) then
-              linfo1 = linfo1+128
-           endif
-           if (.not. ( ifixx(1,1) .lt. zero .or. ldifx .eq. 1 .or. ldifx .ge. &
-!--------------------------------------^---------------------------------------
-!!! FPT - 3085 Objects of .EQ., .NE. .GT. etc. are of different data types
-!------------------------------------------------------------------------------
-            n) .or. size( ifixx,2) .lt. m) then
-              linfo1 = linfo1+128
-           endif
-           if ( ldifx .gt. n) then
-              ldifx = n
-           endif
-           if ( ifixx(1,1) .lt. 0.0_wp) then
-!-------------------------------^----------------------------------------------
-!!! FPT - 3085 Objects of .EQ., .NE. .GT. etc. are of different data types
-!------------------------------------------------------------------------------
-              lifixx(1,1) = ifixx(1,1)
-           else
-              lifixx(1: ldifx,1: m) = ifixx(1: ldifx,1: m)
-           endif
-        endif
-!
-        if (present( iwork)) then
-           if (associated( iwork)) then
-              if (size( iwork) .lt. leniwork) then
-                 linfo1 = linfo1+8192
-              endif
-!             !  This is a restart, copy IWORK.
-              if (mod( ljob/10000,10) .ge. 1) then
-                 liwork(1: leniwork) = iwork(1: leniwork)
-              endif
-           endif
-        endif
-!
-        if (present( maxit)) then
-           lmaxit = maxit
-        endif
-!
-        if (present( ndigit)) then
-           lndigit = ndigit
-        endif
-!
-        if (present( partol)) then
-           lpartol = partol
-        endif
-!
-        if (present( sclb)) then
-           if (size( sclb) .lt. np) then
-              linfo1 = linfo1+1024
-           endif
-           if ( sclb(1) .le. 0.0_wp) then
-              lsclb(1) = sclb(1)
-           else
-              lsclb(1: np) = sclb(1: np)
-           endif
-        endif
-!
-        if (present( scld)) then
-           ldscld = size( scld,1)
-           if (any(size( scld) .le. (/0,0/))) then
-              linfo1 = linfo1+2048
-           endif
-           if (.not. ( scld(1,1) .le. zero .or. ldscld .eq. 1 .or. ldscld     &
-            .ge. n) .or. size( scld,2) .lt. m) then
-              linfo1 = linfo1+2048
-           endif
-           if ( ldscld .gt. n) then
-              ldscld = n
-           endif
-           if ( scld(1,1) .le. 0.0_wp) then
-              lscld(1,1) = scld(1,1)
-           else
-              lscld(1: ldscld,1: m) = scld(1: ldscld,1: m)
-           endif
-        endif
-!
-        if (present( sstol)) then
-           lsstol = sstol
-        endif
-!
-        if (present( stpb)) then
-           if (size( stpb) .lt. np) then
-              linfo1 = linfo1+256
-           endif
-           if ( stpb(1) .le. 0.0_wp) then
-              lstpb(1) = stpb(1)
-           else
-              lstpb(1: np) = stpb(1: np)
-           endif
-        endif
-!
-        if (present( stpd)) then
-           ldstpd = size( stpd,1)
-           if (any(size( stpd) .le. (/0,0/))) then
-              linfo1 = linfo1+512
-           endif
-           if (.not. ( stpd(1,1) .le. zero .or. ldstpd .eq. 1 .or. ldstpd     &
-            .ge. n) .or. size( stpd,2) .lt. m) then
-              linfo1 = linfo1+512
-           endif
-           if ( ldstpd .gt. n) then
-              ldstpd = n
-           endif
-           if ( stpd(1,1) .le. 0.0_wp) then
-              lstpd(1,1) = stpd(1,1)
-           else
-              lstpd(1: ldstpd,1: m) = stpd(1: ldstpd,1: m)
-           endif
-        endif
-!
-        if (present( taufac)) then
-           ltaufac = taufac
-        endif
-!
-        if (present( we)) then
-           ldwe = size( we,1)
-           ld2we = size( we,2)
-           if (any(size( we) .le. (/0,0,0/))) then
-              linfo1 = linfo1+16
-           endif
-           if (.not. ( we(1,1,1) .lt. zero .or.                               &
-                (( ldwe .eq. 1 .or. ldwe .ge. n) .and.                        &
-                 ( ld2we .eq. 1 .or. ld2we .ge. nq))) .or. size( we,3) .lt.   &
-                 nq) then
-              linfo1 = linfo1+16
-           endif
-           if ( ldwe .gt. n) then
-              ldwe = n
-           endif
-           if ( ld2we .gt. nq) then
-              ld2we = nq
-           endif
-           if ( we(1,1,1) .lt. 0.0_wp) then
-              lwe(1,1,1) = we(1,1,1)
-           else
-              lwe(1: ldwe,1: ld2we,1: nq) = we(1: ldwe,1: ld2we,1: nq)
-           endif
-        endif
-!
-        if (present( wd)) then
-           ldwd = size( wd,1)
-           ld2wd = size( wd,2)
-           if (any(size( wd) .le. (/0,0,0/))) then
-              linfo1 = linfo1+32
-           endif
-           if (.not. ( wd(1,1,1) .lt. zero .or.                               &
-                (( ldwd .eq. 1 .or. ldwd .ge. n) .and.                        &
-                 ( ld2wd .eq. 1 .or. ld2wd .ge. m))) .or. size( wd,3) .lt. m) &
-                 then
-              linfo1 = linfo1+32
-           endif
-           if ( ldwd .gt. n) then
-              ldwd = n
-           endif
-           if ( ld2wd .gt. m) then
-              ld2wd = m
-           endif
-           if ( wd(1,1,1) .le. 0.0_wp) then
-              lwd(1,1,1) = wd(1,1,1)
-           else
-              lwd(1: ldwd,1: ld2wd,1: m) = wd(1: ldwd,1: ld2wd,1: m)
-           endif
-        endif
-!
-        if (present( work)) then
-           if (associated( work)) then
-              if (size( work) .lt. lenwork) then
-                 linfo1 = linfo1+4096
-              endif
-!             !  Deltas are in WORK, copy them.
-              if (mod( ljob/1000,10) .ge. 1 .and. .not. present( delta)) then
-                 lwork(1: n* m) = work(1: n* m)
-              endif
-!             !  This is a restart, copy WORK.
-              if (mod( ljob/10000,10) .ge. 1) then
-                 lwork(1: lenwork) = work(1: lenwork)
-              endif
-           endif
-        endif
-!
-        if (present( delta)) then
-           if (associated( delta)) then
-              if (any(shape( delta) .lt. (/ n, m/))) then
-                 linfo1 = linfo1+8
-              endif
-              lwork(1: n* m) = reshape( delta(1: n,1: m),(/ n* m/))
-           endif
-        endif
-!
-        if (present( lower)) then
-           if (size( lower) .lt. np) then
-              linfo1 = linfo1+32768
-           endif
-           llower(1: np) = lower(1: np)
-        endif
-!
-        if (present( upper)) then
-           if (size( upper) .lt. np) then
-              linfo1 = linfo1+16384
-           endif
-           lupper(1: np) = upper(1: np)
-        endif
-!
+
+   if (present(ifixb)) then
+      if (size(ifixb) .lt. np) then
+         linfo1 = linfo1 + 64
+      endif
+      if (ifixb(1) .lt. 0) then
+         lifixb(1) = ifixb(1)
+      else
+         lifixb(1:np) = ifixb(1:np)
+      endif
+   endif
+
+   if (present(ifixx)) then
+      ldifx = size(ifixx,1)
+      if (any(size(ifixx) .le. (/0,0/))) then
+         linfo1 = linfo1 + 128
+      endif
+      if (.not. (ifixx(1,1) .lt. 0 .or. ldifx .eq. 1 .or. ldifx .ge. n) &
+            .or. size( ifixx,2) .lt. m) then
+         linfo1 = linfo1 + 128
+      endif
+      if (ldifx .gt. n) then
+         ldifx = n
+      endif
+      if (ifixx(1,1) .lt. 0) then
+         lifixx(1,1) = ifixx(1,1)
+      else
+         lifixx(1:ldifx,1:m) = ifixx(1:ldifx,1:m)
+      endif
+   endif
+
+   if (present(iwork)) then
+      if (associated( iwork)) then
+         if (size(iwork) .lt. leniwork) then
+            linfo1 = linfo1 + 8192
+         endif
+         !  This is a restart, copy IWORK.
+         if (mod(ljob/10000,10) .ge. 1) then
+            liwork(1:leniwork) = iwork(1:leniwork)
+         endif
+      endif
+   endif
+
+   if (present(maxit)) then
+      lmaxit = maxit
+   endif
+
+   if (present(ndigit)) then
+      lndigit = ndigit
+   endif
+
+   if (present(partol)) then
+      lpartol = partol
+   endif
+
+   if (present(sclb)) then
+      if (size(sclb) .lt. np) then
+         linfo1 = linfo1 + 1024
+      endif
+      if (sclb(1) .le. zero) then
+         lsclb(1) = sclb(1)
+      else
+         lsclb(1:np) = sclb(1:np)
+      endif
+   endif
+
+   if (present(scld)) then
+      ldscld = size(scld,1)
+      if (any(size(scld) .le. (/0,0/))) then
+         linfo1 = linfo1 + 2048
+      endif
+      if (.not. (scld(1,1) .le. zero .or. ldscld .eq. 1 .or. ldscld .ge. n) &
+            .or. size(scld,2) .lt. m) then
+         linfo1 = linfo1 + 2048
+      endif
+      if (ldscld .gt. n) then
+         ldscld = n
+      endif
+      if (scld(1,1) .le. zero) then
+         lscld(1,1) = scld(1,1)
+      else
+         lscld(1:ldscld,1:m) = scld(1:ldscld,1:m)
+      endif
+   endif
+
+   if (present(sstol)) then
+      lsstol = sstol
+   endif
+
+   if (present(stpb)) then
+      if (size(stpb) .lt. np) then
+         linfo1 = linfo1 + 256
+      endif
+      if (stpb(1) .le. zero) then
+         lstpb(1) = stpb(1)
+      else
+         lstpb(1:np) = stpb(1:np)
+      endif
+   endif
+
+   if (present(stpd)) then
+      ldstpd = size(stpd,1)
+      if (any(size(stpd) .le. (/0,0/))) then
+         linfo1 = linfo1 + 512
+      endif
+      if (.not. (stpd(1,1) .le. zero .or. ldstpd .eq. 1 .or. ldstpd .ge. n) &
+            .or. size(stpd,2) .lt. m) then
+         linfo1 = linfo1 + 512
+      endif
+      if (ldstpd .gt. n) then
+         ldstpd = n
+      endif
+      if (stpd(1,1) .le. zero) then
+         lstpd(1,1) = stpd(1,1)
+      else
+         lstpd(1:ldstpd,1:m) = stpd(1:ldstpd,1:m)
+      endif
+   endif
+
+   if (present(taufac)) then
+      ltaufac = taufac
+   endif
+
+   if (present(we)) then
+      ldwe = size(we,1)
+      ld2we = size(we,2)
+      if (any(size(we) .le. (/0,0,0/))) then
+         linfo1 = linfo1 + 16
+      endif
+      if (.not. (we(1,1,1) .lt. zero .or.                               &
+            (( ldwe .eq. 1 .or. ldwe .ge. n) .and.                       &
+            ( ld2we .eq. 1 .or. ld2we .ge. nq))) .or. size(we,3) .lt. nq) then
+         linfo1 = linfo1 + 16
+      endif
+      if (ldwe .gt. n) then
+         ldwe = n
+      endif
+      if (ld2we .gt. nq) then
+         ld2we = nq
+      endif
+      if (we(1,1,1) .lt. zero) then
+         lwe(1,1,1) = we(1,1,1)
+      else
+         lwe(1:ldwe,1:ld2we,1:nq) = we(1:ldwe,1:ld2we,1:nq)
+      endif
+   endif
+
+   if (present(wd)) then
+      ldwd = size(wd,1)
+      ld2wd = size(wd,2)
+      if (any(size(wd) .le. (/0,0,0/))) then
+         linfo1 = linfo1 + 32
+      endif
+      if (.not. (wd(1,1,1) .lt. zero .or.                               &
+            ((ldwd .eq. 1 .or. ldwd .ge. n) .and.                       &
+            (ld2wd .eq. 1 .or. ld2wd .ge. m))) .or. size( wd,3) .lt. m) then
+         linfo1 = linfo1 + 32
+      endif
+      if (ldwd .gt. n) then
+         ldwd = n
+      endif
+      if (ld2wd .gt. m) then
+         ld2wd = m
+      endif
+      if (wd(1,1,1) .le. 0.0_wp) then
+         lwd(1,1,1) = wd(1,1,1)
+      else
+         lwd(1:ldwd,1:ld2wd,1:m) = wd(1:ldwd,1:ld2wd,1:m)
+      endif
+   endif
+
+   if (present(work)) then
+      if (associated(work)) then
+         if (size(work) .lt. lenwork) then
+            linfo1 = linfo1 + 4096
+         endif
+         !  Deltas are in WORK, copy them.
+         if (mod(ljob/1000,10) .ge. 1 .and. .not. present(delta)) then
+            lwork(1:n*m) = work(1:n*m)
+         endif
+         !  This is a restart, copy WORK.
+         if (mod(ljob/10000,10) .ge. 1) then
+            lwork(1:lenwork) = work(1:lenwork)
+         endif
+      endif
+   endif
+
+   if (present(delta)) then
+      if (associated(delta)) then
+         if (any(shape(delta) .lt. (/n, m/))) then
+            linfo1 = linfo1 + 8
+         endif
+         lwork(1:n*m) = reshape(delta(1:n,1:m),(/n*m/))
+      endif
+   endif
+
+   if (present(lower)) then
+      if (size(lower) .lt. np) then
+         linfo1 = linfo1 + 32768
+      endif
+      llower(1:np) = lower(1:np)
+   endif
+
+   if (present(upper)) then
+      if (size(upper) .lt. np) then
+         linfo1 = linfo1 + 16384
+      endif
+      lupper(1:np) = upper(1:np)
+   endif
+
 !  Report an error if any of the array sizes didn't match.
-!
-        if ( linfo1 .ne. 0) then
-           linfo = 100000+ linfo1
-           linfo1 = 0
-           if ( llunerr .gt. 0 .and. liprint .ne. 0) then
-              call dodphd( head, llunrpt)
-              call dodpe1(                                                    &
-               llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1,        &
-               n, m, nq,                                                      &
-               ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd,                      &
-               lenwork, leniwork                                              &
-               )
-           endif
-           if (present( info)) then
-              info = linfo
-           endif
-           return
-        endif
-!
-!
-        if ( lwd(1,1,1) .ne. zero) then
-!----------------------------^-------------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
-           call dodcnt                                                        &
-            ( fcn,                                                            &
-            n, m, np, nq,                                                     &
-            beta(1: np),                                                      &
-            y(1: n,1: nq), n, x(1: n,1: m), n,                                &
-            lwe(1: ldwe,1: ld2we,1: nq), ldwe, ld2we,                         &
-            lwd(1: ldwd,1: ld2wd,1: m), ldwd, ld2wd,                          &
-            lifixb, lifixx(1: ldifx,1: m), ldifx,                             &
-            ljob, lndigit, ltaufac,                                           &
-            lsstol, lpartol, lmaxit,                                          &
-            liprint, llunerr, llunrpt,                                        &
-            lstpb, lstpd(1: ldstpd,1: m), ldstpd,                             &
-            lsclb, lscld(1: ldscld,1: m), ldscld,                             &
-            lwork, lenwork, liwork, leniwork,                                 &
-            linfo,                                                            &
-            llower, lupper)
-        else
-           wd1(1,1,1) = negone
-           call dodcnt                                                        &
-            ( fcn,                                                            &
-            n, m, np, nq,                                                     &
-            beta(1: np),                                                      &
-            y(1: n,1: nq), n, x(1: n,1: m), n,                                &
-            lwe(1: ldwe,1: ld2we,1: nq), ldwe, ld2we,                         &
-            wd1,1,1,                                                          &
-            lifixb, lifixx(1: ldifx,1: m), ldifx,                             &
-            ljob, lndigit, ltaufac,                                           &
-            lsstol, lpartol, lmaxit,                                          &
-            liprint, llunerr, llunrpt,                                        &
-            lstpb, lstpd(1: ldstpd,1: m), ldstpd,                             &
-            lsclb, lscld(1: ldscld,1: m), ldscld,                             &
-            lwork, lenwork, liwork, leniwork,                                 &
-            linfo,                                                            &
-            llower, lupper)
-        endif
-!
-        if (present( delta)) then
-           if (associated( delta)) then
-              delta(1: n,1: m) = reshape( lwork(1: n* m),(/ n, m/))
-           else
-              ldelta(1: n,1: m) = reshape( lwork(1: n* m),(/ n, m/))
-              delta=> ldelta
-           endif
-        endif
-!
-        if (present( info)) then
-           info = linfo
-        endif
-!
-        if (present( iwork)) then
-           if (.not. associated( iwork)) then
-              iwork=> liwork
-           else
-              iwork(1: leniwork) = liwork(1: leniwork)
-              deallocate( liwork)
-           endif
-        else
-           deallocate( liwork)
-        endif
-!
-        if (present( work)) then
-           if (.not. associated( work)) then
-              work=> lwork
-           else
-              work(1: lenwork) = lwork(1: lenwork)
-              deallocate( lwork)
-           endif
-        else
-           deallocate( lwork)
-        endif
-!
-        deallocate( tempret)
-!
-        return
-!
+
+   if (linfo1 .ne. 0) then
+      linfo = 100000 + linfo1
+      linfo1 = 0
+      if ( llunerr .gt. 0 .and. liprint .ne. 0) then
+         call dodphd(head, llunrpt)
+         call dodpe1(                                                   &
+         llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1,        &
+         n, m, nq,                                                      &
+         ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd,                      &
+         lenwork, leniwork                                              &
+         )
+      endif
+      if (present(info)) then
+         info = linfo
+      endif
+      return
+   endif
+
+   if (lwd(1,1,1) .ne. 0) then
+      call dodcnt                                                          &
+         (fcn,                                                             &
+         n, m, np, nq,                                                     &
+         beta(1:np),                                                       &
+         y(1:n,1:nq), n, x(1:n,1:m), n,                                    &
+         lwe(1:ldwe,1:ld2we,1:nq), ldwe, ld2we,                            &
+         lwd(1:ldwd,1:ld2wd,1:m), ldwd, ld2wd,                             &
+         lifixb, lifixx(1:ldifx,1:m), ldifx,                               &
+         ljob, lndigit, ltaufac,                                           &
+         lsstol, lpartol, lmaxit,                                          &
+         liprint, llunerr, llunrpt,                                        &
+         lstpb, lstpd(1:ldstpd,1:m), ldstpd,                               &
+         lsclb, lscld(1:ldscld,1:m), ldscld,                               &
+         lwork, lenwork, liwork, leniwork,                                 &
+         linfo,                                                            &
+         llower, lupper)
+   else
+      wd1(1,1,1) = negone
+      call dodcnt                                                          &
+         (fcn,                                                             &
+         n, m, np, nq,                                                     &
+         beta(1:np),                                                       &
+         y(1:n,1:nq), n, x(1:n,1:m), n,                                    &
+         lwe(1:ldwe,1:ld2we,1:nq), ldwe, ld2we,                            &
+         wd1,1,1,                                                          &
+         lifixb, lifixx(1:ldifx,1:m), ldifx,                               &
+         ljob, lndigit, ltaufac,                                           &
+         lsstol, lpartol, lmaxit,                                          &
+         liprint, llunerr, llunrpt,                                        &
+         lstpb, lstpd(1:ldstpd,1:m), ldstpd,                               &
+         lsclb, lscld(1:ldscld,1:m), ldscld,                               &
+         lwork, lenwork, liwork, leniwork,                                 &
+         linfo,                                                            &
+         llower, lupper)
+   endif
+
+   if (present(delta)) then
+      if (associated(delta)) then
+         delta(1:n,1:m) = reshape(lwork(1:n*m),(/n, m/))
+      else
+         ldelta(1:n,1:m) = reshape(lwork(1:n*m),(/n, m/))
+         delta => ldelta
+      endif
+   endif
+
+   if (present(info)) then
+      info = linfo
+   endif
+
+   if (present(iwork)) then
+      if (.not. associated(iwork)) then
+         iwork => liwork
+      else
+         iwork(1:leniwork) = liwork(1:leniwork)
+         deallocate(liwork)
+      endif
+   else
+      deallocate(liwork)
+   endif
+
+   if (present(work)) then
+      if (.not. associated(work)) then
+         work => lwork
+      else
+         work(1:lenwork) = lwork(1:lenwork)
+         deallocate(lwork)
+      endif
+   else
+      deallocate(lwork)
+   endif
+
+   deallocate(tempret)
+
+   return
 end subroutine odr
+
 end module odrpack95
-!DACCES
+
 subroutine dacces                                                             &
          ( n, m, np, nq, ldwe, ld2we,                                         &
          work, lwork, iwork, liwork,                                          &
