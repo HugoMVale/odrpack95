@@ -1,6 +1,6 @@
 ---
 project: odrpack95
-license: mit
+license: bsd
 summary: ODRPACK95 is a portable collection of fortran subprograms for fitting a model to data with bound constraints on the model parameters. 
 src_dir: ./src
          ./example

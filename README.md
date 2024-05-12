@@ -21,10 +21,10 @@ variable.
 This project aims to modernize the original code, namely:
 
 * [x] Modify the tests so they can be automatically run in the CI.
-* [ ] Fix some warnings, e.g. "Fortran runtime warning: An array temporary was created".
+* [x] Conversion from fixed (`.f`) to free-form (`.f90`) source.
+* [ ] Fix warnings, etc.
 * [ ] Implement a C API.
 * [ ] Implement python bindings to the C API.
-* [ ] Conversion from fixed (.f) to free-form (.f90) source.
 
 ## Installation
 
@@ -41,13 +41,13 @@ fpm test --profile release
 ```
 To run the provided example, do:
 ```
-fpm run --example "simple_example"
+fpm run --example "example_name"
 ```
- 
+
 ## Licence
 
 * The original ODERPACK95 code is [public domain](https://github.com/scipy/scipy/issues/7107#issuecomment-307378785).
-* Any modications done in the course of this project are also public domain.
+* Any modications done in the course of this project are covered by BSD-3.
 
 ## References
 
