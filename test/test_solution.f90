@@ -56,7 +56,7 @@ program dtest
 !       logical unit 6 by default;
 !       logical unit 'LUNSUM' used to summarize results of comparisons
 !       from exercise routine DODRX.
-!
+
         lunrpt = 18
         lunerr = 18
         lunsum = 19
@@ -86,7 +86,7 @@ subroutine dodrx                                                              &
 !***Revision Date  920619   (YYMMDD)
 !***Purpose  Exercise features of ODRPACK95 software
 !***End Prologue  DODRX
-!
+
 !...Used modules
         use odrpack95
         use odrpack95_kinds,only:wp
