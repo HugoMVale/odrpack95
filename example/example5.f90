@@ -7,7 +7,7 @@ program example5
 
    real(kind=wp), allocatable :: beta(:), l(:), u(:), x(:,:), y(:,:)
    integer :: np, n, m, nq
-!
+
    interface
       subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb,      &
        ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
