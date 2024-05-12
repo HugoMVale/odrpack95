@@ -1,67 +1,67 @@
-PROGRAM EXAMPLE5
-   USE ODRPACK95
-   use odrpack95_kinds, only: wp
+program example5
+!! This is an example of the modern way to use ODRPACK95. The work arrays are allocated
+!! internally.
+   use odrpack95
+   use odrpack95_kinds,only: wp
    implicit none
-   REAL (KIND=wp), ALLOCATABLE :: BETA(:),L(:),U(:),X(:,:),Y(:,:)
-   INTEGER :: NP,N,M,NQ
-   INTERFACE
-      SUBROUTINE FCN(N,M,NP,NQ,LDN,LDM,LDNP,BETA,XPLUSD,IFIXB,IFIXX,LDIFX,&
-         IDEVAL,F,FJACB,FJACD,ISTOP)
+
+   real(kind=wp), allocatable :: beta(:), l(:), u(:), x(:,:), y(:,:)
+   integer :: np, n, m, nq
+!
+   interface
+      subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb,      &
+       ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
          import :: wp
-         INTEGER :: IDEVAL,ISTOP,LDIFX,LDM,LDN,LDNP,M,N,NP,NQ
-         REAL (KIND=wp) :: BETA(NP),F(LDN,NQ),FJACB(LDN,LDNP,NQ), &
-            FJACD(LDN,LDM,NQ),XPLUSD(LDN,M)
-         INTEGER :: IFIXB(NP),IFIXX(LDIFX,M)
-      END SUBROUTINE FCN
-   END INTERFACE
+         integer :: ideval, istop, ldifx, ldm, ldn, ldnp, m, n, np, nq
+         real(kind=wp) :: beta(np), f(ldn, nq), fjacb(ldn, ldnp, nq),        &
+         fjacd(ldn, ldm, nq), xplusd(ldn, m)
+         integer :: ifixb( np), ifixx( ldifx, m)
+      end subroutine fcn
+   end interface
 
-   NP = 2
-   N  = 4
-   M  = 1
-   NQ = 1
-   ALLOCATE(BETA(NP),L(NP),U(NP),X(N,M),Y(N,NQ))
-   BETA(1:2) = (/ 2.0_wp, 0.5_wp /)
-   L(1:2)    = (/ 0.0_wp, 0.0_wp /)
-   U(1:2)    = (/ 10.0_wp, 0.9_wp /)
-   X(1:4,1)  = (/ 0.982_wp, 1.998_wp, 4.978_wp, 6.01_wp /)
-   Y(1:4,1)  = (/ 2.7_wp, 7.4_wp, 148.0_wp, 403.0_wp /)
-   CALL ODR(FCN,N,M,NP,NQ,BETA,Y,X,LOWER=L,UPPER=U)
-END PROGRAM EXAMPLE5
+   np = 2
+   n = 4
+   m = 1
+   nq = 1
+
+   allocate(beta(np), l(np), u(np), x(n, m), y(n, nq))
+   beta(1:2) = (/2.0_wp,0.5_wp/)
+   l(1:2) = (/0.0_wp,0.0_wp/)
+   u(1:2) = (/10.0_wp,0.9_wp/)
+   x(1:4,1) = (/0.982_wp,1.998_wp,4.978_wp,6.01_wp/)
+   y(1:4,1) = (/2.7_wp,7.4_wp,148.0_wp,403.0_wp/)
+
+   call odr(fcn, n, m, np, nq, beta, y, x, lower=l, upper=u)
+
+end program example5
 
 
-SUBROUTINE FCN(N,M,NP,NQ,LDN,LDM,LDNP,BETA,XPLUSD,IFIXB,IFIXX,LDIFX,&
-   IDEVAL,F,FJACB,FJACD,ISTOP)
+subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx,      &
+    ldifx, ideval, f, fjacb, fjacd, istop)
 
    use odrpack95_kinds, only: wp
 
-   INTEGER :: IDEVAL,ISTOP,LDIFX,LDM,LDN,LDNP,M,N,NP,NQ, I
-   REAL (KIND=wp) :: BETA(NP),F(LDN,NQ),FJACB(LDN,LDNP,NQ), &
-      FJACD(LDN,LDM,NQ),XPLUSD(LDN,M)
-   INTEGER :: IFIXB(NP),IFIXX(LDIFX,M)
+   integer :: ideval, istop, ldifx, ldm, ldn, ldnp, m, n, np, nq, i
+   real(kind=wp) :: beta(np), f(ldn, nq), fjacb(ldn, ldnp, nq),               &
+                    fjacd(ldn, ldm, nq), xplusd(ldn, m)
+   integer :: ifixb(np), ifixx(ldifx, m)
 
-   ISTOP = 0
+   istop = 0
 
-   ! Calculate model.
-   IF (MOD(IDEVAL,10).NE.0) THEN
-      DO I=1,N
-         F(I,1) = BETA(1)*EXP(BETA(2)*XPLUSD(I,1))
-      END DO
-   END IF
+   ! Calculate model
+   if (mod(ideval,10) .ne. 0) then
+         f(1:n,1) = beta(1)*exp(beta(2)*xplusd(1:n,1))
+   endif
 
-   ! Calculate model partials with respect to BETA.
-   IF (MOD(IDEVAL/10,10).NE.0) THEN
-      DO I=1,N
-         FJACB(I,1,1) = EXP(BETA(2)*XPLUSD(I,1))
-         FJACB(I,2,1) = BETA(1)*XPLUSD(I,1)*EXP(BETA(2)*XPLUSD(I,1))
-      END DO
-   END IF
+   ! Calculate model partials with respect to BETA
+   if (mod(ideval/10,10) .ne. 0) then
+      fjacb(1:n,1,1) = exp(beta(2)*xplusd(1:n,1))
+      fjacb(1:n,2,1) = beta(1)*xplusd(1:n,1)*exp(beta(2)*xplusd(1:n,1))
+   endif
 
-   ! Calculate model partials with respect to DELTA.
-   IF (MOD(IDEVAL/100,10).NE.0) THEN
-      DO I=1,N
-         FJACD(I,1,1) = BETA(1)*BETA(2)*EXP(BETA(2)*XPLUSD(I,1))
-      END DO
-   END IF
- 
+   ! Calculate model partials with respect to DELTA
+   if (mod(ideval/100,10) .ne. 0) then
+      fjacd(1:n,1,1) = beta(1)* beta(2)*exp(beta(2)*xplusd(1:n,1))
+   endif
 
-END SUBROUTINE FCN
+end subroutine fcn
