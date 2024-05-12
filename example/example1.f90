@@ -131,7 +131,7 @@ CALL ODR(FCN=FCN,                                          &
          WORK=WORK,IWORK=IWORK,                            &
          INFO=INFO)
 
-END
+END PROGRAM
 
 
 SUBROUTINE FCN(N,M,NP,NQ,                                  &
@@ -187,7 +187,6 @@ IF (IFIXB(1) .GT. 0 .AND. IFIXX(1,1) .GT. 0) THEN
 !   Do nothing.
 END IF
 
-
 ! Check for unacceptable values for this problem
 IF (BETA(1) .LT. zero) THEN
     ISTOP = 1
@@ -196,8 +195,8 @@ ELSE
     ISTOP = 0
 END IF
 
-!Compute predicted values
-IF (MOD(IDEVAL,10).GE.1) THEN
+! Compute predicted values
+IF (MOD(IDEVAL,10) .GE. 1) THEN
     DO L = 1,NQ
         DO I = 1,N
             F(I,L) = BETA(1) + BETA(2)*(EXP(BETA(3)*XPLUSD(I,1)) - 1.0E0_wp)**2
@@ -229,9 +228,4 @@ IF (MOD(IDEVAL/100,10) .GE. 1) THEN
     END DO
 END IF
 
-RETURN
-END
-
-
-
-
+END SUBROUTINE
