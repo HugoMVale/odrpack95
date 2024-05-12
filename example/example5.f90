@@ -7,17 +7,18 @@ program example5
 
    real(kind=wp), allocatable :: beta(:), l(:), u(:), x(:,:), y(:,:)
    integer :: np, n, m, nq
+   external :: fcn
 
-   interface
-      subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb,      &
-       ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
-         import :: wp
-         integer :: ideval, istop, ldifx, ldm, ldn, ldnp, m, n, np, nq
-         real(kind=wp) :: beta(np), f(ldn, nq), fjacb(ldn, ldnp, nq),        &
-         fjacd(ldn, ldm, nq), xplusd(ldn, m)
-         integer :: ifixb( np), ifixx( ldifx, m)
-      end subroutine fcn
-   end interface
+   ! interface
+   !    subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb,      &
+   !     ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+   !       import :: wp
+   !       integer :: ideval, istop, ldifx, ldm, ldn, ldnp, m, n, np, nq
+   !       real(kind=wp) :: beta(np), f(ldn, nq), fjacb(ldn, ldnp, nq),        &
+   !       fjacd(ldn, ldm, nq), xplusd(ldn, m)
+   !       integer :: ifixb( np), ifixx( ldifx, m)
+   !    end subroutine fcn
+   ! end interface
 
    np = 2
    n = 4
@@ -35,17 +36,17 @@ program example5
 
 end program example5
 
-
 subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx,      &
-    ldifx, ideval, f, fjacb, fjacd, istop)
+   ldifx, ideval, f, fjacb, fjacd, istop)
 
    use odrpack95_kinds, only: wp
 
-   integer :: ideval, istop, ldifx, ldm, ldn, ldnp, m, n, np, nq, i
-   real(kind=wp) :: beta(np), f(ldn, nq), fjacb(ldn, ldnp, nq),               &
-                    fjacd(ldn, ldm, nq), xplusd(ldn, m)
-   integer :: ifixb(np), ifixx(ldifx, m)
-
+   integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
+   integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
+   integer, intent(out) :: istop
+   real(kind=wp), intent(in) :: beta(np), xplusd(ldn, m)
+   real(kind=wp), intent(out) :: f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq)
+   
    istop = 0
 
    ! Calculate model
