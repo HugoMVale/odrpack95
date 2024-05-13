@@ -40,6 +40,7 @@ subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
                ldifx, ideval, f, fjacb, fjacd, istop)
 
    use odrpack95_kinds, only: wp
+   implicit none
 
    integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
    integer, intent(in) :: ifixb(np), ifixx(ldifx, m)

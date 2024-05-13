@@ -168,6 +168,7 @@ SUBROUTINE FCN(N, M, NP, NQ, &
 
 ! Used modules
    use odrpack95_kinds, only: wp, zero
+   implicit none
 
 ! Input arguments, not to be changed by this routine:
    INTEGER, intent(in) :: IDEVAL, LDIFX, LDM, LDN, LDNP, M, N, NP, NQ
