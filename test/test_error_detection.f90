@@ -9,115 +9,115 @@ program tester
 !***END PROLOGUE  TESTER
 
 !...USED MODULES
-        use odrpack95_kinds, only:wp
-        use odrpack95
-        implicit none
+   use odrpack95_kinds, only: wp
+   use odrpack95
+   implicit none
 
 !...LOCAL SCALARS
-        integer n,m,nq,np,info,lun
-        logical passed
-!       STAT
+   integer n, m, nq, np, info, lun
+   logical passed
+!  STAT
 
 !...LOCAL ARRAYS
-        real(kind = wp)                                                       &
-         beta(:),y(:,:),x(:,:),upper(2),lower(2)
+   real(kind=wp) &
+      beta(:), y(:, :), x(:, :), upper(2), lower(2)
 
 !...ALLOCATABLE ARRAYS
-        allocatable beta,y,x
+   allocatable beta, y, x
 
 !...EXTERNAL SUBPROGRAMS
-        external fcn
+   external fcn
 
-        common /bounds/upper,lower
+   common/bounds/upper, lower
 
 !***FIRST EXECUTABLE STATEMENT  TESTER
 
-        passed = .true.
+   passed = .true.
 
-        open (unit = 8,file = "./test/test_error_summary.txt")
-        write (8,*)"NO SUMMARY AVAILABLE"
-        close (8)
+   open (unit=8, file="./test/test_error_summary.txt")
+   write (8, *) "NO SUMMARY AVAILABLE"
+   close (8)
 
-        lun = 9
-        open (unit = lun,file = "./test/test_error_report.txt")
+   lun = 9
+   open (unit=lun, file="./test/test_error_report.txt")
 
 !  ERROR IN PROBLEM SIZE
 
-        n = 0
-        m = 0
-        nq = 0
-        np = 0
-        allocate(beta(np),y(n,nq),x(n,m))
-        y(:,:) = 0.0_wp
-        x(:,:) = 0.0_wp
-        beta(:) = 0.0_wp
+   n = 0
+   m = 0
+   nq = 0
+   np = 0
+   allocate (beta(np), y(n, nq), x(n, m))
+   y(:, :) = 0.0_wp
+   x(:, :) = 0.0_wp
+   beta(:) = 0.0_wp
 
-        call odr(fcn,n,m,np,nq,beta,y,x,iprint = 1,info = info,               &
-         lunrpt = lun,lunerr = lun)
+   call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, &
+            lunrpt=lun, lunerr=lun)
 
-        if (info .ne. 11111)passed = .false.
+   if (info .ne. 11111) passed = .false.
 
-        write (lun,*)"INFO = ",info
+   write (lun, *) "INFO = ", info
 
 !  ERROR IN JOB SPECIFICATION WITH WORK AND IWORK
 
-        n = 1
-        m = 1
-        nq = 1
-        np = 1
-        deallocate(beta,y,x)
-        allocate(beta(np),y(n,nq),x(n,m))
-        y(:,:) = 0.0_wp
-        x(:,:) = 0.0_wp
-        beta(:) = 0.0_wp
+   n = 1
+   m = 1
+   nq = 1
+   np = 1
+   deallocate (beta, y, x)
+   allocate (beta(np), y(n, nq), x(n, m))
+   y(:, :) = 0.0_wp
+   x(:, :) = 0.0_wp
+   beta(:) = 0.0_wp
 
-        call odr(fcn,n,m,np,nq,beta,y,x,iprint = 1,info = info,job = 10000,   &
-         lunrpt = lun,lunerr = lun)
+   call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, job=10000, &
+            lunrpt=lun, lunerr=lun)
 
-        if (info .ne. 70110)passed = .false.
+   if (info .ne. 70110) passed = .false.
 
-        write (lun,*)"INFO = ",info
+   write (lun, *) "INFO = ", info
 
 !  ERROR IN JOB SPECIFICATION WITH DELTA
 
-        n = 1
-        m = 1
-        nq = 1
-        np = 1
-        deallocate(beta,y,x)
-        allocate(beta(np),y(n,nq),x(n,m))
-        y(:,:) = 0.0_wp
-        x(:,:) = 0.0_wp
-        beta(:) = 0.0_wp
+   n = 1
+   m = 1
+   nq = 1
+   np = 1
+   deallocate (beta, y, x)
+   allocate (beta(np), y(n, nq), x(n, m))
+   y(:, :) = 0.0_wp
+   x(:, :) = 0.0_wp
+   beta(:) = 0.0_wp
 
-        call odr(fcn,n,m,np,nq,beta,y,x,iprint = 1,info = info,job = 1000,    &
-         lunrpt = lun,lunerr = lun)
+   call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, job=1000, &
+            lunrpt=lun, lunerr=lun)
 
-        if (info .ne. 71000)passed = .false.
+   if (info .ne. 71000) passed = .false.
 
-        write (lun,*)"INFO = ",info
+   write (lun, *) "INFO = ", info
 
 !  BOUNDS TOO SMALL FOR DERIVATIVE CHECKER WHEN DERIVATIVES DON'T AGREE.
 
-        n = 4
-        m = 1
-        nq = 1
-        np = 2
-        deallocate(beta,y,x)
-        allocate(beta(np),y(n,nq),x(n,m))
-        beta(:) = (/-200.0_wp,-5.0_wp/)
-        upper(1:2) = (/-200.0_wp,0.0_wp/)
-        lower(1:2) = (/-200.000029802322_wp,-5.0_wp/)
-        y(:,1) = (/2.718281828459045_wp,7.389056098930650_wp,                 &
-         148.4131591025766_wp,403.4287934927353_wp/)
-        x(:,1) = (/1.0_wp,2.0_wp,5.0_wp,6.0_wp/)
+   n = 4
+   m = 1
+   nq = 1
+   np = 2
+   deallocate (beta, y, x)
+   allocate (beta(np), y(n, nq), x(n, m))
+   beta(:) = (/-200.0_wp, -5.0_wp/)
+   upper(1:2) = (/-200.0_wp, 0.0_wp/)
+   lower(1:2) = (/-200.000029802322_wp, -5.0_wp/)
+   y(:, 1) = (/2.718281828459045_wp, 7.389056098930650_wp, &
+               148.4131591025766_wp, 403.4287934927353_wp/)
+   x(:, 1) = (/1.0_wp, 2.0_wp, 5.0_wp, 6.0_wp/)
 
-        call odr(fcn,n,m,np,nq,beta,y,x,iprint = 1,info = info,job = 0020,    &
-         lunrpt = lun,lunerr = lun,lower = lower,upper = upper)
+   call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, job=0020, &
+            lunrpt=lun, lunerr=lun, lower=lower, upper=upper)
 
-        if (info .ne. 1) passed = .false.
+   if (info .ne. 1) passed = .false.
 
-        write (lun,*) "INFO = ", info
+   write (lun, *) "INFO = ", info
 
 !  ERROR IN ARRAY ALLOCATION
 !  The following code is intended to force memory allocation failure.  An
@@ -153,24 +153,24 @@ program tester
 !
 !       WRITE(LUN,*) "INFO = ", INFO
 !
-        close (lun)
+   close (lun)
 
-        if (passed) then
-           stop "Error detection tests passed. See report."
-        else
-           error stop "Error detection tests failed. See report."
-        endif
+   if (passed) then
+      stop "Error detection tests passed. See report."
+   else
+      error stop "Error detection tests failed. See report."
+   end if
 
-end program
+end program tester
 
 !FCN
-subroutine fcn                                                                &
-         (n,m,np,nq,                                                          &
-         ldn,ldm,ldnp,                                                        &
-         beta,xplusd,                                                         &
-         ifixb,ifixx,ldifx,                                                   &
-         ideval,f,fjacb,fjacd,                                                &
-         istop)
+subroutine fcn &
+   (n, m, np, nq, &
+    ldn, ldm, ldnp, &
+    beta, xplusd, &
+    ifixb, ifixx, ldifx, &
+    ideval, f, fjacb, fjacd, &
+    istop)
 !***BEGIN PROLOGUE  FCN
 !***REFER TO  ODR
 !***ROUTINES CALLED  (NONE)
@@ -180,79 +180,79 @@ subroutine fcn                                                                &
 !***END PROLOGUE  FCN
 
 !...USED MODULES
-        use odrpack95_kinds, only: wp, ZERO
-        implicit none
+   use odrpack95_kinds, only: wp, ZERO
+   implicit none
 
 !...SCALAR ARGUMENTS
-        integer                                                               &
-         ideval,istop,ldifx,ldm,ldn,ldnp,m,n,np,nq
+   integer &
+      ideval, istop, ldifx, ldm, ldn, ldnp, m, n, np, nq
 
 !...ARRAY ARGUMENTS
-        real(kind = wp)                                                       &
-         beta(np),f(ldn,nq),fjacb(ldn,ldnp,nq),fjacd(ldn,ldm,nq),             &
-         xplusd(ldn,m)
-        integer                                                               &
-         ifixb(np),ifixx(ldifx,m)
+   real(kind=wp) &
+      beta(np), f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq), &
+      xplusd(ldn, m)
+   integer &
+      ifixb(np), ifixx(ldifx, m)
 
 !...ARRAYS IN COMMON
-        real(kind = wp)                                                       &
-         lower(2),upper(2)
+   real(kind=wp) &
+      lower(2), upper(2)
 
 !...LOCAL SCALARS
-        integer                                                               &
-         i
+   integer &
+      i
 
-        common /bounds/upper,lower
+   common/bounds/upper, lower
 
 !***FIRST EXECUTABLE STATEMENT
 !
 !  Do something with FJACD, FJACB, IFIXB and IFIXX to avoid warnings that they
 !  are not being used.  This is simply not to worry users that the example
 !  program is failing.
-        if (ifixb(1) .gt. 0 .and. ifixx(1,1) .gt. 0 .and. fjacb(1,1,1) .gt. ZERO  & 
-                .and.fjacd(1,1,1) .gt. ZERO) then
-        !       Do nothing.
-        endif
+   if (ifixb(1) .gt. 0 .and. ifixx(1, 1) .gt. 0 .and. fjacb(1, 1, 1) .gt. ZERO &
+       .and. fjacd(1, 1, 1) .gt. ZERO) then
+      !       Do nothing.
+   end if
 
-        if (any(lower(1:np) .gt. beta(1:np))) then
-           write (0,*)"LOWER BOUNDS VIOLATED"
-           do i = 1,np
-              if (lower(i) .gt. beta(i))then
-                 write (0,*)"   IN THE ",i," POSITION WITH ",beta(i),         &
-                  "<",lower(i)
-              endif
-           enddo
-        endif
+   if (any(lower(1:np) .gt. beta(1:np))) then
+      write (0, *) "LOWER BOUNDS VIOLATED"
+      do i = 1, np
+         if (lower(i) .gt. beta(i)) then
+            write (0, *) "   IN THE ", i, " POSITION WITH ", beta(i), &
+               "<", lower(i)
+         end if
+      end do
+   end if
 
-        if (any(upper(1:np) .lt. beta(1:np))) then
-           write (0,*)"UPPER BOUNDS VIOLATED"
-           do i = 1,np
-              if (upper(i) .lt. beta(i)) then
-                 write (0,*)"   IN THE ",i," POSITION WITH ",beta(i),         &
-                  ">",upper(i)
-              endif
-           enddo
-        endif
+   if (any(upper(1:np) .lt. beta(1:np))) then
+      write (0, *) "UPPER BOUNDS VIOLATED"
+      do i = 1, np
+         if (upper(i) .lt. beta(i)) then
+            write (0, *) "   IN THE ", i, " POSITION WITH ", beta(i), &
+               ">", upper(i)
+         end if
+      end do
+   end if
 
-        istop = 0
+   istop = 0
 
-        if (mod(ideval,10) .ne. 0) then
-           do i = 1,n
-              f(i,1) = beta(1)*exp(beta(2)*xplusd(i,1))
-           enddo
-        endif
+   if (mod(ideval, 10) .ne. 0) then
+      do i = 1, n
+         f(i, 1) = beta(1)*exp(beta(2)*xplusd(i, 1))
+      end do
+   end if
 
-        if (mod(ideval/10,10) .ne. 0) then
-           do i = 1,n
-              fjacb(i,1,1) = exp(beta(2)*xplusd(i,1))
-              fjacb(i,2,1) = beta(1)*xplusd(i,1)*exp(beta(2)*xplusd(i,1))
-           enddo
-        endif
+   if (mod(ideval/10, 10) .ne. 0) then
+      do i = 1, n
+         fjacb(i, 1, 1) = exp(beta(2)*xplusd(i, 1))
+         fjacb(i, 2, 1) = beta(1)*xplusd(i, 1)*exp(beta(2)*xplusd(i, 1))
+      end do
+   end if
 
-        if (mod(ideval/100,10) .ne. 0) then
-           do i = 1,n
-              fjacd(i,1,1) = beta(1)*beta(2)*exp(beta(2)*xplusd(i,1))
-           enddo
-        endif
+   if (mod(ideval/100, 10) .ne. 0) then
+      do i = 1, n
+         fjacd(i, 1, 1) = beta(1)*beta(2)*exp(beta(2)*xplusd(i, 1))
+      end do
+   end if
 
-end subroutine
+end subroutine fcn
