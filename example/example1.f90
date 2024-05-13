@@ -131,7 +131,7 @@ CALL ODR(FCN=FCN,                                          &
          WORK=WORK,IWORK=IWORK,                            &
          INFO=INFO)
 
-END PROGRAM
+END PROGRAM EXAMPLE1
 
 
 SUBROUTINE FCN(N,M,NP,NQ,                                  &
@@ -178,7 +178,6 @@ REAL(KIND=wp), intent(in) :: BETA(NP), XPLUSD(LDN,M)
 REAL(KIND=wp), intent(out) :: F(LDN,NQ), FJACB(LDN,LDNP,NQ), FJACD(LDN,LDM,NQ)
 integer, intent (out) :: ISTOP
 ! Local variables
-INTRINSIC :: EXP
 INTEGER :: I, L
 
 ! Do something with IFIXB and IFIXX to avoid warnings that they are not being
@@ -228,4 +227,4 @@ IF (MOD(IDEVAL/100,10) .GE. 1) THEN
     END DO
 END IF
 
-END SUBROUTINE
+END SUBROUTINE FCN
