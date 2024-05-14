@@ -9,23 +9,13 @@ program example5
    integer :: np, n, m, nq
    external :: fcn
 
-   ! interface
-   !    subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb,      &
-   !     ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
-   !       import :: wp
-   !       integer :: ideval, istop, ldifx, ldm, ldn, ldnp, m, n, np, nq
-   !       real(kind=wp) :: beta(np), f(ldn, nq), fjacb(ldn, ldnp, nq),        &
-   !       fjacd(ldn, ldm, nq), xplusd(ldn, m)
-   !       integer :: ifixb( np), ifixx( ldifx, m)
-   !    end subroutine fcn
-   ! end interface
-
    np = 2
    n = 4
    m = 1
    nq = 1
 
    allocate (beta(np), l(np), u(np), x(n, m), y(n, nq))
+   
    beta(1:2) = (/2.0_wp, 0.5_wp/)
    l(1:2) = (/0.0_wp, 0.0_wp/)
    u(1:2) = (/10.0_wp, 0.9_wp/)
@@ -44,9 +34,9 @@ subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
 
    integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
    integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
-   integer, intent(out) :: istop
    real(kind=wp), intent(in) :: beta(np), xplusd(ldn, m)
    real(kind=wp), intent(out) :: f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq)
+   integer, intent(out) :: istop
 
    istop = 0
 
@@ -55,13 +45,13 @@ subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
       f(1:n, 1) = beta(1)*exp(beta(2)*xplusd(1:n, 1))
    end if
 
-   ! Calculate model partials with respect to BETA
+   ! Calculate model partials with respect to `beta`
    if (mod(ideval/10, 10) .ne. 0) then
       fjacb(1:n, 1, 1) = exp(beta(2)*xplusd(1:n, 1))
       fjacb(1:n, 2, 1) = beta(1)*xplusd(1:n, 1)*exp(beta(2)*xplusd(1:n, 1))
    end if
 
-   ! Calculate model partials with respect to DELTA
+   ! Calculate model partials with respect to `delta` 
    if (mod(ideval/100, 10) .ne. 0) then
       fjacd(1:n, 1, 1) = beta(1)*beta(2)*exp(beta(2)*xplusd(1:n, 1))
    end if

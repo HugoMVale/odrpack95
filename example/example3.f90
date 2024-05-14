@@ -201,18 +201,18 @@ SUBROUTINE FCN(N, M, NP, NQ, &
 !                       not acceptable; ODRPACK95 should stop
 
 !Used modules
-   use odrpack95_kinds, only: wp, zero
+   use odrpack95_kinds, only: wp, ZERO, ONE
    implicit none
 
-! Input arguments, not to be changed by this routine:
+! Subroutine arguments:
    INTEGER, INTENT(IN) :: IDEVAL, LDIFX, LDM, LDN, LDNP, M, N, NP, NQ
    INTEGER, INTENT(IN) :: IFIXB(NP), IFIXX(LDIFX, M)
    REAL(KIND=wp), INTENT(IN) :: BETA(NP), XPLUSD(LDN, M)
-! Output arguments:
    REAL(KIND=wp), INTENT(OUT) :: F(LDN, NQ), FJACB(LDN, LDNP, NQ), FJACD(LDN, LDM, NQ)
    INTEGER, INTENT(OUT) :: ISTOP
 ! Local variables
-   REAL(KIND=wp) :: FREQ, PI, OMEGA, CTHETA, STHETA, THETA, PHI, R
+   REAL(KIND=wp) :: FREQ, OMEGA, CTHETA, STHETA, THETA, PHI, R
+   REAL(KIND=wp), PARAMETER :: PI = 4*ATAN(ONE)
    INTEGER :: I
 
 ! Do something with FJACD, FJACB, IFIXB and IFIXX to avoid warnings that they
@@ -225,14 +225,12 @@ SUBROUTINE FCN(N, M, NP, NQ, &
 
 ! Check for unacceptable values for this problem
    DO I = 1, N
-      IF (XPLUSD(I, 1) .LT. zero) THEN
+      IF (XPLUSD(I, 1) .LT. ZERO) THEN
          ISTOP = 1
          RETURN
       END IF
    END DO
    ISTOP = 0
-
-   PI = 3.141592653589793238462643383279E0_wp
 
    THETA = PI*BETA(4)*0.5E0_wp
    CTHETA = COS(THETA)

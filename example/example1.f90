@@ -1,4 +1,3 @@
-
 PROGRAM EXAMPLE1
    USE ODRPACK95
    use odrpack95_kinds, only: wp
@@ -167,16 +166,15 @@ SUBROUTINE FCN(N, M, NP, NQ, &
 !                       not acceptable; ODRPACK95 should stop
 
 ! Used modules
-   use odrpack95_kinds, only: wp, zero
+   use odrpack95_kinds, only: wp, ZERO, ONE
    implicit none
 
-! Input arguments, not to be changed by this routine:
-   INTEGER, intent(in) :: IDEVAL, LDIFX, LDM, LDN, LDNP, M, N, NP, NQ
-   INTEGER, intent(in) :: IFIXB(NP), IFIXX(LDIFX, M)
-   REAL(KIND=wp), intent(in) :: BETA(NP), XPLUSD(LDN, M)
-! Output arguments:
-   REAL(KIND=wp), intent(out) :: F(LDN, NQ), FJACB(LDN, LDNP, NQ), FJACD(LDN, LDM, NQ)
-   integer, intent(out) :: ISTOP
+! Subroutine arguments:
+   INTEGER, INTENT(IN) :: IDEVAL, LDIFX, LDM, LDN, LDNP, M, N, NP, NQ
+   INTEGER, INTENT(IN) :: IFIXB(NP), IFIXX(LDIFX, M)
+   REAL(KIND=wp), INTENT(IN) :: BETA(NP), XPLUSD(LDN, M)
+   REAL(KIND=wp), INTENT(OUT) :: F(LDN, NQ), FJACB(LDN, LDNP, NQ), FJACD(LDN, LDM, NQ)
+   INTEGER, INTENT(OUT) :: ISTOP
 ! Local variables
    INTEGER :: I, L
 
@@ -187,7 +185,7 @@ SUBROUTINE FCN(N, M, NP, NQ, &
    END IF
 
 ! Check for unacceptable values for this problem
-   IF (BETA(1) .LT. zero) THEN
+   IF (BETA(1) .LT. ZERO) THEN
       ISTOP = 1
       RETURN
    ELSE
@@ -198,7 +196,7 @@ SUBROUTINE FCN(N, M, NP, NQ, &
    IF (MOD(IDEVAL, 10) .GE. 1) THEN
       DO L = 1, NQ
          DO I = 1, N
-            F(I, L) = BETA(1) + BETA(2)*(EXP(BETA(3)*XPLUSD(I, 1)) - 1.0E0_wp)**2
+            F(I, L) = BETA(1) + BETA(2)*(EXP(BETA(3)*XPLUSD(I, 1)) - ONE)**2
          END DO
       END DO
    END IF
@@ -207,10 +205,10 @@ SUBROUTINE FCN(N, M, NP, NQ, &
    IF (MOD(IDEVAL/10, 10) .GE. 1) THEN
       DO L = 1, NQ
          DO I = 1, N
-            FJACB(I, 1, L) = 1.0E0_wp
-            FJACB(I, 2, L) = (EXP(BETA(3)*XPLUSD(I, 1)) - 1.0E0_wp)**2
+            FJACB(I, 1, L) = ONE
+            FJACB(I, 2, L) = (EXP(BETA(3)*XPLUSD(I, 1)) - ONE)**2
             FJACB(I, 3, L) = BETA(2)*2* &
-                             (EXP(BETA(3)*XPLUSD(I, 1)) - 1.0E0_wp)* &
+                             (EXP(BETA(3)*XPLUSD(I, 1)) - ONE)* &
                              EXP(BETA(3)*XPLUSD(I, 1))*XPLUSD(I, 1)
          END DO
       END DO
@@ -221,7 +219,7 @@ SUBROUTINE FCN(N, M, NP, NQ, &
       DO L = 1, NQ
          DO I = 1, N
             FJACD(I, 1, L) = BETA(2)*2* &
-                             (EXP(BETA(3)*XPLUSD(I, 1)) - 1.0E0_wp)* &
+                             (EXP(BETA(3)*XPLUSD(I, 1)) - ONE)* &
                              EXP(BETA(3)*XPLUSD(I, 1))*BETA(3)
          END DO
       END DO
