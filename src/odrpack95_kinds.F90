@@ -15,6 +15,8 @@ module odrpack95_kinds
     integer, parameter :: wp = real64
 #endif
     
-    real(wp), parameter :: ZERO = 0.0_wp, ONE = 1.0_wp, NEGONE = -1.0_wp
+    real(wp), parameter :: ZERO = 0.0_wp
+    real(wp), parameter :: ONE = 1.0_wp
+    real(wp), parameter :: NEGONE = -1.0_wp
     
 end module odrpack95_kinds
