@@ -2293,7 +2293,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 !***End Prologue  DODRXF
 !
 !...Used modules
-      use odrpack95_kinds, only: wp, zero, one
+      use odrpack95_kinds, only: wp, ZERO, one
       implicit none
 
 !...Scalar arguments
@@ -2373,8 +2373,8 @@ subroutine dodrx(tstfac, passed, lunsum)
 !  Do something with FJACD, FJACB, IFIXB and IFIXX to avoid warnings that they
 !  are not being used.  This is simply not to worry users that the example
 !  program is failing.
-      if (ifixb(1) .gt. 0 .and. ifixx(1, 1) .gt. 0 .and. fjacb(1, 1, 1) .gt. zero &
-          .and. fjacd(1, 1, 1) .gt. zero) then
+      if (ifixb(1) .gt. 0 .and. ifixx(1, 1) .gt. 0 .and. fjacb(1, 1, 1) .gt. ZERO &
+          .and. fjacd(1, 1, 1) .gt. ZERO) then
          ! Do nothing.
       end if
 
@@ -2453,7 +2453,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 
          if (mod(ideval, 10) .ne. 0) then
             do i = 1, n
-               f(i, 1) = zero
+               f(i, 1) = ZERO
                do j = 1, 4
                   f(i, 1) = f(i, 1) + beta(j)/(xplusd(i, 1) + beta(j + 5))
                end do
@@ -2473,7 +2473,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 
          if (mod(ideval/100, 10) .ne. 0) then
             do i = 1, n
-               fjacd(i, 1, 1) = zero
+               fjacd(i, 1, 1) = ZERO
                do k = 4, 1, -1
                   fjacd(i, 1, 1) = fjacd(i, 1, 1) - beta(k)*(xplusd(i, 1) + beta(k + 5))**(-2)
                end do
@@ -2555,9 +2555,9 @@ subroutine dodrx(tstfac, passed, lunsum)
 
          if (mod(ideval/10, 10) .ne. 0) then
             do i = 1, n
-               fjacb(i, 1, 1) = zero
-               fjacb(i, 2, 1) = zero
-               fjacb(i, 3, 1) = zero
+               fjacb(i, 1, 1) = ZERO
+               fjacb(i, 2, 1) = ZERO
+               fjacb(i, 3, 1) = ZERO
 
                if (mod(ideval/100, 10) .ne. 0) then
                   fjacd(i, 1, 1) = xplusd(i, 1)
@@ -2583,15 +2583,15 @@ subroutine dodrx(tstfac, passed, lunsum)
 
          if (mod(ideval/10, 10) .ne. 0) then
             do i = 1, n
-               fjacb(i, 1, 1) = zero
-               fjacb(i, 2, 1) = zero
-               fjacb(i, 3, 1) = zero
-               fjacb(i, 4, 1) = zero
-               fjacb(i, 5, 1) = zero
+               fjacb(i, 1, 1) = ZERO
+               fjacb(i, 2, 1) = ZERO
+               fjacb(i, 3, 1) = ZERO
+               fjacb(i, 4, 1) = ZERO
+               fjacb(i, 5, 1) = ZERO
 
                if (mod(ideval/100, 10) .ne. 0) then
-                  fjacd(i, 1, 1) = zero
-                  fjacd(i, 2, 1) = zero
+                  fjacd(i, 1, 1) = ZERO
+                  fjacd(i, 2, 1) = ZERO
                end if
             end do
          end if
@@ -2628,21 +2628,21 @@ subroutine dodrx(tstfac, passed, lunsum)
 
          if (mod(ideval/10, 10) .ne. 0) then
             do i = 1, n
-               fjacb(i, 1, 1) = zero
-               fjacb(i, 2, 1) = zero
-               fjacb(i, 3, 1) = zero
-               fjacb(i, 4, 1) = zero
-               fjacb(i, 5, 1) = zero
+               fjacb(i, 1, 1) = ZERO
+               fjacb(i, 2, 1) = ZERO
+               fjacb(i, 3, 1) = ZERO
+               fjacb(i, 4, 1) = ZERO
+               fjacb(i, 5, 1) = ZERO
 
-               fjacb(i, 1, 2) = zero
-               fjacb(i, 2, 2) = zero
-               fjacb(i, 3, 2) = zero
-               fjacb(i, 4, 2) = zero
-               fjacb(i, 5, 2) = zero
+               fjacb(i, 1, 2) = ZERO
+               fjacb(i, 2, 2) = ZERO
+               fjacb(i, 3, 2) = ZERO
+               fjacb(i, 4, 2) = ZERO
+               fjacb(i, 5, 2) = ZERO
 
                if (mod(ideval/100, 10) .ne. 0) then
-                  fjacd(i, 1, 1) = zero
-                  fjacd(i, 1, 2) = zero
+                  fjacd(i, 1, 1) = ZERO
+                  fjacd(i, 1, 2) = ZERO
                end if
             end do
          end if
