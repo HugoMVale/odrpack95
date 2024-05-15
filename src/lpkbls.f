@@ -30,7 +30,7 @@ C***Routines called  (none)
 C***End Prologue  DASUM
 
 C...Used modules
-      use odrpack95_kinds, only: wp
+      use odrpack_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
@@ -121,7 +121,7 @@ C***Routines called  (none)
 C***End Prologue  DAXPY
 
 C...Used modules
-      use odrpack95_kinds, only: wp
+      use odrpack_kinds, only: wp
 
 C...Scalar arguments
       REAL (KIND=wp)
@@ -290,7 +290,7 @@ C***Routines called  DROTG
 C***End Prologue  DCHEX
 
 C...Used modules
-      use odrpack95_kinds, only: wp
+      use odrpack_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
@@ -486,7 +486,7 @@ C***Routines called  (none)
 C***End Prologue  DCOPY
 
 C...Used modules
-      use odrpack95_kinds, only: wp
+      use odrpack_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
@@ -600,7 +600,7 @@ C***Routines called  (none)
 C***End Prologue  DDOT
 
 C...Used modules
-      use odrpack95_kinds, only: wp
+      use odrpack_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
@@ -742,7 +742,7 @@ C***Routines called  (none)
 C***End Prologue  DNRM2
 
 C...Used modules
-      use odrpack95_kinds, only: wp
+      use odrpack_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
@@ -914,7 +914,7 @@ C***Routines called  DAXPY,DSCAL
 C***End Prologue  DPODI
 
 C...Used modules
-      use odrpack95_kinds, only: wp
+      use odrpack_kinds, only: wp
 
 C...Scalar arguments
       INTEGER JOB,LDA,N
@@ -1065,7 +1065,7 @@ C***Routines Called  DAXPY,DDOT,DNRM2,DSCAL,DSWAP
 C***End Prologue  DQRDC
 
 C...Used modules
-      use odrpack95_kinds, only: wp
+      use odrpack_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
@@ -1334,7 +1334,7 @@ C***Routines Called  DAXPY,DCOPY,DDOT
 C***End Prologue  DQRSL
 
 C...Used modules
-      use odrpack95_kinds, only: wp
+      use odrpack_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
@@ -1532,7 +1532,7 @@ C***Routines Called  (NONE)
 C***End Prologue  DROT
 
 C...Used modules
-      use odrpack95_kinds, only: wp
+      use odrpack_kinds, only: wp
 
 C...Scalar arguments
       REAL (KIND=wp)
@@ -1634,7 +1634,7 @@ C***Routines Called  (None)
 C***End Prologue  DROTG
 
 C...Used modules
-      use odrpack95_kinds, only: wp
+      use odrpack_kinds, only: wp
 
 C...Scalar arguments
       REAL (KIND=wp)
@@ -1731,7 +1731,7 @@ C***Routines Called  (None)
 C***End Prologue  DSCAL
 
 C...Used modules
-      use odrpack95_kinds, only: wp
+      use odrpack_kinds, only: wp
 
 C...Scalar arguments
       REAL (KIND=wp)
@@ -1823,7 +1823,7 @@ C***Routines Called  (None)
 C***End Prologue  DSWAP
 
 C...Used modules
-      use odrpack95_kinds, only: wp
+      use odrpack_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
@@ -1964,7 +1964,7 @@ C***Routines Called  DASUM,DAXPY,DSCAL
 C***End Prologue  DTRCO
 
 C...Used modules
-      use odrpack95_kinds, only: wp
+      use odrpack_kinds, only: wp
 
 C...Scalar arguments
       REAL (KIND=wp)
@@ -2154,7 +2154,7 @@ C***Routines Called  DAXPY,DDOT
 C***End Prologue  DTRSL
 
 C...Used modules
-      use odrpack95_kinds, only: wp
+      use odrpack_kinds, only: wp
 
 C...Scalar arguments
       INTEGER
@@ -2294,7 +2294,7 @@ C***Routines Called  (None)
 C***End Prologue  IDAMAX
 
 C...Used modules
-      use odrpack95_kinds, only: wp
+      use odrpack_kinds, only: wp
 
 C...Scalar arguments
       INTEGER

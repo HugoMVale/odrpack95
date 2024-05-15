@@ -6,7 +6,7 @@
 !   Curious users are encouraged to remove the bounds in the call statement,
 ! run the code, and compare the results to the current call statement.
 PROGRAM example4
-   use odrpack95_kinds, only: wp
+   use odrpack_kinds, only: wp
    USE ODRPACK95
    IMPLICIT NONE
 
@@ -44,7 +44,7 @@ END PROGRAM example4
 
 SUBROUTINE FCN(N, M, NP, NQ, LDN, LDM, LDNP, BETA, XPLUSD, IFIXB, IFIXX, LDIFX, &
                IDEVAL, F, FJACB, FJACD, ISTOP)
-   use odrpack95_kinds, only: wp, ZERO
+   use odrpack_kinds, only: wp, ZERO
    IMPLICIT NONE
 ! Subroutine arguments:
    INTEGER, INTENT(IN) :: IDEVAL, LDIFX, LDM, LDN, LDNP, M, N, NP, NQ
@@ -85,7 +85,7 @@ END SUBROUTINE FCN
 ! C - Total Cyclin
 ! KWEE, K25, K25P - Model parameters (BETA(1:3))
 SUBROUTINE MPF(M, C, KWEE, K25, K25P, PRINT_EVERY, TOUT, ROOT)
-   use odrpack95_kinds, only: wp, ZERO
+   use odrpack_kinds, only: wp, ZERO
    implicit none
 
    REAL(KIND=wp), INTENT(OUT) :: M

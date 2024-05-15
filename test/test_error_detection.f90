@@ -9,7 +9,7 @@ program tester
 !***END PROLOGUE  TESTER
 
 !...USED MODULES
-   use odrpack95_kinds, only: wp
+   use odrpack_kinds, only: wp
    use odrpack95
    implicit none
 
@@ -180,7 +180,7 @@ subroutine fcn &
 !***END PROLOGUE  FCN
 
 !...USED MODULES
-   use odrpack95_kinds, only: wp, ZERO
+   use odrpack_kinds, only: wp, ZERO
    implicit none
 
 !...SCALAR ARGUMENTS

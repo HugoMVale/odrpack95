@@ -1,6 +1,6 @@
 PROGRAM example1
    USE ODRPACK95
-   use odrpack95_kinds, only: wp
+   use odrpack_kinds, only: wp
    implicit none
 
 ! ODRPACK95 Argument Definitions
@@ -166,7 +166,7 @@ SUBROUTINE FCN(N, M, NP, NQ, &
 !                       not acceptable; ODRPACK95 should stop
 
 ! Used modules
-   use odrpack95_kinds, only: wp, ZERO, ONE
+   use odrpack_kinds, only: wp, ZERO, ONE
    implicit none
 
 ! Subroutine arguments:

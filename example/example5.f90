@@ -2,7 +2,7 @@ program example5
 !! This is an example of the modern way to use ODRPACK95. The work arrays are allocated
 !! internally.
    use odrpack95
-   use odrpack95_kinds, only: wp
+   use odrpack_kinds, only: wp
    implicit none
 
    real(kind=wp), allocatable :: beta(:), l(:), u(:), x(:, :), y(:, :)
@@ -29,7 +29,7 @@ end program example5
 subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
                ldifx, ideval, f, fjacb, fjacd, istop)
 
-   use odrpack95_kinds, only: wp
+   use odrpack_kinds, only: wp
    implicit none
 
    integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq

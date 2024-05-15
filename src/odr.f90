@@ -1,6 +1,6 @@
 module odrpack95
 
-   use odrpack95_kinds, only: wp
+   use odrpack_kinds, only: wp
    implicit none
    private
 
@@ -121,7 +121,7 @@ contains
       !    "A Stable and Efficient Algorithm for Nonlinear Orthogonal Distance Regression,"
       !    SIAM J. Sci. Stat. Comput., 8(6):1052-1078.
 
-      use odrpack95_kinds, only: wp, negone, ZERO
+      use odrpack_kinds, only: wp, negone, ZERO
 
       procedure(fcn_t) :: fcn
          !! User-supplied subroutine for evaluating the model.
@@ -742,7 +742,7 @@ subroutine dacces                                                             &
 !***End Prologue  DACESS
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -1063,7 +1063,7 @@ subroutine desubi                                                             &
 !***End Prologue  DESUBI
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -1227,7 +1227,7 @@ subroutine detaf                                                              &
 !***End Prologue  DETAF
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -1437,7 +1437,7 @@ subroutine devjac                                                             &
 !***End Prologue  DEVJAC
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
         use odrpack95,only: tempret
 !
 !...Scalar arguments
@@ -1490,7 +1490,7 @@ subroutine devjac                                                             &
         interface
            subroutine dwght                                                   &
             ( n, m, wt, ldwt, ld2wt, t, wtt)
-           use odrpack95_kinds,only: wp
+           use odrpack_kinds,only: wp
            integer                                                            &
             ldwt, ld2wt, m, n
            real(kind = wp)                                                    &
@@ -1682,7 +1682,7 @@ subroutine dfctr( oksemi, a, lda, n, info)
 !***End PROLOGUE  DFCTR
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer info, lda, n
@@ -1791,7 +1791,7 @@ subroutine dfctrw                                                             &
 !***End Prologue  DFCTRW
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -2166,7 +2166,7 @@ function dhstep                                                               &
 !***End Prologue  DHSTEP
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -2242,7 +2242,7 @@ subroutine difix                                                              &
 !***End Prologue  DIFIX
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -2341,7 +2341,7 @@ subroutine diniwk                                                             &
 !***End Prologue  DINIWK
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -2716,7 +2716,7 @@ subroutine djaccd                                                             &
 !***End Prologue  DJACCD
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -3052,7 +3052,7 @@ subroutine mbfb                                                               &
 !***END PROLOGUE  MBFB
 !
 !...USED MODULES
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...SCALAR ARGUMENTS
         integer                                                               &
@@ -3185,7 +3185,7 @@ function derstep                                                              &
 !***End Prologue  DERSTEP
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -3267,7 +3267,7 @@ subroutine djacfd                                                             &
 !***End Prologue  DJACFD
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -3553,7 +3553,7 @@ subroutine djck                                                               &
 !***End Prologue  DJCK
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -3881,7 +3881,7 @@ subroutine djckc                                                              &
 !***End prologue  DJCKC
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -4121,7 +4121,7 @@ subroutine djckf                                                              &
 !***End Prologue  DJCKF
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -4290,7 +4290,7 @@ subroutine djckm                                                              &
 !***End prologue  DJCKM
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -4562,7 +4562,7 @@ subroutine djckz                                                              &
 !***End Prologue  DJCKZ
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -4727,7 +4727,7 @@ subroutine dodchk                                                             &
 !***End Prologue  DODCHK
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -5024,7 +5024,7 @@ subroutine dodcnt                                                             &
 !***End Prologue  DODCNT
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -5297,7 +5297,7 @@ subroutine doddrv                                                             &
 !***End Prologue  DODDRV
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
         use odrpack95,only: tempret
 !
 !...Scalar arguments
@@ -5364,7 +5364,7 @@ subroutine doddrv                                                             &
         interface
            subroutine dwght                                                   &
             ( n, m, wt, ldwt, ld2wt, t, wtt)
-           use odrpack95_kinds,only: wp
+           use odrpack_kinds,only: wp
            integer                                                            &
             ldwt, ld2wt, m, n
            real(kind = wp)                                                    &
@@ -5967,7 +5967,7 @@ subroutine dodlm                                                              &
 !***End Prologue  DODLM
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
         use odrpack95,only: tempret
 !
 !...Scalar arguments
@@ -6015,7 +6015,7 @@ subroutine dodlm                                                              &
         interface
            subroutine dwght                                                   &
             ( n, m, wt, ldwt, ld2wt, t, wtt)
-           use odrpack95_kinds,only: wp
+           use odrpack_kinds,only: wp
            integer                                                            &
             ldwt, ld2wt, m, n
            real(kind = wp)                                                    &
@@ -6259,7 +6259,7 @@ subroutine dodmn                                                              &
 !***End Prologue  DODMN
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
         use odrpack95,only: tempret
 !
 !...Scalar arguments
@@ -6335,7 +6335,7 @@ subroutine dodmn                                                              &
         interface
            subroutine dwght                                                   &
             ( n, m, wt, ldwt, ld2wt, t, wtt)
-           use odrpack95_kinds,only: wp
+           use odrpack_kinds,only: wp
            integer                                                            &
             ldwt, ld2wt, m, n
            real(kind = wp)                                                    &
@@ -7213,7 +7213,7 @@ subroutine dodpc1                                                             &
 !***End Prologue  DODPC1
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -7856,7 +7856,7 @@ subroutine dodpc2                                                             &
 !***End Prologue  DODPC2
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -8044,7 +8044,7 @@ subroutine dodpc3                                                             &
 !***End Prologue  DODPC3
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -8607,7 +8607,7 @@ subroutine dodpcr                                                             &
 !***End Prologue  DODPCR
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -9340,7 +9340,7 @@ subroutine dodpe2                                                             &
 !***End Prologue  DODPE2
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -9718,7 +9718,7 @@ subroutine dodper                                                             &
 !***End Prologue  DODPER
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -9942,7 +9942,7 @@ subroutine dodstp                                                             &
 !***End Prologue  DODSTP
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
         use odrpack95,only: tempret
 !
 !...Scalar arguments
@@ -9997,7 +9997,7 @@ subroutine dodstp                                                             &
         interface
            subroutine dwght                                                   &
             ( n, m, wt, ldwt, ld2wt, t, wtt)
-           use odrpack95_kinds,only: wp
+           use odrpack_kinds,only: wp
            integer                                                            &
             ldwt, ld2wt, m, n
            real(kind = wp)                                                    &
@@ -10382,7 +10382,7 @@ subroutine dodvcv                                                             &
 !***End Prologue  DODVCV
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -10639,7 +10639,7 @@ subroutine dpack                                                              &
 !***End Prologue  DPACK
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -10749,7 +10749,7 @@ function dppnml                                                               &
 !***End Prologue  DPPNML
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -10862,7 +10862,7 @@ function dppt                                                                 &
 !***End Prologue  DPPT
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -11077,7 +11077,7 @@ subroutine dpvb                                                               &
 !***End Prologue  DPVB
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -11170,7 +11170,7 @@ subroutine dpvd                                                               &
 !***End Prologue  DPVD
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -11257,7 +11257,7 @@ subroutine dscale                                                             &
 !***End Prologue  DSCALE
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -11338,7 +11338,7 @@ subroutine dsclb                                                              &
 !***End Prologue  DSCLB
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -11441,7 +11441,7 @@ subroutine dscld                                                              &
 !***End Prologue  DSCLD
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -11547,7 +11547,7 @@ subroutine dsetn                                                              &
 !***End Prologue  DSETN
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -11613,7 +11613,7 @@ subroutine dsolve( n, t, ldt, b, job)
 !***End Prologue  DSOLVE
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -11778,7 +11778,7 @@ subroutine dunpac                                                             &
 !***End Prologue  DUNPAC
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -11845,7 +11845,7 @@ subroutine dvevtr                                                             &
 !***End Prologue  DVEVTR
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -11931,7 +11931,7 @@ subroutine dwght                                                              &
 !***End Prologue  DWGHT
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -12278,7 +12278,7 @@ subroutine dxmy                                                               &
 !***End Prologue  DXMY
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -12328,7 +12328,7 @@ subroutine dxpy                                                               &
 !***End Prologue  DXPY
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &
@@ -12378,7 +12378,7 @@ subroutine dzero                                                              &
 !***End Prologue  DZERO
 !
 !...Used modules
-        use odrpack95_kinds,only: wp
+        use odrpack_kinds,only: wp
 !
 !...Scalar arguments
         integer                                                               &

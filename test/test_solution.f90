@@ -9,7 +9,7 @@ program dtest
 !***End Prologue  DTEST
 
 !...Used modules
-   use odrpack95_kinds, only: wp
+   use odrpack_kinds, only: wp
    implicit none
 
 !...Scalars in common
@@ -88,7 +88,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 
 !...Used modules
    use odrpack95
-   use odrpack95_kinds, only: wp
+   use odrpack_kinds, only: wp
    implicit none
 
 !...Parameters
@@ -283,7 +283,7 @@ subroutine dodrx(tstfac, passed, lunsum)
    interface
       subroutine dwght &
          (n, m, wt, ldwt, ld2wt, t, wtt)
-         use odrpack95_kinds, only: wp
+         use odrpack_kinds, only: wp
          integer &
             ldwt, ld2wt, m, n
          real(kind=wp) &
@@ -1367,7 +1367,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 !***End Prologue  DODRXD
 !
 !...Used modules
-      use odrpack95_kinds, only: wp
+      use odrpack_kinds, only: wp
       implicit none
 
 !...Parameters
@@ -2293,7 +2293,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 !***End Prologue  DODRXF
 !
 !...Used modules
-      use odrpack95_kinds, only: wp, ZERO, one
+      use odrpack_kinds, only: wp, ZERO, one
       implicit none
 
 !...Scalar arguments
@@ -2716,7 +2716,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 !***End Prologue  DODRXW
 !
 !...Used modules
-      use odrpack95_kinds, only: wp
+      use odrpack_kinds, only: wp
       implicit none
 
 !...Scalar arguments

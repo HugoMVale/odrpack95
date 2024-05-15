@@ -1,4 +1,4 @@
-module odrpack95_kinds
+module odrpack_kinds
 !! Real kinds and common numeric constants.
     use, intrinsic :: iso_fortran_env, only: real32, real64
     implicit none
@@ -19,4 +19,4 @@ module odrpack95_kinds
     real(wp), parameter :: ONE = 1.0_wp
     real(wp), parameter :: NEGONE = -1.0_wp
     
-end module odrpack95_kinds
+end module odrpack_kinds
