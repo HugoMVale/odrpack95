@@ -12,12 +12,46 @@ module odrpack95
    abstract interface
       subroutine fcn_t(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, ldifx, &
                        ideval, f, fjacb, fjacd, istop)
+      !! User-supplied subroutine for evaluating the model.
          import :: wp
-         integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
-         integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
+         integer, intent(in) :: n
+            !! Number of observations.
+         integer, intent(in) :: m
+            !! Number of columns of data in the independent variable.
+         integer, intent(in) :: np
+            !! Number of function parameters.
+         integer, intent(in) :: nq
+            !! Number of responses per observation.
+         integer, intent(in) :: ldn
+            !! Leading dimension declarator equal or exceeding `n`.
+         integer, intent(in) :: ldm
+            !! Leading dimension declarator equal or exceeding `m`.
+         integer, intent(in) :: ldnp
+            !! Leading dimension declarator equal or exceeding `np`.
+         integer, intent(in) :: beta
+            !! Current values of parameters.
+         real(kind=wp), intent(in) :: xplusd(ldn, m)
+            !! Current value of explanatory variable, i.e., `x + delta`.
+         integer, intent(in) :: ifixb(np)
+            !! Indicators for "fixing" parameters (`beta`).
+         integer, intent(in) :: ifixx(ldifx, m)
+            !!  Indicators for "fixing" explanatory variable (`x`).	
+         integer, intent(in) :: ldifx
+            !! Leading dimension of array `ifixx`.
+         integer, intent(in) :: ideval
+            !! Indicator for selecting computation to be performed.
+         real(kind=wp), intent(out) :: f(ldn, nq)
+            !! Predicted function values.
+         real(kind=wp), intent(out) :: fjacb(ldn, ldnp, nq)
+            !! Jacobian with respect to `beta`.
+         real(kind=wp), intent(out) :: fjacd(ldn, ldm, nq)
+            !! Jacobian with respect to errors `delta`.
          integer, intent(out) :: istop
-         real(kind=wp), intent(in) :: beta(np), xplusd(ldn, m)
-         real(kind=wp), intent(out) :: f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq)
+            !! Stopping condition, with meaning as follows. 0 means current `beta` and
+            !! `x+delta` were acceptable and values were computed successfully. 1 means current
+            !! `beta` and `x+delta` are not acceptable;  ODRPACK95 should select values closer
+            !! to most recently used values if possible. -1 means current `beta` and `x+delta`
+            !! are not acceptable; ODRPACK95 should stop.
       end subroutine fcn_t
    end interface
 
