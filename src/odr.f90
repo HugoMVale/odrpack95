@@ -90,71 +90,67 @@ contains
       use odrpack95_kinds, only: wp, negone, ZERO
 
       procedure(fcn_t) :: fcn
-      !! The user-supplied subroutine for evaluating the model.
-
+         !! User-supplied subroutine for evaluating the model.
       real(kind=wp), intent(in), optional :: partol
-         !! The parameter convergence stopping tolerance.
+         !! Parameter convergence stopping tolerance.
       real(kind=wp), intent(in), optional :: sstol
-         !! The sum-of-squares convergence stopping tolerance.
+         !! Sum-of-squares convergence stopping tolerance.
       real(kind=wp), intent(in), optional :: taufac
-         !! The factor used to compute the initial trust region diameter.
-
+         !! Factor used to compute the initial trust region diameter.
       integer, intent(out), optional :: info
-         !! The variable designating why the computations were stopped.
+         !! Variable designating why the computations were stopped.
       integer, intent(in), optional :: iprint
-         !! The print control variable.
+         !! Print control variable.
       integer, intent(in), optional :: job
-         !! The variable controlling problem initialization and computational method.
+         !! Variable controlling problem initialization and computational method.
       integer, intent(in), optional :: lunerr
-         !! The logical unit number for error messages.
+         !! Logical unit number for error messages.
       integer, intent(in), optional :: lunrpt
-         !! The logical unit number for computation reports.
+         !! Logical unit number for computation reports.
       integer, intent(in) :: m
-         !! The number of columns of data in the independent variable.
+         !! Number of columns of data in the independent variable.
       integer, intent(in), optional :: maxit
-         !! The maximum number of iterations allowed.
+         !! Maximum number of iterations allowed.
       integer, intent(in) :: n
-         !! The number of observations.
+         !! Number of observations.
       integer, intent(in), optional :: ndigit
-         !! The number of accurate digits in the function results, as supplied by the user.
+         !! Number of accurate digits in the function results, as supplied by the user.
       integer, intent(in) :: np
-         !! The number of function parameters.
+         !! Number of function parameters.
       integer, intent(in) :: nq
-         !! The number of responses per observation.
-
+         !! Number of responses per observation.
       real(kind=wp), intent(inout) :: beta(:)
-         !! The function parameters.
+         !! Function parameters.
       real(kind=wp), intent(inout), optional :: delta(:, :)
-         !! The initial error in the `x` data.
+         !! Initial error in the `x` data.
       real(kind=wp), intent(in), optional :: lower(:)
-         !! The lower bound on `beta`.
+         !! Lower bound on `beta`.
       real(kind=wp), intent(in), optional :: upper(:)
-         !!The upper bound on `beta`.
+         !! Upper bound on `beta`.
       real(kind=wp), intent(in), optional :: sclb(:)
-         !! The scaling values for `beta`.
+         !! Scaling values for `beta`.
       real(kind=wp), intent(in), optional :: scld(:, :)
-         !! The scaling values for `delta`.
+         !! Scaling values for `delta`.
       real(kind=wp), intent(in), optional :: stpb(:)
-         !! The relative step for computing finite difference derivatives with respect to `beta`.
+         !! Relative step for computing finite difference derivatives with respect to `beta`.
       real(kind=wp), intent(in), optional :: stpd(:, :)
-         !! The relative step for computing finite difference derivatives with respect to `delta`.
+         !! Relative step for computing finite difference derivatives with respect to `delta`.
       real(kind=wp), intent(in), optional :: wd(:, :, :)
-         !! The `delta` weights.
+         !! `delta` weights.
       real(kind=wp), intent(in), optional :: we(:, :, :)
-         !! The `epsilon` weights.
+         !! `epsilon` weights.
       real(kind=wp), intent(inout), optional :: work(:)
-         !! The real work space.
+         !! Real work space.
       real(kind=wp), intent(in) :: x(:, :)
-         !! The explanatory variable.
+         !! Explanatory variable.
       real(kind=wp), intent(in) :: y(:, :)
-         !! The dependent variable. Unused when the model is implicit.
-
+         !! Dependent variable. Unused when the model is implicit.
       integer, intent(in), optional :: ifixb(:)
-         !! The values designating whether the elements of `beta` are fixed at their input values or not.
+         !! Values designating whether the elements of `beta` are fixed at their input values or not.
       integer, intent(in), optional :: ifixx(:, :)
-         !! The values designating whether the elements of `x` are fixed at their input values or not.
+         !! Values designating whether the elements of `x` are fixed at their input values or not.
       integer, intent(out), optional :: iwork(:)
-         !! The integer work space.
+         !! Integer work space.
 
       ! TODO: why pointers?
       pointer :: delta, iwork, work
