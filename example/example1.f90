@@ -1,5 +1,5 @@
 PROGRAM example1
-   USE ODRPACK95
+   USE odrpack
    use odrpack_kinds, only: wp
    implicit none
 

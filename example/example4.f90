@@ -7,7 +7,7 @@
 ! run the code, and compare the results to the current call statement.
 PROGRAM example4
    use odrpack_kinds, only: wp
-   USE ODRPACK95
+   USE odrpack
    IMPLICIT NONE
 
    REAL(KIND=wp) :: BETA(3) = (/1.1E-0_wp, 3.3E+0_wp, 8.7_wp/)

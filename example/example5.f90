@@ -1,7 +1,7 @@
 program example5
 !! This is an example of the modern way to use ODRPACK95. The work arrays are allocated
 !! internally.
-   use odrpack95
+   use odrpack
    use odrpack_kinds, only: wp
    implicit none
 

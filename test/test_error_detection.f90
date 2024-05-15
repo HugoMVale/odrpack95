@@ -10,7 +10,7 @@ program tester
 
 !...USED MODULES
    use odrpack_kinds, only: wp
-   use odrpack95
+   use odrpack
    implicit none
 
 !...LOCAL SCALARS

@@ -87,7 +87,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 !***End Prologue  DODRX
 
 !...Used modules
-   use odrpack95
+   use odrpack
    use odrpack_kinds, only: wp
    implicit none
 
