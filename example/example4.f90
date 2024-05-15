@@ -5,7 +5,7 @@
 ! used the call statement here to solve their problem.
 !   Curious users are encouraged to remove the bounds in the call statement,
 ! run the code, and compare the results to the current call statement.
-PROGRAM EXAMPLE4
+PROGRAM example4
    use odrpack95_kinds, only: wp
    USE ODRPACK95
    IMPLICIT NONE
@@ -40,7 +40,7 @@ PROGRAM EXAMPLE4
    !       WRITE (*, *) C, TOUT
    !    END DO
 
-END PROGRAM EXAMPLE4
+END PROGRAM example4
 
 SUBROUTINE FCN(N, M, NP, NQ, LDN, LDM, LDNP, BETA, XPLUSD, IFIXB, IFIXX, LDIFX, &
                IDEVAL, F, FJACB, FJACD, ISTOP)

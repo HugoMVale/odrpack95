@@ -1,4 +1,4 @@
-PROGRAM EXAMPLE3
+PROGRAM example3
    USE ODRPACK95
    use odrpack95_kinds, only: wp
    implicit none
@@ -165,7 +165,7 @@ PROGRAM EXAMPLE3
             WORK=WORK, IWORK=IWORK, &
             INFO=INFO)
 
-END PROGRAM EXAMPLE3
+END PROGRAM example3
 
 SUBROUTINE FCN(N, M, NP, NQ, &
                LDN, LDM, LDNP, &
