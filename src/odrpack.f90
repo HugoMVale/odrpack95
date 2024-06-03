@@ -155,7 +155,7 @@ contains
          !! Number of responses per observation.
       real(kind=wp), intent(inout) :: beta(:)
          !! Function parameters.
-      real(kind=wp), intent(inout), optional :: delta(:, :)
+      real(kind=wp), intent(inout), pointer, optional :: delta(:, :)
          !! Initial error in the `x` data.
       real(kind=wp), intent(in), optional :: lower(:)
          !! Lower bound on `beta`.
@@ -173,7 +173,7 @@ contains
          !! `delta` weights.
       real(kind=wp), intent(in), optional :: we(:, :, :)
          !! `epsilon` weights.
-      real(kind=wp), intent(inout), optional :: work(:)
+      real(kind=wp), intent(inout), pointer, optional :: work(:)
          !! Real work space.
       real(kind=wp), intent(in) :: x(:, :)
          !! Explanatory variable.
@@ -183,28 +183,22 @@ contains
          !! Values designating whether the elements of `beta` are fixed at their input values or not.
       integer, intent(in), optional :: ifixx(:, :)
          !! Values designating whether the elements of `x` are fixed at their input values or not.
-      integer, intent(out), optional :: iwork(:)
+      integer, intent(out), pointer, optional :: iwork(:)
          !! Integer work space.
 
-      ! TODO: why pointers?
-      pointer :: delta, iwork, work
-
       ! Local variables
-      real(kind=wp) :: ltaufac, lsstol, lpartol
+      ! TODO: remove save? replace pointer with allocatable?
       integer :: ldwe, ld2we, ldwd, ld2wd, ldifx, ldscld, ldstpd, ljob, lndigit, lmaxit, &
                  liprint, llunerr, llunrpt, linfo, lenwork, leniwork, linfo1, linfo2, linfo3, &
                  linfo4, linfo5
+      integer :: lifixb(np), lifixx(n, m)
+      real(kind=wp) :: ltaufac, lsstol, lpartol
+      real(kind=wp) :: llower(np), lwe(n, nq, nq), lwd(n, m, m), lstpb(np), lstpd(n, m), &
+                       lsclb(np), lscld(n, m), lupper(np), wd1(1, 1, 1)
+      real(kind=wp), pointer, save :: ldelta(:, :)
+      real(kind=wp), pointer, save :: lwork(:)
+      integer, pointer, save :: liwork(:)  
       logical :: head
-
-      real(kind=wp) :: ldelta(:, :), llower(np), lwe(n, nq, nq), lwd(n, m, m), lstpb(np), &
-                       lstpd(n, m), lsclb(np), lscld(n, m), lupper(np), lwork(:), wd1(1, 1, 1)
-      integer :: lifixb(np), liwork(:), lifixx(n, m)
-
-      ! TODO: why pointers?
-      pointer :: ldelta, liwork, lwork
-
-      ! TODO: check if can be removed
-      save :: ldelta, liwork, lwork
 
       ! TODO: interface or inside module?
       external :: dodcnt
