@@ -14,16 +14,15 @@ program tester
    implicit none
 
 !...LOCAL SCALARS
-   integer n, m, nq, np, info, lun
-   logical passed
+   integer ::  n, m, nq, np, info, lun
+   logical :: passed
 !  STAT
 
 !...LOCAL ARRAYS
-   real(kind=wp) &
-      beta(:), y(:, :), x(:, :), upper(2), lower(2)
+   real(kind=wp) :: beta(:), y(:, :), x(:, :), upper(2), lower(2)
 
 !...ALLOCATABLE ARRAYS
-   allocatable beta, y, x
+   allocatable :: beta, y, x
 
 !...EXTERNAL SUBPROGRAMS
    external fcn
@@ -184,25 +183,20 @@ subroutine fcn &
    implicit none
 
 !...SCALAR ARGUMENTS
-   integer &
-      ideval, istop, ldifx, ldm, ldn, ldnp, m, n, np, nq
+   integer :: ideval, istop, ldifx, ldm, ldn, ldnp, m, n, np, nq
 
 !...ARRAY ARGUMENTS
-   real(kind=wp) &
-      beta(np), f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq), &
-      xplusd(ldn, m)
-   integer &
-      ifixb(np), ifixx(ldifx, m)
+   real(kind=wp) :: beta(np), f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq), &
+                    xplusd(ldn, m)
+   integer :: ifixb(np), ifixx(ldifx, m)
 
 !...ARRAYS IN COMMON
-   real(kind=wp) &
-      lower(2), upper(2)
+   real(kind=wp) :: lower(2), upper(2)
 
 !...LOCAL SCALARS
-   integer &
-      i
+   integer :: i
 
-   common/bounds/upper, lower
+   common /bounds/ upper, lower
 
 !***FIRST EXECUTABLE STATEMENT
 !
@@ -211,7 +205,7 @@ subroutine fcn &
 !  program is failing.
    if (ifixb(1) .gt. 0 .and. ifixx(1, 1) .gt. 0 .and. fjacb(1, 1, 1) .gt. ZERO &
        .and. fjacd(1, 1, 1) .gt. ZERO) then
-      !       Do nothing.
+      ! Do nothing.
    end if
 
    if (any(lower(1:np) .gt. beta(1:np))) then
