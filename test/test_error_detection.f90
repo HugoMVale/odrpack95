@@ -1,4 +1,3 @@
-!TESTER
 program tester
 !***BEGIN PROLOGUE  TESTER
 !***REFER TO ODR
@@ -14,7 +13,7 @@ program tester
    implicit none
 
 !...LOCAL SCALARS
-   integer ::  n, m, nq, np, info, lun
+   integer :: n, m, nq, np, info, lun
    logical :: passed
 !  STAT
 
@@ -162,7 +161,6 @@ program tester
 
 end program tester
 
-!FCN
 subroutine fcn &
    (n, m, np, nq, &
     ldn, ldm, ldnp, &
