@@ -6,13 +6,6 @@
 #define ODRPACK_EXTERN extern
 #endif
 
-typedef void (*minpack_func)(
-    int /* n */,
-    const double * /* x */,
-    double * /* fvec */,
-    int * /* iflag */,
-    void * /* udata */);
-
 /**
  * @brief User-supplied function for evaluating the model, computing predicted values and their Jacobians.
  *
@@ -37,23 +30,43 @@ typedef void (*minpack_func)(
  *                1 - current `beta` and `x+delta` are not acceptable; ODRPACK95 should select values closer to most recently used values if possible,
  *               -1 - current `beta` and `x+delta` are not acceptable; ODRPACK95 should stop.
  */
-typedef void (*odrpack_fcn)(
-    int /* n */,
-    int /* m */,
-    int /* np */,
-    int /* nq */,
-    int /* ldn */,
-    int /* ldm */,
-    int /* ldnp */,
-    const double * /* beta */,
-    const double * /* xplusd */,
-    const int * /* ifixb */,
-    const int * /* ifixx */,
-    int /* ldifx */,
-    int /* ideval */,
-    double * /* f */,
-    double * /* fjacb */,
-    double * /* fjacd */,
-    int * /* istop */
+ODRPACK_EXTERN typedef void (*odrpack_fcn)(
+    int n,
+    int m,
+    int np,
+    int nq,
+    int ldn,
+    int ldm,
+    int ldnp,
+    const double *beta,
+    const double *xplusd,
+    const int *ifixb,
+    const int *ifixx,
+    int ldifx,
+    int ideval,
+    double *f,
+    double *fjacb,
+    double *fjacd,
+    int *istop);
 
-);
+/**
+ * @brief Wrapper for the ODR routine including only mandatory arguments.
+ *
+ * @param fcn  User-supplied subroutine for evaluating the model.
+ * @param n    Number of observations.
+ * @param m    Number of columns of data in the independent variable.
+ * @param np   Number of function parameters.
+ * @param nq   Number of responses per observation.
+ * @param beta Function parameters. Array of size np.
+ * @param y    Dependent variable. Unused when the model is implicit. 2D array of size n x nq.
+ * @param x    Explanatory variable. 2D array of size n x m.
+ */
+ODRPACK_EXTERN void odr_c(
+    odrpack_fcn fcn,
+    int n,
+    int m,
+    int np,
+    int nq,
+    double *beta,
+    const double *y,
+    const double *x);

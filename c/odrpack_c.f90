@@ -1,9 +1,11 @@
-module odrpack_capi
-   use, intrinsic :: iso_c_binding, only : c_int, c_double, c_funptr, c_ptr, c_f_procpointer
+module odrpack_c
+   use, intrinsic :: iso_c_binding, only : c_int, c_double
    use odrpack, only: odr
    use odrpack_kinds, only: wp
    implicit none
    private
+
+   public :: odr_c
 
    abstract interface
       subroutine fcn_tc(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, ldifx, &
@@ -27,10 +29,33 @@ module odrpack_capi
             real(c_double), intent(out) :: fjacb(ldn, ldnp, nq)
             real(c_double), intent(out) :: fjacd(ldn, ldm, nq)
             integer(c_int), intent(out) :: istop
-      end subroutine fcn_tc
+      end subroutine
    end interface
 
 contains
+
+   subroutine odr_c(fcn, n, m, np, nq, beta, y, x) bind(c)
+      !! "Short" wrapper for the ODR routine including only mandatory arguments.
+      procedure(fcn_tc) :: fcn
+         !! User-supplied subroutine for evaluating the model.
+      integer(c_int), intent(in), value :: n
+         !! Number of observations.
+      integer(c_int), intent(in), value :: m
+         !! Number of columns of data in the independent variable.
+      integer(c_int), intent(in), value :: np
+         !! Number of function parameters.
+      integer(c_int), intent(in), value :: nq
+         !! Number of responses per observation.
+      real(c_double), intent(inout) :: beta(np)
+         !! Function parameters.
+      real(c_double), intent(in) :: y(n, nq)
+         !! Dependent variable. Unused when the model is implicit.
+      real(c_double), intent(in) :: x(n, m)
+         !! Explanatory variable.      
+
+      call odr(fcn, n, m, np, nq, beta, y, x)
+
+   end subroutine odr_c
 
    ! subroutine odr_c( &
    !    fcn, &
@@ -118,27 +143,4 @@ contains
    
    ! end subroutine
 
-   subroutine odr_c(fcn, n, m, np, nq, beta, y, x) bind(c)
-      !! "Short" wrapper for the ODR routine including only mandatory arguments.
-      procedure(fcn_tc) :: fcn
-         !! User-supplied subroutine for evaluating the model.
-      integer(c_int), intent(in), value :: n
-         !! Number of observations.
-      integer(c_int), intent(in), value :: m
-         !! Number of columns of data in the independent variable.
-      integer(c_int), intent(in), value :: np
-         !! Number of function parameters.
-      integer(c_int), intent(in), value :: nq
-         !! Number of responses per observation.
-      real(c_double), intent(inout) :: beta(np)
-         !! Function parameters.
-      real(c_double), intent(in) :: y(n, nq)
-         !! Dependent variable. Unused when the model is implicit.
-      real(c_double), intent(in) :: x(n, m)
-         !! Explanatory variable.      
-   
-      call odr(fcn, n, m, np, nq, beta, y, x)
-   
-   end subroutine
-
-end module odrpack_capi
+end module odrpack_c
