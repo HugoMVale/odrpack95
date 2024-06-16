@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ODRPACK_H
+#define ODRPACK_H
 
 #ifdef __cplusplus
 #define ODRPACK_EXTERN extern "C"
@@ -70,3 +71,5 @@ ODRPACK_EXTERN void odr_c(
     double *beta,
     const double *y,
     const double *x);
+
+#endif // ODRPACK_H
