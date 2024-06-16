@@ -34,8 +34,8 @@ module odrpack_c
 
 contains
 
-   subroutine odr_c(fcn, n, m, np, nq, beta, y, x) bind(c)
-      !! "Short" wrapper for the ODR routine including only mandatory arguments.
+   subroutine odr_c(fcn, n, m, np, nq, beta, y, x, lower, upper) bind(c)
+      !! "Short" wrapper for the ODR routine including only principal arguments.
       procedure(fcn_tc) :: fcn
          !! User-supplied subroutine for evaluating the model.
       integer(c_int), intent(in), value :: n
@@ -52,8 +52,12 @@ contains
          !! Dependent variable. Unused when the model is implicit.
       real(c_double), intent(in) :: x(n, m)
          !! Explanatory variable.      
+      real(c_double), intent(in) :: lower(np)
+         !! Lower bound on `beta`.
+      real(kind=wp), intent(in) :: upper(np)
+         !! Upper bound on `beta`.
 
-      call odr(fcn, n, m, np, nq, beta, y, x)
+      call odr(fcn, n, m, np, nq, beta, y, x, lower=lower, upper=upper)
 
    end subroutine odr_c
 
