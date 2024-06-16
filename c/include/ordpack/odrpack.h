@@ -13,37 +13,37 @@
  * @param m       Number of columns of data in the independent variable.
  * @param np      Number of function parameters.
  * @param nq      Number of responses per observation.
- * @param ldn     Leading dimension declarator for `n`, must be greater than or equal to `n`.
- * @param ldm     Leading dimension declarator for `m`, must be greater than or equal to `m`.
- * @param ldnp    Leading dimension declarator for `np`, must be greater than or equal to `np`.
- * @param beta    Array of current parameter values (size: np).
- * @param xplusd  Array of current explanatory variable values, i.e., `x + delta` (size: ldn by m).
- * @param ifixb   Array of indicators for fixing parameters `beta` (size: np).
- * @param ifixx   Array of indicators for fixing explanatory variable `x` (size: ldifx by m).
- * @param ldifx   Leading dimension of array `ifixx`, must be greater than or equal to `ldifx`.
+ * @param ldn     Leading dimension declarator for `n`, `ldn >= n`.
+ * @param ldm     Leading dimension declarator for `m`, `ldm >= m`.
+ * @param ldnp    Leading dimension declarator for `np`, `ldnp >= np`.
+ * @param beta    Input array [np] of current parameter values.
+ * @param xplusd  Input array [m][ldn] of current explanatory variable values, i.e., `x + delta`.
+ * @param ifixb   Input array [np] of indicators for fixing parameters `beta`.
+ * @param ifixx   Input array [m][ldifx] of indicators for fixing explanatory variable `x`.
+ * @param ldifx   Leading dimension of array `ifixx`.
  * @param ideval  Indicator for selecting computation to be performed.
- * @param f       Output array for predicted function values (size: ldn by nq).
- * @param fjacb   Output array for Jacobian with respect to `beta` (size: ldn by ldnp by nq).
- * @param fjacd   Output array for Jacobian with respect to errors `delta` (size: ldn by ldm by nq).
+ * @param f       Output array [nq][ldn] for predicted function values.
+ * @param fjacb   Output array [nq][ldnp][ldn] for Jacobian with respect to `beta`.
+ * @param fjacd   Output array [nq][ldm][ldn] for Jacobian with respect to errors `delta`.
  * @param istop   Output integer for stopping condition. Values:
  *                0 - current `beta` and `x+delta` were acceptable and values were computed successfully,
  *                1 - current `beta` and `x+delta` are not acceptable; ODRPACK95 should select values closer to most recently used values if possible,
  *               -1 - current `beta` and `x+delta` are not acceptable; ODRPACK95 should stop.
  */
 ODRPACK_EXTERN typedef void (*odrpack_fcn)(
-    int n,
-    int m,
-    int np,
-    int nq,
-    int ldn,
-    int ldm,
-    int ldnp,
+    int *n,
+    int *m,
+    int *np,
+    int *nq,
+    int *ldn,
+    int *ldm,
+    int *ldnp,
     const double *beta,
     const double *xplusd,
     const int *ifixb,
     const int *ifixx,
-    int ldifx,
-    int ideval,
+    int *ldifx,
+    int *ideval,
     double *f,
     double *fjacb,
     double *fjacd,
@@ -57,9 +57,9 @@ ODRPACK_EXTERN typedef void (*odrpack_fcn)(
  * @param m    Number of columns of data in the independent variable.
  * @param np   Number of function parameters.
  * @param nq   Number of responses per observation.
- * @param beta Function parameters. Array of size np.
- * @param y    Dependent variable. Unused when the model is implicit. 2D array of size n x nq.
- * @param x    Explanatory variable. 2D array of size n x m.
+ * @param beta Input/output array [np] of function parameters.
+ * @param y    Input array [nq][n] of dependent variable. Unused when the model is implicit.
+ * @param x    Input array [m][n] of explanatory variable.
  */
 ODRPACK_EXTERN void odr_c(
     odrpack_fcn fcn,
