@@ -53,14 +53,16 @@ typedef void (*odrpack_fcn_callback)(
 /**
  * @brief Wrapper for the ODR routine including only mandatory arguments.
  *
- * @param fcn  User-supplied subroutine for evaluating the model.
- * @param n    Number of observations.
- * @param m    Number of columns of data in the independent variable.
- * @param np   Number of function parameters.
- * @param nq   Number of responses per observation.
- * @param beta Input/output array [np] of function parameters.
- * @param y    Input array [nq][n] of dependent variable. Unused when the model is implicit.
- * @param x    Input array [m][n] of explanatory variable.
+ * @param fcn    User-supplied subroutine for evaluating the model.
+ * @param n      Number of observations.
+ * @param m      Number of columns of data in the independent variable.
+ * @param np     Number of function parameters.
+ * @param nq     Number of responses per observation.
+ * @param beta   Input/output array [np] of function parameters.
+ * @param y      Input array [nq][n] of dependent variable. Unused when the model is implicit.
+ * @param x      Input array [m][n] of explanatory variable.
+ * @param lower  Input array [np] with lower bound on `beta`.
+ * @param upper  Input array [np] with upper bound on `beta`.
  */
 ODRPACK_EXTERN void odr_c(
     odrpack_fcn_callback fcn,
@@ -70,6 +72,8 @@ ODRPACK_EXTERN void odr_c(
     int nq,
     double *beta,
     const double *y,
-    const double *x);
+    const double *x,
+    const double *lower,
+    const double *upper);
 
 #endif // ODRPACK_H
