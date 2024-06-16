@@ -31,7 +31,7 @@
  *                1 - current `beta` and `x+delta` are not acceptable; ODRPACK95 should select values closer to most recently used values if possible,
  *               -1 - current `beta` and `x+delta` are not acceptable; ODRPACK95 should stop.
  */
-ODRPACK_EXTERN typedef void (*odrpack_fcn)(
+typedef void (*odrpack_fcn)(
     int *n,
     int *m,
     int *np,
