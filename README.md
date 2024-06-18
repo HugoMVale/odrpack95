@@ -26,22 +26,48 @@ This project aims to modernize the original code, namely:
 * [ ] Implement a C API.
 * [ ] Implement python bindings to the C API.
 
-## Installation
+## Build instructions
 
-The easiest way to build/test the code and run the examples is by means of [`fpm`](https://fpm.fortran-lang.org/). 
+### With fpm
+
+The easiest way to build/test the code and run the examples is by means of [`fpm`](https://fpm.fortran-lang.org/).
 
 To build the library, do:
-```
+
+```sh
 fpm build --profile release
 ```
 
 To run the tests, do:
-```
+
+```sh
 fpm test --profile release
 ```
+
 To run the provided example, do:
+
+```sh
+fpm run --example "example_name" --profile release
 ```
-fpm run --example "example_name"
+
+### With meson
+
+First, setup the build:
+
+```sh
+meson setup _build
+```
+
+To build the libraries (static and dynamic), do:
+
+```sh
+meson compile -C _build
+```
+
+To run the tests, do:
+
+```sh
+meson test -C _build
 ```
 
 ## Licence
