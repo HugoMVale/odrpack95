@@ -5,30 +5,30 @@
 ! used the call statement here to solve their problem.
 !   Curious users are encouraged to remove the bounds in the call statement,
 ! run the code, and compare the results to the current call statement.
-PROGRAM example4
+program example4
    use odrpack_kinds, only: wp
-   USE odrpack
-   IMPLICIT NONE
+   use odrpack
+   implicit none
 
-   REAL(KIND=wp) :: BETA(3) = (/1.1E-0_wp, 3.3E+0_wp, 8.7_wp/)
-   EXTERNAL :: FCN
-!     INTEGER :: I
-!     REAL (KIND=wp) :: C, M, TOUT
+   real(kind=wp) :: beta(3) = [1.1E-0_wp, 3.3E+0_wp, 8.7_wp]
+   external :: fcn
+   ! INTEGER :: I
+   ! REAL (KIND=wp) :: C, M, TOUT
 
-   OPEN (9, FILE="./example/report4.dat")
+   open (9, file="./example/report4.dat")
 
-   CALL ODR(FCN, &
-            N=5, M=1, NP=3, NQ=1, &
-            BETA=BETA, &
-            Y=RESHAPE((/55.0_wp, 45.0_wp, 40.0_wp, 30.0_wp, 20.0_wp/), (/5, 1/)), &
-            X=RESHAPE((/0.15_wp, 0.20_wp, 0.25_wp, 0.30_wp, 0.50_wp/), (/5, 1/)), &
-            LOWER=(/0.0_wp, 0.0_wp, 0.0_wp/), &
-            UPPER=(/1000.0_wp, 1000.0_wp, 1000.0_wp/), &
-            IPRINT=2122, &
-            LUNRPT=9, &
-            MAXIT=20)
+   call odr(fcn, &
+            n=5, m=1, np=3, nq=1, &
+            beta=beta, &
+            y=reshape([55.0_wp, 45.0_wp, 40.0_wp, 30.0_wp, 20.0_wp], [5, 1]), &
+            x=reshape([0.15_wp, 0.20_wp, 0.25_wp, 0.30_wp, 0.50_wp], [5, 1]), &
+            lower=[0.0_wp, 0.0_wp, 0.0_wp], &
+            upper=[1000.0_wp, 1000.0_wp, 1000.0_wp], &
+            iprint=2122, &
+            lunrpt=9, &
+            maxit=20)
 
-   CLOSE (9)
+   close (9)
 
    ! The following code will reproduce the plot in Figure 2 of Zwolak et al. 2001.
    !    DO I = 0, 100
@@ -40,33 +40,33 @@ PROGRAM example4
    !       WRITE (*, *) C, TOUT
    !    END DO
 
-END PROGRAM example4
+end program example4
 
-SUBROUTINE FCN(N, M, NP, NQ, LDN, LDM, LDNP, BETA, XPLUSD, IFIXB, IFIXX, LDIFX, &
-               IDEVAL, F, FJACB, FJACD, ISTOP)
-   use odrpack_kinds, only: wp, ZERO
-   IMPLICIT NONE
-! Subroutine arguments:
-   INTEGER, INTENT(IN) :: IDEVAL, LDIFX, LDM, LDN, LDNP, M, N, NP, NQ
-   INTEGER, INTENT(IN) :: IFIXB(NP), IFIXX(LDIFX, M)
-   REAL(KIND=wp), INTENT(IN) :: BETA(NP), XPLUSD(LDN, M)
-   REAL(KIND=wp), INTENT(OUT) :: F(LDN, NQ), FJACB(LDN, LDNP, NQ), FJACD(LDN, LDM, NQ)
-   INTEGER, INTENT(OUT) :: ISTOP
-! Local variables
-   REAL(KIND=wp) :: MOUT
-   INTEGER :: I
+subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, ldifx, &
+               ideval, f, fjacb, fjacd, istop)
+   use odrpack_kinds, only: wp, zero
+   implicit none
 
-   ISTOP = 0
-   FJACB(:, :, :) = ZERO
-   FJACD(:, :, :) = ZERO
-   IF (MOD(IDEVAL, 10) .GE. 1) THEN
-      DO I = 1, N
-         F(I, 1) = 1440.0_wp
-         CALL MPF(MOUT, XPLUSD(I, 1), &
-                  BETA(1), BETA(2), BETA(3), ZERO, F(I, 1), XPLUSD(I, 1)/2)
-      END DO
-   END IF
-END SUBROUTINE FCN
+   integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
+   integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
+   real(kind=wp), intent(in) :: beta(np), xplusd(ldn, m)
+   real(kind=wp), intent(out) :: f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq)
+   integer, intent(out) :: istop
+
+   real(kind=wp) :: mout
+   integer :: i
+
+   istop = 0
+   fjacb(:, :, :) = zero
+   fjacd(:, :, :) = zero
+   if (mod(ideval, 10) .ge. 1) then
+      do i = 1, n
+         f(i, 1) = 1440.0_wp
+         call mpf(mout, xplusd(i, 1), &
+                  beta(1), beta(2), beta(3), zero, f(i, 1), xplusd(i, 1)/2)
+      end do
+   end if
+end subroutine fcn
 
 ! -------------------------------------------------------------------------------
 ! MPF
@@ -84,51 +84,51 @@ END SUBROUTINE FCN
 ! M - MPF
 ! C - Total Cyclin
 ! KWEE, K25, K25P - Model parameters (BETA(1:3))
-SUBROUTINE MPF(M, C, KWEE, K25, K25P, PRINT_EVERY, TOUT, ROOT)
-   use odrpack_kinds, only: wp, ZERO
+subroutine mpf(m, c, kwee, k25, k25p, print_every, tout, root)
+   use odrpack_kinds, only: wp, zero
    implicit none
 
-   REAL(KIND=wp), INTENT(OUT) :: M
-   REAL(KIND=wp), INTENT(IN)  :: C, KWEE, K25, K25P, PRINT_EVERY, ROOT
-   REAL(KIND=wp), INTENT(INOUT) :: TOUT
-   !  Local variables
-   REAL(KIND=wp), PARAMETER :: H = 1.0E-1_wp
-   REAL(KIND=wp) :: LAST_PRINT, LAST_M, LAST_T, T
-   REAL(KIND=wp) :: K1, K2, K3, K4
+   real(kind=wp), intent(out) :: m
+   real(kind=wp), intent(in) :: c, kwee, k25, k25p, print_every, root
+   real(kind=wp), intent(inout) :: tout
+   real(kind=wp), parameter :: h = 1.0E-1_wp
+   real(kind=wp) :: last_print, last_m, last_t, t
+   real(kind=wp) :: k1, k2, k3, k4
 
-   M = ZERO
-   T = ZERO
-   LAST_PRINT = ZERO
-   IF (PRINT_EVERY .GT. ZERO) THEN
-      WRITE (*, *) T, M
-   END IF
-   DO WHILE (T .LT. TOUT)
-      LAST_T = T
-      LAST_M = M
-      K1 = H*DMDT(M, C, KWEE, K25, K25P)
-      K2 = H*DMDT(M + K1/2, C, KWEE, K25, K25P)
-      K3 = H*DMDT(M + K2/2, C, KWEE, K25, K25P)
-      K4 = H*DMDT(M + K3, C, KWEE, K25, K25P)
-      M = M + (K1 + 2*K2 + 2*K3 + K4)/6
-      T = T + H
-      IF (T .GE. PRINT_EVERY + LAST_PRINT .AND. PRINT_EVERY .GT. ZERO) THEN
-         WRITE (*, *) T, M
-         LAST_PRINT = T
-      END IF
-      IF (ROOT .GT. ZERO) THEN
-         IF (LAST_M .LE. ROOT .AND. ROOT .LT. M) THEN
-            TOUT = (T - LAST_T)/(M - LAST_M)*(ROOT - LAST_M) + LAST_T
-            RETURN
-         END IF
-      END IF
-   END DO
+   m = zero
+   t = zero
+   last_print = zero
+   if (print_every .gt. zero) then
+      write (*, *) t, m
+   end if
+   do while (t .lt. tout)
+      last_t = t
+      last_m = m
+      k1 = h*dmdt(m, c, kwee, k25, k25p)
+      k2 = h*dmdt(m + k1/2, c, kwee, k25, k25p)
+      k3 = h*dmdt(m + k2/2, c, kwee, k25, k25p)
+      k4 = h*dmdt(m + k3, c, kwee, k25, k25p)
+      m = m + (k1 + 2*k2 + 2*k3 + k4)/6
+      t = t + h
+      if (t .ge. print_every + last_print .and. print_every .gt. zero) &
+         then
+         write (*, *) t, m
+         last_print = t
+      end if
+      if (root .gt. zero) then
+         if (last_m .le. root .and. root .lt. m) then
+            tout = (t - last_t)/(m - last_m)*(root - last_m) + last_t
+            return
+         end if
+      end if
+   end do
 
-CONTAINS
+contains
 
    ! Equation from Zwolak et al. 2001.
-   FUNCTION DMDT(M_, C_, KWEE_, K25_, K25P_) RESULT(RES)
-      REAL(KIND=wp) :: M_, C_, KWEE_, K25_, K25P_, RES
-      RES = KWEE_*M_ + (K25_ + K25P_*M_**2)*(C_ - M_)
-   END FUNCTION DMDT
+   function dmdt(m_, c_, kwee_, k25_, k25p_) result(res)
+      real(kind=wp) :: m_, c_, kwee_, k25_, k25p_, res
+      res = kwee_*m_ + (k25_ + k25p_*m_**2)*(c_ - m_)
+   end function dmdt
 
-END SUBROUTINE MPF
+end subroutine mpf
