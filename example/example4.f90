@@ -68,23 +68,21 @@ subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, ldifx, 
    end if
 end subroutine fcn
 
-! -------------------------------------------------------------------------------
-! MPF
-!
-! If ROOT is not zero then returns value of time when M==ROOT in TOUT.  Else,
-! runs until TOUT and returns value in M.  If PRINT_EVERY is non-zero then
-! the solution is printed every PRINT_EVERY time units or every H (which ever
-! is greater).
-!
-! This routine is not meant to be precise, it is only intended to be good
-! enough for providing a working example of ODRPACK95 with bounds.  4th order
-! Runge Kutta and linear interpolation are used for numerical integration and
-! root finding, respectively.
-!
-! M - MPF
-! C - Total Cyclin
-! KWEE, K25, K25P - Model parameters (BETA(1:3))
+
 subroutine mpf(m, c, kwee, k25, k25p, print_every, tout, root)
+!! If ROOT is not zero then returns value of time when M==ROOT in TOUT.  Else,
+!! runs until TOUT and returns value in M.  If PRINT_EVERY is non-zero then
+!! the solution is printed every PRINT_EVERY time units or every H (which ever
+!! is greater).
+!!
+!! This routine is not meant to be precise, it is only intended to be good
+!! enough for providing a working example of ODRPACK95 with bounds.  4th order
+!! Runge Kutta and linear interpolation are used for numerical integration and
+!! root finding, respectively.
+!!
+!! M - MPF
+!! C - Total Cyclin
+!! KWEE, K25, K25P - Model parameters (BETA(1:3))
    use odrpack_kinds, only: wp, zero
    implicit none
 
