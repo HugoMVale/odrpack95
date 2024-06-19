@@ -75,7 +75,6 @@ program dtest
 
 end program dtest
 
-!DODRX
 subroutine dodrx(tstfac, passed, lunsum)
 !***Begin Prologue  DODRX
 !***Refer to ODR
@@ -1355,7 +1354,6 @@ subroutine dodrx(tstfac, passed, lunsum)
 
    end
 
-!DODRXD
    subroutine dodrxd &
       (title, n, m, np, nq, ldx, x, ldy, y, beta)
 !***Begin Prologue  DODRXD
@@ -2276,7 +2274,6 @@ subroutine dodrx(tstfac, passed, lunsum)
 
    end
 
-!DODRXF
    subroutine dodrxf &
       (n, m, np, nq, &
        ldn, ldm, ldnp, &
@@ -2703,7 +2700,6 @@ subroutine dodrx(tstfac, passed, lunsum)
 
    end
 
-!DODRXW
    subroutine dodrxw &
       (maxn, maxm, maxnp, maxnq, ldwe, ld2we, isodr, liwmin, lwmin)
 !***Begin Prologue  DODRXW
