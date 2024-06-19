@@ -42,18 +42,18 @@ subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
 
    ! Calculate model
    if (mod(ideval, 10) .ne. 0) then
-      f(1:n, 1) = beta(1)*exp(beta(2)*xplusd(1:n, 1))
+      f(:, 1) = beta(1)*exp(beta(2)*xplusd(:, 1))
    end if
 
    ! Calculate model partials with respect to `beta`
    if (mod(ideval/10, 10) .ne. 0) then
-      fjacb(1:n, 1, 1) = exp(beta(2)*xplusd(1:n, 1))
-      fjacb(1:n, 2, 1) = beta(1)*xplusd(1:n, 1)*exp(beta(2)*xplusd(1:n, 1))
+      fjacb(:, 1, 1) = exp(beta(2)*xplusd(:, 1))
+      fjacb(:, 2, 1) = beta(1)*xplusd(:, 1)*exp(beta(2)*xplusd(:, 1))
    end if
 
    ! Calculate model partials with respect to `delta` 
    if (mod(ideval/100, 10) .ne. 0) then
-      fjacd(1:n, 1, 1) = beta(1)*beta(2)*exp(beta(2)*xplusd(1:n, 1))
+      fjacd(:, 1, 1) = beta(1)*beta(2)*exp(beta(2)*xplusd(:, 1))
    end if
 
 end subroutine fcn
