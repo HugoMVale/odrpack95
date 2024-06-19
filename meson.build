@@ -1,13 +1,11 @@
 # meson.build
 
-project('odrpack', 'fortran',
+project(
+  'odrpack',
+  'fortran',
   version: '1.0.0',
   meson_version: '>=0.55',
-  default_options: [
-    'default_library=both',
-    'buildtype=debugoptimized',
-    'fortran_std=none'
-  ],
+  default_options: ['default_library=both', 'buildtype=debugoptimized', 'fortran_std=none'],
 )
 
 odrpack_lic = files(
@@ -16,9 +14,9 @@ odrpack_lic = files(
 
 # Sources
 srcs = files(
-  'src/odrpack_kinds.F90',
+  'src/lpkbls.f',
   'src/odrpack.f90',
-  'src/lpkbls.f'
+  'src/odrpack_kinds.F90',
 )
 
 odrpack_lib = library(
@@ -27,9 +25,7 @@ odrpack_lib = library(
   install: false,
 )
 
-odrpack_dep = declare_dependency(
-  link_with: odrpack_lib
-)
+odrpack_dep = declare_dependency(link_with: odrpack_lib)
 
 # minpack_inc = minpack_lib.private_dir_include()
 # minpack_dep = declare_dependency(
@@ -39,11 +35,11 @@ odrpack_dep = declare_dependency(
 # )
 
 odrpack_header = files(
-  'c/include/odrpack/odrpack.h',
+  'include/odrpack/odrpack.h',
 )
 
 # Examples
-# subdir('example')
+subdir('example')
 
 # Tests
 subdir('test')
