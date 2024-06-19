@@ -1,11 +1,11 @@
-!   This sample problem comes from Zwolak et al. 2001 (High Performance Computing
-! Symposium, "Estimating rate constants in cell cycle models").  The call to
-! ODRPACK95 is modified from the call the authors make to ODRPACK.  This is
-! done to illustrate the need for bounds.  The authors could just have easily
-! used the call statement here to solve their problem.
-!   Curious users are encouraged to remove the bounds in the call statement,
-! run the code, and compare the results to the current call statement.
 program example4
+!!   This sample problem comes from Zwolak et al. 2001 (High Performance Computing
+!! Symposium, "Estimating rate constants in cell cycle models").  The call to
+!! ODRPACK95 is modified from the call the authors make to ODRPACK.  This is
+!! done to illustrate the need for bounds.  The authors could just have easily
+!! used the call statement here to solve their problem.
+!!   Curious users are encouraged to remove the bounds in the call statement,
+!! run the code, and compare the results to the current call statement.
    use odrpack_kinds, only: wp
    use odrpack
    implicit none
