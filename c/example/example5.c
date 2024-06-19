@@ -5,7 +5,7 @@ This is a translation of example 5 from the ODRPACK95 documentation.
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "../include/odrpack/odrpack.h"
+#include "../../include/odrpack/odrpack.h"
 
 // User-supplied function for evaluating the model and its partial derivatives
 void fcn(int *n, int *m, int *np, int *nq, int *ldn, int *ldm, int *ldnp, double *beta, double *xplusd,
