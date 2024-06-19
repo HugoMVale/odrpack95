@@ -16,11 +16,11 @@ program example5
 
    allocate (beta(np), l(np), u(np), x(n, m), y(n, nq))
    
-   beta(1:2) = (/2.0_wp, 0.5_wp/)
-   l(1:2) = (/0.0_wp, 0.0_wp/)
-   u(1:2) = (/10.0_wp, 0.9_wp/)
-   x(1:4, 1) = (/0.982_wp, 1.998_wp, 4.978_wp, 6.01_wp/)
-   y(1:4, 1) = (/2.7_wp, 7.4_wp, 148.0_wp, 403.0_wp/)
+   beta(1:2) = [2.0_wp, 0.5_wp]
+   l(1:2) = [0.0_wp, 0.0_wp]
+   u(1:2) = [10.0_wp, 0.9_wp]
+   x(1:4, 1) = [0.982_wp, 1.998_wp, 4.978_wp, 6.01_wp]
+   y(1:4, 1) = [2.7_wp, 7.4_wp, 148.0_wp, 403.0_wp]
 
    call odr(fcn, n, m, np, nq, beta, y, x, lower=l, upper=u)
 
