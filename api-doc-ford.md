@@ -1,9 +1,10 @@
 ---
-project: odrpack95
+project: odrpack
 license: bsd
-summary: ODRPACK95 is a portable collection of fortran subprograms for fitting a model to data with bound constraints on the model parameters. 
+summary: ODRPACK is a portable collection of fortran subprograms for fitting a model to data with bound constraints on the model parameters. 
 src_dir: ./src
          ./example
+exclude: ./src/lpkbls.f
 output_dir: _site
 page_dir: ./doc
 source: true
