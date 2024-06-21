@@ -125,66 +125,66 @@ contains
 
       procedure(fcn_t) :: fcn
          !! User-supplied subroutine for evaluating the model.
-      real(kind=wp), intent(in), optional :: partol
-         !! Parameter convergence stopping tolerance.
-      real(kind=wp), intent(in), optional :: sstol
-         !! Sum-of-squares convergence stopping tolerance.
-      real(kind=wp), intent(in), optional :: taufac
-         !! Factor used to compute the initial trust region diameter.
-      integer, intent(out), optional :: info
-         !! Variable designating why the computations were stopped.
-      integer, intent(in), optional :: iprint
-         !! Print control variable.
-      integer, intent(in), optional :: job
-         !! Variable controlling problem initialization and computational method.
-      integer, intent(in), optional :: lunerr
-         !! Logical unit number for error messages.
-      integer, intent(in), optional :: lunrpt
-         !! Logical unit number for computation reports.
-      integer, intent(in) :: m
-         !! Number of columns of data in the independent variable.
-      integer, intent(in), optional :: maxit
-         !! Maximum number of iterations allowed.
       integer, intent(in) :: n
          !! Number of observations.
-      integer, intent(in), optional :: ndigit
-         !! Number of accurate digits in the function results, as supplied by the user.
+      integer, intent(in) :: m
+         !! Number of columns of data in the independent variable.
       integer, intent(in) :: np
          !! Number of function parameters.
       integer, intent(in) :: nq
          !! Number of responses per observation.
       real(kind=wp), intent(inout) :: beta(:)
-         !! Function parameters.
+         !! Function parameters. `Shape: (np)`.
+      real(kind=wp), intent(in) :: y(:, :)
+         !! Dependent variable. `Shape: (n, nq)`. Unused when the model is implicit.
+      real(kind=wp), intent(in) :: x(:, :)
+         !! Explanatory variable. `Shape: (n, m)`.
       real(kind=wp), intent(inout), pointer, optional :: delta(:, :)
-         !! Initial error in the `x` data.
-      real(kind=wp), intent(in), optional :: lower(:)
-         !! Lower bound on `beta`.
-      real(kind=wp), intent(in), optional :: upper(:)
-         !! Upper bound on `beta`.
-      real(kind=wp), intent(in), optional :: sclb(:)
-         !! Scaling values for `beta`.
-      real(kind=wp), intent(in), optional :: scld(:, :)
-         !! Scaling values for `delta`.
-      real(kind=wp), intent(in), optional :: stpb(:)
-         !! Relative step for computing finite difference derivatives with respect to `beta`.
-      real(kind=wp), intent(in), optional :: stpd(:, :)
-         !! Relative step for computing finite difference derivatives with respect to `delta`.
-      real(kind=wp), intent(in), optional :: wd(:, :, :)
-         !! `delta` weights.
+         !! Initial error in the `x` data. `Shape: (n, m)`.
       real(kind=wp), intent(in), optional :: we(:, :, :)
-         !! `epsilon` weights.
+         !! `epsilon` weights. `Shape: (1<=ldwe<=n, 1<=ld2we<=nq, nq)`. See p. 25.
+      real(kind=wp), intent(in), optional :: wd(:, :, :)
+         !! `delta` weights. `Shape: (1<=ldwd<=n, 1<=ld2wd<=m, m)`. See p. 26.
+      integer, intent(in), optional :: ifixb(:)
+         !! Values designating whether the elements of `beta` are fixed at their input values or not. `Shape: (np)`.
+      integer, intent(in), optional :: ifixx(:, :)
+         !! Values designating whether the elements of `x` are fixed at their input values or not. `Shape: (1<=ldifx<=n, m)`. See p. 27.
+      integer, intent(in), optional :: job
+      !! Variable controlling problem initialization and computational method.
+      integer, intent(in), optional :: ndigit
+         !! Number of accurate digits in the function results, as supplied by the user.
+      real(kind=wp), intent(in), optional :: taufac
+         !! Factor used to compute the initial trust region diameter.
+      real(kind=wp), intent(in), optional :: sstol
+         !! Sum-of-squares convergence stopping tolerance.
+      real(kind=wp), intent(in), optional :: partol
+      !! Parameter convergence stopping tolerance.
+      integer, intent(in), optional :: maxit
+         !! Maximum number of iterations allowed.
+      integer, intent(in), optional :: iprint
+         !! Print control variable.
+      integer, intent(in), optional :: lunerr
+         !! Logical unit number for error messages.
+      integer, intent(in), optional :: lunrpt
+         !! Logical unit number for computation reports.
+      real(kind=wp), intent(in), optional :: stpb(:)
+         !! Relative step for computing finite difference derivatives with respect to `beta`. `Shape: (np)`.
+      real(kind=wp), intent(in), optional :: stpd(:, :)
+         !! Relative step for computing finite difference derivatives with respect to `delta`. `Shape: (1<=ldstpd<=n, m)`. See p. 31.
+      real(kind=wp), intent(in), optional :: sclb(:)
+      !! Scaling values for `beta`. `Shape: (np)`.
+      real(kind=wp), intent(in), optional :: scld(:, :)
+         !! Scaling values for `delta`. `Shape: (1<=ldscld<=n, m)`. See p. 32.
       real(kind=wp), intent(inout), pointer, optional :: work(:)
          !! Real work space.
-      real(kind=wp), intent(in) :: x(:, :)
-         !! Explanatory variable.
-      real(kind=wp), intent(in) :: y(:, :)
-         !! Dependent variable. Unused when the model is implicit.
-      integer, intent(in), optional :: ifixb(:)
-         !! Values designating whether the elements of `beta` are fixed at their input values or not.
-      integer, intent(in), optional :: ifixx(:, :)
-         !! Values designating whether the elements of `x` are fixed at their input values or not.
       integer, intent(out), pointer, optional :: iwork(:)
          !! Integer work space.
+      integer, intent(out), optional :: info
+         !! Variable designating why the computations were stopped.
+      real(kind=wp), intent(in), optional :: lower(:)
+         !! Lower bound on `beta`. `Shape: (np)`.
+      real(kind=wp), intent(in), optional :: upper(:)
+         !! Upper bound on `beta`. `Shape: (np)`.
 
       ! Local variables
       ! TODO: remove save? replace pointer with allocatable?
