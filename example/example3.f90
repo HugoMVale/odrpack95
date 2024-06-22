@@ -23,9 +23,6 @@ program example3
 
    ! Allocate arrays
    allocate (beta(np), x(n, m), y(n, nq), delta(n, m), we(n, nq, nq), wd(n, m, m), ifixx(n, m))
-   we(1, 1, 1) = -1.0E0_wp
-   wd(1, 1, 1) = -1.0E0_wp
-   ifixx(1, 1) = -1
 
    ! Read problem data
    read (5, fmt=*) (beta(i), i=1, np)
