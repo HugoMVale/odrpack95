@@ -29,6 +29,7 @@ program example3
    do i = 1, n
       read (5, fmt=*) (x(i, j), j=1, m), (y(i, j), j=1, nq)
    end do
+   close(5)
 
    ! Specify task as explicit orthogonal distance regression
    !       With central difference derivatives
@@ -130,8 +131,7 @@ subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
          freq = xplusd(i, 1)
          omega = (2.0E0_wp*pi*freq*exp(-beta(3)))**beta(4)
          phi = atan2((omega*stheta), (1 + omega*ctheta))
-         r = (beta(1) - beta(2))*sqrt((1 + omega*ctheta)**2 + (omega*stheta)** &
-                                      2)**(-beta(5))
+         r = (beta(1) - beta(2))*sqrt((1 + omega*ctheta)**2 + (omega*stheta)**2)**(-beta(5))
          f(i, 1) = beta(2) + r*cos(beta(5)*phi)
          f(i, 2) = r*sin(beta(5)*phi)
       end do

@@ -26,6 +26,7 @@ program example2
    do i = 1, n
       read (5, fmt=*) (x(i, j), j=1, m)
    end do
+   close(5)
 
    ! Specify task: Implicit orthogonal distance regression
    !       With forward finite difference derivatives

@@ -32,6 +32,7 @@ program example1
          ifixx(i, 1) = 1
       end if
    end do
+   close(5)
 
    ! Specify task: Explicit orthogonal distance regression
    !       With user supplied derivatives (checked)
