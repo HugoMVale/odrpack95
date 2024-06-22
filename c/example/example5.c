@@ -8,8 +8,9 @@ This is a translation of example 5 from the ODRPACK95 documentation.
 #include "../../include/odrpack/odrpack.h"
 
 // User-supplied function for evaluating the model and its partial derivatives
-void fcn(int *n, int *m, int *np, int *nq, int *ldn, int *ldm, int *ldnp, double *beta, double *xplusd,
-         int *ifixb, int *ifixx, int *ldifx, int *ideval, double *f, double *fjacb, double *fjacd, int *istop)
+void fcn(int *n, int *m, int *np, int *nq, int *ldn, int *ldm, int *ldnp, double *beta,
+         double *xplusd, int *ifixb, int *ifixx, int *ldifx, int *ideval, double *f,
+         double *fjacb, double *fjacd, int *istop)
 {
     int i;
 
@@ -54,10 +55,10 @@ int main()
     double beta[np] = {2.0, 0.5};
     double lower[np] = {0.0, 0.0};
     double upper[np] = {10.0, 0.9};
-    double x[n * m] = {0.982, 1.998, 4.978, 6.01};
-    double y[n * nq] = {2.7, 7.4, 148.0, 403.0};
+    double x[m][n] = {{0.982, 1.998, 4.978, 6.01}};
+    double y[nq][n] = {{2.7, 7.4, 148.0, 403.0}};
 
-    odr_c(fcn, n, m, np, nq, beta, y, x, lower, upper);
+    odr_c(fcn, n, m, np, nq, beta, (double *)y, (double *)x, lower, upper);
 
     return 0;
 }
