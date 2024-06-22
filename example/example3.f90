@@ -17,7 +17,7 @@ program example3
    lunrpt = 9
    open (unit=9, file='./example/report3.dat')
 
-   ! Read problem data: dimensions
+   ! Read problem dimensions
    open (unit=5, file='./example/data3.dat')
    read (5, fmt=*) n, m, np, nq
 
@@ -27,7 +27,7 @@ program example3
    wd(1, 1, 1) = -1.0E0_wp
    ifixx(1, 1) = -1
 
-   ! Read problem data: values
+   ! Read problem data
    read (5, fmt=*) (beta(i), i=1, np)
    do i = 1, n
       read (5, fmt=*) (x(i, j), j=1, m), (y(i, j), j=1, nq)
