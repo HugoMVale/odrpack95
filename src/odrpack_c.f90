@@ -1,40 +1,40 @@
 module odrpack_c
-   use, intrinsic :: iso_c_binding, only : c_int, c_double
+   use, intrinsic :: iso_c_binding, only: c_int, c_double, c_char
    use odrpack, only: odr
    use odrpack_kinds, only: wp
    implicit none
    private
 
-   public :: odr_c
+   public :: odr_short_c, dlunc, dluno
 
    abstract interface
       subroutine fcn_tc(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, ldifx, &
-                        ideval, f, fjacb, fjacd, istop) bind(c)
+                        ideval, f, fjacb, fjacd, istop) bind(C)
          !! User-supplied subroutine for evaluating the model.
-            import :: c_int, c_double
-            integer(c_int), intent(in) :: n
-            integer(c_int), intent(in) :: m
-            integer(c_int), intent(in) :: np
-            integer(c_int), intent(in) :: nq
-            integer(c_int), intent(in) :: ldn
-            integer(c_int), intent(in) :: ldm
-            integer(c_int), intent(in) :: ldnp
-            real(c_double), intent(in) :: beta(np)
-            real(c_double), intent(in) :: xplusd(ldn, m)
-            integer(c_int), intent(in) :: ifixb(np)
-            integer(c_int), intent(in) :: ifixx(ldifx, m)
-            integer(c_int), intent(in) :: ldifx
-            integer(c_int), intent(in) :: ideval
-            real(c_double), intent(out) :: f(ldn, nq)
-            real(c_double), intent(out) :: fjacb(ldn, ldnp, nq)
-            real(c_double), intent(out) :: fjacd(ldn, ldm, nq)
-            integer(c_int), intent(out) :: istop
+         import :: c_int, c_double
+         integer(c_int), intent(in) :: n
+         integer(c_int), intent(in) :: m
+         integer(c_int), intent(in) :: np
+         integer(c_int), intent(in) :: nq
+         integer(c_int), intent(in) :: ldn
+         integer(c_int), intent(in) :: ldm
+         integer(c_int), intent(in) :: ldnp
+         real(c_double), intent(in) :: beta(np)
+         real(c_double), intent(in) :: xplusd(ldn, m)
+         integer(c_int), intent(in) :: ifixb(np)
+         integer(c_int), intent(in) :: ifixx(ldifx, m)
+         integer(c_int), intent(in) :: ldifx
+         integer(c_int), intent(in) :: ideval
+         real(c_double), intent(out) :: f(ldn, nq)
+         real(c_double), intent(out) :: fjacb(ldn, ldnp, nq)
+         real(c_double), intent(out) :: fjacd(ldn, ldm, nq)
+         integer(c_int), intent(out) :: istop
       end subroutine
    end interface
 
 contains
 
-   subroutine odr_c(fcn, n, m, np, nq, beta, y, x, lower, upper) bind(c)
+   subroutine odr_short_c(fcn, n, m, np, nq, beta, y, x, lower, upper) bind(C)
       !! "Short" wrapper for the ODR routine including only principal arguments.
       procedure(fcn_tc) :: fcn
          !! User-supplied subroutine for evaluating the model.
@@ -51,15 +51,15 @@ contains
       real(c_double), intent(in) :: y(n, nq)
          !! Dependent variable. Unused when the model is implicit.
       real(c_double), intent(in) :: x(n, m)
-         !! Explanatory variable.      
-      real(c_double), intent(in) :: lower(np)
+         !! Explanatory variable.
+      real(c_double), intent(in), optional :: lower(np)
          !! Lower bound on `beta`.
-      real(kind=wp), intent(in) :: upper(np)
+      real(kind=wp), intent(in), optional :: upper(np)
          !! Upper bound on `beta`.
 
       call odr(fcn, n, m, np, nq, beta, y, x, lower=lower, upper=upper)
 
-   end subroutine odr_c
+   end subroutine odr_short_c
 
    ! subroutine odr_c( &
    !    fcn, &
@@ -75,7 +75,7 @@ contains
    !    stpb, stpd, &
    !    sclb, scld, &
    !    info, &
-   !    lower, upper) bind(c)
+   !    lower, upper) bind(C)
    !    !! Driver routine for finding the weighted explicit or implicit orthogonal distance
    !    !! regression (ODR) or ordinary linear or nonlinear least squares (OLS) solution (long call
    !    !! statement).
@@ -94,7 +94,7 @@ contains
    !    real(c_double), intent(in) :: y(n, nq)
    !       !! Dependent variable. Unused when the model is implicit.
    !    real(c_double), intent(in) :: x(n, m)
-   !       !! Explanatory variable.      
+   !       !! Explanatory variable.
    !    real(c_double), intent(inout), optional :: delta(n, m)
    !       !! Initial error in the `x` data.
    !    real(c_double), intent(in), optional :: we(ldwe, ld2we, nq)
@@ -138,13 +138,29 @@ contains
    !       !! Lower bound on `beta`.
    !    real(c_double), intent(in), optional :: upper(np)
    !       !! Upper bound on `beta`.
-   
+
    !    call odr(fcn, n, m, np, nq, beta, y, x, &
    !             delta=delta, we=we, wd=wd, ifixb=ifixb, ifixx=ifixx, job=job, ndigit=ndigit, &
    !             taufac=taufac, sstol=sstol, partol=partol, maxit=maxit, iprint=iprint, &
    !             lunerr=lunerr, lunrpt=lunrpt, stpb=stpb, stpd=stpd, sclb=sclb, scld=scld, &
    !             info=info, lower=lower, upper=upper)
-   
+
    ! end subroutine
+
+   subroutine dluno(lun, fn) bind(C)
+   !! Open a new file associated with a specified logical unit number.
+      integer(c_int), intent(in), value :: lun
+         !! Logical unit number.
+      character(kind=c_char, len=*), intent(in) :: fn
+         !! String containing the file name.
+      open (unit=lun, file=fn, status='new')
+   end subroutine dluno
+
+   subroutine dlunc(lun) bind(C)
+   !! Close a file associated with a specified logical unit number.
+      integer(c_int), intent(in), value :: lun
+         !! Logical unit number.
+      close (unit=lun)
+   end subroutine dlunc
 
 end module odrpack_c

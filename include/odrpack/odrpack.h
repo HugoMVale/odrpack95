@@ -8,6 +8,21 @@
 #endif
 
 /**
+ * @brief Open a new file associated with a specified logical unit number.
+ *
+ * @param lun Logical unit number.
+ * @param fn String containing the file name.
+ */
+ODRPACK_EXTERN void dluno(int lun, const char *fn);
+
+/**
+ * @brief Close a file associated with a specified logical unit number.
+ *
+ * @param lun Logical unit number.
+ */
+ODRPACK_EXTERN void dlunc(int lun);
+
+/**
  * @brief User-supplied function for evaluating the model, computing predicted values and their Jacobians.
  *
  * @param n       Number of observations.
