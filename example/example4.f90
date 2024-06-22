@@ -95,10 +95,12 @@ subroutine mpf(m, c, kwee, k25, k25p, print_every, tout, root)
 
    m = zero
    t = zero
+   
    last_print = zero
    if (print_every .gt. zero) then
       write (*, *) t, m
    end if
+   
    do while (t .lt. tout)
       last_t = t
       last_m = m
