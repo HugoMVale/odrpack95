@@ -150,7 +150,7 @@ contains
       integer, intent(in), optional :: ifixx(:, :)
          !! Values designating whether the elements of `x` are fixed at their input values or not. `Shape: (1<=ldifx<=n, m)`. See p. 27.
       integer, intent(in), optional :: job
-      !! Variable controlling problem initialization and computational method.
+         !! Variable controlling problem initialization and computational method.
       integer, intent(in), optional :: ndigit
          !! Number of accurate digits in the function results, as supplied by the user.
       real(kind=wp), intent(in), optional :: taufac
