@@ -1,228 +1,105 @@
-PROGRAM example1
-   USE odrpack
+program example1
+!! Explicit ODR job, with user-supplied analytic derivatives and nondefault ifixx.
+   use odrpack
    use odrpack_kinds, only: wp
    implicit none
 
-! ODRPACK95 Argument Definitions
-!      ==> FCN      Name of the user supplied function subroutine
-!      ==> N        Number of observations
-!      ==> M        Columns of data in the explanatory variable
-!      ==> NP       Number of parameters
-!      ==> NQ       Number of responses per observation
-!     <==> BETA     Function parameters
-!      ==> Y        Response variable
-!      ==> X        Explanatory variable
-!      ==> WE       "Epsilon" weights
-!      ==> WD       "Delta" weights
-!      ==> IFIXB    Indicators for "fixing" parameters (BETA)
-!      ==> IFIXX    Indicators for "fixing" explanatory variable (X)
-!      ==> JOB      Task to be performed
-!      ==> NDIGIT   Good digits in subroutine function results
-!      ==> TAUFAC   Trust region initialization factor
-!      ==> SSTOL    Sum of squares convergence criterion
-!      ==> PARTOL   Parameter convergence criterion
-!      ==> MAXIT    Maximum number of iterations
-!      ==> IPRINT   Print control
-!      ==> LUNERR   Logical unit for error reports
-!      ==> LUNRPT   Logical unit for computation reports
-!      ==> STPB     Step sizes for finite difference derivatives wrt BETA
-!      ==> STPD     Step sizes for finite difference derivatives wrt DELTA
-!      ==> SCLB     Scale values for parameters BETA
-!      ==> SCLD     Scale values for errors delta in explanatory variable
-!     <==> WORK     REAL (KIND=wp) work vector
-!     <==  IWORK    Integer work vector
-!     <==  INFO     Stopping condition
+   ! Variable declarations
+   integer :: i, info, iprint, j, job, lunerr, lunrpt, m, n, np, nq
+   integer, allocatable :: ifixx(:, :)
+   real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :)
+   external :: fcn
 
-! Parameters specifying maximum problem sizes handled by this driver
-!     MAXN          Maximum number of observations
-!     MAXM          Maximum number of columns in explanatory variable
-!     MAXNP         Maximum number of function parameters
-!     MAXNQ         Maximum number of responses per observation
+   ! Set up report files
+   lunerr = 9
+   lunrpt = 9
+   open (unit=9, file='./example/report1.dat')
 
-! Parameter Declarations and Specifications
-   INTEGER :: LDIFX, LDSCLD, LDSTPD, LDWD, LDWE, LDX, LDY, LD2WD, LD2WE, &
-              LIWORK, LWORK, MAXM, MAXN, MAXNP, MAXNQ
-   PARAMETER(MAXM=5, MAXN=25, MAXNP=5, MAXNQ=1, &
-             LDY=MAXN, LDX=MAXN, &
-             LDWE=1, LD2WE=1, LDWD=1, LD2WD=1, &
-             LDIFX=MAXN, LDSTPD=1, LDSCLD=1, &
-             LWORK=18 + 11*MAXNP + MAXNP**2 + MAXM + MAXM**2 + &
-             4*MAXN*MAXNQ + 6*MAXN*MAXM + 2*MAXN*MAXNQ*MAXNP + &
-             2*MAXN*MAXNQ*MAXM + MAXNQ**2 + &
-             5*MAXNQ + MAXNQ*(MAXNP + MAXM) + LDWE*LD2WE*MAXNQ, &
-             LIWORK=20 + MAXNP + MAXNQ*(MAXNP + MAXM))
+   ! Read problem dimensions
+   open (unit=5, file='./example/data1.dat')
+   read (5, *) n, m, np, nq
 
-! Variable Declarations
-   INTEGER :: I, INFO, IPRINT, J, JOB, L, LUNERR, LUNRPT, M, MAXIT, N, NDIGIT, NP, NQ
-   INTEGER :: IFIXB(MAXNP), IFIXX(LDIFX, MAXM), IWORK(:)
-   REAL(KIND=wp) :: PARTOL, SSTOL, TAUFAC
-   REAL(KIND=wp) :: BETA(MAXNP), SCLB(MAXNP), SCLD(LDSCLD, MAXM), &
-                    STPB(MAXNP), STPD(LDSTPD, MAXM), &
-                    WD(LDWD, LD2WD, MAXM), WE(LDWE, LD2WE, MAXNQ), &
-                    WORK(:), X(LDX, MAXM), Y(LDY, MAXNQ)
-   EXTERNAL :: FCN
-   POINTER  :: IWORK, WORK
+   ! Allocate arrays
+   allocate (beta(np), x(n, m), y(n, nq), ifixx(n, m))
 
-! Allocate work arrays
-   ALLOCATE (IWORK(LIWORK), WORK(LWORK))
+   ! Read problem data and set nondefault value for argument 'ifixx'
+   read (5, *) (beta(i), i=1, np)
+   do i = 1, n
+      read (5, *) (x(i, j), j=1, m), (y(i, j), j=1, nq)
+      if (x(i, 1) .eq. 0.0E0_wp .or. x(i, 1) .eq. 100.0E0_wp) then
+         ifixx(i, 1) = 0
+      else
+         ifixx(i, 1) = 1
+      end if
+   end do
 
-! Specify default values for ODR arguments
-   WE(1, 1, 1) = -1.0E0_wp
-   WD(1, 1, 1) = -1.0E0_wp
-   IFIXB(1) = -1
-   IFIXX(1, 1) = -1
-   JOB = -1
-   NDIGIT = -1
-   TAUFAC = -1.0E0_wp
-   SSTOL = -1.0E0_wp
-   PARTOL = -1.0E0_wp
-   MAXIT = -1
-   IPRINT = -1
-   LUNERR = -1
-   LUNRPT = -1
-   STPB(1) = -1.0E0_wp
-   STPD(1, 1) = -1.0E0_wp
-   SCLB(1) = -1.0E0_wp
-   SCLD(1, 1) = -1.0E0_wp
+   ! Specify task: Explicit orthogonal distance regression
+   !       With user supplied derivatives (checked)
+   !       Covariance matrix constructed with recomputed derivatives
+   !       Delta initialized to zero
+   !       Not a restart
+   ! And indicate short initial report
+   !       Short iteration reports every iteration, and
+   !       Long final report
+   job = 00020
+   iprint = 1112
 
-! Set up ODRPACK95 report files
-   LUNERR = 9
-   LUNRPT = 9
-   OPEN (UNIT=9, FILE='./example/report1.dat')
+   ! Compute solution
+   call odr(fcn=fcn, &
+            n=n, m=m, np=np, nq=nq, &
+            beta=beta, &
+            y=y, x=x, &
+            ifixx=ifixx, &
+            job=job, &
+            iprint=iprint, lunerr=lunerr, lunrpt=lunrpt, &
+            info=info)
 
-! Read problem data, and set nondefault value for argument IFIXX
-   OPEN (UNIT=5, FILE='./example/data1.dat')
-   READ (5, *) N, M, NP, NQ
-   READ (5, *) (BETA(I), I=1, NP)
-   DO I = 1, N
-      READ (5, *) (X(I, J), J=1, M), (Y(I, L), L=1, NQ)
-      IF (X(I, 1) .EQ. 0.0E0_wp .OR. X(I, 1) .EQ. 100.0E0_wp) THEN
-         IFIXX(I, 1) = 0
-      ELSE
-         IFIXX(I, 1) = 1
-      END IF
-   END DO
+end program example1
 
-! Specify task: Explicit orthogonal distance regression
-!               With user supplied derivatives (checked)
-!               Covariance matrix constructed with recomputed derivatives
-!               Delta initialized to zero
-!               Not a restart
-! And indicate short initial report
-!               Short iteration reports every iteration, and
-!               Long final report
+subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
+               ldifx, ideval, f, fjacb, fjacd, istop)
 
-   JOB = 00020
-   IPRINT = 1112
-
-! Compute solution
-   CALL ODR(FCN=FCN, &
-            N=N, M=M, NP=NP, NQ=NQ, &
-            BETA=BETA, &
-            Y=Y, X=X, &
-            WE=WE, WD=WD, &
-            IFIXB=IFIXB, IFIXX=IFIXX, &
-            JOB=JOB, NDIGIT=NDIGIT, TAUFAC=TAUFAC, &
-            SSTOL=SSTOL, PARTOL=PARTOL, MAXIT=MAXIT, &
-            IPRINT=IPRINT, LUNERR=LUNERR, LUNRPT=LUNRPT, &
-            STPB=STPB, STPD=STPD, &
-            SCLB=SCLB, SCLD=SCLD, &
-            WORK=WORK, IWORK=IWORK, &
-            INFO=INFO)
-
-END PROGRAM example1
-
-SUBROUTINE FCN(N, M, NP, NQ, &
-               LDN, LDM, LDNP, &
-               BETA, XPLUSD, &
-               IFIXB, IFIXX, LDIFX, &
-               IDEVAL, F, FJACB, FJACD, &
-               ISTOP)
-
-! Subroutine arguments
-!      ==> N        Number of observations
-!      ==> M        Number of columns in explanatory variable
-!      ==> NP       Number of parameters
-!      ==> NQ       Number of responses per observation
-!      ==> LDN      Leading dimension declarator equal or exceeding N
-!      ==> LDM      Leading dimension declarator equal or exceeding M
-!      ==> LDNP     Leading dimension declarator equal or exceeding NP
-!      ==> BETA     Current values of parameters
-!      ==> XPLUSD   Current value of explanatory variable, i.e., X + DELTA
-!      ==> IFIXB    Indicators for "fixing" parameters (BETA)
-!      ==> IFIXX    Indicators for "fixing" explanatory variable (X)
-!      ==> LDIFX    Leading dimension of array IFIXX
-!      ==> IDEVAL   Indicator for selecting computation to be performed
-!     <==  F        Predicted function values
-!     <==  FJACB    Jacobian with respect to BETA
-!     <==  FJACD    Jacobian with respect to errors DELTA
-!     <==  ISTOP    Stopping condition, where
-!                     0 means current BETA and X+DELTA were
-!                       acceptable and values were computed successfully
-!                     1 means current BETA and X+DELTA are
-!                       not acceptable;  ODRPACK95 should select values
-!                       closer to most recently used values if possible
-!                    -1 means current BETA and X+DELTA are
-!                       not acceptable; ODRPACK95 should stop
-
-! Used modules
-   use odrpack_kinds, only: wp, ZERO, ONE
+   use odrpack_kinds, only: wp, zero, one
    implicit none
 
-! Subroutine arguments:
-   INTEGER, INTENT(IN) :: IDEVAL, LDIFX, LDM, LDN, LDNP, M, N, NP, NQ
-   INTEGER, INTENT(IN) :: IFIXB(NP), IFIXX(LDIFX, M)
-   REAL(KIND=wp), INTENT(IN) :: BETA(NP), XPLUSD(LDN, M)
-   REAL(KIND=wp), INTENT(OUT) :: F(LDN, NQ), FJACB(LDN, LDNP, NQ), FJACD(LDN, LDM, NQ)
-   INTEGER, INTENT(OUT) :: ISTOP
-! Local variables
-   INTEGER :: I, L
+   integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
+   integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
+   real(kind=wp), intent(in) :: beta(np), xplusd(ldn, m)
+   real(kind=wp), intent(out) :: f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq)
+   integer, intent(out) :: istop
 
-! Do something with IFIXB and IFIXX to avoid warnings that they are not being
-! used.  This is simply not to worry users that the example program is failing.
-   IF (IFIXB(1) .GT. 0 .AND. IFIXX(1, 1) .GT. 0) THEN
-!   Do nothing.
-   END IF
+   ! Local variables
+   integer :: i
 
-! Check for unacceptable values for this problem
-   IF (BETA(1) .LT. ZERO) THEN
-      ISTOP = 1
-      RETURN
-   ELSE
-      ISTOP = 0
-   END IF
+   ! Check for unacceptable values for this problem
+   if (beta(1) .lt. zero) then
+      istop = 1
+      return
+   else
+      istop = 0
+   end if
 
-! Compute predicted values
-   IF (MOD(IDEVAL, 10) .GE. 1) THEN
-      DO L = 1, NQ
-         DO I = 1, N
-            F(I, L) = BETA(1) + BETA(2)*(EXP(BETA(3)*XPLUSD(I, 1)) - ONE)**2
-         END DO
-      END DO
-   END IF
+   ! Compute predicted values
+   if (mod(ideval, 10) .ge. 1) then
+      do i = 1, nq
+         f(:, i) = beta(1) + beta(2)*(exp(beta(3)*xplusd(:, 1)) - one)**2
+      end do
+   end if
 
-! Compute derivatives with respect to BETA
-   IF (MOD(IDEVAL/10, 10) .GE. 1) THEN
-      DO L = 1, NQ
-         DO I = 1, N
-            FJACB(I, 1, L) = ONE
-            FJACB(I, 2, L) = (EXP(BETA(3)*XPLUSD(I, 1)) - ONE)**2
-            FJACB(I, 3, L) = BETA(2)*2* &
-                             (EXP(BETA(3)*XPLUSD(I, 1)) - ONE)* &
-                             EXP(BETA(3)*XPLUSD(I, 1))*XPLUSD(I, 1)
-         END DO
-      END DO
-   END IF
+   ! Compute derivatives with respect to 'beta'
+   if (mod(ideval/10, 10) .ge. 1) then
+      do i = 1, nq
+         fjacb(:, 1, i) = one
+         fjacb(:, 2, i) = (exp(beta(3)*xplusd(:, 1)) - one)**2
+         fjacb(:, 3, i) = beta(2)*2*(exp(beta(3)*xplusd(:, 1)) - one)*exp(beta(3)*xplusd(:, 1))*xplusd(:, 1)
+      end do
+   end if
 
-! Compute derivatives with respect to DELTA
-   IF (MOD(IDEVAL/100, 10) .GE. 1) THEN
-      DO L = 1, NQ
-         DO I = 1, N
-            FJACD(I, 1, L) = BETA(2)*2* &
-                             (EXP(BETA(3)*XPLUSD(I, 1)) - ONE)* &
-                             EXP(BETA(3)*XPLUSD(I, 1))*BETA(3)
-         END DO
-      END DO
-   END IF
+   ! Compute derivatives with respect to 'delta'
+   if (mod(ideval/100, 10) .ge. 1) then
+      do i = 1, nq
+         fjacd(:, 1, i) = beta(2)*2*(exp(beta(3)*xplusd(:, 1)) - one)*exp(beta(3)*xplusd(:, 1))*beta(3)
+      end do
+   end if
 
-END SUBROUTINE FCN
+end subroutine fcn
