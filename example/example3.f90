@@ -4,46 +4,46 @@ program example3
    use odrpack_kinds, only: wp
    implicit none
 
-! Variable declarations
+   ! Variable declarations
    integer :: i, info, iprint, j, job, lunerr, lunrpt, m, n, np, nq
    integer, allocatable :: ifixx(:, :)
    real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :), wd(:, :, :), we(:, :, :)
    real(kind=wp), pointer :: delta(:, :)
    external :: fcn
 
-! Set up ODRPACK95 report files
+   ! Set up report files
    lunerr = 9
    lunrpt = 9
    open (unit=9, file='./example/report3.dat')
 
-! Read problem data: dimensions
+   ! Read problem data: dimensions
    open (unit=5, file='./example/data3.dat')
    read (5, fmt=*) n, m, np, nq
 
-! Allocate arrays
+   ! Allocate arrays
    allocate (beta(np), x(n, m), y(n, nq), delta(n, m), we(n, nq, nq), wd(n, m, m), ifixx(n, m))
    we(1, 1, 1) = -1.0E0_wp
    wd(1, 1, 1) = -1.0E0_wp
    ifixx(1, 1) = -1
 
-! Read problem data: values
+   ! Read problem data: values
    read (5, fmt=*) (beta(i), i=1, np)
    do i = 1, n
       read (5, fmt=*) (x(i, j), j=1, m), (y(i, j), j=1, nq)
    end do
 
-! Specify task as explicit orthogonal distance regression
-!       With central difference derivatives
-!       Covariance matrix constructed with recomputed derivatives
-!       DELTA initialized by user
-!       Not a restart
-! And indicate long initial report
-!       No iteration reports
-!       Long final report
+   ! Specify task as explicit orthogonal distance regression
+   !       With central difference derivatives
+   !       Covariance matrix constructed with recomputed derivatives
+   !       `delta` initialized by user
+   !       Not a restart
+   ! And indicate long initial report
+   !       No iteration reports
+   !       Long final report
    job = 01010
    iprint = 2002
 
-! Initialize DELTA, and specify first decade of frequencies as fixed
+   ! Initialize `delta`, and specify first decade of frequencies as fixed
    do i = 1, n
       if (x(i, 1) .lt. 100.0E0_wp) then
          delta(i, 1) = 0.0E0_wp
@@ -66,7 +66,7 @@ program example3
       end if
    end do
 
-! Set weights
+   ! Set weights
    do i = 1, n
       if (x(i, 1) .eq. 100.0E0_wp .or. x(i, 1) .eq. 150.0E0_wp) then
          we(i, 1, 1) = 0.0E0_wp
@@ -82,7 +82,7 @@ program example3
       wd(i, 1, 1) = (1.0E-4_wp)/(x(i, 1)**2)
    end do
 
-! Compute solution
+   ! Compute solution
    call odr(fcn=fcn, &
             n=n, m=m, np=np, nq=nq, &
             beta=beta, &
@@ -108,12 +108,12 @@ subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
    real(kind=wp), intent(out) :: f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq)
    integer, intent(out) :: istop
 
-! Local variables
+   ! Local variables
    real(kind=wp) :: freq, omega, ctheta, stheta, theta, phi, r
    real(kind=wp), parameter :: pi = 4*atan(one)
    integer :: i
 
-! Check for unacceptable values for this problem
+   ! Check for unacceptable values for this problem
    do i = 1, n
       if (xplusd(i, 1) .lt. zero) then
          istop = 1
@@ -126,7 +126,7 @@ subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
    ctheta = cos(theta)
    stheta = sin(theta)
 
-! Compute predicted values
+   ! Compute predicted values
    if (mod(ideval, 10) .ge. 1) then
       do i = 1, n
          freq = xplusd(i, 1)
