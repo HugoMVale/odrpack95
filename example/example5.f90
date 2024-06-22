@@ -1,11 +1,15 @@
 program example5
-!! Default ODR job, with parameter bounds.
+!! Explicit ODR job, with parameter bounds, user-supplied derivatives, and output of work
+!! arrays.
    use odrpack
    use odrpack_kinds, only: wp
    implicit none
 
    real(kind=wp), allocatable :: beta(:), l(:), u(:), x(:, :), y(:, :)
-   integer :: np, n, m, nq
+   real(kind=wp), pointer :: work(:)
+   integer, pointer :: iwork(:)
+   integer :: np, n, m, nq, job
+   !integer :: i,
    external :: fcn
 
    np = 2
@@ -13,15 +17,25 @@ program example5
    m = 1
    nq = 1
 
+   nullify (iwork, work)
+
    allocate (beta(np), l(np), u(np), x(n, m), y(n, nq))
-   
+
    beta(1:2) = [2.0_wp, 0.5_wp]
    l(1:2) = [0.0_wp, 0.0_wp]
    u(1:2) = [10.0_wp, 0.9_wp]
    x(1:4, 1) = [0.982_wp, 1.998_wp, 4.978_wp, 6.01_wp]
    y(1:4, 1) = [2.7_wp, 7.4_wp, 148.0_wp, 403.0_wp]
 
-   call odr(fcn, n, m, np, nq, beta, y, x, lower=l, upper=u)
+   job = 20
+
+   call odr(fcn, n, m, np, nq, beta, y, x, job=job, iwork=iwork, work=work, lower=l, upper=u)
+
+   ! print *
+   ! print *, "iwork"
+   ! do i=1, size(iwork)
+   !    print *, i, iwork(i)
+   ! end do
 
 end program example5
 
@@ -50,7 +64,7 @@ subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
       fjacb(:, 2, 1) = beta(1)*xplusd(:, 1)*exp(beta(2)*xplusd(:, 1))
    end if
 
-   ! Calculate model partials with respect to `delta` 
+   ! Calculate model partials with respect to `delta`
    if (mod(ideval/100, 10) .ne. 0) then
       fjacd(:, 1, 1) = beta(1)*beta(2)*exp(beta(2)*xplusd(:, 1))
    end if
