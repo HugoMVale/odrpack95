@@ -1,6 +1,5 @@
 program example5
-!! This is an example of the modern way to use ODRPACK. The work arrays are allocated
-!! internally.
+!! Default ODR job, with parameter bounds.
    use odrpack
    use odrpack_kinds, only: wp
    implicit none

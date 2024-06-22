@@ -1,5 +1,6 @@
 program example3
-
+!! Explicit ODR job, with parameter bounds, weights, delta initialized by user, and central
+!! difference derivatives.
    use odrpack
    use odrpack_kinds, only: wp
    implicit none
