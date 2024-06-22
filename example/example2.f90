@@ -14,14 +14,14 @@ program example2
    lunrpt = 9
    open (unit=9, file='./example/report2.dat')
 
-   ! Read problem data: dimensions
+   ! Read problem dimensions
    open (unit=5, file='./example/data2.dat')
    read (5, fmt=*) n, m, np, nq
 
    ! Allocate arrays
    allocate (beta(np), x(n, m), y(n, nq))
 
-   ! Read problem data: values
+   ! Read problem data
    read (5, fmt=*) (beta(i), i=1, np)
    do i = 1, n
       read (5, fmt=*) (x(i, j), j=1, m)
