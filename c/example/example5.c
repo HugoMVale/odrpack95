@@ -60,7 +60,27 @@ int main()
     double x[M][N] = {{0.982, 1.998, 4.978, 6.01}};
     double y[NQ][N] = {{2.7, 7.4, 148.0, 403.0}};
 
-    odr_short_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x, &job, lower, upper);
+    // odr_short_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x, &job, lower, upper);
+
+    int ifixb[NP] = {1, 1};
+    int ndigit = -1;
+    double taufac = -1.0;
+    double sstol = -1.0;
+    double partol = -1.0;
+    int maxint = -1;
+    int iprint = 1001;
+    int lunerr = -1;
+    int lunrpt = -1;
+    int info = 0;
+    double *stpb = NULL;
+    double *sclb = NULL;
+
+    odr_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x,
+          ifixb,
+          &job, &ndigit, &taufac, &sstol, &partol, &maxint, &iprint, &lunerr, &lunrpt,
+          stpb, sclb,
+          &info,
+          lower, upper);
 
     return 0;
 }
