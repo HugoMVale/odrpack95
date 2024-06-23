@@ -10,17 +10,23 @@
 /**
  * @brief Open a new file associated with a specified logical unit number.
  *
- * @param lun Logical unit number.
- * @param fn String containing the file name.
+ * @param lun    Logical unit number.
+ * @param fn     String containing the file name.
+ * @param length Length of the string containing the file name.
+ * @param ierr   Error code.
  */
-ODRPACK_EXTERN void dluno(int lun, const char *fn);
+ODRPACK_EXTERN void open_file(
+    int *lun,
+    const char *fn,
+    const int *length,
+    int *ierr);
 
 /**
  * @brief Close a file associated with a specified logical unit number.
  *
  * @param lun Logical unit number.
  */
-ODRPACK_EXTERN void dlunc(int lun);
+ODRPACK_EXTERN void close_file(int *lun);
 
 /**
  * @brief User-supplied function for evaluating the model, computing predicted values and their Jacobians.

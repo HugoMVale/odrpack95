@@ -5,8 +5,8 @@ module odrpack_c
    implicit none
    private
 
-   public :: odr_short_c, dlunc, dluno
-
+   public :: odr_short_c, open_file, close_file
+   
    abstract interface
       subroutine fcn_tc(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, ldifx, &
                         ideval, f, fjacb, fjacd, istop) bind(C)
@@ -147,20 +147,38 @@ contains
 
    ! end subroutine
 
-   subroutine dluno(lun, fn) bind(C)
+   subroutine open_file(lun, fn, len, ierr) bind(C)
    !! Open a new file associated with a specified logical unit number.
-      integer(c_int), intent(in), value :: lun
-         !! Logical unit number.
-      character(kind=c_char, len=*), intent(in) :: fn
+      integer(c_int), intent(inout) :: lun
+         !! Logical unit number. If `lun>0`, the user-supplied logical unit number is used.
+         !! Otherwise, a new logical unit number is assigned.
+      integer(c_int), intent(in) :: len
+         !! Length of the string containing the file name.
+      character(kind=c_char), intent(in) :: fn(len)
          !! String containing the file name.
-      open (unit=lun, file=fn, status='new')
-   end subroutine dluno
+      integer(c_int), intent(out) :: ierr
+         !! Error code.
 
-   subroutine dlunc(lun) bind(C)
+      character(len=len) :: fn_
+      integer :: i
+
+      do i = 1, len
+         fn_(i:i) = fn(i)
+      end do 
+
+      if (lun > 0) then
+         open (file=fn_, unit=lun, status='new', iostat=ierr)
+      else
+         open (file=fn_, newunit=lun, status='new', iostat=ierr)
+      end if
+
+   end subroutine
+
+   subroutine close_file(lun) bind(C)
    !! Close a file associated with a specified logical unit number.
-      integer(c_int), intent(in), value :: lun
+      integer(c_int), intent(in) :: lun
          !! Logical unit number.
       close (unit=lun)
-   end subroutine dlunc
+   end subroutine
 
 end module odrpack_c
