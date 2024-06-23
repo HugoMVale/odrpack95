@@ -47,18 +47,20 @@ void fcn(int *n, int *m, int *np, int *nq, int *ldn, int *ldm, int *ldnp, double
 
 int main()
 {
-#define np 2
-#define n 4
-#define m 1
-#define nq 1
+#define NP 2
+#define N 4
+#define M 1
+#define NQ 1
 
-    double beta[np] = {2.0, 0.5};
-    double lower[np] = {0.0, 0.0};
-    double upper[np] = {10.0, 0.9};
-    double x[m][n] = {{0.982, 1.998, 4.978, 6.01}};
-    double y[nq][n] = {{2.7, 7.4, 148.0, 403.0}};
+    int n = NP, m = M, np = NP, nq = NQ;
+    int job = 20;
+    double beta[NP] = {2.0, 0.5};
+    double lower[NP] = {0.0, 0.0};
+    double upper[NP] = {10.0, 0.9};
+    double x[M][N] = {{0.982, 1.998, 4.978, 6.01}};
+    double y[NQ][N] = {{2.7, 7.4, 148.0, 403.0}};
 
-    odr_c(fcn, n, m, np, nq, beta, (double *)y, (double *)x, lower, upper);
+    odr_short_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x, &job, lower, upper);
 
     return 0;
 }
