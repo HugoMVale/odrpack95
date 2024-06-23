@@ -12,13 +12,13 @@
  *
  * @param lun    Logical unit number.
  * @param fn     String containing the file name.
- * @param length Length of the string containing the file name.
+ * @param fnlen  Length of the string containing the file name.
  * @param ierr   Error code.
  */
 ODRPACK_EXTERN void open_file(
     int *lun,
     const char *fn,
-    const int *length,
+    const int *fnlen,
     int *ierr);
 
 /**
@@ -74,6 +74,61 @@ typedef void (*odrpack_fcn_callback)(
 /**
  * @brief Wrapper for the ODR routine including only mandatory arguments.
  *
+ * @param fcn     User-supplied subroutine for evaluating the model.
+ * @param n       Number of observations.
+ * @param m       Number of columns of data in the independent variable.
+ * @param np      Number of function parameters.
+ * @param nq      Number of responses per observation.
+ * @param beta    Input/output array [np] of function parameters.
+ * @param y       Input array [nq][n] of dependent variable. Unused when the model is implicit.
+ * @param x       Input array [m][n] of explanatory variable.
+ * @param ifixb   Input array [np] of indicators for fixing parameters `beta`.
+ * @param job     Variable controlling problem initialization and computational method.
+ * @param ndigit  Number of accurate digits in the function results, as supplied by the user.
+ * @param taufac  Factor used to compute the initial trust region diameter.
+ * @param sstol   Sum-of-squares convergence stopping tolerance.
+ * @param partol  Parameter convergence stopping tolerance.
+ * @param maxint  Maximum number of iterations allowed.
+ * @param iprint  Print control variable.
+ * @param lunerr  Logical unit number for error messages.
+ * @param lunrpt  Logical unit number for computation reports.
+ * @param stpb    Input array [np] with relative step for computing finite difference derivatives with respect to `beta`.
+ * @param sclb    Input array [np] with scaling values for `beta`.
+ * @param info    Variable designating why the computations were stopped.
+ * @param lower   Input array [np] with lower bound on `beta`.
+ * @param upper   Input array [np] with upper bound on `beta`.
+ */
+ODRPACK_EXTERN void odr_c(
+    odrpack_fcn_callback fcn,
+    const int *n,
+    const int *m,
+    const int *np,
+    const int *nq,
+    double *beta,
+    const double *y,
+    const double *x,
+    const int *ifixb,
+
+    const int *job,
+    const int *ndigit,
+    const double *taufac,
+    const double *sstol,
+    const double *partol,
+    const int *maxint,
+    const int *iprint,
+    const int *lunerr,
+    const int *lunrpt,
+
+    const double *stpb,
+    const double *sclb,
+
+    int *info,
+    const double *lower,
+    const double *upper);
+
+/**
+ * @brief Short wrapper for the ODR routine including only mandatory arguments.
+ *
  * @param fcn    User-supplied subroutine for evaluating the model.
  * @param n      Number of observations.
  * @param m      Number of columns of data in the independent variable.
@@ -88,10 +143,10 @@ typedef void (*odrpack_fcn_callback)(
  */
 ODRPACK_EXTERN void odr_short_c(
     odrpack_fcn_callback fcn,
-    int *n,
-    int *m,
-    int *np,
-    int *nq,
+    const int *n,
+    const int *m,
+    const int *np,
+    const int *nq,
     double *beta,
     const double *y,
     const double *x,
