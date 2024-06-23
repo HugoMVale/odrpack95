@@ -34,17 +34,17 @@ module odrpack_c
 
 contains
 
-   subroutine odr_short_c(fcn, n, m, np, nq, beta, y, x, lower, upper) bind(C)
+   subroutine odr_short_c(fcn, n, m, np, nq, beta, y, x, job, lower, upper) bind(C)
       !! "Short" wrapper for the ODR routine including only principal arguments.
       procedure(fcn_tc) :: fcn
          !! User-supplied subroutine for evaluating the model.
-      integer(c_int), intent(in), value :: n
+      integer(c_int), intent(in) :: n
          !! Number of observations.
-      integer(c_int), intent(in), value :: m
+      integer(c_int), intent(in) :: m
          !! Number of columns of data in the independent variable.
-      integer(c_int), intent(in), value :: np
+      integer(c_int), intent(in) :: np
          !! Number of function parameters.
-      integer(c_int), intent(in), value :: nq
+      integer(c_int), intent(in) :: nq
          !! Number of responses per observation.
       real(c_double), intent(inout) :: beta(np)
          !! Function parameters.
@@ -52,12 +52,14 @@ contains
          !! Dependent variable. Unused when the model is implicit.
       real(c_double), intent(in) :: x(n, m)
          !! Explanatory variable.
+      integer(c_int), intent(in), optional :: job
+         !! Variable controlling problem initialization and computational method.
       real(c_double), intent(in), optional :: lower(np)
          !! Lower bound on `beta`.
       real(kind=wp), intent(in), optional :: upper(np)
          !! Upper bound on `beta`.
 
-      call odr(fcn, n, m, np, nq, beta, y, x, lower=lower, upper=upper)
+      call odr(fcn, n, m, np, nq, beta, y, x, job=job, lower=lower, upper=upper)
 
    end subroutine odr_short_c
 
@@ -153,11 +155,11 @@ contains
          !! Logical unit number. If `lun>0`, the user-supplied logical unit number is used.
          !! Otherwise, a new logical unit number is assigned.
       integer(c_int), intent(in) :: len
-         !! Length of the string containing the file name.
+         !! Length of the string containing the file name, i.e. `strlen(fn)`.
       character(kind=c_char), intent(in) :: fn(len)
          !! String containing the file name.
       integer(c_int), intent(out) :: ierr
-         !! Error code.
+         !! Error code returned by `iostat`.
 
       character(len=len) :: fn_
       integer :: i

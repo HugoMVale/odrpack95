@@ -82,18 +82,20 @@ typedef void (*odrpack_fcn_callback)(
  * @param beta   Input/output array [np] of function parameters.
  * @param y      Input array [nq][n] of dependent variable. Unused when the model is implicit.
  * @param x      Input array [m][n] of explanatory variable.
+ * @param job    Variable controlling problem initialization and computational method.
  * @param lower  Input array [np] with lower bound on `beta`.
  * @param upper  Input array [np] with upper bound on `beta`.
  */
-ODRPACK_EXTERN void odr_c(
+ODRPACK_EXTERN void odr_short_c(
     odrpack_fcn_callback fcn,
-    int n,
-    int m,
-    int np,
-    int nq,
+    int *n,
+    int *m,
+    int *np,
+    int *nq,
     double *beta,
     const double *y,
     const double *x,
+    int *job,
     const double *lower,
     const double *upper);
 
