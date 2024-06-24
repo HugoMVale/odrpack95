@@ -10,7 +10,7 @@ module odrpack_c
    abstract interface
       subroutine fcn_tc(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, ldifx, &
                         ideval, f, fjacb, fjacd, istop) bind(C)
-         !! User-supplied subroutine for evaluating the model.
+      !! User-supplied subroutine for evaluating the model.
          import :: c_int, c_double
          integer(c_int), intent(in) :: n
          integer(c_int), intent(in) :: m
@@ -34,8 +34,9 @@ module odrpack_c
 
 contains
 
-   subroutine odr_short_c(fcn, n, m, np, nq, beta, y, x, job, lower, upper) bind(C)
-      !! "Short" wrapper for the ODR routine including only principal arguments.
+   subroutine odr_basic_c(fcn, n, m, np, nq, beta, y, x, lower, upper, job) bind(C)
+   !! Wrapper for the ODR routine including mandatory arguments and very few optional
+   !! arguments.
       procedure(fcn_tc) :: fcn
          !! User-supplied subroutine for evaluating the model.
       integer(c_int), intent(in) :: n
@@ -52,14 +53,79 @@ contains
          !! Dependent variable. Unused when the model is implicit.
       real(c_double), intent(in) :: x(n, m)
          !! Explanatory variable.
-      integer(c_int), intent(in), optional :: job
-         !! Variable controlling problem initialization and computational method.
       real(c_double), intent(in), optional :: lower(np)
          !! Lower bound on `beta`.
       real(kind=wp), intent(in), optional :: upper(np)
          !! Upper bound on `beta`.
+      integer(c_int), intent(in), optional :: job
+         !! Variable controlling initialization and computational method.
+      
+      call odr(fcn, n, m, np, nq, beta, y, x, lower=lower, upper=upper, job=job)
 
-      call odr(fcn, n, m, np, nq, beta, y, x, job=job, lower=lower, upper=upper)
+   end subroutine odr_basic_c
+
+
+   subroutine odr_short_c( &
+      fcn, &
+      n, m, np, nq, &
+      beta, y, x, &
+      we, ldwe, ld2we, &
+      wd, ldwd, ld2wd, &
+      lower, upper, &
+      job, &
+      iprint, lunerr, lunrpt, &
+      info) bind(C)
+   !! Wrapper for the ODR routine including mandatory arguments and most commonly used 
+   !! optional arguments. Similar to the short-call statement of the original ODRPACK `DODR`. 
+      procedure(fcn_tc) :: fcn
+         !! User-supplied subroutine for evaluating the model.
+      integer(c_int), intent(in) :: n
+         !! Number of observations.
+      integer(c_int), intent(in) :: m
+         !! Number of columns of data in the independent variable.
+      integer(c_int), intent(in) :: np
+         !! Number of function parameters.
+      integer(c_int), intent(in) :: nq
+         !! Number of responses per observation.
+      real(c_double), intent(inout) :: beta(np)
+         !! Function parameters.
+      real(c_double), intent(in) :: y(n, nq)
+         !! Dependent variable. Unused when the model is implicit.
+      real(c_double), intent(in) :: x(n, m)
+         !! Explanatory variable.
+      real(c_double), intent(in) :: we(ldwe, ld2we, nq)
+         !! `epsilon` weights.
+      integer(c_int), intent(in) :: ldwe
+         !! Leading dimension of array `we`.
+      integer(c_int), intent(in) :: ld2we
+         !! Second dimension of array `we`.     
+      real(c_double), intent(in) :: wd(ldwd, ld2wd, m)
+         !! `delta` weights.
+      integer(c_int), intent(in) :: ldwd
+         !! Leading dimension of array `wd`.
+      integer(c_int), intent(in) :: ld2wd
+         !! Second dimension of array `wd`.
+      real(c_double), intent(in), optional :: lower(np)
+         !! Lower bound on `beta`.
+      real(kind=wp), intent(in), optional :: upper(np)
+         !! Upper bound on `beta`.
+      integer(c_int), intent(in), optional :: job
+         !! Variable controlling initialization and computational method.
+      integer(c_int), intent(in), optional :: iprint
+         !! Print control variable.
+      integer(c_int), intent(in), optional :: lunerr
+         !! Logical unit number for error messages.
+      integer(c_int), intent(in), optional :: lunrpt
+         !! Logical unit number for computation reports.
+      integer(c_int), intent(out), optional :: info
+         !! Logical unit number for computation reports.
+      
+      call odr(fcn, n, m, np, nq, beta, y, x, &
+               we=we, wd=wd, &
+               lower=lower, upper=upper, &            
+               job=job, &
+               iprint=iprint, lunerr=lunerr, lunrpt=lunrpt, &
+               info=info)
 
    end subroutine odr_short_c
 
@@ -185,11 +251,13 @@ contains
 
    end subroutine open_file
 
-   subroutine close_file(lun) bind(C)
+   subroutine close_file(lun, ierr) bind(C)
    !! Close a file associated with a specified logical unit number.
       integer(c_int), intent(in) :: lun
          !! Logical unit number.
-      close (unit=lun)
+      integer(c_int), intent(out) :: ierr
+         !! Error code returned by `iostat`.
+      close (unit=lun, iostat=ierr)
    end subroutine close_file
 
    subroutine dwinf_c( &
@@ -218,7 +286,7 @@ contains
       integer(c_int), intent(in) :: ld2we
          !! Second dimension of array `we`.
       integer(c_int), intent(out) :: isodr
-         !! Variable designating whether the solution is by ODR (isodr=.true.) or by OLS (isodr=.false.).
+         !! Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
       integer(c_int), intent(out) :: deltai
          !! Starting location in array `work` of array `delta.
       integer(c_int), intent(out) :: epsi
@@ -322,7 +390,7 @@ contains
       integer(c_int), intent(out) :: upperi
          !! Starting location in array `work` of array `upper`.
       integer(c_int), intent(out) :: lwkmn
-         !! Minimum acceptable length of vector work.
+         !! Minimum acceptable length of vector `work`.
 
       external :: dwinf
 
