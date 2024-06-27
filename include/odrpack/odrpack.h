@@ -75,7 +75,7 @@ typedef void (*odrpack_fcn)(
     int *istop);
 
 /**
- * @brief Basic wrapper for the ODR routine including only mandatory arguments and very few
+ * @brief Basic wrapper for the ODR routine including mandatory arguments and very few
  * optional arguments.
  *
  * @param fcn    `==>` User-supplied subroutine for evaluating the model.
@@ -117,7 +117,7 @@ ODRPACK_EXTERN void odr_basic_c(
  * @param x      `==>` Array [m][n] of explanatory variable.
  * @param we     `==>` Array [nq][ld2we][ldwe] with `epsilon` weights.
  * @param ldwe   `==>` Leading dimension of array `we`, `ldwe ∈ {1, n}`.
- * @param ld2we  `==>` Second dimension of array `we`, `ldwe ∈ {1, n}`.
+ * @param ld2we  `==>` Second dimension of array `we`, `ld2we ∈ {1, n}`.
  * @param wd     `==>` Array [m][ld2wd][ldwd] with `delta` weights.
  * @param ldwd   `==>` Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
  * @param ld2wd  `==>` Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
@@ -152,8 +152,7 @@ ODRPACK_EXTERN void odr_short_c(
     const int *lunrpt,
     int *info);
 
-//  * @param stpb    Input array [np] with relative step for computing finite difference
-//  *                derivatives with respect to `beta`.
+//  * @param stpb    Input array [np] with relative step for computing finite difference derivatives with respect to `beta`.
 //  * @param sclb    Input array [np] with scaling values for `beta`.
 
 /**
@@ -165,8 +164,7 @@ ODRPACK_EXTERN void odr_short_c(
  * @param nq     `==>` Number of responses per observation.
  * @param ldwe   `==>` Leading dimension of array `we`.
  * @param ld2we  `==>` Second dimension of array `we`.
- * @param isodr  `<==` Variable designating whether the solution is by ODR (`isodr=.true.`) or
- *                   by OLS (`isodr=.false.`).
+ * @param isodr  `<==` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
  * @param deltai `<==` Starting location in array `work` of array `delta`.
  * @param epsi   `<==` Starting location in array `work` of array `eps`.
  * @param xplusi `<==` Starting location in array `work` of array `xplusd`.
