@@ -139,7 +139,7 @@ contains
          !! Dependent variable. `Shape: (n, nq)`. Unused when the model is implicit.
       real(kind=wp), intent(in) :: x(:, :)
          !! Explanatory variable. `Shape: (n, m)`.
-      real(kind=wp), intent(inout), pointer, optional :: delta(:, :)
+      real(kind=wp), intent(inout), allocatable, optional :: delta(:, :)
          !! Initial error in the `x` data. `Shape: (n, m)`.
       real(kind=wp), intent(in), optional :: we(:, :, :)
          !! `epsilon` weights. `Shape: (1<=ldwe<=n, 1<=ld2we<=nq, nq)`. See p. 25.
@@ -195,7 +195,7 @@ contains
       real(kind=wp) :: ltaufac, lsstol, lpartol
       real(kind=wp) :: llower(np), lwe(n, nq, nq), lwd(n, m, m), lstpb(np), lstpd(n, m), &
                        lsclb(np), lscld(n, m), lupper(np), wd1(1, 1, 1)
-      real(kind=wp), pointer, save :: ldelta(:, :)
+
       real(kind=wp), pointer, save :: lwork(:)
       integer, pointer, save :: liwork(:)  
       logical :: head
@@ -294,7 +294,7 @@ contains
             if (.not. present(delta)) then
                linfo5 = 7
                linfo4 = 1
-            elseif (.not. associated(delta)) then
+            elseif (.not. allocated(delta)) then
                linfo5 = 7
                linfo4 = 1
             end if
@@ -356,8 +356,8 @@ contains
       lwork = ZERO
       liwork = 0
       if (present(delta)) then
-         if (.not. associated(delta)) then
-            allocate (ldelta(n, m), stat=linfo4)
+         if (.not. allocated(delta)) then
+            allocate (delta(n, m), stat=linfo4)
          end if
       end if
       if (linfo4 .ne. 0 .or. linfo3 .ne. 0 .or. linfo2 .ne. 0) then
@@ -596,7 +596,7 @@ contains
       end if
 
       if (present(delta)) then
-         if (associated(delta)) then
+         if (allocated(delta)) then
             if (any(shape(delta) .lt. (/n, m/))) then
                linfo1 = linfo1 + 8
             end if
@@ -675,11 +675,8 @@ contains
       end if
 
       if (present(delta)) then
-         if (associated(delta)) then
+         if (allocated(delta)) then
             delta(1:n, 1:m) = reshape(lwork(1:n*m), (/n, m/))
-         else
-            ldelta(1:n, 1:m) = reshape(lwork(1:n*m), (/n, m/))
-            delta => ldelta
          end if
       end if
 

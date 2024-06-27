@@ -8,8 +8,8 @@ program example3
    ! Variable declarations
    integer :: i, info, iprint, j, job, lunerr, lunrpt, m, n, np, nq
    integer, allocatable :: ifixx(:, :)
-   real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :), wd(:, :, :), we(:, :, :)
-   real(kind=wp), pointer :: delta(:, :)
+   real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :), wd(:, :, :), we(:, :, :), &
+                                 delta(:, :)
    external :: fcn
 
    ! Set up report files
