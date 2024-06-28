@@ -708,7 +708,6 @@ contains
 
       deallocate (tempret)
 
-      return
    end subroutine odr
 
 end module odrpack
@@ -1042,45 +1041,29 @@ subroutine dacces                                                             &
 !
         return
 end subroutine
-!DESUBI
-subroutine desubi                                                             &
-         ( n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, e)
+
+subroutine desubi( n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, e)
 !***Begin Prologue  DESUBI
 !***Refer to  ODR
-!***Routines Called  DZERO
+!***Routines Called 
 !***Date Written   860529   (YYMMDD)
 !***Revision Date  920304   (YYMMDD)
 !***Purpose  Compute E = WD + ALPHA*TT**2
 !***End Prologue  DESUBI
-!
+
 !...Used modules
-        use odrpack_kinds,only: wp
-!
+        use odrpack_kinds, only: wp, zero
+
 !...Scalar arguments
-        real(kind = wp)                                                       &
-         alpha
-        integer                                                               &
-         ldtt, ldwd, ld2wd, m, n
-!
+        real(kind = wp) :: alpha
+        integer :: ldtt, ldwd, ld2wd, m, n
+
 !...Array arguments
-        real(kind = wp)                                                       &
-         e( m, m), tt( ldtt, m), wd( ldwd, ld2wd, m)
-!
+        real(kind = wp) :: e( m, m), tt( ldtt, m), wd( ldwd, ld2wd, m)
+
 !...Local scalars
-        real(kind = wp)                                                       &
-         zero
-        integer                                                               &
-         i, j, j1, j2
-!
-!...External subroutines
-        external                                                              &
-         dzero
-!
-!...Data statements
-        data                                                                  &
-         zero                                                                 &
-         /0.0E0_wp/
-!
+        integer :: i, j, j1, j2
+
 !...Variable Definitions (alphabetically)
 !       ALPHA:  The Levenberg-Marquardt parameter.
 !       E:      The value of the array E = WD + ALPHA*TT**2
@@ -1096,24 +1079,22 @@ subroutine desubi                                                             &
 !       TT:     The scaling values used for DELTA.
 !       WD:     The squared DELTA weights, D**2.
 !       ZERO:   The value 0.0E0_wp.
-!
-!
+
 !***First executable statement  DESUBI
-!
-!
+
 !       N.B. the locations of WD and TT accessed depend on the value
 !       of the first element of each array and the leading dimensions
 !       of the multiply subscripted arrays.
-!
+
         if ( n .eq. 0 .or. m .eq. 0) return
-!
+
         if ( wd(1,1,1) .ge. zero) then
            if ( ldwd .ge. n) then
 !  The elements of WD have been individually specified
 !
               if ( ld2wd .eq. 1) then
 !  The arrays stored in WD are diagonal
-                 call dzero( m, m, e, m)
+                 e = zero 
                  do 10 j = 1, m
                     e( j, j) = wd( i,1, j)
 10               continue
@@ -1146,7 +1127,7 @@ subroutine desubi                                                             &
 !
               if ( ld2wd .eq. 1) then
 !  The array stored in WD is diagonal
-                 call dzero( m, m, e, m)
+                 e = zero
                  do 140 j = 1, m
                     e( j, j) = wd(1,1, j)
 140              continue
@@ -1177,7 +1158,7 @@ subroutine desubi                                                             &
            endif
         else
 !  WD is a diagonal matrix with elements ABS(WD(1,1,1))
-           call dzero( m, m, e, m)
+           e = zero
            if ( tt(1,1) .gt. zero) then
               if ( ldtt .ge. n) then
                  do 310 j = 1, m
@@ -1194,10 +1175,9 @@ subroutine desubi                                                             &
 330           continue
            endif
         endif
-!
-        return
+
 end subroutine
-!DETAF
+
 subroutine detaf                                                              &
          ( fcn,                                                               &
          n, m, np, nq,                                                        &
@@ -2325,15 +2305,15 @@ subroutine diniwk                                                             &
          loweri, upperi, boundi)
 !***Begin Prologue  DINIWK
 !***Refer to  ODR
-!***Routines Called  DFLAGS,DSCLB,DSCLD,DZERO
+!***Routines Called  DFLAGS,DSCLB,DSCLD
 !***Date Written   860529   (YYMMDD)
 !***Revision Date  920304   (YYMMDD)
 !***Purpose  Initialize work vectors as necessary
 !***End Prologue  DINIWK
 !
 !...Used modules
-        use odrpack_kinds,only: wp
-!
+        use odrpack_kinds, only: wp, zero, one, two, three
+
 !...Scalar arguments
         real(kind = wp)                                                       &
          partol, sstol, taufac
@@ -2342,33 +2322,22 @@ subroutine diniwk                                                             &
          ldscld, ldtti, ldx, liwork, loweri, luneri, lunerr, lunrpi, lunrpt,  &
          lwork, m, maxit, maxiti, n, np, partli, ssfi, sstoli, taufci, tti,   &
          upperi
-!
+
 !...Array arguments
         real(kind = wp)                                                       &
          beta( np), lower( np), sclb( np), scld( ldscld, m), upper( np),      &
          work( lwork), x( ldx, m)
         integer                                                               &
          ifixx( ldifx, m), iwork( liwork)
-!
+
 !...Local scalars
-        real(kind = wp)                                                       &
-         one, three, two, zero
-        integer                                                               &
-         i, j
-        logical                                                               &
-         anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
-!
-!...External functions
-!
+        integer :: i, j, istart
+        logical :: anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
+
 !...External subroutines
-        external                                                              &
-         dcopy, dflags, dsclb, dscld, dzero
-!
-!...Data statements
-        data                                                                  &
-         zero, one, two, three                                                &
-         /0.0E0_wp,1.0E0_wp,2.0E0_wp,3.0E0_wp/
-!
+        external :: dcopy, dflags, dsclb, dscld
+
+
 !...Variable Definitions (alphabetically)
 !       ANAJAC:  The variable designating whether the Jacobians are
 !       computed by finite differences (ANAJAC=FALSE) or not
@@ -2545,14 +2514,17 @@ subroutine diniwk                                                             &
 !  Initialize DELTA's as necessary
 !
         if ( isodr) then
-           if ( initd) then
-              call dzero( n, m, work( deltai), n)
+           if (initd) then
+              !call dzero( n, m, work( deltai), n)
+              work(deltai:deltai+(n*m-1)) = zero
            else
               if ( ifixx(1,1) .ge. 0) then
                  if ( ldifx .eq. 1) then
                     do 20 j = 1, m
                        if ( ifixx(1, j) .eq. 0) then
-                          call dzero( n,1, work( deltai+( j-1)* n), n)
+                          istart = deltai+(j-1)*n
+                          work(istart:istart+(n-1)) = zero
+                          !call dzero( n,1, work( deltai+( j-1)* n), n)
                        endif
 20                  continue
                  else
@@ -2567,7 +2539,8 @@ subroutine diniwk                                                             &
               endif
            endif
         else
-           call dzero( n, m, work( deltai), n)
+           !call dzero( n, m, work( deltai), n)
+           work(deltai:deltai+(n*m-1)) = zero
         endif
 !
 !  Copy bounds into WORK
@@ -2578,10 +2551,9 @@ subroutine diniwk                                                             &
 !  Initialize parameters on bounds in IWORK
 !
         iwork( boundi: boundi+ np-1) = 0
-!
-        return
+
 end subroutine
-!DIWINF
+
 subroutine diwinf                                                             &
          ( m, np, nq,                                                         &
          msgbi, msgdi, ifix2i, istopi,                                        &
@@ -2699,7 +2671,7 @@ subroutine djaccd                                                             &
          lower, upper)
 !***Begin Prologue  DJACCD
 !***Refer to  ODR
-!***Routines Called  FCN,DHSTEP,DZERO
+!***Routines Called  FCN,DHSTEP
 !***Date Written   860529   (YYMMDD)
 !***Revision Date  920619   (YYMMDD)
 !***Purpose  Compute central difference approximations to the
@@ -2707,7 +2679,7 @@ subroutine djaccd                                                             &
 !***End Prologue  DJACCD
 !
 !...Used modules
-        use odrpack_kinds,only: wp
+        use odrpack_kinds,only: wp, zero, one
 !
 !...Scalar arguments
         integer                                                               &
@@ -2727,30 +2699,15 @@ subroutine djaccd                                                             &
 !...Subroutine arguments
         external                                                              &
          fcn
-!
+
 !...Local scalars
-        real(kind = wp)                                                       &
-         betak, one, typj, zero
-        integer                                                               &
-         i, j, k, l
-        logical                                                               &
-         doit, setzro
-!
-!...External subroutines
-        external                                                              &
-         dzero
-!
+        real(kind = wp) :: betak, typj
+        integer :: i, j, k, l
+        logical :: doit, setzro
+
 !...External functions
-        real(kind = wp)                                                       &
-         dhstep, derstep
-        external                                                              &
-         dhstep, derstep
-!
-!...Data statements
-        data                                                                  &
-         zero, one                                                            &
-         /0.0E0_wp,1.0E0_wp/
-!
+        real(kind = wp), external :: dhstep, derstep
+
 !...Routine names used as subprogram arguments
 !       FCN:     The user supplied subroutine for evaluating the model.
 !
@@ -2788,7 +2745,6 @@ subroutine djaccd                                                             &
 !       NETA:    The number of good digits in the function results.
 !       NFEV:    The number of function evaluations.
 !       NP:      The number of function parameters.
-!       ONE:     The value 1.0E0_wp.
 !       SETZRO:  The variable designating whether the derivative wrt some
 !       DELTA needs to be set to zero (SETZRO=TRUE) or not
 !       (SETZRO=FALSE).
@@ -2808,7 +2764,6 @@ subroutine djaccd                                                             &
 !       WRK2:    A work array of (N BY NQ) elements.
 !       WRK3:    A work array of (NP) elements.
 !       WRK6:    A WORK ARRAY OF (N BY NP BY NQ) elements.
-!       ZERO:    The value 0.0E0_wp.
 !
 !
 !***First executable statement  DJACCD
@@ -2828,7 +2783,7 @@ subroutine djaccd                                                             &
            endif
            if (.not. doit) then
               do 10 l = 1, nq
-                 call dzero( n,1, fjacb(1, k, l), n)
+                 fjacb(1:n, k, l) = zero
 10            continue
            else
               betak = beta( k)
@@ -2942,7 +2897,7 @@ subroutine djaccd                                                             &
               endif
               if (.not. doit) then
                  do 110 l = 1, nq
-                    call dzero( n,1, fjacd(1, j, l), n)
+                    fjacd(1:n, j, l) = zero
 110              continue
               else
                  do 120 i = 1, n
@@ -3250,7 +3205,7 @@ subroutine djacfd                                                             &
          lower, upper)
 !***Begin Prologue  DJACFD
 !***Refer to  ODR
-!***Routines Called  FCN,DHSTEP,DZERO,DERSTEP
+!***Routines Called  FCN,DHSTEP,DERSTEP
 !***Date Written   860529   (YYMMDD)
 !***Revision Date  920619   (YYMMDD)
 !***Purpose  Compute forward difference approximations to the
@@ -3258,7 +3213,7 @@ subroutine djacfd                                                             &
 !***End Prologue  DJACFD
 !
 !...Used modules
-        use odrpack_kinds,only: wp
+        use odrpack_kinds, only: wp, zero, one
 !
 !...Scalar arguments
         integer                                                               &
@@ -3274,34 +3229,19 @@ subroutine djacfd                                                             &
          ( n, np, nq), x( ldx, m), xplusd( n, m)
         integer                                                               &
          ifixb( np), ifixx( ldifx, m)
-!
+
 !...Subroutine arguments
         external                                                              &
          fcn
-!
+
 !...Local scalars
-        real(kind = wp)                                                       &
-         betak, one, step, typj, zero
-        integer                                                               &
-         i, j, k, l
-        logical                                                               &
-         doit, setzro
-!
-!...External subroutines
-        external                                                              &
-         dzero
-!
+        real(kind = wp) :: betak, step, typj
+        integer :: i, j, k, l
+        logical :: doit, setzro
+
 !...External functions
-        real(kind = wp)                                                       &
-         dhstep, derstep
-        external                                                              &
-         dhstep, derstep
-!
-!...Data statements
-        data                                                                  &
-         zero, one                                                            &
-         /0.0E0_wp,1.0E0_wp/
-!
+        real(kind = wp), external :: dhstep, derstep
+
 !...Routine names used as subprogram arguments
 !       FCN:     The user supplied subroutine for evaluating the model.
 !
@@ -3336,7 +3276,6 @@ subroutine djacfd                                                             &
 !       NETA:    The number of good digits in the function results.
 !       NFEV:    The number of function evaluations.
 !       NP:      The number of function parameters.
-!       ONE:     The value 1.0E0_wp.
 !       SETZRO:  The variable designating whether the derivative wrt some
 !       DELTA needs to be set to zero (SETZRO=TRUE) or not
 !       (SETZRO=FALSE).
@@ -3355,7 +3294,6 @@ subroutine djacfd                                                             &
 !       WRK2:    A work array of (N BY NQ) elements.
 !       WRK3:    A work array of (NP) elements.
 !       WRK6:    A work array of (N BY NP BY NQ) elements.
-!       ZERO:    The value 0.0E0_wp.
 !
 !
 !***First executable statement  DJACFD
@@ -3375,7 +3313,7 @@ subroutine djacfd                                                             &
            endif
            if (.not. doit) then
               do 10 l = 1, nq
-                 call dzero( n,1, fjacb(1, k, l), n)
+                 fjacb(1:n, k, l) = zero
 10            continue
            else
               betak = beta( k)
@@ -3447,7 +3385,7 @@ subroutine djacfd                                                             &
               endif
               if (.not. doit) then
                  do 110 l = 1, nq
-                    call dzero( n,1, fjacd(1, j, l), n)
+                    fjacd(1:n, j, l) = zero
 110              continue
               else
                  do 120 i = 1, n
@@ -9914,7 +9852,7 @@ subroutine dodphd                                                             &
          ' * ODRPACK95 version 1.00 of 12-27-2005 (REAL (KIND=wp)) * '/       &
          ' ********************************************************* '/)
 end subroutine
-!DODSTP
+
 subroutine dodstp                                                             &
          ( n, m, np, nq, npp,                                                 &
          f, fjacb, fjacd,                                                     &
@@ -9926,15 +9864,15 @@ subroutine dodstp                                                             &
 !***Begin Prologue  DODSTP
 !***Refer to  ODR
 !***Routines Called  IDAMAX,DCHEX,DESUBI,DFCTR,DNRM2,DQRDC,DQRSL,DROT,
-!       DROTG,DSOLVE,DTRCO,DTRSL,DVEVTR,DWGHT,DZERO
+!       DROTG,DSOLVE,DTRCO,DTRSL,DVEVTR,DWGHT
 !***Date Written   860529   (YYMMDD)
 !***Revision Date  920619   (YYMMDD)
 !***Purpose  Compute locally constrained steps S and T, and PHI(ALPHA)
 !***End Prologue  DODSTP
 !
 !...Used modules
-        use odrpack_kinds,only: wp
-        use odrpack,only: tempret
+        use odrpack_kinds, only: wp, zero, one
+        use odrpack, only: tempret
 !
 !...Scalar arguments
         real(kind = wp)                                                       &
@@ -9953,37 +9891,23 @@ subroutine dodstp                                                             &
          wrk( lwrk)
         integer                                                               &
          kpvt( np)
-!
+
 !...Local scalars
-        real(kind = wp)                                                       &
-         co, one, si, temp, zero
-        integer                                                               &
-         i, imax, inf, ipvt, j, k, k1, k2, kp, l
-        logical                                                               &
-         elim, forvcv
-!
+        real(kind = wp) :: co, si, temp
+        integer :: i, imax, inf, ipvt, j, k, k1, k2, kp, l
+        logical :: elim, forvcv
+
 !...LOCAL ARRAYS
-        real(kind = wp)                                                       &
-         dum(2)
-!
+        real(kind = wp) :: dum(2)
+
 !...External functions
-        real(kind = wp)                                                       &
-         dnrm2
-        integer                                                               &
-         idamax
-        external                                                              &
-         dnrm2, idamax
-!
+        real(kind = wp), external :: dnrm2
+        integer, external :: idamax
+
 !...External subroutines
-        external                                                              &
-         dchex, desubi, dfctr, dqrdc, dqrsl, drot, drotg,                     &
-         dsolve, dtrco, dtrsl, dvevtr, dzero
-!
-!...Data statements
-        data                                                                  &
-         zero, one                                                            &
-         /0.0E0_wp,1.0E0_wp/
-!
+        external :: dchex, desubi, dfctr, dqrdc, dqrsl, drot, drotg, dsolve, dtrco, dtrsl, &
+                    dvevtr
+
 !...Interface blocks
         interface
            subroutine dwght                                                   &
@@ -9995,7 +9919,7 @@ subroutine dodstp                                                             &
             t(:,:), wt(:,:,:), wtt(:,:)
            end subroutine
         end interface
-!
+
 !...Variable definitions (alphabetically)
 !       ALPHA:   The Levenberg-Marquardt parameter.
 !       CO:      The cosine from the plane rotation.
@@ -10210,9 +10134,9 @@ subroutine dodstp                                                             &
 !-----------------------^------------------------------------------------------
 !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
 !------------------------------------------------------------------------------
-           call dzero( npp,1, s, npp)
+           s(1:npp) = zero
            do 430 k1 = 1, kp
-              call dzero( kp,1, wrk3, kp)
+              wrk3(1:kp) = zero
               wrk3( k1) = sqrt( alpha)
               do 420 k2 = k1, kp
                  call drotg( tfjacb( k2,1, k2), wrk3( k2), co, si)
@@ -12354,60 +12278,5 @@ subroutine dxpy                                                               &
               xpy( i, j) = x( i, j)+ y( i, j)
 10         continue
 20      continue
-!
-        return
-end subroutine
-!DZERO
-subroutine dzero                                                              &
-         ( n, m, a, lda)
-!***Begin Prologue  DZERO
-!***Refer to  ODR
-!***Routines Called  (None)
-!***Date Written   860529   (YYMMDD)
-!***Revision Date  920304   (YYMMDD)
-!***Purpose  Set A = ZERO
-!***End Prologue  DZERO
-!
-!...Used modules
-        use odrpack_kinds,only: wp
-!
-!...Scalar arguments
-        integer                                                               &
-         lda, m, n
-!
-!...Array arguments
-        real(kind = wp)                                                       &
-         a( lda, m)
-!
-!...Local scalars
-        real(kind = wp)                                                       &
-         zero
-        integer                                                               &
-         i, j
-!
-!...Data statements
-        data                                                                  &
-         zero                                                                 &
-         /0.0E0_wp/
-!
-!...Variable Definitions (alphabetically)
-!       A:       The array to be set to zero.
-!       I:       An indexing variable.
-!       J:       An indexing variable.
-!       LDA:     The leading dimension of array A.
-!       M:       The number of columns to be set to zero.
-!       N:       The number of rows to be set to zero.
-!       ZERO:    The value 0.0E0_wp.
-!
-!
-!***First executable statement  DZERO
-!
-!
-        do 20 j = 1, m
-           do 10 i = 1, n
-              a( i, j) = zero
-10         continue
-20      continue
-!
-        return
+
 end subroutine
