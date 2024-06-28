@@ -78,7 +78,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 !***Begin Prologue  DODRX
 !***Refer to ODR
 !***Routines Called  DDOT,DNRM2,ODR,DODRXD,
-!       DODRXF,DODRXW,DWGHT,Dzero
+!       DODRXF,DODRXW,DWGHT
 !***Date Written   860529   (YYMMDD)
 !***Revision Date  920619   (YYMMDD)
 !***Purpose  Exercise features of ODRPACK95 software
@@ -135,7 +135,7 @@ subroutine dodrx(tstfac, passed, lunsum)
    real(kind=wp), external :: ddot, dnrm2
 
 !...External subroutines
-   external :: dodrxd, dodrxf, dodrxw, dzero
+   external :: dodrxd, dodrxf, dodrxw
 
 !...Common blocks
    common/setid/setno
@@ -450,7 +450,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 5
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 00020
          short = .true.
@@ -470,7 +470,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 5
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 00002
          short = .true.
@@ -491,7 +491,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 3
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          ifixb(1) = 1
          ifixb(2) = 1
@@ -522,7 +522,7 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 3
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          ldwd1 = ldwd
          ldwe1 = ldwe
@@ -562,7 +562,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 1
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 01020
          ldscld = 1
@@ -595,7 +595,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 4
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 00020
          sstol = hundrd*epsmac
@@ -638,7 +638,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 6
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 00210
          taufac = p01
@@ -660,7 +660,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 7
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 00001
          partol = epsmac**(one/three)
@@ -683,7 +683,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 8
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
 
          ldwd1 = ldwd
@@ -747,7 +747,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 6
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 00022
          short = .false.
@@ -766,7 +766,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 6
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 00020
          short = .false.
@@ -786,7 +786,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 9
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 00000
          short = .false.
@@ -810,7 +810,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 9
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 00000
          short = .false.
@@ -833,7 +833,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 9
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 00000
          short = .false.
@@ -858,7 +858,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 9
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 00000
          short = .false.
@@ -882,7 +882,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 9
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 00000
          short = .false.
@@ -906,7 +906,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 9
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 00010
          short = .false.
@@ -930,7 +930,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 9
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 00010
          short = .false.
@@ -960,7 +960,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 9
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 00000
          short = .false.
@@ -986,7 +986,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 9
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 00000
          short = .false.
@@ -1014,7 +1014,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 10
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 00010
          short = .false.
@@ -1038,7 +1038,7 @@ subroutine dodrx(tstfac, passed, lunsum)
          end do
          setno = 10
          call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-         call dzero(lwork, 1, work, lwork)
+         work = zero
          delta = zero
          job = 00010
          short = .false.
