@@ -1401,14 +1401,14 @@ subroutine devjac                                                             &
          lower, upper)
 !***Begin Prologue  DEVJAC
 !***Refer to  ODR
-!***Routines Called  FCN,DDOT,DIFIX,DJACCD,DJACFD,DWGHT,DUNPAC,DXPY
+!***Routines Called  FCN,DDOT,DIFIX,DJACCD,DJACFD,DWGHT,DUNPAC
 !***Date Written   860529   (YYMMDD)
 !***Revision Date  920304   (YYMMDD)
 !***Purpose  Compute the weighted Jacobians wrt BETA and DELTA
 !***End Prologue  DEVJAC
 !
 !...Used modules
-        use odrpack_kinds,only: wp
+        use odrpack_kinds, only: wp, zero
         use odrpack,only: tempret
 !
 !...Scalar arguments
@@ -1427,36 +1427,24 @@ subroutine devjac                                                             &
          xplusd( n, m)
         integer                                                               &
          ifixb( np), ifixx( ldifx, m)
-!
+
 !...Subroutine arguments
         external                                                              &
          fcn
-!
+
 !...Local scalars
-        integer                                                               &
-         ideval, j, k, k1, l
-        real(kind = wp)                                                       &
-         zero
-        logical                                                               &
-         error
+        integer :: ideval, j, k, k1, l
+        logical :: error
 !-------------^----------------------------------------------------------------
 !!! FPT - 1269 Fortran keyword used as local identifier name.
 !------------------------------------------------------------------------------
-!
+
 !...External subroutines
-        external                                                              &
-         difix, djaccd, djacfd, dunpac, dxpy
-!
+        external :: difix, djaccd, djacfd, dunpac
+
 !...External functions
-        real(kind = wp)                                                       &
-         ddot
-        external                                                              &
-         ddot
-!
-!...Data statements
-        data zero                                                             &
-         /0.0E0_wp/
-!
+        real(kind = wp), external :: ddot
+
 !...Interface blocks
         interface
            subroutine dwght                                                   &
@@ -1539,16 +1527,13 @@ subroutine devjac                                                             &
 !
 !
 !  Insert current unfixed BETA estimates into BETA
-!
-        call dunpac( np, betac, beta, ifixb)
-!
+      call dunpac( np, betac, beta, ifixb)
+
 !  Compute XPLUSD = X + DELTA
-!
-        call dxpy( n, m, x, ldx, delta, n, xplusd, n)
-!
+      xplusd = x(1:n,:) + delta
+
 !  Compute the Jacobian wrt the estimated BETAS (FJACB) and
 !       the Jacobian wrt DELTA (FJACD)
-!
         istop = 0
         if ( isodr) then
            ideval = 110
@@ -5198,11 +5183,9 @@ subroutine dodcnt                                                             &
             work, lwork, iwork, liwork,                                       &
             maxit1, tstimp, info, lower, upper)
         endif
-!
-        return
-!
+
 end subroutine
-!DODDRV
+
 subroutine doddrv                                                             &
          ( head, fstitr, prtpen,                                              &
          fcn, n, m, np, nq, beta, y, ldy, x, ldx,                             &
@@ -5216,7 +5199,7 @@ subroutine doddrv                                                             &
 !***Refer to  ODR
 !***Routines Called  FCN,DCOPY,DDOT,DETAF,DFCTRW,DFLAGS,
 !       DINIWK,DIWINF,DJCK,DNRM2,DODCHK,DODMN,
-!       DODPER,DPACK,DSETN,DUNPAC,DWGHT,DWINF,DXMY,DXPY,
+!       DODPER,DPACK,DSETN,DUNPAC,DWGHT,DWINF,DXMY
 !       DERSTEP
 !***Date Written   860529   (YYMMDD)
 !***Revision Date  920619   (YYMMDD)
@@ -5282,7 +5265,7 @@ subroutine doddrv                                                             &
 !...External subroutines
         external                                                              &
          dcopy, detaf, dfctrw, dflags, diniwk, diwinf, djck, dodchk,          &
-         dodmn, dodper, dpack, dsetn, dunpac, dwinf, dxmy, dxpy
+         dodmn, dodper, dpack, dsetn, dunpac, dwinf, dxmy
 !
 !...Data statements
         data                                                                  &
@@ -5639,11 +5622,11 @@ subroutine doddrv                                                             &
 !          weighted EPSILONS at the starting point
 !
            call dunpac( np, work( betaci), beta, ifixb)
-           call dxpy( n, m, x, ldx, work( deltai), n, work( xplusi), n)
+           work(xplusi:xplusi+(n*m-1)) = work(deltai:deltai+(n*m-1)) + reshape(x(1:n,:), shape=[n*m])
            istop = 0
            call fcn( n, m, np, nq,                                            &
             n, m, np,                                                         &
-            beta, work( xplusi),                                              &
+            beta, work(xplusi),                                              &
             ifixb, ifixx, ldifx,                                              &
             002, work( fni), work( wrk6i), work( wrk1i),                      &
             istop)
@@ -6166,7 +6149,7 @@ subroutine dodlm                                                              &
 !
         return
 end subroutine
-!DODMN
+
 subroutine dodmn                                                              &
          ( head, fstitr, prtpen,                                              &
          fcn, n, m, np, nq, job, beta, y, ldy, x, ldx,                        &
@@ -6181,14 +6164,14 @@ subroutine dodmn                                                              &
 !***Begin Prologue  DODMN
 !***Refer to  ODR
 !***Routines Called  FCN,DACCES,DCOPY,DDOT,DEVJAC,DFLAGS,DNRM2,DODLM,
-!       DODPCR,DODVCV,DUNPAC,DWGHT,DXMY,DXPY
+!       DODPCR,DODVCV,DUNPAC,DWGHT,DXMY
 !***Date Written   860529   (YYMMDD)
 !***Revision Date  920619   (YYMMDD)
 !***Purpose  Iteratively compute least squares solution
 !***End Prologue  DODMN
 !
 !...Used modules
-        use odrpack_kinds,only: wp
+        use odrpack_kinds, only: wp, zero, one
         use odrpack,only: tempret
 !
 !...Scalar arguments
@@ -6210,17 +6193,16 @@ subroutine dodmn                                                              &
          msgb( nq* np+1), msgd( nq* m+1)
         logical                                                               &
          fstitr, head, prtpen
-!
+
 !...Subroutine arguments
         external                                                              &
          fcn
-!
+
 !...Local scalars
-        real(kind = wp)                                                       &
-         actred, actrs, alpha, dirder, eta, olmavg, one,                      &
+        real(kind = wp) :: actred, actrs, alpha, dirder, eta, olmavg,         &
          p0001, p1, p25, p5, p75, partol, pnorm, prered, prers,               &
          ratio, rcond, rnorm, rnormn, rnorms, rss, rvar, sstol, tau, taufac,  &
-         temp, temp1, temp2, tsnorm, zero
+         temp, temp1, temp2, tsnorm
         integer                                                               &
          i, idf, iflag, int2, ipr, ipr1, ipr2, ipr2f, ipr3, irank,            &
 !---------------------------^--------------------------------------------------
@@ -6235,27 +6217,20 @@ subroutine dodmn                                                              &
 !!! FPT - 1273 Fortran auxiliary keyword used as identifier name.
 !------------------------------------------------------------------------------
          implct, initd, intdbl, isodr, lstep, redoj, restrt
-!
+
 !...Local arrays
-        real(kind = wp)                                                       &
-         loweru( np), upperu( np), wss(3)
-!
+        real(kind = wp) :: loweru( np), upperu( np), wss(3)
+
 !...External functions
-        real(kind = wp)                                                       &
-         ddot, dnrm2
-        external                                                              &
-         ddot, dnrm2
-!
+        real(kind = wp), external :: ddot, dnrm2
+
 !...External subroutines
-        external                                                              &
-         dacces, dcopy, devjac, dflags,                                       &
-         dodlm, dodpcr, dodvcv, dunpac, dxmy, dxpy
-!
+        external :: dacces, dcopy, devjac, dflags, dodlm, dodpcr, dodvcv, dunpac, dxmy
+
 !...Data statements
         data                                                                  &
-         zero, p0001, p1, p25, p5, p75, one                                   &
-         /0.0E0_wp,0.00010E0_wp,0.10E0_wp,0.250E0_wp,                         &
-         0.50E0_wp,0.750E0_wp,1.0E0_wp/
+         p0001, p1, p25, p5, p75                                              &
+         /0.00010E0_wp,0.10E0_wp,0.250E0_wp,0.50E0_wp,0.750E0_wp/
         data                                                                  &
          ludflt                                                               &
          /6/
@@ -6397,7 +6372,6 @@ subroutine dodmn                                                              &
 !       OLMAVG:  The average number of Levenberg-Marquardt steps per
 !       iteration.
 !       OMEGA:   The starting location in WORK of array OMEGA.
-!       ONE:     The value 1.0E0_wp.
 !       P0001:   The value 0.0001E0_wp.
 !       P1:      The value 0.1E0_wp.
 !       P25:     The value 0.25E0_wp.
@@ -6462,7 +6436,6 @@ subroutine dodmn                                                              &
 !       X:       The explanatory variable.
 !       XPLUSD:  The values of X + DELTA.
 !       Y:       The dependent variable.  Unused when the model is implicit.
-!       ZERO:    The value 0.0E0_wp.
 !
 !
 !***First executable statement  DODMN
@@ -6615,12 +6588,11 @@ subroutine dodmn                                                              &
            goto 200
         endif
         olmavg = olmavg+ nlms
-!
+
 !  Compute BETAN = BETAC + S
 !       DELTAN = DELTA + T
-!
-        call dxpy( npp,1, betac, npp, s, npp, betan, npp)
-        if ( isodr) call dxpy( n, m, delta, n, t, n, deltan, n)
+        betan = betac + s
+        if (isodr) deltan = delta + t
 !
 !  Project the step wrt the bounds
         do i = 1, npu
@@ -6688,7 +6660,7 @@ subroutine dodmn                                                              &
 !  Evaluate predicted values at new point
 !
         call dunpac( np, betan, beta, ifixb)
-        call dxpy( n, m, x, ldx, deltan, n, xplusd, n)
+        xplusd = x(1:n,:) + deltan
         istop = 0
         call fcn( n, m, np, nq,                                               &
          n, m, np,                                                            &
@@ -6940,7 +6912,7 @@ subroutine dodmn                                                              &
            call dxmy( n, nq, fs, n, y, ldy, f, n)
         endif
         call dunpac( np, betac, beta, ifixb)
-        call dxpy( n, m, x, ldx, delta, n, xplusd, n)
+        xplusd = x(1:n, :) + delta
 !
 !  Compute covariance matrix of estimated parameters
 !  in upper NP by NP portion of WORK(VCV) if requested
@@ -12178,10 +12150,9 @@ subroutine dwinf                                                              &
            upperi = 1
            lwkmn = 1
         endif
-!
-        return
+
 end subroutine
-!DXMY
+
 subroutine dxmy                                                               &
          ( n, m, x, ldx, y, ldy, xmy, ldxmy)
 !***Begin Prologue  DXMY
@@ -12226,56 +12197,6 @@ subroutine dxmy                                                               &
         do 20 j = 1, m
            do 10 i = 1, n
               xmy( i, j) = x( i, j)- y( i, j)
-10         continue
-20      continue
-!
-        return
-end subroutine
-!DXPY
-subroutine dxpy                                                               &
-         ( n, m, x, ldx, y, ldy, xpy, ldxpy)
-!***Begin Prologue  DXPY
-!***Refer to  ODR
-!***Routines Called  (None)
-!***Date Written   860529   (YYMMDD)
-!***Revision Date  920304   (YYMMDD)
-!***Purpose  Compute XPY = X + Y
-!***End Prologue  DXPY
-!
-!...Used modules
-        use odrpack_kinds,only: wp
-!
-!...Scalar arguments
-        integer                                                               &
-         ldx, ldxpy, ldy, m, n
-!
-!...Array arguments
-        real(kind = wp)                                                       &
-         x( ldx, m), xpy( ldxpy, m), y( ldy, m)
-!
-!...Local scalars
-        integer                                                               &
-         i, j
-!
-!...Variable Definitions (alphabetically)
-!       I:       An indexing variable.
-!       J:       An indexing variable.
-!       LDX:     The leading dimension of array X.
-!       LDXPY:   The leading dimension of array XPY.
-!       LDY:     The leading dimension of array Y.
-!       M:       The number of columns of data in arrays X and Y.
-!       N:       The number of rows of data in arrays X and Y.
-!       X:       The first of the two arrays to be added together.
-!       XPY:     The values of X+Y.
-!       Y:       The second of the two arrays to be added together.
-!
-!
-!***First executable statement  DXPY
-!
-!
-        do 20 j = 1, m
-           do 10 i = 1, n
-              xpy( i, j) = x( i, j)+ y( i, j)
 10         continue
 20      continue
 
