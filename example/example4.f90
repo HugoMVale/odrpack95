@@ -8,7 +8,7 @@ program example4
 !!   Curious users are encouraged to remove the bounds in the call statement,
 !! run the code, and compare the results to the current call statement.
    use odrpack_kinds, only: wp
-   use odrpack
+   use odrpack, only: odr
    implicit none
 
    real(kind=wp) :: beta(3) = [1.1E-0_wp, 3.3E+0_wp, 8.7_wp]

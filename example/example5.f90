@@ -1,7 +1,7 @@
 program example5
 !! Explicit ODR job, with parameter bounds, user-supplied derivatives, and output of work
 !! arrays.
-   use odrpack
+   use odrpack, only: odr
    use odrpack_kinds, only: wp
    implicit none
 

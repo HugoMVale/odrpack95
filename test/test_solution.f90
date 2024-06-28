@@ -85,7 +85,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 !***End Prologue  DODRX
 
 !...Used modules
-   use odrpack
+   use odrpack, only: odr
    use odrpack_kinds, only: wp
    implicit none
 
@@ -361,7 +361,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 !       WSSEPS:  The sum of the squared weighted errors in Y.
 !       X:       The explanatory variable.
 !       Y:       The response variable.
-!       zero:    The value 0.0E0_wp.
+!       ZERO:    The value 0.0E0_wp.
 
 !***First executable statement  DODRX
 
@@ -2214,8 +2214,6 @@ subroutine dodrxd &
    do k = 1, np
       beta(k) = bdata(k, setno)
    end do
-
-   return
 
 end
 

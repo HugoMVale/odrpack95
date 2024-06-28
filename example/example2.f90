@@ -1,6 +1,6 @@
 program example2
 !! Implicit ODR job.
-   use odrpack
+   use odrpack, only: odr
    use odrpack_kinds, only: wp
    implicit none
 

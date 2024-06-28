@@ -1,6 +1,6 @@
 program example1
 !! Explicit ODR job, with user-supplied analytic derivatives and nondefault ifixx.
-   use odrpack
+   use odrpack, only: odr
    use odrpack_kinds, only: wp
    implicit none
 

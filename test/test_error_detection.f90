@@ -9,7 +9,7 @@ program tester
 
 !...USED MODULES
    use odrpack_kinds, only: wp
-   use odrpack
+   use odrpack, only: odr
    implicit none
 
 !...LOCAL SCALARS
@@ -177,7 +177,7 @@ subroutine fcn &
 !***END PROLOGUE  FCN
 
 !...USED MODULES
-   use odrpack_kinds, only: wp, ZERO
+   use odrpack_kinds, only: wp, zero
    implicit none
 
 !...SCALAR ARGUMENTS
@@ -201,8 +201,8 @@ subroutine fcn &
 !  Do something with FJACD, FJACB, IFIXB and IFIXX to avoid warnings that they
 !  are not being used.  This is simply not to worry users that the example
 !  program is failing.
-   if (ifixb(1) .gt. 0 .and. ifixx(1, 1) .gt. 0 .and. fjacb(1, 1, 1) .gt. ZERO &
-       .and. fjacd(1, 1, 1) .gt. ZERO) then
+   if (ifixb(1) .gt. 0 .and. ifixx(1, 1) .gt. 0 .and. fjacb(1, 1, 1) .gt. zero &
+       .and. fjacd(1, 1, 1) .gt. zero) then
       ! Do nothing.
    end if
 
