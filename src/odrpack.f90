@@ -139,7 +139,7 @@ contains
          !! Dependent variable. `Shape: (n, nq)`. Unused when the model is implicit.
       real(kind=wp), intent(in) :: x(:, :)
          !! Explanatory variable. `Shape: (n, m)`.
-      real(kind=wp), intent(inout), allocatable, optional :: delta(:, :)
+      real(kind=wp), intent(inout), optional :: delta(:, :)
          !! Initial error in the `x` data. `Shape: (n, m)`.
       real(kind=wp), intent(in), optional :: we(:, :, :)
          !! `epsilon` weights. `Shape: (1<=ldwe<=n, 1<=ld2we<=nq, nq)`. See p. 25.
@@ -294,9 +294,9 @@ contains
             if (.not. present(delta)) then
                linfo5 = 7
                linfo4 = 1
-            elseif (.not. allocated(delta)) then
-               linfo5 = 7
-               linfo4 = 1
+            ! elseif (.not. allocated(delta)) then
+            !    linfo5 = 7
+            !    linfo4 = 1
             end if
          end if
          if (job .ge. 10000) then
@@ -353,13 +353,13 @@ contains
       ! Allocate the work arrays
       allocate (lwork(lenwork), tempret(max(n, np), max(nq, m)), stat=linfo3)
       allocate (liwork(leniwork), stat=linfo2)
-      lwork = ZERO
+      lwork = zero
       liwork = 0
-      if (present(delta)) then
-         if (.not. allocated(delta)) then
-            allocate (delta(n, m), stat=linfo4)
-         end if
-      end if
+      ! if (present(delta)) then
+      !    if (.not. allocated(delta)) then
+      !       allocate (delta(n, m), stat=linfo4)
+      !    end if
+      ! end if
       if (linfo4 .ne. 0 .or. linfo3 .ne. 0 .or. linfo2 .ne. 0) then
          linfo5 = 8
       end if
@@ -596,12 +596,12 @@ contains
       end if
 
       if (present(delta)) then
-         if (allocated(delta)) then
+         !if (allocated(delta)) then
             if (any(shape(delta) .lt. (/n, m/))) then
                linfo1 = linfo1 + 8
             end if
             lwork(1:n*m) = reshape(delta(1:n, 1:m), (/n*m/))
-         end if
+         !end if
       end if
 
       if (present(lower)) then
@@ -675,9 +675,9 @@ contains
       end if
 
       if (present(delta)) then
-         if (allocated(delta)) then
+         !if (allocated(delta)) then
             delta(1:n, 1:m) = reshape(lwork(1:n*m), (/n, m/))
-         end if
+         !end if
       end if
 
       if (present(info)) then
