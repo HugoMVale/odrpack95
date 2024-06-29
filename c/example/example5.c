@@ -73,28 +73,38 @@ int main()
     int lunrpt = -1;
     int info = 0;
 
-    // int ifixb[NP] = {1, 1};
-    // int ndigit = -1;
-    // double taufac = -1.0;
-    // double sstol = -1.0;
-    // double partol = -1.0;
-    // int maxint = -1;
-    // double *stpb = NULL;
-    // double *sclb = NULL;
+    // odr_short_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x,
+    //             (double *)we, &ldwe, &ld2we,
+    //             (double *)wd, &ldwd, &ld2wd,
+    //             lower, upper,
+    //             &job, &iprint, &lunerr, &lunrpt,
+    //             &info);
 
-    odr_short_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x,
-                (double *)we, &ldwe, &ld2we,
-                (double *)wd, &ldwd, &ld2wd,
-                lower, upper,
-                &job, &iprint, &lunerr, &lunrpt,
-                &info);
+    int ifixb[NP] = {1, 1};
+    int ifixx[M][1] = {-1};
+    int ldifx = 1;
+    double stpb[NP] = {-1.0, -1.0};
+    double stpd[M][1] = {-1.0};
+    int ldstpd = 1;
+    double sclb[NP] = {-1.0, -1.0};
+    double scld[M][1] = {-1.0};
+    int ldscld = 1;
+    int ndigit = -1;
+    double taufac = -1.0;
+    double sstol = -1.0;
+    double partol = -1.0;
+    int maxit = -1;
 
-    // odr_basic_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x,
-    //             ifixb,
-    //             &job, &ndigit, &taufac, &sstol, &partol, &maxint, &iprint, &lunerr, &lunrpt,
-    //             stpb, sclb,
-    //             &info,
-    //             lower, upper);
+    odr_long_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x,
+               (double *)we, &ldwe, &ld2we,
+               (double *)wd, &ldwd, &ld2wd,
+               ifixb, (int *)ifixx, &ldifx,
+               stpb, (double *)stpd, &ldstpd,
+               sclb, (double *)scld, &ldscld,
+               lower, upper,
+               &job, &ndigit, &taufac, &sstol, &partol,
+               &maxit, &iprint, &lunerr, &lunrpt,
+               &info);
 
     return 0;
 }
