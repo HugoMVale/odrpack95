@@ -80,6 +80,7 @@ int main()
     //             &job, &iprint, &lunerr, &lunrpt,
     //             &info);
 
+    double delta[M][N] = {{0.1, 0.1, 0.1, 0.1}};
     int ifixb[NP] = {1, 1};
     int ifixx[M][1] = {-1};
     int ldifx = 1;
@@ -94,6 +95,7 @@ int main()
     double sstol = -1.0;
     double partol = -1.0;
     int maxit = -1;
+    job = 1020;
 
     odr_long_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x,
                (double *)we, &ldwe, &ld2we,
@@ -102,6 +104,7 @@ int main()
                stpb, (double *)stpd, &ldstpd,
                sclb, (double *)scld, &ldscld,
                lower, upper,
+               (double *)delta,
                &job, &ndigit, &taufac, &sstol, &partol,
                &maxit, &iprint, &lunerr, &lunrpt,
                &info);

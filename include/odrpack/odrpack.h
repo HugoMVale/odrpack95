@@ -181,9 +181,7 @@ ODRPACK_EXTERN void odr_short_c(
  * @param ldscld `==>` Leading dimension of array `scld`, `ldscld ∈ {1, n}`.
  * @param lower  `==>` Optional array [np] with lower bound on `beta`.
  * @param upper  `==>` Optional array [np] with upper bound on `beta`.
-
  * @param delta  `<=>` Optional array [m][n] with initial error in the `x` data.
-
  * @param job    `==>` Optional variable controlling initialization and computational method.
  * @param ndigit `==>` Optional number of accurate digits in the function results, as supplied by the user.
  * @param taufac `==>` Optional factor used to compute the initial trust region diameter.
@@ -221,7 +219,7 @@ ODRPACK_EXTERN void odr_long_c(
     const int *ldscld,
     const double *lower,
     const double *upper,
-    // const double *delta,
+    const double *delta,
     const int *job,
     const int *ndigit,
     const double *taufac,
