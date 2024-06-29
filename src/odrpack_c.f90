@@ -139,7 +139,7 @@ contains
       stpb, stpd, ldstpd, &
       sclb, scld, ldscld, &
       lower, upper, &
-      ! delta, &
+      delta, &
       job, ndigit, taufac, &
       sstol, partol, maxit, &
       iprint, lunerr, lunrpt, &
@@ -195,7 +195,7 @@ contains
          !! Lower bound on `beta`.
       real(kind=wp), intent(in), optional :: upper(np)
          !! Upper bound on `beta`.
-      !real(c_double), intent(inout), optional :: delta(n, m)
+      real(c_double), intent(inout), optional :: delta(n, m)
          !! Initial error in the `x` data.
       integer(c_int), intent(in), optional :: job
          !! Variable controlling initialization and computational method.
@@ -219,7 +219,7 @@ contains
          !! Variable designating why the computations were stopped.
 
       call odr(fcn, n, m, np, nq, beta, y, x, &
-               !delta=delta, &
+               delta=delta, &
                we=we, wd=wd, &
                lower=lower, upper=upper, &
                ifixb=ifixb, &
