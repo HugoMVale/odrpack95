@@ -5199,7 +5199,7 @@ subroutine doddrv                                                             &
 !***Refer to  ODR
 !***Routines Called  FCN,DCOPY,DDOT,DETAF,DFCTRW,DFLAGS,
 !       DINIWK,DIWINF,DJCK,DNRM2,DODCHK,DODMN,
-!       DODPER,DPACK,DSETN,DUNPAC,DWGHT,DWINF,DXMY
+!       DODPER,DPACK,DSETN,DUNPAC,DWGHT,DWINF
 !       DERSTEP
 !***Date Written   860529   (YYMMDD)
 !***Revision Date  920619   (YYMMDD)
@@ -5209,7 +5209,7 @@ subroutine doddrv                                                             &
 !***End Prologue  DODDRV
 !
 !...Used modules
-        use odrpack_kinds,only: wp
+        use odrpack_kinds, only: wp, zero, one
         use odrpack,only: tempret
 !
 !...Scalar arguments
@@ -5233,44 +5233,35 @@ subroutine doddrv                                                             &
 !...Subroutine arguments
         external                                                              &
          fcn
-!
+
 !...Local scalars
-        real(kind = wp)                                                       &
-         epsmac, eta, p5, one, ten, zero
-        integer                                                               &
-         actrsi, alphai, betaci, betani, betasi, beta0i, boundi, deltai,      &
-         deltni, deltsi, diffi, epsmai, etai, fi, fjacbi, fjacdi, fni, fsi, i &
-         , idfi, int2i, iprini, iranki, istop, istopi, jobi, jpvti, k, ldtt,  &
-         ldtti, liwkmn, loweri, luneri, lunrpi, lwkmn, lwrk, maxiti, msgb,    &
-         msgd, neta, netai, nfev, nfevi, niteri, njev, njevi, nnzw, nnzwi,    &
-         npp, nppi, nrow, nrowi, ntol, ntoli, olmavi, omegai, partli, pnormi, &
-         prersi, qrauxi, rcondi, rnorsi, rvari, sdi, si, ssfi, ssi, sstoli,   &
-         taufci, taui, ti, tti, ui, upperi, vcvi, we1i, wrk1i, wrk2i, wrk3i,  &
-         wrk4i, wrk5i, wrk6i, wrk7i, wrk, wssi, wssdei, wssepi, xplusi
-        logical                                                               &
-         anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
-!
+        real(kind = wp) :: epsmac, eta, p5, ten
+        integer :: actrsi, alphai, betaci, betani, betasi, beta0i, boundi, deltai,  &
+                   deltni, deltsi, diffi, epsmai, etai, fi, fjacbi, fjacdi, fni, fsi, i, &
+                   idfi, int2i, iprini, iranki, istop, istopi, jobi, jpvti, k, ldtt,  &
+                   ldtti, liwkmn, loweri, luneri, lunrpi, lwkmn, lwrk, maxiti, msgb,    &
+                   msgd, neta, netai, nfev, nfevi, niteri, njev, njevi, nnzw, nnzwi,    &
+                   npp, nppi, nrow, nrowi, ntol, ntoli, olmavi, omegai, partli, pnormi, &
+                   prersi, qrauxi, rcondi, rnorsi, rvari, sdi, si, ssfi, ssi, sstoli,   &
+                   taufci, taui, ti, tti, ui, upperi, vcvi, we1i, wrk1i, wrk2i, wrk3i,  &
+                   wrk4i, wrk5i, wrk6i, wrk7i, wrk, wssi, wssdei, wssepi, xplusi
+        logical :: anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
+
 !...Local arrays
-        real(kind = wp)                                                       &
-         betaj( np)
-        integer                                                               &
-         interval( np)
-!
+        real(kind = wp) :: betaj( np)
+        integer :: interval( np)
+
 !...External functions
-        real(kind = wp)                                                       &
-         ddot, dnrm2, derstep
-        external                                                              &
-         ddot, dnrm2, derstep
-!
+        real(kind = wp), external :: ddot, dnrm2, derstep
+
 !...External subroutines
-        external                                                              &
-         dcopy, detaf, dfctrw, dflags, diniwk, diwinf, djck, dodchk,          &
-         dodmn, dodper, dpack, dsetn, dunpac, dwinf, dxmy
+        external :: dcopy, detaf, dfctrw, dflags, diniwk, diwinf, djck, dodchk, &
+                    dodmn, dodper, dpack, dsetn, dunpac, dwinf
 !
 !...Data statements
         data                                                                  &
-         zero, p5, one, ten                                                   &
-         /0.0E0_wp,0.5E0_wp,1.0E0_wp,10.0E0_wp/
+         p5, ten                                                              &
+         /0.5E0_wp,10.0E0_wp/
 !
 !...Interface blocks
         interface
@@ -5283,7 +5274,7 @@ subroutine doddrv                                                             &
             t(:,:), wt(:,:,:), wtt(:,:)
            end subroutine
         end interface
-!
+
 !...Routine names used as subprogram arguments
 !       FCN:     THE USER SUPPLIED SUBROUTINE FOR EVALUATING THE MODEL.
 !
@@ -5542,7 +5533,8 @@ subroutine doddrv                                                             &
            if ( implct) then
               call dcopy( n* nq, work( fni),1, work( fi),1)
            else
-              call dxmy( n, nq, work( fni), n, y, ldy, work( fi), n)
+              !call dxmy( n, nq, work( fni), n, y, ldy, work( fi), n)
+              work(fi:fi+(n*nq-1)) = work(fni:fni+(n*nq-1)) - reshape(y(1:n,:), shape=[n*nq]) 
            endif
            call dwght( n, nq,                                                 &
             reshape( work( we1i: we1i+ ldwe* ld2we* nq-1),(/ ldwe, ld2we, nq  &
@@ -5626,7 +5618,7 @@ subroutine doddrv                                                             &
            istop = 0
            call fcn( n, m, np, nq,                                            &
             n, m, np,                                                         &
-            beta, work(xplusi),                                              &
+            beta, work(xplusi),                                               &
             ifixb, ifixx, ldifx,                                              &
             002, work( fni), work( wrk6i), work( wrk1i),                      &
             istop)
@@ -5636,7 +5628,8 @@ subroutine doddrv                                                             &
               if ( implct) then
                  call dcopy( n* nq, work( fni),1, work( fi),1)
               else
-                 call dxmy( n, nq, work( fni), n, y, ldy, work( fi), n)
+                 !call dxmy( n, nq, work( fni), n, y, ldy, work( fi), n)
+                 work(fi:fi+(n*nq-1)) = work(fni:fni+(n*nq-1)) - reshape(y(1:n,:), shape=[n*nq]) 
               endif
               call dwght( n, nq,                                              &
                reshape( work( we1i: we1i+ ldwe* ld2we* nq-1),                 &
@@ -6164,7 +6157,7 @@ subroutine dodmn                                                              &
 !***Begin Prologue  DODMN
 !***Refer to  ODR
 !***Routines Called  FCN,DACCES,DCOPY,DDOT,DEVJAC,DFLAGS,DNRM2,DODLM,
-!       DODPCR,DODVCV,DUNPAC,DWGHT,DXMY
+!       DODPCR,DODVCV,DUNPAC,DWGHT
 !***Date Written   860529   (YYMMDD)
 !***Revision Date  920619   (YYMMDD)
 !***Purpose  Iteratively compute least squares solution
@@ -6225,7 +6218,7 @@ subroutine dodmn                                                              &
         real(kind = wp), external :: ddot, dnrm2
 
 !...External subroutines
-        external :: dacces, dcopy, devjac, dflags, dodlm, dodpcr, dodvcv, dunpac, dxmy
+        external :: dacces, dcopy, devjac, dflags, dodlm, dodpcr, dodvcv, dunpac
 
 !...Data statements
         data                                                                  &
@@ -6690,7 +6683,8 @@ subroutine dodmn                                                              &
            if ( implct) then
               call dcopy( n* nq, fn,1, wrk,1)
            else
-              call dxmy( n, nq, fn, n, y, ldy, wrk, n)
+              !call dxmy( n, nq, fn, n, y, ldy, wrk, n)
+              wrk(1:n*nq) = reshape(fn - y(1:n,:), [n*nq])
            endif
            call dwght( n, nq, we1, ldwe, ld2we,reshape( wrk,(/ n, nq/)),      &
             tempret(1: n,1: nq))
@@ -6795,7 +6789,8 @@ subroutine dodmn                                                              &
            if ( implct) then
               call dcopy( n* nq, fs,1, f,1)
            else
-              call dxmy( n, nq, fs, n, y, ldy, f, n)
+              !call dxmy( n, nq, fs, n, y, ldy, f, n)
+              f = fs - y(1:n,:)
            endif
            call dwght( n, nq, we1, ldwe, ld2we, f, tempret(1: n,1: nq))
            f(1: n,1: nq) = tempret(1: n,1: nq)
@@ -6909,7 +6904,8 @@ subroutine dodmn                                                              &
         if ( implct) then
            call dcopy( n* nq, fs,1, f,1)
         else
-           call dxmy( n, nq, fs, n, y, ldy, f, n)
+           !call dxmy( n, nq, fs, n, y, ldy, f, n)
+           f = fs - y(1:n,:)
         endif
         call dunpac( np, betac, beta, ifixb)
         xplusd = x(1:n, :) + delta
@@ -12150,54 +12146,5 @@ subroutine dwinf                                                              &
            upperi = 1
            lwkmn = 1
         endif
-
-end subroutine
-
-subroutine dxmy                                                               &
-         ( n, m, x, ldx, y, ldy, xmy, ldxmy)
-!***Begin Prologue  DXMY
-!***Refer to  ODR
-!***Routines Called  (NONE)
-!***Date Written   860529   (YYMMDD)
-!***Revision Date  920304   (YYMMDD)
-!***Purpose  Compute XMY = X - Y
-!***End Prologue  DXMY
-!
-!...Used modules
-        use odrpack_kinds,only: wp
-!
-!...Scalar arguments
-        integer                                                               &
-         ldx, ldxmy, ldy, m, n
-!
-!...Array arguments
-        real(kind = wp)                                                       &
-         x( ldx, m), xmy( ldxmy, m), y( ldy, m)
-!
-!...Local scalars
-        integer                                                               &
-         i, j
-!
-!...Variable Definitions (alphabetically)
-!       I:       An indexing variable.
-!       J:       An indexing variable.
-!       LDX:     The leading dimension of array X.
-!       LDXMY:   The leading dimension of array XMY.
-!       LDY:     The leading dimension of array Y.
-!       M:       The number of columns of data in arrays X and Y.
-!       N:       The number of rows of data in arrays X and Y.
-!       X:       The first of the two arrays.
-!       XMY:     The values of X-Y.
-!       Y:       The second of the two arrays.
-!
-!
-!***First executable statement  DXMY
-!
-!
-        do 20 j = 1, m
-           do 10 i = 1, n
-              xmy( i, j) = x( i, j)- y( i, j)
-10         continue
-20      continue
 
 end subroutine
