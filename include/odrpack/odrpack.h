@@ -75,7 +75,7 @@ typedef void (*odrpack_fcn)(
     int *istop);
 
 /**
- * @brief Basic wrapper for the ODR routine including mandatory arguments and very few
+ * @brief "Basic" wrapper for the ODR routine including mandatory arguments and very few
  * optional arguments.
  *
  * @param fcn    `==>` User-supplied subroutine for evaluating the model.
@@ -104,8 +104,8 @@ ODRPACK_EXTERN void odr_basic_c(
     const int *job);
 
 /**
- * @brief Wrapper for the ODR routine including mandatory arguments and most commonly used
- * optional arguments. Similar to the short-call statement of the original ODRPACK `DODR`.
+ * @brief "Short" wrapper for the ODR routine including mandatory arguments and most commonly
+ * used optional arguments. Similar to the short-call statement of the original ODRPACK `DODR`.
  *
  * @param fcn    `==>` User-supplied subroutine for evaluating the model.
  * @param n      `==>` Number of observations.
@@ -153,8 +153,8 @@ ODRPACK_EXTERN void odr_short_c(
     int *info);
 
 /**
- * @brief Wrapper for the ODR routine including mandatory arguments and most commonly used
- * optional arguments. Similar to the short-call statement of the original ODRPACK `DODR`.
+ * @brief "Long" wrapper for the ODR routine including mandatory arguments and most commonly
+ * used optional arguments. Similar to the long-call statement of the original ODRPACK `DODC`.
  *
  * @param fcn    `==>` User-supplied subroutine for evaluating the model.
  * @param n      `==>` Number of observations.
@@ -230,6 +230,7 @@ ODRPACK_EXTERN void odr_long_c(
     const int *lunerr,
     const int *lunrpt,
     int *info);
+
 /**
  * @brief Set storage locations within real work space.
  *
@@ -239,7 +240,7 @@ ODRPACK_EXTERN void odr_long_c(
  * @param nq     `==>` Number of responses per observation.
  * @param ldwe   `==>` Leading dimension of array `we`.
  * @param ld2we  `==>` Second dimension of array `we`.
- * @param isodr  `<==` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
+ * @param isodr  `==>` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
  * @param deltai `<==` Starting location in array `work` of array `delta`.
  * @param epsi   `<==` Starting location in array `work` of array `eps`.
  * @param xplusi `<==` Starting location in array `work` of array `xplusd`.
@@ -300,7 +301,7 @@ ODRPACK_EXTERN void dwinf_c(
     const int *nq,
     const int *ldwe,
     const int *ld2we,
-    int *isodr,
+    const int *isodr,
     int *deltai,
     int *epsi,
     int *xplusi,
