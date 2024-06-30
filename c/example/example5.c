@@ -52,7 +52,7 @@ int main()
 #define M 1
 #define NQ 1
 
-    int n = NP, m = M, np = NP, nq = NQ;
+    int n = N, m = M, np = NP, nq = NQ;
     int job = 20;
     double beta[NP] = {2.0, 0.5};
     double lower[NP] = {0.0, 0.0};
@@ -62,13 +62,14 @@ int main()
 
     // odr_basic_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x, lower, upper, &job);
 
+    // extra arguments for use with odr_short_c and odr_long_c
     int ldwe = 1;
     int ld2we = 1;
     int ldwd = 1;
     int ld2wd = 1;
     double we[NQ][1][1] = {-1.0};
     double wd[M][1][1] = {-1.0};
-    int iprint = 1001;
+    int iprint = 2002;
     int lunerr = -1;
     int lunrpt = -1;
     int info = 0;
@@ -80,6 +81,7 @@ int main()
     //             &job, &iprint, &lunerr, &lunrpt,
     //             &info);
 
+    // extra arguments for use with odr_long_c
     double delta[M][N] = {{0.1, 0.1, 0.1, 0.1}};
     int ifixb[NP] = {1, 1};
     int ifixx[M][1] = {-1};
@@ -108,6 +110,15 @@ int main()
                &job, &ndigit, &taufac, &sstol, &partol,
                &maxit, &iprint, &lunerr, &lunrpt,
                &info);
+
+    for (int i = 0; i < M; i++)
+    {
+        for (int j = 0; j < N; j++)
+        {
+            printf("%lf ", delta[i][j]);
+        }
+        printf("\n");
+    }
 
     return 0;
 }
