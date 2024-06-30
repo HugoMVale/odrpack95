@@ -11910,7 +11910,7 @@ subroutine dwght                                                              &
 !
         return
 end subroutine
-!DWINF
+
 subroutine dwinf                                                              &
          ( n, m, np, nq, ldwe, ld2we, isodr,                                  &
          deltai, epsi, xplusi, fni, sdi, vcvi,                                &
@@ -11930,7 +11930,7 @@ subroutine dwinf                                                              &
 !***Revision Date  920619   (YYMMDD)
 !***Purpose  Set storage locations within REAL (KIND=wp) work space
 !***End Prologue  DWINF
-!
+
 !...Scalar arguments
         integer                                                               &
          actrsi, alphai, betaci, betani, betasi, beta0i, deltai, deltni,      &
@@ -11941,14 +11941,14 @@ subroutine dwinf                                                              &
          wrk4i, wrk5i, wrk6i, wrk7i, wssi, wssdei, wssepi, xplusi
         logical                                                               &
          isodr
-!
+
 !...Local scalars
         integer                                                               &
          next
 !------------^-----------------------------------------------------------------
 !!! FPT - 1273 Fortran auxiliary keyword used as identifier name.
 !------------------------------------------------------------------------------
-!
+
 !...Variable Definitions (alphabetically)
 !       ACTRSI:  The location in array WORK of variable ACTRS.
 !       ALPHAI:  The location in array WORK of variable ALPHA.
@@ -12012,11 +12012,10 @@ subroutine dwinf                                                              &
 !
 !
 !***First executable statement  DWINF
-!
-!
+
         if ( n .ge. 1 .and. m .ge. 1 .and. np .ge. 1 .and. nq .ge. 1 .and.    &
          ldwe .ge. 1 .and. ld2we .ge. 1) then
-!
+
            deltai = 1
            epsi = deltai+ n* m
            xplusi = epsi+ n* nq
@@ -12024,14 +12023,14 @@ subroutine dwinf                                                              &
            sdi = fni+ n* nq
            vcvi = sdi+ np
            rvari = vcvi+ np* np
-!
+
            wssi = rvari+1
            wssdei = wssi+1
            wssepi = wssdei+1
            rcondi = wssepi+1
            etai = rcondi+1
            olmavi = etai+1
-!
+
            taui = olmavi+1
            alphai = taui+1
            actrsi = alphai+1
@@ -12043,7 +12042,7 @@ subroutine dwinf                                                              &
            taufci = sstoli+1
            epsmai = taufci+1
            beta0i = epsmai+1
-!
+
            betaci = beta0i+ np
            betasi = betaci+ np
            betani = betasi+ np
@@ -12053,15 +12052,15 @@ subroutine dwinf                                                              &
            qrauxi = ssfi+ np
            ui = qrauxi+ np
            fsi = ui+ np
-!
+
            fjacbi = fsi+ n* nq
-!
+
            we1i = fjacbi+ n* np* nq
-!
+
            diffi = we1i+ ldwe* ld2we* nq
-!
+
            next = diffi+ nq*( np+ m)
-!
+
            if ( isodr) then
               deltsi = next
               deltni = deltsi+ n* m
@@ -12080,7 +12079,7 @@ subroutine dwinf                                                              &
               fjacdi = deltai
               wrk1i = deltai
            endif
-!
+
            wrk2i = next
            wrk3i = wrk2i+ n* nq
            wrk4i = wrk3i+ np
@@ -12090,7 +12089,7 @@ subroutine dwinf                                                              &
            loweri = wrk7i+5* nq
            upperi = loweri+ np
            next = upperi+ np
-!
+
            lwkmn = next
         else
            deltai = 1
