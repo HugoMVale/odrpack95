@@ -5,6 +5,7 @@ This is a translation of example 5 from the ODRPACK95 documentation.
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 #include "../../include/odrpack/odrpack.h"
 
 // User-supplied function for evaluating the model and its partial derivatives
@@ -70,9 +71,13 @@ int main()
     double we[NQ][1][1] = {-1.0};
     double wd[M][1][1] = {-1.0};
     int iprint = 2002;
-    int lunerr = -1;
-    int lunrpt = -1;
+    int lunerr = 8;
+    int lunrpt = 8;
     int info = 0;
+    char *fn = "report5.txt";
+    int ierr = 0;
+
+    open_file(&lunrpt, fn, &ierr);
 
     // odr_short_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x,
     //             (double *)we, &ldwe, &ld2we,
@@ -111,14 +116,16 @@ int main()
                &maxit, &iprint, &lunerr, &lunrpt,
                &info);
 
-    for (int i = 0; i < M; i++)
-    {
-        for (int j = 0; j < N; j++)
-        {
-            printf("%lf ", delta[i][j]);
-        }
-        printf("\n");
-    }
+    close_file(&lunrpt, &ierr);
+
+    // for (int i = 0; i < M; i++)
+    // {
+    //     for (int j = 0; j < N; j++)
+    //     {
+    //         printf("%lf ", delta[i][j]);
+    //     }
+    //     printf("\n");
+    // }
 
     return 0;
 }

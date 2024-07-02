@@ -10,22 +10,20 @@
 /**
  * @brief Open a new file associated with a specified logical unit number.
  *
- * @param lun    Logical unit number.
- * @param fn     String containing the file name.
- * @param fnlen  Length of the string containing the file name.
- * @param ierr   Error code.
+ * @param lun      `<=>` Logical unit number.
+ * @param filename `==>` String containing the file name.
+ * @param ierr     `<==` Error code.
  */
 ODRPACK_EXTERN void open_file(
     int *lun,
-    const char *fn,
-    const int *fnlen,
+    const char *filename,
     int *ierr);
 
 /**
  * @brief Close a file associated with a specified logical unit number.
  *
- * @param lun    Logical unit number.
- * @param ierr   Error code.
+ * @param lun    `==>` Logical unit number.
+ * @param ierr   `==>` Error code.
  */
 ODRPACK_EXTERN void close_file(
     const int *lun,

@@ -1,5 +1,5 @@
 module odrpack_c
-   use, intrinsic :: iso_c_binding, only: c_int, c_double, c_char
+   use, intrinsic :: iso_c_binding, only: c_int, c_double, c_char, c_ptr, c_f_pointer
    use odrpack, only: odr
    use odrpack_kinds, only: wp
    implicit none
@@ -30,6 +30,13 @@ module odrpack_c
          real(c_double), intent(out) :: fjacd(ldn, ldm, nq)
          integer(c_int), intent(out) :: istop
       end subroutine
+   end interface
+
+   interface
+      integer(c_int) function strlen(string) bind(C)
+         import :: c_int, c_ptr
+         type(c_ptr), intent(in), value :: string
+      end function
    end interface
 
 contains
@@ -235,29 +242,33 @@ contains
 
    end subroutine odr_long_c
 
-   subroutine open_file(lun, fn, fnlen, ierr) bind(C)
+   subroutine open_file(lun, filename_cptr, ierr) bind(C)
    !! Open a new file associated with a specified logical unit number.
       integer(c_int), intent(inout) :: lun
          !! Logical unit number. If `lun>0`, the user-supplied logical unit number is used.
          !! Otherwise, a new logical unit number is assigned.
-      integer(c_int), intent(in) :: fnlen
-         !! Length of the string containing the file name, i.e. `strlen(fn)`.
-      character(kind=c_char), intent(in) :: fn(fnlen)
+      type(c_ptr), intent(in), value :: filename_cptr
          !! String containing the file name.
       integer(c_int), intent(out) :: ierr
          !! Error code returned by `iostat`.
 
-      character(len=fnlen) :: fn_
-      integer :: i
+      character(kind=c_char), pointer :: filename_fptr(:)
+      character(len=:), allocatable :: filename
+      integer :: length, i
 
-      do i = 1, fnlen
-         fn_(i:i) = fn(i)
+      length = strlen(filename_cptr)
+      allocate(filename_fptr(length))
+      call c_f_pointer(cptr=filename_cptr, fptr=filename_fptr, shape=[length])
+
+      allocate(character(len=length) :: filename)
+      do i = 1, length
+         filename(i:i) = filename_fptr(i)
       end do
 
       if (lun > 0) then
-         open (file=fn_, unit=lun, status='new', iostat=ierr)
+         open (file=filename, unit=lun, status='replace', iostat=ierr)
       else
-         open (file=fn_, newunit=lun, status='new', iostat=ierr)
+         open (file=filename, newunit=lun, status='replace', iostat=ierr)
       end if
 
    end subroutine open_file
