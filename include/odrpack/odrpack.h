@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 #ifndef ODRPACK_H
 #define ODRPACK_H
 
@@ -230,67 +232,75 @@ ODRPACK_EXTERN void odr_long_c(
     int *info);
 
 /**
+ * @brief 0-based locations within real work array.
+ */
+typedef struct
+{
+    int delta; /**< Starting location of array `delta`. */
+    int eps;   /**< Starting location of array `eps`. */
+    int xplus; /**< Starting location of array `xplusd`. */
+    int fn;    /**< Starting location of array `fn`. */
+    int sd;    /**< Starting location of array `sd`. */
+    int vcv;   /**< Starting location of array `vcv`. */
+    int rvar;  /**< Location of variable `rvar`. */
+    int wss;   /**< Location of variable `wss`. */
+    int wssde; /**< Location of variable `wssdel`. */
+    int wssep; /**< Location of variable `wsep`. */
+    int rcond; /**< Location of variable `rcond`. */
+    int eta;   /**< Location of variable `eta`. */
+    int olmav; /**< Location of variable `olmavg`. */
+    int tau;   /**< Location of variable `tau`. */
+    int alpha; /**< Location of variable `alpha`. */
+    int actrs; /**< Location of variable `actrs`. */
+    int pnorm; /**< Location of variable `pnorm`. */
+    int rnors; /**< Location of variable `rnorms`. */
+    int prers; /**< Location of variable `prers`. */
+    int partl; /**< Location of variable `partol`. */
+    int sstol; /**< Location of variable `sstol`. */
+    int taufc; /**< Location of variable `taufac`. */
+    int epsma; /**< Location of variable `epsmac`. */
+    int beta0; /**< Starting location of array `beta0`. */
+    int betac; /**< Starting location of array `betac`. */
+    int betas; /**< Starting location of array `betas`. */
+    int betan; /**< Starting location of array `betan`. */
+    int s;     /**< Starting location of array `s`. */
+    int ss;    /**< Starting location of array `ss`. */
+    int ssf;   /**< Starting location of array `ssf`. */
+    int qraux; /**< Starting location of array `qraux`. */
+    int u;     /**< Starting location of array `u`. */
+    int fs;    /**< Starting location of array `fs`. */
+    int fjacb; /**< Starting location of array `fjacb`. */
+    int we1;   /**< Location of variable `we1`. */
+    int diff;  /**< Starting location of array `diff`. */
+    int delts; /**< Starting location of array `deltas`. */
+    int deltn; /**< Starting location of array `deltan`. */
+    int t;     /**< Starting location of array `t`. */
+    int tt;    /**< Starting location of array `tt`. */
+    int omega; /**< Starting location of array `omega`. */
+    int fjacd; /**< Starting location of array `fjacd`. */
+    int wrk1;  /**< Starting location of array `wrk1`. */
+    int wrk2;  /**< Starting location of array `wrk2`. */
+    int wrk3;  /**< Starting location of array `wrk3`. */
+    int wrk4;  /**< Starting location of array `wrk4`. */
+    int wrk5;  /**< Starting location of array `wrk5`. */
+    int wrk6;  /**< Starting location of array `wrk6`. */
+    int wrk7;  /**< Starting location of array `wrk7`. */
+    int lower; /**< Starting location of array `lower`. */
+    int upper; /**< Starting location of array `upper`. */
+    int lwkmn; /**< Minimum acceptable length of vector `work`. */
+} workidx_t;
+
+/**
  * @brief Set storage locations within real work space.
  *
- * @param n      `==>` Number of observations.
- * @param m      `==>` Number of columns of data in the explanatory variable.
- * @param np     `==>` Number of function parameters.
- * @param nq     `==>` Number of responses per observation.
- * @param ldwe   `==>` Leading dimension of array `we`.
- * @param ld2we  `==>` Second dimension of array `we`.
- * @param isodr  `==>` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
- * @param deltai `<==` Starting location in array `work` of array `delta`.
- * @param epsi   `<==` Starting location in array `work` of array `eps`.
- * @param xplusi `<==` Starting location in array `work` of array `xplusd`.
- * @param fni    `<==` Starting location in array `work` of array `fn`.
- * @param sdi    `<==` Starting location in array `work` of array `sd`.
- * @param vcvi   `<==` Starting location in array `work` of array `vcv`.
- * @param rvari  `<==` Location in array `work` of variable `rvar`.
- * @param wssi   `<==` Location in array `work` of variable `wss`.
- * @param wssdei `<==` Location in array `work` of variable `wssdel`.
- * @param wssepi `<==` Location in array `work` of variable `wsep`.
- * @param rcondi `<==` Location in array `work` of variable `rcond`.
- * @param etai   `<==` Location in array `work` of variable `eta`.
- * @param olmavi `<==` Location in array `work` of variable `olmavg`.
- * @param taui   `<==` Location in array `work` of variable `tau`.
- * @param alphai `<==` Location in array `work` of variable `alpha`.
- * @param actrsi `<==` Location in array `work` of variable `actrs`.
- * @param pnormi `<==` Location in array `work` of variable `pnorm`.
- * @param rnorsi `<==` Location in array `work` of variable `rnorms`.
- * @param prersi `<==` Location in array `work` of variable `prers`.
- * @param partli `<==` Location in array `work` of variable `partol`.
- * @param sstoli `<==` Location in array `work` of variable `sstol`.
- * @param taufci `<==` Location in array `work` of variable `taufac`.
- * @param epsmai `<==` Location in array `work` of variable `epsmac`.
- * @param beta0i `<==` Starting location in array `work` of array `beta0`.
- * @param betaci `<==` Starting location in array `work` of array `betac`.
- * @param betasi `<==` Starting location in array `work` of array `betas`.
- * @param betani `<==` Starting location in array `work` of array `betan`.
- * @param si     `<==` Starting location in array `work` of array `s`.
- * @param ssi    `<==` Starting location in array `work` of array `ss`.
- * @param ssfi   `<==` Starting location in array `work` of array `ssf`.
- * @param qrauxi `<==` Starting location in array `work` of array `qraux`.
- * @param ui     `<==` Starting location in array `work` of array `u`.
- * @param fsi    `<==` Starting location in array `work` of array `fs`.
- * @param fjacbi `<==` Starting location in array `work` of array `fjacb`.
- * @param we1i   `<==` Location in array `work` of variable `we1`.
- * @param diffi  `<==` Starting location in array `work` of array `diff`.
- * @param deltsi `<==` Starting location in array `work` of array `deltas`.
- * @param deltni `<==` Starting location in array `work` of array `deltan`.
- * @param ti     `<==` Starting location in array `work` of array `t`.
- * @param tti    `<==` Starting location in array `work` of array `tt`.
- * @param omegai `<==` Starting location in array `work` of array `omega`.
- * @param fjacdi `<==` Starting location in array `work` of array `fjacd`.
- * @param wrk1i  `<==` Starting location in array `work` of array `wrk1`.
- * @param wrk2i  `<==` Starting location in array `work` of array `wrk2`.
- * @param wrk3i  `<==` Starting location in array `work` of array `wrk3`.
- * @param wrk4i  `<==` Starting location in array `work` of array `wrk4`.
- * @param wrk5i  `<==` Starting location in array `work` of array `wrk5`.
- * @param wrk6i  `<==` Starting location in array `work` of array `wrk6`.
- * @param wrk7i  `<==` Starting location in array `work` of array `wrk7`.
- * @param loweri `<==` Starting location in array `work` of array `lower`.
- * @param upperi `<==` Starting location in array `work` of array `upper`.
- * @param lwkmn  `<==` Minimum acceptable length of vector `work`.
+ * @param n       `==>` Number of observations.
+ * @param m       `==>` Number of columns of data in the explanatory variable.
+ * @param np      `==>` Number of function parameters.
+ * @param nq      `==>` Number of responses per observation.
+ * @param ldwe    `==>` Leading dimension of array `we`.
+ * @param ld2we   `==>` Second dimension of array `we`.
+ * @param isodr   `==>` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
+ * @param workidx `<==` 0-based indexes of real work array.
  */
 ODRPACK_EXTERN void dwinf_c(
     const int *n,
@@ -299,58 +309,7 @@ ODRPACK_EXTERN void dwinf_c(
     const int *nq,
     const int *ldwe,
     const int *ld2we,
-    const int *isodr,
-    int *deltai,
-    int *epsi,
-    int *xplusi,
-    int *fni,
-    int *sdi,
-    int *vcvi,
-    int *rvari,
-    int *wssi,
-    int *wssdei,
-    int *wssepi,
-    int *rcondi,
-    int *etai,
-    int *olmavi,
-    int *taui,
-    int *alphai,
-    int *actrsi,
-    int *pnormi,
-    int *rnorsi,
-    int *prersi,
-    int *partli,
-    int *sstoli,
-    int *taufci,
-    int *epsmai,
-    int *beta0i,
-    int *betaci,
-    int *betasi,
-    int *betani,
-    int *si,
-    int *ssi,
-    int *ssfi,
-    int *qrauxi,
-    int *ui,
-    int *fsi,
-    int *fjacbi,
-    int *we1i,
-    int *diffi,
-    int *deltsi,
-    int *deltni,
-    int *ti,
-    int *tti,
-    int *omegai,
-    int *fjacdi,
-    int *wrk1i,
-    int *wrk2i,
-    int *wrk3i,
-    int *wrk4i,
-    int *wrk5i,
-    int *wrk6i,
-    int *wrk7i,
-    int *loweri,
-    int *upperi,
-    int *lwkmn);
+    const _Bool *isodr,
+    workidx_t *workidx);
 
 #endif // ODRPACK_H

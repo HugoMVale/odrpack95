@@ -1,11 +1,18 @@
 module odrpack_c
-   use, intrinsic :: iso_c_binding, only: c_int, c_double, c_char, c_ptr, c_f_pointer
+   use, intrinsic :: iso_c_binding, only: c_bool, c_char, c_double, c_f_pointer, c_int, c_ptr
    use odrpack, only: odr
    use odrpack_kinds, only: wp
    implicit none
    private
 
-   public :: odr_basic_c, odr_short_c, odr_long_c, dwinf_c, open_file, close_file
+   public :: odr_basic_c
+   public :: odr_short_c
+   public :: odr_long_c
+   public :: fcn_tc
+   public :: dwinf_c
+   public :: workidx_t
+   public :: open_file
+   public :: close_file
 
    abstract interface
       subroutine fcn_tc(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, ldifx, &
@@ -34,15 +41,72 @@ module odrpack_c
 
    interface
       integer(c_int) function strlen(string) bind(C)
+      !! Length of a C-string
          import :: c_int, c_ptr
          type(c_ptr), intent(in), value :: string
       end function
    end interface
 
+   type, bind(C) :: workidx_t
+   !! Work array indices
+      integer(c_int) :: delta
+      integer(c_int) :: eps
+      integer(c_int) :: xplus
+      integer(c_int) :: fn
+      integer(c_int) :: sd
+      integer(c_int) :: vcv
+      integer(c_int) :: rvar
+      integer(c_int) :: wss
+      integer(c_int) :: wssde
+      integer(c_int) :: wssep
+      integer(c_int) :: rcond
+      integer(c_int) :: eta
+      integer(c_int) :: olmav
+      integer(c_int) :: tau
+      integer(c_int) :: alpha
+      integer(c_int) :: actrs
+      integer(c_int) :: pnorm
+      integer(c_int) :: rnors
+      integer(c_int) :: prers
+      integer(c_int) :: partl
+      integer(c_int) :: sstol
+      integer(c_int) :: taufc
+      integer(c_int) :: epsma
+      integer(c_int) :: beta0
+      integer(c_int) :: betac
+      integer(c_int) :: betas
+      integer(c_int) :: betan
+      integer(c_int) :: s
+      integer(c_int) :: ss
+      integer(c_int) :: ssf
+      integer(c_int) :: qraux
+      integer(c_int) :: u
+      integer(c_int) :: fs
+      integer(c_int) :: fjacb
+      integer(c_int) :: we1
+      integer(c_int) :: diff
+      integer(c_int) :: delts
+      integer(c_int) :: deltn
+      integer(c_int) :: t
+      integer(c_int) :: tt
+      integer(c_int) :: omega
+      integer(c_int) :: fjacd
+      integer(c_int) :: wrk1
+      integer(c_int) :: wrk2
+      integer(c_int) :: wrk3
+      integer(c_int) :: wrk4
+      integer(c_int) :: wrk5
+      integer(c_int) :: wrk6
+      integer(c_int) :: wrk7
+      integer(c_int) :: lower
+      integer(c_int) :: upper
+      integer(c_int) :: lwkmn
+   end type
+
 contains
 
    subroutine odr_basic_c(fcn, n, m, np, nq, beta, y, x, lower, upper, job) bind(C)
-   !! Wrapper for the ODR routine including mandatory arguments and very few optional
+   !! "Basic" wrapper for the ODR routine including mandatory arguments and very few optional
    !! arguments.
       procedure(fcn_tc) :: fcn
          !! User-supplied subroutine for evaluating the model.
@@ -82,7 +146,7 @@ contains
       job, &
       iprint, lunerr, lunrpt, &
       info) bind(C)
-   !! Wrapper for the ODR routine including mandatory arguments and most commonly used 
+   !! "Short" wrapper for the ODR routine including mandatory arguments and most commonly used 
    !! optional arguments. Similar to the short-call statement of the original ODRPACK `DODR`. 
       procedure(fcn_tc) :: fcn
          !! User-supplied subroutine for evaluating the model.
@@ -151,7 +215,8 @@ contains
       sstol, partol, maxit, &
       iprint, lunerr, lunrpt, &
       info) bind(C)
-   !! Wrapper for the ODR routine including mandatory arguments and all optional arguments.
+   !! "Long" wrapper for the ODR routine including mandatory arguments and all optional
+   !! arguments.
       procedure(fcn_tc) :: fcn
          !! User-supplied subroutine for evaluating the model.
       integer(c_int), intent(in) :: n
@@ -284,18 +349,7 @@ contains
    
    end subroutine close_file
 
-   subroutine dwinf_c( &
-      n, m, np, nq, ldwe, ld2we, isodr, &
-      deltai, epsi, xplusi, fni, sdi, vcvi, &
-      rvari, wssi, wssdei, wssepi, rcondi, etai, &
-      olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
-      partli, sstoli, taufci, epsmai, &
-      beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
-      fsi, fjacbi, we1i, diffi, &
-      deltsi, deltni, ti, tti, omegai, fjacdi, &
-      wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
-      loweri, upperi, &
-      lwkmn) bind(C)
+   subroutine dwinf_c(n, m, np, nq, ldwe, ld2we, isodr, workidx) bind(C)
    !! Set storage locations within real work space
       integer(c_int), intent(in) :: n
          !! Number of observations.
@@ -309,114 +363,18 @@ contains
          !! Leading dimension of array `we`.
       integer(c_int), intent(in) :: ld2we
          !! Second dimension of array `we`.
-      integer(c_int), intent(out) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
-      integer(c_int), intent(out) :: deltai
-         !! Starting location in array `work` of array `delta.
-      integer(c_int), intent(out) :: epsi
-         !! Starting location in array `work` of array `eps`.
-      integer(c_int), intent(out) :: xplusi
-         !! Starting location in array `work` of array `xplusd`.
-      integer(c_int), intent(out) :: fni
-         !! Starting location in array `work` of array `fn`.
-      integer(c_int), intent(out) :: sdi
-         !! Starting location in array `work` of array `sd`.
-      integer(c_int), intent(out) :: vcvi
-         !! Starting location in array `work` of array `vcv`.
-      integer(c_int), intent(out) :: rvari
-         !! Location in array `work` of variable `rvar`.
-      integer(c_int), intent(out) :: wssi
-         !! Location in array `work` of variable `wss`.
-      integer(c_int), intent(out) :: wssdei
-         !! Location in array `work` of variable `wssdel`.
-      integer(c_int), intent(out) :: wssepi
-         !! Location in array `work` of variable `wsep`.
-      integer(c_int), intent(out) :: rcondi
-         !! Location in array `work` of variable `rcond`.
-      integer(c_int), intent(out) :: etai
-         !! Location in array `work` of variable `eta`.
-      integer(c_int), intent(out) :: olmavi
-         !! Location in array `work` of variable `olmavg`.
-      integer(c_int), intent(out) :: taui
-         !! Location in array `work` of variable `tau`.
-      integer(c_int), intent(out) :: alphai
-         !! Location in array `work` of variable `alpha`.
-      integer(c_int), intent(out) :: actrsi
-         !! Location in array `work` of variable `actrs`.
-      integer(c_int), intent(out) :: pnormi
-         !! Location in array `work` of variable `pnorm`.
-      integer(c_int), intent(out) :: rnorsi
-         !! Location in array `work` of variable `rnorms`.
-      integer(c_int), intent(out) :: prersi
-         !! Location in array `work` of variable `prers`.
-      integer(c_int), intent(out) :: partli
-         !! Location in array `work` of variable `partol`.
-      integer(c_int), intent(out) :: sstoli
-         !! Location in array `work` of variable `sstol`.
-      integer(c_int), intent(out) :: taufci
-         !! Location in array `work` of variable `taufac`.
-      integer(c_int), intent(out) :: epsmai
-         !! Location in array `work` of variable `epsmac`.
-      integer(c_int), intent(out) :: beta0i
-         !! Starting location in array `work` of array `beta0`.
-      integer(c_int), intent(out) :: betaci
-         !! Starting location in array `work` of array `betac`.
-      integer(c_int), intent(out) :: betasi
-         !! Starting location in array `work` of array `betas`.
-      integer(c_int), intent(out) :: betani
-         !! Starting location in array `work` of array `betan`.
-      integer(c_int), intent(out) :: si
-         !! Starting location in array `work` of array `s`.
-      integer(c_int), intent(out) :: ssi
-         !! Starting location in array `work` of array `ss`.
-      integer(c_int), intent(out) :: ssfi
-         !! Starting location in array `work` of array `ssf`.
-      integer(c_int), intent(out) :: qrauxi
-         !! Starting location in array `work` of array `qraux`.
-      integer(c_int), intent(out) :: ui
-         !! Starting location in array `work` of array `u`.
-      integer(c_int), intent(out) :: fsi
-         !! Starting location in array `work` of array `fs`.
-      integer(c_int), intent(out) :: fjacbi
-         !! Starting location in array `work` of array `fjacb`.
-      integer(c_int), intent(out) :: we1i
-         !! Location in array `work` of variable `we1`.
-      integer(c_int), intent(out) :: diffi
-         !! Starting location in array `work` of array `diff`.
-      integer(c_int), intent(out) :: deltsi
-         !! Starting location in array `work` of array `deltas`.
-      integer(c_int), intent(out) :: deltni
-         !! Starting location in array `work` of array `deltan`.
-      integer(c_int), intent(out) :: ti
-         !! Starting location in array `work` of array `t`.
-      integer(c_int), intent(out) :: tti
-         !! Starting location in array `work` of array `tt`.
-      integer(c_int), intent(out) :: omegai
-         !! Starting location in array `work` of array `omega`.
-      integer(c_int), intent(out) :: fjacdi
-         !! Starting location in array `work` of array `fjacd`.
-      integer(c_int), intent(out) :: wrk1i
-         !! Starting location in array `work` of array `wrk1`.
-      integer(c_int), intent(out) :: wrk2i
-         !! Starting location in array `work` of array `wrk2`.
-      integer(c_int), intent(out) :: wrk3i
-         !! Starting location in array `work` of array `wrk3`.
-      integer(c_int), intent(out) :: wrk4i
-         !! Starting location in array `work` of array `wrk4`.
-      integer(c_int), intent(out) :: wrk5i
-         !! Starting location in array `work` of array `wrk5`.
-      integer(c_int), intent(out) :: wrk6i
-         !! Starting location in array `work` of array `wrk6`.
-      integer(c_int), intent(out) :: wrk7i
-         !! Starting location in array `work` of array `wrk7`.
-      integer(c_int), intent(out) :: loweri
-         !! Starting location in array `work` of array `lower`.
-      integer(c_int), intent(out) :: upperi
-         !! Starting location in array `work` of array `upper`.
-      integer(c_int), intent(out) :: lwkmn
-         !! Minimum acceptable length of vector `work`.
+      logical(c_bool), intent(in) :: isodr
+         !!Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
+      type(workidx_t), intent(out) :: workidx
+         !! 0-based indexes of real work array.
 
       external :: dwinf
+      integer :: deltai, epsi, xplusi, fni, sdi, vcvi, rvari, wssi, wssdei, wssepi, &
+                 rcondi, etai, olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, partli, &
+                 sstoli, taufci, epsmai, beta0i, betaci, betasi, betani, si, ssi, ssfi, &
+                 qrauxi, ui, fsi, fjacbi, we1i, diffi, deltsi, deltni, ti, tti, omegai, &
+                 fjacdi, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, loweri, upperi, &
+                 lwkmn
 
       call dwinf(n, m, np, nq, ldwe, ld2we, isodr, &
                  deltai, epsi, xplusi, fni, sdi, vcvi, &
@@ -429,6 +387,58 @@ contains
                  wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
                  loweri, upperi, &
                  lwkmn)
+
+      workidx%eps    = epsi - 1
+      workidx%xplus  = xplusi - 1
+      workidx%fn     = fni - 1
+      workidx%sd     = sdi - 1
+      workidx%vcv    = vcvi - 1
+      workidx%rvar   = rvari - 1
+      workidx%wss    = wssi - 1
+      workidx%wssde  = wssdei - 1
+      workidx%wssep  = wssepi - 1
+      workidx%rcond  = rcondi - 1
+      workidx%eta    = etai - 1
+      workidx%olmav  = olmavi - 1
+      workidx%tau    = taui - 1
+      workidx%alpha  = alphai - 1
+      workidx%actrs  = actrsi - 1
+      workidx%pnorm  = pnormi - 1
+      workidx%rnors  = rnorsi - 1
+      workidx%prers  = prersi - 1
+      workidx%partl  = partli - 1
+      workidx%sstol  = sstoli - 1
+      workidx%taufc  = taufci - 1
+      workidx%epsma  = epsmai - 1
+      workidx%beta0  = beta0i - 1
+      workidx%betac  = betaci - 1
+      workidx%betas  = betasi - 1
+      workidx%betan  = betani - 1
+      workidx%s      = si - 1
+      workidx%ss     = ssi - 1
+      workidx%ssf    = ssfi - 1
+      workidx%qraux  = qrauxi - 1
+      workidx%u      = ui - 1
+      workidx%fs     = fsi - 1
+      workidx%fjacb  = fjacbi - 1
+      workidx%we1    = we1i - 1
+      workidx%diff   = diffi - 1
+      workidx%delts  = deltsi - 1
+      workidx%deltn  = deltni - 1
+      workidx%t      = ti - 1
+      workidx%tt     = tti - 1
+      workidx%omega  = omegai - 1
+      workidx%fjacd  = fjacdi - 1
+      workidx%wrk1   = wrk1i - 1
+      workidx%wrk2   = wrk2i - 1
+      workidx%wrk3   = wrk3i - 1
+      workidx%wrk4   = wrk4i - 1
+      workidx%wrk5   = wrk5i - 1
+      workidx%wrk6   = wrk6i - 1
+      workidx%wrk7   = wrk7i - 1
+      workidx%lower  = loweri - 1
+      workidx%upper  = upperi - 1
+      workidx%lwkmn  = lwkmn
 
    end subroutine dwinf_c
 
