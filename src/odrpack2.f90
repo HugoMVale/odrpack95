@@ -16,123 +16,123 @@ pure subroutine dwinf &
    ! Date Written   860529   (YYMMDD)
    ! Revision Date  920619   (YYMMDD)
    integer, intent(in) :: n
-    !! The number of observations.
+      !! The number of observations.
    integer, intent(in) :: m
-    !! The number of columns of data in the explanatory variable.
+      !! The number of columns of data in the explanatory variable.
    integer, intent(in) :: np
-    !! The number of function parameters.
+      !! The number of function parameters.
    integer, intent(in) :: nq
-    !! The number of responses per observation.
+      !! The number of responses per observation.
    integer, intent(in) :: ldwe
-    !! The leading dimension of array `we`.
+      !! The leading dimension of array `we`.
    integer, intent(in) :: ld2we
-    !! The second dimension of array `we`.
+      !! The second dimension of array `we`.
    logical, intent(in) :: isodr
-    !! The variable designating whether the solution is by ODR (`isodr`=.true.) or by OLS (`isodr`=.false.).
+      !! The variable designating whether the solution is by ODR (`isodr`=.true.) or by OLS (`isodr`=.false.).
    integer, intent(out) :: deltai
-    !! The starting location in array `work` of array `delta`.
+      !! The starting location in array `work` of array `delta`.
    integer, intent(out) :: epsi
-    !! The starting location in array `work` of array `eps`.
+      !! The starting location in array `work` of array `eps`.
    integer, intent(out) :: xplusi
-    !! The starting location in array `work` of array `xplusd`.
+      !! The starting location in array `work` of array `xplusd`.
    integer, intent(out) :: fni
-    !! The starting location in array `work` of array `fn`.
+      !! The starting location in array `work` of array `fn`.
    integer, intent(out) :: sdi
-    !! The starting location in array `work` of array `sd`.
+      !! The starting location in array `work` of array `sd`.
    integer, intent(out) :: vcvi
-    !! The starting location in array `work` of array `vcv`.
+      !! The starting location in array `work` of array `vcv`.
    integer, intent(out) :: rvari
-    !! The location in array `work` of variable `rvar`.
+      !! The location in array `work` of variable `rvar`.
    integer, intent(out) :: wssi
-    !! The location in array `work` of variable `wss`.
+      !! The location in array `work` of variable `wss`.
    integer, intent(out) :: wssdei
-    !! The location in array `work` of variable `wssdel`.
+      !! The location in array `work` of variable `wssdel`.
    integer, intent(out) :: wssepi
-    !! The location in array `work` of variable `wsseps`.
+      !! The location in array `work` of variable `wsseps`.
    integer, intent(out) :: rcondi
-    !! The location in array `work` of variable `rcondi`.
+      !! The location in array `work` of variable `rcondi`.
    integer, intent(out) :: etai
-    !! The location in array `work` of variable `eta`.
+      !! The location in array `work` of variable `eta`.
    integer, intent(out) :: olmavi
-    !! The location in array `work` of variable `olmavg`.
+      !! The location in array `work` of variable `olmavg`.
    integer, intent(out) :: taui
-    !! The location in array `work` of variable `tau`.
+      !! The location in array `work` of variable `tau`.
    integer, intent(out) :: alphai
-    !! The location in array `work` of variable `alpha`.
+      !! The location in array `work` of variable `alpha`.
    integer, intent(out) :: actrsi
-    !! The location in array `work` of variable `actrs`.
+      !! The location in array `work` of variable `actrs`.
    integer, intent(out) :: pnormi
-    !! The location in array `work` of variable `pnorm`.
+      !! The location in array `work` of variable `pnorm`.
    integer, intent(out) :: rnorsi
-    !! The location in array `work` of variable `rnorms`.
+      !! The location in array `work` of variable `rnorms`.
    integer, intent(out) :: prersi
-    !! The location in array `work` of variable `prers`.
+      !! The location in array `work` of variable `prers`.
    integer, intent(out) :: partli
-    !! The location in array `work` of variable `partol`.
+      !! The location in array `work` of variable `partol`.
    integer, intent(out) :: sstoli
-    !! The location in array `work` of variable `sstol`.
+      !! The location in array `work` of variable `sstol`.
    integer, intent(out) :: taufci
-    !! The location in array `work` of variable `taufac`.
+      !! The location in array `work` of variable `taufac`.
    integer, intent(out) :: epsmai
-    !! The location in array `work` of variable `epsmac`.
+      !! The location in array `work` of variable `epsmac`.
    integer, intent(out) :: beta0i
-    !! The starting location in array `work` of array `beta0`.
+      !! The starting location in array `work` of array `beta0`.
    integer, intent(out) :: betaci
-    !! The starting location in array `work` of array `betac`.
+      !! The starting location in array `work` of array `betac`.
    integer, intent(out) :: betasi
-    !! The starting location in array `work` of array `betas`.
+      !! The starting location in array `work` of array `betas`.
    integer, intent(out) :: betani
-    !! The starting location in array `work` of array `betan`.
+      !! The starting location in array `work` of array `betan`.
    integer, intent(out) :: si
-    !! The starting location in array `work` of array `s`.
+      !! The starting location in array `work` of array `s`.
    integer, intent(out) :: ssi
-    !! The starting location in array `work` of array `ss`.
+      !! The starting location in array `work` of array `ss`.
    integer, intent(out) :: ssfi
-    !! The starting location in array `work` of array `ssf`.
+      !! The starting location in array `work` of array `ssf`.
    integer, intent(out) :: qrauxi
-    !! The starting location in array `work` of array `qraux`.
+      !! The starting location in array `work` of array `qraux`.
    integer, intent(out) :: ui
-    !! The starting location in array `work` of array `u`.
+      !! The starting location in array `work` of array `u`.
    integer, intent(out) :: fsi
-    !! The starting location in array `work` of array `fs`.
+      !! The starting location in array `work` of array `fs`.
    integer, intent(out) :: fjacbi
-    !! The starting location in array `work` of array `fjacb`.
+      !! The starting location in array `work` of array `fjacb`.
    integer, intent(out) :: we1i
-    !! The starting location in array `work` of array `we1`.
+      !! The starting location in array `work` of array `we1`.
    integer, intent(out) :: diffi
-    !! The starting location in array `work` of array `diff`.
+      !! The starting location in array `work` of array `diff`.
    integer, intent(out) :: deltsi
-    !! The starting location in array `work` of array `deltas`.
+      !! The starting location in array `work` of array `deltas`.
    integer, intent(out) :: deltni
-    !! The starting location in array `work` of array `deltan`.
+      !! The starting location in array `work` of array `deltan`.
    integer, intent(out) :: ti
-    !! The starting location in array `work` of array `t`.
+      !! The starting location in array `work` of array `t`.
    integer, intent(out) :: tti
-    !! The starting location in array `work` of array `tt`.
+      !! The starting location in array `work` of array `tt`.
    integer, intent(out) :: omegai
-    !! The starting location in array `work` of array `omega`.
+      !! The starting location in array `work` of array `omega`.
    integer, intent(out) :: fjacdi
-    !! The starting location in array `work` of array `fjacd`.
+      !! The starting location in array `work` of array `fjacd`.
    integer, intent(out) :: wrk1i
-    !! The starting location in array `work` of array `wrk1`.
+      !! The starting location in array `work` of array `wrk1`.
    integer, intent(out) :: wrk2i
-    !! The starting location in array `work` of array `wrk2`.
+      !! The starting location in array `work` of array `wrk2`.
    integer, intent(out) :: wrk3i
-    !! The starting location in array `work` of array `wrk3`.
+      !! The starting location in array `work` of array `wrk3`.
    integer, intent(out) :: wrk4i
-    !! The starting location in array `work` of array `wrk4`.
+      !! The starting location in array `work` of array `wrk4`.
    integer, intent(out) :: wrk5i
-    !! The starting location in array `work` of array `wrk5`.
+      !! The starting location in array `work` of array `wrk5`.
    integer, intent(out) :: wrk6i
-    !! The starting location in array `work` of array `wrk6`.
+      !! The starting location in array `work` of array `wrk6`.
    integer, intent(out) :: wrk7i
-    !! The starting location in array `work` of array `wrk7`.
+      !! The starting location in array `work` of array `wrk7`.
    integer, intent(out) :: loweri
-    !! The starting location in array `work` of array `lower`.
+      !! The starting location in array `work` of array `lower`.
    integer, intent(out) :: upperi
-    !! The starting location in array `work` of array `upper`.
+      !! The starting location in array `work` of array `upper`.
    integer, intent(out) :: lwkmn
-    !! The minimum acceptable length of vector `work`.
+      !! The minimum acceptable length of vector `work`.
 
    ! Local scalars
    integer :: next
@@ -441,33 +441,33 @@ subroutine dvevtr &
    use odrpack_kinds, only: wp, zero
 
    integer, intent(in) :: m
-   !! The number of columns of data in the independent variable.
+      !! The number of columns of data in the independent variable.
    integer, intent(in) :: nq
-   !! The number of responses per observation.
+      !! The number of responses per observation.
    integer, intent(in) :: indx
-   !! The row in `v` in which the `m` by `nq` array is stored.
+      !! The row in `v` in which the `m` by `nq` array is stored.
    integer, intent(in) :: ldv
-   !! The leading dimension of array `v`.
+      !! The leading dimension of array `v`.
    integer, intent(in) :: ld2v
-   !! The second dimension of array `v`.
+      !! The second dimension of array `v`.
    integer, intent(in) :: lde
-   !! The leading dimension of array `e`.
+      !! The leading dimension of array `e`.
    integer, intent(in) :: ldve
-   !! The leading dimension of array `ve`.
+      !! The leading dimension of array `ve`.
    integer, intent(in) :: ldvev
-   !! The leading dimension of array `vev`.
+      !! The leading dimension of array `vev`.
    integer, intent(in) :: ld2ve
-   !! The second dimension of array `ve`.
+      !! The second dimension of array `ve`.
    real(kind=wp), intent(in) :: v(ldv, ld2v, nq)
-   !! An array of `nq` by `m` matrices.
+      !! An array of `nq` by `m` matrices.
    real(kind=wp), intent(in) :: e(lde, m)
-   !! The `m` by `m` matrix of the factors so `ete = (d**2 + alpha*t**2)`.
+      !! The `m` by `m` matrix of the factors so `ete = (d**2 + alpha*t**2)`.
    real(kind=wp), intent(out) :: ve(ldve, ld2ve, m)
-   !! The `nq` by `m` array `ve = v * inv(e)`.
+      !! The `nq` by `m` array `ve = v * inv(e)`.
    real(kind=wp), intent(out) :: vev(ldvev, nq)
-   !! The `nq` by `nq` array `vev = v * inv(ete) * trans(v)`.
+      !! The `nq` by `nq` array `vev = v * inv(ete) * trans(v)`.
    real(kind=wp), intent(out) :: wrk5(m)
-   !! An `m` work vector.
+      !! An `m` work vector.
 
    ! Local scalars
    integer :: j, l1, l2
