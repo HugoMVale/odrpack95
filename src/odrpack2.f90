@@ -331,4 +331,102 @@ pure subroutine dwinf &
       lwkmn = 1
    end if
 
-end subroutine
+end subroutine dwinf
+
+pure subroutine dwght(n, m, wt, ldwt, ld2wt, t, wtt)
+   !! Scale matrix T using WT, i.e., compute WTT = WT*T
+   ! Routines Called  (NONE)
+   ! Date Written   860529   (YYMMDD)
+   ! Revision Date  920304   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero
+
+   integer, intent(in) :: n
+      !! The number of rows of data in `t`.
+   integer, intent(in) :: m
+      !! The number of columns of data in `t`.
+   integer, intent(in) :: ldwt
+      !! The leading dimension of array `wt`.
+   integer, intent(in) :: ld2wt
+      !! The second dimension of array `wt`.
+   real(kind=wp), intent(in) :: wt(:, :, :)
+      !! The weights.
+   real(kind=wp), intent(in) :: t(:, :)
+      !! The array being scaled by `wt`.
+   real(kind=wp), intent(out) :: wtt(:, :)
+      !! The results of weighting array `t` by `wt`. Array `wtt` can be the same as `t` only if 
+      !! the arrays in `wt` are upper triangular with zeros below the diagonal.
+
+   ! Local scalars
+   real(kind=wp) :: temp
+   integer :: i, j, k
+
+   ! Variable Definitions (alphabetically)
+   ! I:       An indexing variable.
+   ! J:       An indexing variable.
+   ! K:       An indexing variable.
+   ! LDWT:    The leading dimension of array WT.
+   ! LD2WT:   The second dimension of array WT.
+   ! M:       The number of columns of data in T.
+   ! N:       The number of rows of data in T.
+   ! T:       The array being scaled by WT.
+   ! TEMP:    A temporary scalar.
+   ! WT:      The weights.
+   ! WTT:     The results of weighting array T by WT.
+   ! Array WTT can be the same as T only if the arrays in WT
+   ! are upper triangular with zeros below the diagonal.
+
+   if (n .eq. 0 .or. m .eq. 0) return
+
+   if (wt(1, 1, 1) .ge. zero) then
+      if (ldwt .ge. n) then
+         if (ld2wt .ge. m) then
+            ! WT is an N-array of M by M matrices
+            do i = 1, n
+               do j = 1, m
+                  temp = zero
+                  do k = 1, m
+                     temp = temp + wt(i, j, k)*t(i, k)
+                  end do
+                  wtt(i, j) = temp
+               end do
+            end do
+         else
+            ! WT is an N-array of diagonal matrices
+            do i = 1, n
+               do j = 1, m
+                  wtt(i, j) = wt(i, 1, j)*t(i, j)
+               end do
+            end do
+         end if
+      else
+         if (ld2wt .ge. m) then
+            ! WT is an M by M matrix
+            do i = 1, n
+               do j = 1, m
+                  temp = zero
+                  do k = 1, m
+                     temp = temp + wt(1, j, k)*t(i, k)
+                  end do
+                  wtt(i, j) = temp
+               end do
+            end do
+         else
+            ! WT is a diagonal matrice
+            do i = 1, n
+               do j = 1, m
+                  wtt(i, j) = wt(1, 1, j)*t(i, j)
+               end do
+            end do
+         end if
+      end if
+   else
+      ! WT is a scalar
+      do j = 1, m
+         do i = 1, n
+            wtt(i, j) = abs(wt(1, 1, 1))*t(i, j)
+         end do
+      end do
+   end if
+
+end subroutine dwght
