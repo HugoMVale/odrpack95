@@ -562,3 +562,136 @@ subroutine dunpac(n2, v1, v2, ifix)
    end if
 
 end subroutine dunpac
+
+subroutine dsolve(n, t, ldt, b, job)
+!! Solve systems of the form:
+!!  T * X = B  or  trans(T) * X = B
+!! where T is an upper or lower triangular matrix of order N, and the solution X overwrites
+!! the RHS B. (adapted from LINPACK subroutine DTRSL)
+!! References:
+!!  Dongarra J.J., Bunch J.R., Moler C.B., Stewart G.W., *LINPACK Users Guide*, SIAM, 1979.
+! Routines Called  DAXPY,DDOT
+! Date Written   920220   (YYMMDD)
+! Revision Date  920619   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero
+
+   integer, intent(in) :: n
+      !! The number of rows and columns of data in array `t`.
+   real(kind=wp), intent(in) :: t(ldt, n)
+      !! The upper or lower tridiagonal system.
+   integer, intent(in) :: ldt
+      !! The leading dimension of array `t`.
+   real(kind=wp), intent(inout) :: b(n)
+      !! On input: the right hand side; On exit: the solution.
+   integer, intent(in) :: job
+      !! What kind of system is to be solved:
+      !!   1   Solve T*X=B, T lower triangular,
+      !!   2   Solve T*X=B, T upper triangular,
+      !!   3   Solve trans(T)*X=B, T lower triangular,
+      !!   4   Solve trans(T)*X=B, T upper triangular.
+
+   ! Local scalars
+   real(kind=wp) :: temp
+   integer :: j1, j, jn
+
+   ! External functions
+   real(kind=wp), external :: ddot
+
+   ! External subroutines
+   external :: daxpy
+
+   ! Variable Definitions (alphabetically)
+   !  B:       On input:  the right hand side;  On exit:  the solution
+   !  J1:      The first nonzero entry in T.
+   !  J:       An indexing variable.
+   !  JN:      The last nonzero entry in T.
+   !  JOB:     What kind of system is to be solved, where if JOB is
+   !           1   Solve T*X=B, T lower triangular,
+   !           2   Solve T*X=B, T upper triangular,
+   !           3   Solve trans(T)*X=B, T lower triangular,
+   !           4   Solve trans(T)*X=B, T upper triangular.
+   !  LDT:     The leading dimension of array T.
+   !  N:       The number of rows and columns of data in array T.
+   !  T:       The upper or lower tridiagonal system.
+
+   !  Find first nonzero diagonal entry in T
+   j1 = 0
+   do j = 1, n
+      if (j1 .eq. 0 .and. t(j, j) .ne. zero) then
+   !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+         j1 = j
+      elseif (t(j, j) .eq. zero) then
+   !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+         b(j) = zero
+      end if
+   end do
+   if (j1 .eq. 0) return
+   !  Find last nonzero diagonal entry in T
+   jn = 0
+   do j = n, j1, -1
+      if (jn .eq. 0 .and. t(j, j) .ne. zero) then
+   !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+         jn = j
+      elseif (t(j, j) .eq. zero) then
+   !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+         b(j) = zero
+      end if
+   end do
+
+   if (job .eq. 1) then
+      !  Solve T*X=B for T lower triangular
+      b(j1) = b(j1)/t(j1, j1)
+      do j = j1 + 1, jn
+         temp = -b(j - 1)
+         call daxpy(jn - j + 1, temp, t(j, j - 1), 1, b(j), 1)
+         if (t(j, j) .ne. zero) then
+   !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+            b(j) = b(j)/t(j, j)
+         else
+            b(j) = zero
+         end if
+      end do
+
+   elseif (job .eq. 2) then
+      !  Solve T*X=B for T upper triangular.
+      b(jn) = b(jn)/t(jn, jn)
+      do j = jn - 1, j1, -1
+         temp = -b(j + 1)
+         call daxpy(j, temp, t(1, j + 1), 1, b(1), 1)
+         if (t(j, j) .ne. zero) then
+   !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+            b(j) = b(j)/t(j, j)
+         else
+            b(j) = zero
+         end if
+      end do
+
+   elseif (job .eq. 3) then
+      !  Solve trans(T)*X=B for T lower triangular.
+      b(jn) = b(jn)/t(jn, jn)
+      do j = jn - 1, j1, -1
+         b(j) = b(j) - ddot(jn - j + 1, t(j + 1, j), 1, b(j + 1), 1)
+         if (t(j, j) .ne. zero) then
+   !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+            b(j) = b(j)/t(j, j)
+         else
+            b(j) = zero
+         end if
+      end do
+
+   elseif (job .eq. 4) then
+      !  Solve trans(T)*X=B for T upper triangular.
+      b(j1) = b(j1)/t(j1, j1)
+      do j = j1 + 1, jn
+         b(j) = b(j) - ddot(j - 1, t(1, j), 1, b(1), 1)
+         if (t(j, j) .ne. zero) then
+   !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+            b(j) = b(j)/t(j, j)
+         else
+            b(j) = zero
+         end if
+      end do
+   end if
+
+end subroutine dsolve
