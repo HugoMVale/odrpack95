@@ -516,3 +516,49 @@ subroutine dvevtr &
    end do
 
 end subroutine dvevtr
+
+subroutine dunpac(n2, v1, v2, ifix)
+!! Copy the elements of `v1` into the locations of `v2` which are unfixed
+! Routines Called  DCOPY
+! Date Written   860529   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
+
+   use odrpack_kinds, only: wp
+
+   integer, intent(in) :: n2
+      !! The number of items in `v2`.
+   real(kind=wp), intent(in) :: v1(n2)
+      !! The vector of the unfixed items.
+   real(kind=wp), intent(out) :: v2(n2)
+      !! The vector of the fixed and unfixed items into which the elements of `v1` are to be inserted.
+   integer, intent(in) :: ifix(n2)
+      !! The values designating whether the elements of `v2` are fixed at their input values or not.
+
+   ! Local scalars
+   integer :: i, n1
+
+   ! External subroutines
+   external :: dcopy
+
+   ! Variable Definitions (alphabetically)
+   !  I:       An indexing variable.
+   !  IFIX:    The values designating whether the elements of V2 are fixed at their input values or not.
+   !  N1:      The number of items in V1.
+   !  N2:      The number of items in V2.
+   !  V1:      The vector of the unfixed items.
+   !  V2:      The vector of the fixed and unfixed items into which the elements of V1 are to be inserted.
+
+   n1 = 0
+   if (ifix(1) .ge. 0) then
+      do i = 1, n2
+         if (ifix(i) .ne. 0) then
+            n1 = n1 + 1
+            v2(i) = v1(n1)
+         end if
+      end do
+   else
+      n1 = n2
+      call dcopy(n2, v1, 1, v2, 1)
+   end if
+
+end subroutine dunpac
