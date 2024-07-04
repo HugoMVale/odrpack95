@@ -137,66 +137,65 @@ pure subroutine dwinf &
    ! Local scalars
    integer :: next
 
-!...Variable Definitions (alphabetically)
-!       ACTRSI:  The location in array WORK of variable ACTRS.
-!       ALPHAI:  The location in array WORK of variable ALPHA.
-!       BETACI:  The starting location in array WORK of array BETAC.
-!       BETANI:  The starting location in array WORK of array BETAN.
-!       BETASI:  The starting location in array WORK of array BETAS.
-!       BETA0I:  The starting location in array WORK of array BETA0.
-!       DELTAI:  The starting location in array WORK of array DELTA.
-!       DELTNI:  The starting location in array WORK of array DELTAN.
-!       DELTSI:  The starting location in array WORK of array DELTAS.
-!       DIFFI:   The starting location in array WORK of array DIFF.
-!       EPSI:    The starting location in array WORK of array EPS.
-!       EPSMAI:  The location in array WORK of variable EPSMAC.
-!       ETAI:    The location in array WORK of variable ETA.
-!       FJACBI:  The starting location in array WORK of array FJACB.
-!       FJACDI:  The starting location in array WORK of array FJACD.
-!       FNI:     The starting location in array WORK of array FN.
-!       FSI:     The starting location in array WORK of array FS.
-!       ISODR:   The variable designating whether the solution is by ODR
-!       (ISODR=TRUE) or by OLS (ISODR=FALSE).
-!       LDWE:    The leading dimension of array WE.
-!       LD2WE:   The second dimension of array WE.
-!       LWKMN:   The minimum acceptable length of vector work.
-!       M:       The number of columns of data in the explanatory variable.
-!       N:       The number of observations.
-!       NEXT:    The next available location with WORK.
-!       NP:      The number of function parameters.
-!       NQ:      The number of responses per observation.
-!       OLMAVI:  The location in array WORK of variable OLMAVG.
-!       OMEGAI:  The starting location in array WORK of array OMEGA.
-!       PARTLI:  The location in array WORK of variable PARTOL.
-!       PNORMI:  The location in array WORK of variable PNORM.
-!       PRERSI:  The location in array WORK of variable PRERS.
-!       QRAUXI:  The starting location in array WORK of array QRAUX.
-!       RCONDI:  The location in array WORK of variable RCONDI.
-!       RNORSI:  The location in array WORK of variable RNORMS.
-!       RVARI:   The location in array WORK of variable RVAR.
-!       SDI:     The starting location in array WORK of array SD.
-!       SI:      The starting location in array WORK of array S.
-!       SSFI:    The starting location in array WORK of array SSF.
-!       SSI:     The starting location in array WORK of array SS.
-!       SSTOLI:  The location in array WORK of variable SSTOL.
-!       TAUFCI:  The location in array WORK of variable TAUFAC.
-!       TAUI:    The location in array WORK of variable TAU.
-!       TI:      The starting location in array WORK of array T.
-!       TTI:     The starting location in array WORK of array TT.
-!       UI:      The starting location in array WORK of array U.
-!       VCVI:    The starting location in array WORK of array VCV.
-!       WE1I:    The starting location in array WORK of array WE1.
-!       WRK1I:   The starting location in array WORK of array WRK1.
-!       WRK2I:   The starting location in array WORK of array WRK2.
-!       WRK3I:   The starting location in array WORK of array WRK3.
-!       WRK4I:   The starting location in array WORK of array WRK4.
-!       WRK5I:   The starting location in array WORK of array WRK5.
-!       WRK6I:   The starting location in array WORK of array WRK6.
-!       WRK7I:   The starting location in array WORK of array WRK7.
-!       WSSI:    The location in array WORK of variable WSS.
-!       WSSDEI:  The location in array WORK of variable WSSDEL.
-!       WSSEPI:  The location in array work of variable WSSEPS.
-!       XPLUSI:  The starting location in array WORK of array XPLUSD.
+   ! Variable Definitions (alphabetically)
+   !  ACTRSI:  The location in array WORK of variable ACTRS.
+   !  ALPHAI:  The location in array WORK of variable ALPHA.
+   !  BETACI:  The starting location in array WORK of array BETAC.
+   !  BETANI:  The starting location in array WORK of array BETAN.
+   !  BETASI:  The starting location in array WORK of array BETAS.
+   !  BETA0I:  The starting location in array WORK of array BETA0.
+   !  DELTAI:  The starting location in array WORK of array DELTA.
+   !  DELTNI:  The starting location in array WORK of array DELTAN.
+   !  DELTSI:  The starting location in array WORK of array DELTAS.
+   !  DIFFI:   The starting location in array WORK of array DIFF.
+   !  EPSI:    The starting location in array WORK of array EPS.
+   !  EPSMAI:  The location in array WORK of variable EPSMAC.
+   !  ETAI:    The location in array WORK of variable ETA.
+   !  FJACBI:  The starting location in array WORK of array FJACB.
+   !  FJACDI:  The starting location in array WORK of array FJACD.
+   !  FNI:     The starting location in array WORK of array FN.
+   !  FSI:     The starting location in array WORK of array FS.
+   !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by OLS (ISODR=FALSE).
+   !  LDWE:    The leading dimension of array WE.
+   !  LD2WE:   The second dimension of array WE.
+   !  LWKMN:   The minimum acceptable length of vector work.
+   !  M:       The number of columns of data in the explanatory variable.
+   !  N:       The number of observations.
+   !  NEXT:    The next available location with WORK.
+   !  NP:      The number of function parameters.
+   !  NQ:      The number of responses per observation.
+   !  OLMAVI:  The location in array WORK of variable OLMAVG.
+   !  OMEGAI:  The starting location in array WORK of array OMEGA.
+   !  PARTLI:  The location in array WORK of variable PARTOL.
+   !  PNORMI:  The location in array WORK of variable PNORM.
+   !  PRERSI:  The location in array WORK of variable PRERS.
+   !  QRAUXI:  The starting location in array WORK of array QRAUX.
+   !  RCONDI:  The location in array WORK of variable RCONDI.
+   !  RNORSI:  The location in array WORK of variable RNORMS.
+   !  RVARI:   The location in array WORK of variable RVAR.
+   !  SDI:     The starting location in array WORK of array SD.
+   !  SI:      The starting location in array WORK of array S.
+   !  SSFI:    The starting location in array WORK of array SSF.
+   !  SSI:     The starting location in array WORK of array SS.
+   !  SSTOLI:  The location in array WORK of variable SSTOL.
+   !  TAUFCI:  The location in array WORK of variable TAUFAC.
+   !  TAUI:    The location in array WORK of variable TAU.
+   !  TI:      The starting location in array WORK of array T.
+   !  TTI:     The starting location in array WORK of array TT.
+   !  UI:      The starting location in array WORK of array U.
+   !  VCVI:    The starting location in array WORK of array VCV.
+   !  WE1I:    The starting location in array WORK of array WE1.
+   !  WRK1I:   The starting location in array WORK of array WRK1.
+   !  WRK2I:   The starting location in array WORK of array WRK2.
+   !  WRK3I:   The starting location in array WORK of array WRK3.
+   !  WRK4I:   The starting location in array WORK of array WRK4.
+   !  WRK5I:   The starting location in array WORK of array WRK5.
+   !  WRK6I:   The starting location in array WORK of array WRK6.
+   !  WRK7I:   The starting location in array WORK of array WRK7.
+   !  WSSI:    The location in array WORK of variable WSS.
+   !  WSSDEI:  The location in array WORK of variable WSSDEL.
+   !  WSSEPI:  The location in array work of variable WSSEPS.
+   !  XPLUSI:  The starting location in array WORK of array XPLUSD.
 
    if (n .ge. 1 .and. m .ge. 1 .and. np .ge. 1 .and. nq .ge. 1 .and. &
        ldwe .ge. 1 .and. ld2we .ge. 1) then
@@ -354,7 +353,7 @@ pure subroutine dwght(n, m, wt, ldwt, ld2wt, t, wtt)
    real(kind=wp), intent(in) :: t(:, :)
       !! The array being scaled by `wt`.
    real(kind=wp), intent(out) :: wtt(:, :)
-      !! The results of weighting array `t` by `wt`. Array `wtt` can be the same as `t` only if 
+      !! The results of weighting array `t` by `wt`. Array `wtt` can be the same as `t` only if
       !! the arrays in `wt` are upper triangular with zeros below the diagonal.
 
    ! Local scalars
@@ -362,19 +361,18 @@ pure subroutine dwght(n, m, wt, ldwt, ld2wt, t, wtt)
    integer :: i, j, k
 
    ! Variable Definitions (alphabetically)
-   ! I:       An indexing variable.
-   ! J:       An indexing variable.
-   ! K:       An indexing variable.
-   ! LDWT:    The leading dimension of array WT.
-   ! LD2WT:   The second dimension of array WT.
-   ! M:       The number of columns of data in T.
-   ! N:       The number of rows of data in T.
-   ! T:       The array being scaled by WT.
-   ! TEMP:    A temporary scalar.
-   ! WT:      The weights.
-   ! WTT:     The results of weighting array T by WT.
-   ! Array WTT can be the same as T only if the arrays in WT
-   ! are upper triangular with zeros below the diagonal.
+   !  I:       An indexing variable.
+   !  J:       An indexing variable.
+   !  K:       An indexing variable.
+   !  LDWT:    The leading dimension of array WT.
+   !  LD2WT:   The second dimension of array WT.
+   !  M:       The number of columns of data in T.
+   !  N:       The number of rows of data in T.
+   !  T:       The array being scaled by WT.
+   !  TEMP:    A temporary scalar.
+   !  WT:      The weights.
+   !  WTT:     The results of weighting array T by WT. Array WTT can be the same as T only if
+   !           the arrays in WT are upper triangular with zeros below the diagonal.
 
    if (n .eq. 0 .or. m .eq. 0) return
 
@@ -430,3 +428,91 @@ pure subroutine dwght(n, m, wt, ldwt, ld2wt, t, wtt)
    end if
 
 end subroutine dwght
+
+subroutine dvevtr &
+   (m, nq, indx, &
+    v, ldv, ld2v, e, lde, ve, ldve, ld2ve, vev, ldvev, &
+    wrk5)
+!! Compute  V*E*trans(V) for the (INDX)TH M by NQ array in V
+! Routines Called  DSOLVE
+! Date Written   910613   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero
+
+   integer, intent(in) :: m
+   !! The number of columns of data in the independent variable.
+   integer, intent(in) :: nq
+   !! The number of responses per observation.
+   integer, intent(in) :: indx
+   !! The row in `v` in which the `m` by `nq` array is stored.
+   integer, intent(in) :: ldv
+   !! The leading dimension of array `v`.
+   integer, intent(in) :: ld2v
+   !! The second dimension of array `v`.
+   integer, intent(in) :: lde
+   !! The leading dimension of array `e`.
+   integer, intent(in) :: ldve
+   !! The leading dimension of array `ve`.
+   integer, intent(in) :: ldvev
+   !! The leading dimension of array `vev`.
+   integer, intent(in) :: ld2ve
+   !! The second dimension of array `ve`.
+   real(kind=wp), intent(in) :: v(ldv, ld2v, nq)
+   !! An array of `nq` by `m` matrices.
+   real(kind=wp), intent(in) :: e(lde, m)
+   !! The `m` by `m` matrix of the factors so `ete = (d**2 + alpha*t**2)`.
+   real(kind=wp), intent(out) :: ve(ldve, ld2ve, m)
+   !! The `nq` by `m` array `ve = v * inv(e)`.
+   real(kind=wp), intent(out) :: vev(ldvev, nq)
+   !! The `nq` by `nq` array `vev = v * inv(ete) * trans(v)`.
+   real(kind=wp), intent(out) :: wrk5(m)
+   !! An `m` work vector.
+
+   ! Local scalars
+   integer :: j, l1, l2
+
+   ! External subroutines
+   external :: dsolve
+
+   ! Variable Definitions (alphabetically)
+   !  INDX:    The row in V in which the M by NQ array is stored.
+   !  J:       An indexing variable.
+   !  LDE:     The leading dimension of array E.
+   !  LDV:     The leading dimension of array V.
+   !  LDVE:    The leading dimension of array VE.
+   !  LDVEV:   The leading dimension of array VEV.
+   !  LD2V:    The second dimension of array V.
+   !  L1:      An indexing variable.
+   !  L2:      An indexing variable.
+   !  M:       The number of columns of data in the independent variable.
+   !  NQ:      The number of responses per observation.
+   !  E:       The M by M matrix of the factors so ETE = (D**2 + ALPHA*T**2).
+   !  V:       An array of NQ by M matrices.
+   !  VE:      The NQ by M array VE = V * inv(E)
+   !  VEV:     The NQ by NQ array VEV = V * inv(ETE) * trans(V).
+   !  WRK5:    An M work vector.
+
+   if (nq .eq. 0 .or. m .eq. 0) return
+
+   do l1 = 1, nq
+      do j = 1, m
+         wrk5(j) = v(indx, j, l1)
+      end do
+      call dsolve(m, e, lde, wrk5, 4)
+      do j = 1, m
+         ve(indx, l1, j) = wrk5(j)
+      end do
+   end do
+
+   do l1 = 1, nq
+      do l2 = 1, l1
+         vev(l1, l2) = zero
+         do j = 1, m
+            vev(l1, l2) = vev(l1, l2) + ve(indx, l1, j)*ve(indx, l2, j)
+         end do
+         vev(l2, l1) = vev(l1, l2)
+      end do
+   end do
+
+end subroutine dvevtr
