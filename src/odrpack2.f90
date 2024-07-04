@@ -28,7 +28,7 @@ pure subroutine dwinf &
    integer, intent(in) :: ld2we
     !! The second dimension of array `we`.
    logical, intent(in) :: isodr
-    !! The variable designating whether the solution is by ODR (`isodr`=TRUE) or by OLS (`isodr`=FALSE).
+    !! The variable designating whether the solution is by ODR (`isodr`=.true.) or by OLS (`isodr`=.false.).
    integer, intent(out) :: deltai
     !! The starting location in array `work` of array `delta`.
    integer, intent(out) :: epsi
