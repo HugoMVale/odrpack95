@@ -1072,3 +1072,102 @@ subroutine dpvd &
    pvd = wrk2(nrow, lq)
 
 end subroutine dpvd
+
+subroutine dpvb &
+   (fcn, &
+    n, m, np, nq, &
+    beta, xplusd, ifixb, ifixx, ldifx, &
+    nrow, j, lq, stp, &
+    istop, nfev, pvb, &
+    wrk1, wrk2, wrk6)
+!! Compute the NROW-th function value using BETA(J) + STP
+! Routines Called  FCN
+! Date Written   860529   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
+
+   use odrpack_kinds, only: wp
+
+   external :: fcn
+      !! The user-supplied subroutine for evaluating the model.
+   integer, intent(in) :: n
+      !! The number of observations.
+   integer, intent(in) :: m
+      !! The number of columns of data in the independent variable.
+   integer, intent(in) :: np
+      !! The number of function parameters.
+   integer, intent(in) :: nq
+      !! The number of responses per observation.
+   real(kind=wp), intent(inout) :: beta(np)
+      !! The function parameters.
+   real(kind=wp), intent(in) :: xplusd(n, m)
+      !! The values of X + DELTA.
+   integer, intent(in) :: ifixb(np)
+      !! The values designating whether the elements of `beta` are fixed at their input values or not.
+   integer, intent(in) :: ifixx(ldifx, m)
+      !! The values designating whether the elements of `x` are fixed at their input values or not.
+   integer, intent(in) :: ldifx
+      !! The leading dimension of array `ifixx`.
+   integer, intent(in) :: nrow
+      !! The row number of the independent variable array at which the derivative is to be checked.
+   integer, intent(in) :: j
+      !! The index of the partial derivative being examined.
+   integer, intent(in) :: lq
+      !! The response currently being examined.
+   real(kind=wp), intent(in) :: stp
+      !! The step size for the finite difference derivative.
+   integer, intent(out) :: istop
+      !! The variable designating whether there are problems computing the function at the current `beta` and `delta`.
+   integer, intent(inout) :: nfev
+      !! The number of function evaluations.
+   real(kind=wp), intent(out) :: pvb
+      !! The function value for the selected observation & response.
+   real(kind=wp), intent(out) :: wrk1(n, m, nq)
+      !! Work array.
+   real(kind=wp), intent(out) :: wrk2(n, nq)
+      !! Work array.
+   real(kind=wp), intent(out) :: wrk6(n, np, nq)
+      !! Work array.
+
+   ! Local scalars
+   real(kind=wp) :: betaj
+
+   ! Routine names used as subprogram arguments
+   !  FCN:     The user-supplied subroutine for evaluating the model.
+   ! Variable Definitions (alphabetically)
+   !  BETA:    The function parameters.
+   !  BETAJ:   The current estimate of the jth parameter.
+   !  IFIXB:   The values designating whether the elements of BETA are fixed at their input values or not.
+   !  IFIXX:   The values designating whether the elements of X are fixed at their input values or not.
+   !  ISTOP:   The variable designating whether there are problems computing the function at the current BETA and DELTA.
+   !  J:       The index of the partial derivative being examined.
+   !  LDIFX:   The leading dimension of array IFIXX.
+   !  LQ:      The response currently being examined.
+   !  M:       The number of columns of data in the independent variable.
+   !  N:       The number of observations.
+   !  NFEV:    The number of function evaluations.
+   !  NP:      The number of function parameters.
+   !  NQ:      The number of responses per observation.
+   !  NROW:    The row number of the independent variable array at which the derivative is to be checked.
+   !  PVB:     The function value for the selected observation & response.
+   !  STP:     The step size for the finite difference derivative.
+   !  XPLUSD:  The values of X + DELTA.
+
+   betaj = beta(j)
+   beta(j) = beta(j) + stp
+   istop = 0
+   call fcn(n, m, np, nq, &
+            n, m, np, &
+            beta, xplusd, &
+            ifixb, ifixx, ldifx, &
+            003, wrk2, wrk6, wrk1, &
+            istop)
+   if (istop .eq. 0) then
+      nfev = nfev + 1
+   else
+      return
+   end if
+   beta(j) = betaj
+
+   pvb = wrk2(nrow, lq)
+
+end subroutine dpvb
