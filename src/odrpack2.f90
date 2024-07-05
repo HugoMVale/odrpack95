@@ -742,3 +742,88 @@ pure subroutine dsetn(n, m, x, ldx, nrow)
 !------------------------------------------------------------------------------
 
 end subroutine dsetn
+
+pure subroutine dscld(n, m, x, ldx, tt, ldtt)
+!! Select scaling values for DELTA according to the algorithm given in the ODRPACK95 reference guide
+!***Routines Called  (None)
+!***Date Written   860529   (YYMMDD)
+!***Revision Date  920304   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero, one, ten
+
+   integer, intent(in) :: n
+      !! The number of observations.
+   integer, intent(in) :: m
+      !! The number of columns of data in the independent variable.
+   real(kind=wp), intent(inout) :: x(ldx, m)
+      !! The independent variable.
+   integer, intent(in) :: ldx
+      !! The leading dimension of array `x`.
+   real(kind=wp), intent(out) :: tt(ldtt, m)
+      !! The scaling values for `delta`.
+   integer, intent(in) :: ldtt
+      !! The leading dimension of array `tt`.
+
+   ! Local scalars
+   real(kind=wp) :: xmax, xmin
+   integer :: i, j
+   logical :: bigdif
+
+   ! Variable Definitions (alphabetically)
+   !  BIGDIF:  The variable designating whether there is a significant
+   !           difference in the magnitudes of the nonzero elements of
+   !           X (BIGDIF=.TRUE.) or not (BIGDIF=.FALSE.).
+   !  I:       An indexing variable.
+   !  J:       An indexing variable.
+   !  LDTT:    The leading dimension of array TT.
+   !  LDX:     The leading dimension of array X.
+   !  M:       The number of columns of data in the independent variable.
+   !  N:       The number of observations.
+   !  TT:      THE SCALING VALUES FOR DELTA.
+   !  X:       The independent variable.
+   !  XMAX:    The largest nonzero magnitude.
+   !  XMIN:    THE SMALLEST NONZERO MAGNITUDE.
+
+   do j = 1, m
+      xmax = abs(x(1, j))
+      do i = 2, n
+         xmax = max(xmax, abs(x(i, j)))
+      end do
+      if (xmax .eq. zero) then
+!-------------------------^----------------------------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+         !  All input values of X(I,J), I=1,...,N, are zero
+         do i = 1, n
+            tt(i, j) = one
+         end do
+      else
+         !  Some of the input values are nonzero
+         xmin = xmax
+         do i = 1, n
+            if (x(i, j) .ne. zero) then
+!-----------------------------------^------------------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+               xmin = min(xmin, abs(x(i, j)))
+            end if
+         end do
+         bigdif = log10(xmax) - log10(xmin) .ge. one
+         do i = 1, n
+            if (x(i, j) .ne. zero) then
+!-----------------------------------^------------------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+               if (bigdif) then
+                  tt(i, j) = one/abs(x(i, j))
+               else
+                  tt(i, j) = one/xmax
+               end if
+            else
+               tt(i, j) = ten/xmin
+            end if
+         end do
+      end if
+   end do
+
+end subroutine dscld
