@@ -11,9 +11,9 @@ pure subroutine dwinf &
     loweri, upperi, &
     lwkmn)
 !! Set storage locations within REAL (KIND=wp) work space
-   ! Routines Called  (NONE)
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
+! Routines Called  (NONE)
+! Date Written   860529   (YYMMDD)
+! Revision Date  920619   (YYMMDD)
    integer, intent(in) :: n
       !! The number of observations.
    integer, intent(in) :: m
@@ -332,10 +332,10 @@ pure subroutine dwinf &
 end subroutine dwinf
 
 pure subroutine dwght(n, m, wt, ldwt, ld2wt, t, wtt)
-   !! Scale matrix T using WT, i.e., compute WTT = WT*T
-   ! Routines Called  (NONE)
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
+!! Scale matrix T using WT, i.e., compute WTT = WT*T
+! Routines Called  (NONE)
+! Date Written   860529   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
 
    use odrpack_kinds, only: wp, zero
 
@@ -697,9 +697,9 @@ end subroutine dsolve
 
 pure subroutine dsetn(n, m, x, ldx, nrow)
 !! Select the row at which the derivative will be checked
-!***Routines Called  (None)
-!***Date Written   860529   (YYMMDD)
-!***Revision Date  920304   (YYMMDD)
+! Routines Called  (None)
+! Date Written   860529   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
 
    use odrpack_kinds, only: wp
 
@@ -745,9 +745,9 @@ end subroutine dsetn
 
 pure subroutine dscld(n, m, x, ldx, tt, ldtt)
 !! Select scaling values for DELTA according to the algorithm given in the ODRPACK95 reference guide
-!***Routines Called  (None)
-!***Date Written   860529   (YYMMDD)
-!***Revision Date  920304   (YYMMDD)
+! Routines Called  (None)
+! Date Written   860529   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
 
    use odrpack_kinds, only: wp, zero, one, ten
 
@@ -830,9 +830,9 @@ end subroutine dscld
 
 pure subroutine dsclb(np, beta, ssf)
 !! Select scaling values for BETA according to the algorithm given in the ODRPACK95 reference guide
-!***Routines Called  (NONE)
-!***Date Written   860529   (YYMMDD)
-!***Revision Date  920304   (YYMMDD)
+! Routines Called  (NONE)
+! Date Written   860529   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
 
    use odrpack_kinds, only: wp, zero, one, ten
 
@@ -900,3 +900,73 @@ pure subroutine dsclb(np, beta, ssf)
    end if
 
 end subroutine dsclb
+
+pure subroutine dscale(n, m, scl, ldscl, t, ldt, sclt, ldsclt)
+!! Scale T by the inverse of SCL, I.E., compute T/SCL
+! Routines Called  (NONE)
+! Date Written   860529   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero, one
+
+   integer, intent(in) :: n
+      !! The number of rows of data in `t`.
+   integer, intent(in) :: m
+      !! The number of columns of data in `t`.
+   real(kind=wp), intent(in) :: scl(ldscl, m)
+      !! The scale values.
+   integer, intent(in) :: ldscl
+      !! The leading dimension of array `scl`.
+   real(kind=wp), intent(in) :: t(ldt, m)
+      !! The array to be inversely scaled by `scl`.
+   integer, intent(in) :: ldt
+      !! The leading dimension of array `t`.
+   real(kind=wp), intent(out) :: sclt(ldsclt, m)
+      !! The inversely scaled matrix.
+   integer, intent(in) :: ldsclt
+      !! The leading dimension of array `sclt`.
+
+   ! Local scalars
+   real(kind=wp) :: temp
+   integer :: i, j
+
+   ! Variable Definitions (alphabetically)
+   !  I:       An indexing variable.
+   !  J:       An indexing variable.
+   !  LDSCL:   The leading dimension of array SCL.
+   !  LDSCLT:  The leading dimension of array SCLT.
+   !  LDT:     The leading dimension of array T.
+   !  M:       The number of columns of data in T.
+   !  N:       The number of rows of data in T.
+   !  SCL:     The scale values.
+   !  SCLT:    The inversely scaled matrix.
+   !  T:       The array to be inversely scaled by SCL.
+   !  TEMP:    A temporary scalar.
+
+   if (n .eq. 0 .or. m .eq. 0) return
+
+   if (scl(1, 1) .ge. zero) then
+      if (ldscl .ge. n) then
+         do j = 1, m
+            do i = 1, n
+               sclt(i, j) = t(i, j)/scl(i, j)
+            end do
+         end do
+      else
+         do j = 1, m
+            temp = one/scl(1, j)
+            do i = 1, n
+               sclt(i, j) = t(i, j)*temp
+            end do
+         end do
+      end if
+   else
+      temp = one/abs(scl(1, 1))
+      do j = 1, m
+         do i = 1, n
+            sclt(i, j) = t(i, j)*temp
+         end do
+      end do
+   end if
+
+end subroutine dscale
