@@ -1185,10 +1185,6 @@ real(kind=wp) function dppt(p, idf) result(dpptr)
 !       Washington, D. C. 20234
 !       (Original Version--October   1975.)
 !       (Updated         --November  1975.)
-!***Purpose  Compute the percent point function value for the
-!       student's T distribution with IDF degrees of freedom.
-!       (Adapted from DATAPAC subroutine TPPF, with modifications
-!       to facilitate conversion to REAL (KIND=wp) automatically)
 !***Description
 !       --For IDF = 1 AND IDF = 2, the percent point function
 !       for the T distribution exists in simple closed form
@@ -1368,4 +1364,109 @@ real(kind=wp) function dppt(p, idf) result(dpptr)
    end if
 
 end function dppt
+
+real(kind=wp) function dppnml(p) result(dppnmlr)
+!! Compute the percent point function value for the normal (Gaussian) distribution with mean 0
+!! and standard deviation 1, and with probability density function
+!!       F(X) = (1/SQRT(2*PI))*EXP(-X*X/2).
+!! (Adapted from DATAPAC subroutine TPPF, with modifications to facilitate conversion to
+!! REAL (KIND=wp) automatically)
+! Routines Called  (None)
+! Date Written   901207   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
+!***Author  Filliben, James J.,
+!       Statistical Engineering Division
+!       National Bureau of Standards
+!       Washington, D. C. 20234
+!       (Original Version--June      1972.
+!       (Updated         --September 1975,
+!       November  1975, AND
+!       October   1976.
+!***Description
+!       --The coding as presented below is essentially
+!       identical to that presented by Odeh and Evans
+!       as Algortihm 70 of Applied Statistics.
+!       --As pointed out by Odeh and Evans in Applied
+!       Statistics, their algorithm representes a
+!       substantial improvement over the previously employed
+!       Hastings approximation for the normal percent point
+!       function, with accuracy improving from 4.5*(10**-4)
+!       to 1.5*(10**-8).
+!***References  Odeh and Evans, the Percentage Points of the Normal
+!       Distribution, Algortihm 70, Applied Statistics, 1974,
+!       Pages 96-97.
+!       Evans, Algorithms for Minimal Degree Polynomial and
+!       Rational Approximation, M. Sc. Thesis, 1972,
+!       University of Victoria, B. C., Canada.
+!       Hastings, Approximations for Digital Computers, 1955,
+!       Pages 113, 191, 192.
+!       National Bureau of Standards Applied Mathematics
+!       Series 55, 1964, Page 933, Formula 26.2.23.
+!       Filliben, Simple and Robust Linear Estimation of the
+!       Location Parameter of a Symmetric Distribution
+!       (Unpublished Ph.D. Dissertation, Princeton
+!       University), 1969, Pages 21-44, 229-231.
+!       Filliben, "The Percent Point Function",
+!       (Unpublished Manuscript), 1970, Pages 28-31.
+!       Johnson and Kotz, Continuous Univariate Distributions,
+!       Volume 1, 1970, Pages 40-111.
+!       Kelley Statistical Tables, 1948.
+!       Owen, Handbook of Statistical Tables, 1962, Pages 3-16.
+!       Pearson and Hartley, Biometrika Tables for
+!       Statisticians, Volume 1, 1954, Pages 104-113.
+
+   use odrpack_kinds, only: wp, zero, half, one, two
+
+   real(kind=wp), intent(in) :: p
+      !! The probability at which the percent point is to be evaluated. `p` must lie between
+      !! 0.0 and 1.0E0_wp, exclusive.
+
+   ! Local scalars
+   real(kind=wp) :: aden, anum, p0, p1, p2, p3, p4, q0, q1, q2, q3, q4, r, t
+
+   ! Data statements
+   data &
+      p0, p1, p2, p3, p4 &
+      /-0.322232431088E0_wp, -1.0E0_wp, -0.342242088547E0_wp, &
+      -0.204231210245E-1_wp, -0.453642210148E-4_wp/
+   data &
+      q0, q1, q2, q3, q4 &
+      /0.993484626060E-1_wp, 0.588581570495E0_wp, &
+      0.531103462366E0_wp, 0.103537752850E0_wp, 0.38560700634E-2_wp/
+
+   ! Variable Definitions (alphabetically)
+   !  ADEN:    A value used in the approximation.
+   !  ANUM:    A value used in the approximation.
+   !  P:       The probability at which the percent point is to be evaluated.  P must be between
+   !           0.0E0_wp and 1.0E0_wp, exclusive.
+   !  P0:      A parameter used in the approximation.
+   !  P1:      A parameter used in the approximation.
+   !  P2:      A parameter used in the approximation.
+   !  P3:      A parameter used in the approximation.
+   !  P4:      A parameter used in the approximation.
+   !  Q0:      A parameter used in the approximation.
+   !  Q1:      A parameter used in the approximation.
+   !  Q2:      A parameter used in the approximation.
+   !  Q3:      A parameter used in the approximation.
+   !  Q4:      A parameter used in the approximation.
+   !  R:       The probability at which the percent point is evaluated.
+   !  T:       A value used in the approximation.
+
+   if (p .eq. half) then
+!-------------------^----------------------------------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+      dppnmlr = zero
+
+   else
+      r = p
+      if (p .gt. half) r = one - r
+      t = sqrt(-two*log(r))
+      anum = ((((t*p4 + p3)*t + p2)*t + p1)*t + p0)
+      aden = ((((t*q4 + q3)*t + q2)*t + q1)*t + q0)
+      dppnmlr = t + (anum/aden)
+      if (p .lt. half) dppnmlr = -dppnmlr
+   end if
+
+end function dppnml
 
