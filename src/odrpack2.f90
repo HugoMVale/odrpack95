@@ -827,3 +827,76 @@ pure subroutine dscld(n, m, x, ldx, tt, ldtt)
    end do
 
 end subroutine dscld
+
+pure subroutine dsclb(np, beta, ssf)
+!! Select scaling values for BETA according to the algorithm given in the ODRPACK95 reference guide
+!***Routines Called  (NONE)
+!***Date Written   860529   (YYMMDD)
+!***Revision Date  920304   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero, one, ten
+
+   integer, intent(in) :: np
+      !! The number of function parameters.
+   real(kind=wp), intent(in) :: beta(np)
+      !! The function parameters.
+   real(kind=wp), intent(out) :: ssf(np)
+      !! The scaling values for `beta`.
+
+   ! Local scalars
+   real(kind=wp) :: bmax, bmin
+   integer :: k
+   logical ::bigdif
+
+   ! Variable Definitions (alphabetically)
+   !  BETA:    The function parameters.
+   !  BIGDIF:  The variable designating whether there is a significant
+   !           difference in the magnitudes of the nonzero elements of
+   !  BETA (BIGDIF=.TRUE.) or not (BIGDIF=.FALSE.).
+   !  BMAX:    The largest nonzero magnitude.
+   !  BMIN:    The smallest nonzero magnitude.
+   !  K:       An indexing variable.
+   !  NP:      The number of function parameters.
+   !  SSF:     The scaling values for BETA.
+
+   bmax = abs(beta(1))
+   do k = 2, np
+      bmax = max(bmax, abs(beta(k)))
+   end do
+
+   if (bmax .eq. zero) then
+!------------------------------------------------------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+      !  All input values of BETA are zero
+      ssf(1:np) = one
+   else
+      !  Some of the input values are nonzero
+      bmin = bmax
+      do k = 1, np
+         if (beta(k) .ne. zero) then
+!--------------------------------^---------------------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+            bmin = min(bmin, abs(beta(k)))
+         end if
+      end do
+      bigdif = log10(bmax) - log10(bmin) .ge. one
+      do k = 1, np
+         if (beta(k) .eq. zero) then
+!--------------------------------^---------------------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+            ssf(k) = ten/bmin
+         else
+            if (bigdif) then
+               ssf(k) = one/abs(beta(k))
+            else
+               ssf(k) = one/bmax
+            end if
+         end if
+      end do
+
+   end if
+
+end subroutine dsclb
