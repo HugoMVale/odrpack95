@@ -1457,7 +1457,6 @@ real(kind=wp) function dppnml(p) result(dppnmlr)
 !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
 !------------------------------------------------------------------------------
       dppnmlr = zero
-
    else
       r = p
       if (p .gt. half) r = one - r
@@ -1470,3 +1469,50 @@ real(kind=wp) function dppnml(p) result(dppnmlr)
 
 end function dppnml
 
+subroutine dpack(n2, n1, v1, v2, ifix)
+!! Select the unfixed elements of V2 and return them in V1.
+! Routines Called  DCOPY
+! Date Written   860529   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
+
+   use odrpack_kinds, only: wp
+
+   integer, intent(in) :: n2
+      !! The number of items in V2.
+   integer, intent(out) :: n1
+      !! The number of items in V1.
+   real(kind=wp), intent(out) :: v1(n2)
+      !! The vector of the unfixed items from V2.
+   real(kind=wp), intent(in) :: v2(n2)
+      !! The vector of the fixed and unfixed items from which the unfixed elements are to be extracted.
+   integer, intent(in) :: ifix(n2)
+      !! The values designating whether the elements of V2 are fixed at their input values or not.
+
+   ! Local scalars
+   integer :: i
+
+   ! External subroutines
+   external :: dcopy
+
+   ! Variable definitions (alphabetically)
+   !  I:       An indexing variable.
+   !  IFIX:    The values designating whether the elements of V2 are fixed at their input values or not.
+   !  N1:      The number of items in V1.
+   !  N2:      The number of items in V2.
+   !  V1:      The vector of the unfixed items from V2.
+   !  V2:      The vector of the fixed and unfixed items from which the unfixed elements are to be extracted.
+
+   n1 = 0
+   if (ifix(1) .ge. 0) then
+      do i = 1, n2
+         if (ifix(i) .ne. 0) then
+            n1 = n1 + 1
+            v1(n1) = v2(i)
+         end if
+      end do
+   else
+      n1 = n2
+      call dcopy(n2, v2, 1, v1, 1)
+   end if
+
+end subroutine dpack
