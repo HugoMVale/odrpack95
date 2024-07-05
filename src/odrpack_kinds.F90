@@ -5,7 +5,7 @@ module odrpack_kinds
     private
 
     public :: wp
-    public :: zero, one, negone, two, three
+    public :: negone, zero, one, two, three, ten
     
 #ifdef REAL32
     integer, parameter :: wp = real32
@@ -20,5 +20,6 @@ module odrpack_kinds
     real(wp), parameter :: one = 1.0_wp
     real(wp), parameter :: two = 2.0_wp
     real(wp), parameter :: three = 3.0_wp
+    real(wp), parameter :: ten = 10.0_wp
 
 end module odrpack_kinds
