@@ -1,4 +1,3 @@
-
 pure subroutine dwinf &
    (n, m, np, nq, ldwe, ld2we, isodr, &
     deltai, epsi, xplusi, fni, sdi, vcvi, &
@@ -695,3 +694,51 @@ subroutine dsolve(n, t, ldt, b, job)
    end if
 
 end subroutine dsolve
+
+pure subroutine dsetn(n, m, x, ldx, nrow)
+!! Select the row at which the derivative will be checked
+!***Routines Called  (None)
+!***Date Written   860529   (YYMMDD)
+!***Revision Date  920304   (YYMMDD)
+
+   use odrpack_kinds, only: wp
+
+   integer, intent(in) :: n
+      !! The number of observations.
+   integer, intent(in) :: m
+      !! The number of columns of data in the independent variable.
+   real(kind=wp), intent(in) :: x(ldx, m)
+      !! The independent variable.
+   integer, intent(in) :: ldx
+      !! The leading dimension of array `x`.
+   integer, intent(inout) :: nrow
+      !! The selected row number of the independent variable.
+
+   ! Local scalars
+   integer :: i
+
+   ! Variable Definitions (alphabetically)
+   !  I:       An index variable.
+   !  J:       An index variable.
+   !  LDX:     The leading dimension of array X.
+   !  M:       The number of columns of data in the independent variable.
+   !  N:       The number of observations.
+   !  NROW:    The selected row number of the independent variable.
+   !  X:       The independent variable.
+
+   if ((nrow .ge. 1) .and. (nrow .le. n)) return
+
+   ! Select first row of independent variables which contains no zeros
+   ! if there is one, otherwise first row is used.
+   nrow = 1
+   do i = 1, n
+      if (all(x(i, :) .ne. 0.0_wp)) then
+         nrow = i
+         return
+      end if
+   end do
+!--------------------------------^---------------------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+
+end subroutine dsetn
