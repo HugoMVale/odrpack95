@@ -701,7 +701,7 @@ pure subroutine dsetn(n, m, x, ldx, nrow)
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
 
-   use odrpack_kinds, only: wp
+   use odrpack_kinds, only: wp, zero
 
    integer, intent(in) :: n
       !! The number of observations.
@@ -732,7 +732,7 @@ pure subroutine dsetn(n, m, x, ldx, nrow)
    ! if there is one, otherwise first row is used.
    nrow = 1
    do i = 1, n
-      if (all(x(i, :) .ne. 0.0_wp)) then
+      if (all(x(i, :) .ne. zero)) then
          nrow = i
          return
       end if
@@ -970,3 +970,105 @@ pure subroutine dscale(n, m, scl, ldscl, t, ldt, sclt, ldsclt)
    end if
 
 end subroutine dscale
+
+subroutine dpvd &
+   (fcn, &
+    n, m, np, nq, &
+    beta, xplusd, ifixb, ifixx, ldifx, &
+    nrow, j, lq, stp, &
+    istop, nfev, pvd, &
+    wrk1, wrk2, wrk6)
+!! Compute NROW-th function value using X(NROW,J) + DELTA(NROW,J) + STP
+! Routines Called  FCN
+! Date Written   860529   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
+
+   use odrpack_kinds, only: wp
+
+   external :: fcn
+      !! The user-supplied subroutine for evaluating the model.
+   integer, intent(in) :: n
+      !! The number of observations.
+   integer, intent(in) :: m
+      !! The number of columns of data in the independent variable.
+   integer, intent(in) :: np
+      !! The number of function parameters.
+   integer, intent(in) :: nq
+      !! The number of responses per observation.
+   real(kind=wp), intent(in) :: beta(np)
+      !! The function parameters.
+   real(kind=wp), intent(inout) :: xplusd(n, m)
+      !! The values of X + DELTA.
+   integer, intent(in) :: ifixb(np)
+      !! The values designating whether the elements of `beta` are fixed at their input values or not.
+   integer, intent(in) :: ifixx(ldifx, m)
+      !! The values designating whether the elements of `x` are fixed at their input values or not.
+   integer, intent(in) :: ldifx
+      !! The leading dimension of array `ifixx`.
+   integer, intent(in) :: nrow
+      !! The row number of the independent variable array at which the derivative is to be checked.
+   integer, intent(in) :: j
+      !! The index of the partial derivative being examined.
+   integer, intent(in) :: lq
+      !! The response currently being examined.
+   real(kind=wp), intent(in) :: stp
+      !! The step size for the finite difference derivative.
+   integer, intent(out) :: istop
+      !! The variable designating whether there are problems computing the function at the current `beta` and `delta`.
+   integer, intent(out) :: nfev
+      !! The number of function evaluations.
+   real(kind=wp), intent(out) :: pvd
+      !! The function value for the selected observation & response.
+   real(kind=wp), intent(out) :: wrk1(n, m, nq)
+      !! Work array.
+   real(kind=wp), intent(out) :: wrk2(n, nq)
+      !! Work array.
+   real(kind=wp), intent(out) :: wrk6(n, np, nq)
+      !! Work array.
+
+   ! Local scalars
+   real(kind=wp) :: xpdj
+
+   ! Routine names used as subprogram arguments
+   !  FCN:     The user-supplied subroutine for evaluating the model.
+   !
+   ! Variable Definitions (alphabetically)
+   !  BETA:    The function parameters.
+   !  IFIXB:   The values designating whether the elements of BETA are
+   !           fixed at their input values or not.
+   !  IFIXX:   The values designating whether the elements of X are fixed at their input values or not.
+   !  ISTOP:   The variable designating whether there are problems
+   !           computing the function at the current BETA and DELTA.
+   !  J:       The index of the partial derivative being examined.
+   !  LDIFX:   The leading dimension of array IFIXX.
+   !  LQ:      The response currently being examined.
+   !  M:       The number of columns of data in the independent variable.
+   !  N:       The number of observations.
+   !  NFEV:    The number of function evaluations.
+   !  NP:      The number of function parameters.
+   !  NQ:      The number of responses per observation.
+   !  NROW:    The row number of the independent variable array at which the derivative is to be checked.
+   !  PVD:     The function value for the selected observation & response.
+   !  STP:     The step size for the finite difference derivative.
+   !  XPDJ:    The (NROW,J)th element of XPLUSD.
+   !  XPLUSD:  The values of X + DELTA.
+
+   xpdj = xplusd(nrow, j)
+   xplusd(nrow, j) = xplusd(nrow, j) + stp
+   istop = 0
+   call fcn(n, m, np, nq, &
+            n, m, np, &
+            beta, xplusd, &
+            ifixb, ifixx, ldifx, &
+            003, wrk2, wrk6, wrk1, &
+            istop)
+   if (istop .eq. 0) then
+      nfev = nfev + 1
+   else
+      return
+   end if
+   xplusd(nrow, j) = xpdj
+
+   pvd = wrk2(nrow, lq)
+
+end subroutine dpvd
