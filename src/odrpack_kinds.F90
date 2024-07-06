@@ -5,7 +5,7 @@ module odrpack_kinds
     private
 
     public :: wp
-    public :: negone, zero, half, one, two, three, eight, ten, fiftn
+    public :: negone, zero, half, one, two, three, eight, ten, fiftn, hundrd
     public :: pi
     
 #ifdef REAL32
@@ -25,6 +25,7 @@ module odrpack_kinds
     real(wp), parameter :: eight = 8.0_wp
     real(wp), parameter :: ten = 10.0_wp
     real(wp), parameter :: fiftn = 15.0_wp
+    real(wp), parameter :: hundrd = 100.0_wp
     real(wp), parameter :: pi = 4*atan(one)
 
 end module odrpack_kinds
