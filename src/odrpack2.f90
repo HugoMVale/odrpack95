@@ -755,7 +755,7 @@ pure subroutine dscld(n, m, x, ldx, tt, ldtt)
       !! The number of observations.
    integer, intent(in) :: m
       !! The number of columns of data in the independent variable.
-   real(kind=wp), intent(inout) :: x(ldx, m)
+   real(kind=wp), intent(in) :: x(ldx, m)
       !! The independent variable.
    integer, intent(in) :: ldx
       !! The leading dimension of array `x`.
@@ -1261,8 +1261,6 @@ real(kind=wp) function dppt(p, idf) result(dpptr)
    !  D5:     A value used in the approximation.
    !  D7:     A value used in the approximation.
    !  D9:     A value used in the approximation.
-   !  EIGHT:  The value 8.0E0_wp.
-   !  FIFTN:  The value 15.0E0_wp.
    !  IDF:    The (positive integer) degrees of freedom.
    !  IPASS:  A value used in the approximation.
    !  MAXIT:  The maximum number of iterations allowed for the approx.
@@ -1581,11 +1579,11 @@ subroutine dodvcv &
       !! The approximate null vector for `fjacb`.
    real(kind=wp), intent(out) :: qraux(np)
       !! The array required to recover the orthogonal part of the Q-R decomposition.
-   integer, intent(inout) :: jpvt(np)
+   integer, intent(out) :: jpvt(np)
       !! The pivot vector.
-   real(kind=wp), intent(in) :: s(np)
+   real(kind=wp), intent(out) :: s(np)
       !! The step for `beta`.
-   real(kind=wp), intent(in) :: t(n, m)
+   real(kind=wp), intent(out) :: t(n, m)
       !! The step for `delta`.
    integer, intent(out) :: irank
       !! The rank deficiency of the Jacobian wrt `beta`.
@@ -1599,17 +1597,17 @@ subroutine dodvcv &
       !! The residual variance.
    integer, intent(in) :: ifixb(np)
       !! The values designating whether the elements of `beta` are fixed at their input values or not.
-   real(kind=wp), intent(inout) :: wrk1(n, nq, m)
+   real(kind=wp), intent(out) :: wrk1(n, nq, m)
       !! A work array of `(n by nq by m)` elements.
-   real(kind=wp), intent(inout) :: wrk2(n, nq)
+   real(kind=wp), intent(out) :: wrk2(n, nq)
       !! A work array of `(n by nq)` elements.
-   real(kind=wp), intent(inout) :: wrk3(np)
+   real(kind=wp), intent(out) :: wrk3(np)
       !! A work array of `(np)` elements.
-   real(kind=wp), intent(inout) :: wrk4(m, m)
+   real(kind=wp), intent(out) :: wrk4(m, m)
       !! A work array of `(m by m)` elements.
-   real(kind=wp), intent(inout) :: wrk5(m)
+   real(kind=wp), intent(out) :: wrk5(m)
       !! A work array of `(m)` elements.
-   real(kind=wp), intent(inout) :: wrk(lwrk)
+   real(kind=wp), intent(out) :: wrk(lwrk)
       !! A work array of `(lwrk)` elements, equivalenced to `wrk1` and `wrk2`.
    integer, intent(in) :: lwrk
       !! The length of vector `lwrk`.
@@ -1807,3 +1805,445 @@ subroutine dodvcv &
 
 end subroutine dodvcv
 
+subroutine dodstp &
+   (n, m, np, nq, npp, &
+    f, fjacb, fjacd, &
+    wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
+    alpha, epsfcn, isodr, &
+    tfjacb, omega, u, qraux, kpvt, &
+    s, t, phi, irank, rcond, forvcv, &
+    wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
+!! Compute locally constrained steps S and T, and PHI(ALPHA).
+! Routines Called  IDAMAX,DCHEX,DESUBI,DFCTR,DNRM2,DQRDC,DQRSL,DROT,
+!                  DROTG,DSOLVE,DTRCO,DTRSL,DVEVTR,DWGHT
+! Date Written   860529   (YYMMDD)
+! Revision Date  920619   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero, one
+   use odrpack, only: tempret
+
+   integer, intent(in) :: n
+      !! The number of observations.
+   integer, intent(in) :: m
+      !! The number of columns of data in the explanatory variable.
+   integer, intent(in) :: np
+      !! The number of function parameters.
+   integer, intent(in) :: nq
+      !! The number of responses per observation.
+   integer, intent(in) :: npp
+      !! The number of function parameters being estimated.
+   real(kind=wp), intent(in) :: f(n, nq)
+      !! The (weighted) estimated values of `epsilon`.
+   real(kind=wp), intent(in) :: fjacb(n, np, nq)
+      !! The Jacobian with respect to `beta`.
+   real(kind=wp), intent(in) :: fjacd(n, m, nq)
+      !! The Jacobian with respect to `delta`.
+   real(kind=wp), intent(in) :: wd(ldwd, ld2wd, m)
+      !! The (squared) `delta` weights.
+   integer, intent(in) :: ldwd
+      !! The leading dimension of array `wd`.
+   integer, intent(in) :: ld2wd
+      !! The second dimension of array `wd`.
+   real(kind=wp), intent(in) :: ss(np)
+      !! The scaling values for the unfixed `betas`.
+   real(kind=wp), intent(in) :: tt(ldtt, m)
+      !! The scaling values for `delta`.
+   integer, intent(in) :: ldtt
+      !! The leading dimension of array `tt`.
+   real(kind=wp), intent(in) :: delta(n, m)
+      !! The estimated errors in the explanatory variables.
+   real(kind=wp), intent(in) :: alpha
+      !! The Levenberg-Marquardt parameter.
+   real(kind=wp), intent(in) :: epsfcn
+      !! The function's precision.
+   logical, intent(in) :: isodr
+      !! The variable designating whether the solution is by ODR (`isodr`=TRUE) or by OLS (`isodr`=FALSE).
+   real(kind=wp), intent(out) :: tfjacb(n, nq, np)
+      !! The array `omega`*`fjacb`.
+   real(kind=wp), intent(out) :: omega(nq, nq)
+      !! The array defined S.T.
+      !! `omega`*trans(`omega`) = inv(I+`fjacd`*inv(E)*trans(`fjacd`))
+      !! = (I-`fjacd`*inv(P)*trans(`fjacd`))
+      !! where E = D**2 + `alpha`*`tt`**2
+      !! P = trans(`fjacd`)*`fjacd` + D**2 + `alpha`*`tt`**2
+   real(kind=wp), intent(out) :: u(np)
+      !! The approximate null vector for `tfjacb`.
+   real(kind=wp), intent(out) :: qraux(np)
+      !! The array required to recover the orthogonal part of the Q-R decomposition.
+   integer, intent(out) :: kpvt(np)
+      !! The pivot vector.
+   real(kind=wp), intent(out) :: s(np)
+      !! The step for `beta`.
+   real(kind=wp), intent(out) :: t(n, m)
+      !! The step for `delta`.
+   real(kind=wp), intent(out) :: phi
+      !! The difference between the norm of the scaled step and the trust region diameter.
+   integer, intent(out) :: irank
+      !! The rank deficiency of the Jacobian wrt `beta`.
+   real(kind=wp), intent(out) :: rcond
+      !! The approximate reciprocal condition number of `tfjacb`.
+   logical, intent(in) :: forvcv
+      !! The variable designating whether this subroutine was called to set up for the covariance matrix computations (`forvcv`=TRUE) or not (`forvcv`=FALSE).
+   real(kind=wp), intent(out) :: wrk1(n, nq, m)
+      !! A work array of (`n` by `nq` by `m`) elements.
+   real(kind=wp), intent(out) :: wrk2(n, nq)
+      !! A work array of (`n` by `nq`) elements.
+   real(kind=wp), intent(out) :: wrk3(np)
+      !! A work array of (`np`) elements.
+   real(kind=wp), intent(out) :: wrk4(m, m)
+      !! A work array of (`m` by `m`) elements.
+   real(kind=wp), intent(out) :: wrk5(m)
+      !! A work array of (`m`) elements.
+   real(kind=wp), intent(out) :: wrk(lwrk)
+      !! A work array of (`lwrk`) elements, equivalenced to `wrk1` and `wrk2`.
+   integer, intent(in) :: lwrk
+      !! The length of vector `wrk`.
+   integer, intent(out) :: istopc
+      !! The variable designating whether the computations were stopped due to a numerical error within subroutine `dodstp`.
+
+   ! Local scalars
+   real(kind=wp) :: co, si, temp
+   integer :: i, imax, inf, ipvt, j, k, k1, k2, kp, l
+   logical :: elim
+
+   ! Local arrays
+   real(kind=wp) :: dum(2)
+
+   ! External functions
+   real(kind=wp), external :: dnrm2
+   integer, external :: idamax
+
+   ! External subroutines
+   external :: dchex, desubi, dfctr, dqrdc, dqrsl, drot, drotg, dsolve, dtrco, dtrsl, dvevtr
+
+   ! Interface blocks
+   interface
+      subroutine dwght &
+         (n, m, wt, ldwt, ld2wt, t, wtt)
+         use odrpack_kinds, only: wp
+         integer &
+            ldwt, ld2wt, m, n
+         real(kind=wp) &
+            t(:, :), wt(:, :, :), wtt(:, :)
+      end subroutine
+   end interface
+
+   ! Variable definitions (alphabetically)
+   !  ALPHA:   The Levenberg-Marquardt parameter.
+   !  CO:      The cosine from the plane rotation.
+   !  DELTA:   The estimated errors in the explanatory variables.
+   !  DUM:     A dummy array.
+   !  ELIM:    The variable designating whether columns of the Jacobian
+   !           wrt BETA have been eliminated (ELIM=TRUE) or not (ELIM=FALSE).
+   !  EPSFCN:  The function's precision.
+   !  F:       The (weighted) estimated values of EPSILON.
+   !  FJACB:   The Jacobian with respect to BETA.
+   !  FJACD:   The Jacobian with respect to DELTA.
+   !  FORVCV:  The variable designating whether this subroutine was called to set up for the
+   !           covariance matrix computations (FORVCV=TRUE) or not (FORVCV=FALSE).
+   !  I:       An indexing variable.
+   !  IMAX:    The index of the element of U having the largest absolute value.
+   !  INF:     The return code from LINPACK routines.
+   !  IPVT:    The variable designating whether pivoting is to be done.
+   !  IRANK:   The rank deficiency of the Jacobian wrt BETA.
+   !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by
+   !           OLS (ISODR=FALSE).
+   !  ISTOPC:  The variable designating whether the computations were stoped due to a numerical
+   !                error within subroutine DODSTP.
+   !  J:       An indexing variable.
+   !  K:       An indexing variable.
+   !  K1:      An indexing variable.
+   !  K2:      An indexing variable.
+   !  KP:      The rank of the Jacobian wrt BETA.
+   !  KPVT:    The pivot vector.
+   !  L:       An indexing variable.
+   !  LDTT:    The leading dimension of array TT.
+   !  LDWD:    The leading dimension of array WD.
+   !  LD2WD:   The second dimension of array WD.
+   !  LWRK:    The length of vector WRK.
+   !  M:       The number of columns of data in the explanatory variable.
+   !  N:       The number of observations.
+   !  NP:      The number of function parameters.
+   !  NPP:     The number of function parameters being estimated.
+   !  OMEGA:   The array defined S.T.
+   !           OMEGA*trans(OMEGA) = inv(I+FJACD*inv(E)*trans(FJACD))
+   !           = (I-FJACD*inv(P)*trans(FJACD))
+   !           where E = D**2 + ALPHA*TT**2
+   !           P = trans(FJACD)*FJACD + D**2 + ALPHA*TT**2
+   !  PHI:     The difference between the norm of the scaled step and the trust region diameter.
+   !  QRAUX:   The array required to recover the orthogonal part of the Q-R decomposition.
+   !  RCOND:   The approximate reciprocal condition number of TFJACB.
+   !  S:       The step for BETA.
+   !  SI:      The sine from the plane rotation.
+   !  SS:      The scaling values for the unfixed BETAS.
+   !  T:       The step for DELTA.
+   !  TEMP:    A temporary storage LOCATION.
+   !  TFJACB:  The array OMEGA*FJACB.
+   !  TT:      The scaling values for DELTA.
+   !  U:       The approximate null vector for TFJACB.
+   !  WD:      The (squared) DELTA weights.
+   !  WRK:     A work array of (LWRK) elements, equivalenced to WRK1 and WRK2.
+   !  WRK1:    A work array of (N by NQ by M) elements.
+   !  WRK2:    A work array of (N by NQ) elements.
+   !  WRK3:    A work array of (NP) elements.
+   !  WRK4:    A work array of (M by M) elements.
+   !  WRK5:    A work array of (M) elements.
+
+   ! Compute loop parameters which depend on weight structure
+
+   !  Set up KPVT if ALPHA = 0
+   if (alpha .eq. zero) then
+!-----------------------^------------------------------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+      kp = npp
+      do k = 1, np
+         kpvt(k) = k
+      end do
+   else
+      if (npp .ge. 1) then
+         kp = npp - irank
+      else
+         kp = npp
+      end if
+   end if
+
+   if (isodr) then
+      ! T = WD * DELTA = D*G2
+      call dwght(n, m, wd, ldwd, ld2wd, delta, t)
+
+      do i = 1, n
+         !  Compute WRK4, such that TRANS(WRK4)*WRK4 = E = (D**2 + ALPHA*TT**2)
+         call desubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, wrk4)
+         call dfctr(.false., wrk4, m, m, inf)
+         if (inf .ne. 0) then
+            istopc = 60000
+            return
+         end if
+         !  Compute OMEGA, such that
+         !             trans(OMEGA)*OMEGA = I+FJACD*inv(E)*trans(FJACD)
+         !             inv(trans(OMEGA)*OMEGA) = I-FJACD*inv(P)*trans(FJACD)
+         call dvevtr(m, nq, i, fjacd, n, m, wrk4, m, wrk1, n, nq, omega, nq, wrk5)
+         do l = 1, nq
+            omega(l, l) = one + omega(l, l)
+         end do
+         call dfctr(.false., omega, nq, nq, inf)
+         if (inf .ne. 0) then
+            istopc = 60000
+            return
+         end if
+         ! Compute WRK1 = trans(FJACD)*(I-FJACD*inv(P)*trans(JFACD))
+         !              = trans(FJACD)*inv(trans(OMEGA)*OMEGA)
+         do j = 1, m
+            do l = 1, nq
+               wrk1(i, l, j) = fjacd(i, j, l)
+            end do
+            call dsolve(nq, omega, nq, wrk1(i, 1:nq, j), 4)
+            call dsolve(nq, omega, nq, wrk1(i, 1:nq, j), 2)
+         end do
+
+         ! Compute WRK5 = inv(E)*D*G2
+         do j = 1, m
+            wrk5(j) = t(i, j)
+         end do
+         call dsolve(m, wrk4, m, wrk5, 4)
+         call dsolve(m, wrk4, m, wrk5, 2)
+
+         ! Compute TFJACB = inv(trans(OMEGA))*FJACB
+         do k = 1, kp
+            do l = 1, nq
+               tfjacb(i, l, k) = fjacb(i, kpvt(k), l)
+            end do
+            call dsolve(nq, omega, nq, tfjacb(i, 1:nq, k), 4)
+            do l = 1, nq
+               if (ss(1) .gt. zero) then
+                  tfjacb(i, l, k) = tfjacb(i, l, k)/ss(kpvt(k))
+               else
+                  tfjacb(i, l, k) = tfjacb(i, l, k)/abs(ss(1))
+               end if
+            end do
+         end do
+         ! Compute WRK2 = (V*inv(E)*D**2*G2 - G1)
+         do l = 1, nq
+            wrk2(i, l) = zero
+            do j = 1, m
+               wrk2(i, l) = wrk2(i, l) + fjacd(i, j, l)*wrk5(j)
+            end do
+            wrk2(i, l) = wrk2(i, l) - f(i, l)
+         end do
+
+         ! Compute WRK2 = inv(trans(OMEGA))*(V*inv(E)*D**2*G2 - G1)
+         call dsolve(nq, omega, nq, wrk2(i, 1:nq), 4)
+      end do
+
+   else
+      do i = 1, n
+         do l = 1, nq
+            do k = 1, kp
+               tfjacb(i, l, k) = fjacb(i, kpvt(k), l)
+               if (ss(1) .gt. zero) then
+                  tfjacb(i, l, k) = tfjacb(i, l, k)/ss(kpvt(k))
+               else
+                  tfjacb(i, l, k) = tfjacb(i, l, k)/abs(ss(1))
+               end if
+            end do
+            wrk2(i, l) = -f(i, l)
+         end do
+      end do
+   end if
+
+   ! Compute S
+   ! Do QR factorization (with column pivoting of TFJACB if ALPHA = 0)
+   if (alpha .eq. zero) then
+!-----------------------^------------------------------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+      ipvt = 1
+      do k = 1, np
+         kpvt(k) = 0
+      end do
+   else
+      ipvt = 0
+   end if
+
+   call dqrdc(tfjacb, n*nq, n*nq, kp, qraux, kpvt, wrk3, ipvt)
+   call dqrsl(tfjacb, n*nq, n*nq, kp, &
+              qraux, wrk2, dum, wrk2, dum, dum, dum, 1000, inf)
+   if (inf .ne. 0) then
+      istopc = 60000
+      return
+   end if
+
+   ! Eliminate alpha part using givens rotations
+   if (alpha .ne. zero) then
+!-----------------------^------------------------------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+      s(1:npp) = zero
+      do k1 = 1, kp
+         wrk3(1:kp) = zero
+         wrk3(k1) = sqrt(alpha)
+         do k2 = k1, kp
+            call drotg(tfjacb(k2, 1, k2), wrk3(k2), co, si)
+            if (kp - k2 .ge. 1) then
+               call drot(kp - k2, tfjacb(k2, 1, k2 + 1), n*nq, &
+                         wrk3(k2 + 1), 1, co, si)
+            end if
+            temp = co*wrk2(k2, 1) + si*s(kpvt(k1))
+            s(kpvt(k1)) = -si*wrk2(k2, 1) + co*s(kpvt(k1))
+            wrk2(k2, 1) = temp
+         end do
+      end do
+   end if
+
+   ! Compute solution - eliminate variables if necessary
+   if (npp .ge. 1) then
+      if (alpha .eq. zero) then
+!--------------------------^---------------------------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+         kp = npp
+         elim = .true.
+         do while (elim .and. kp .ge. 1)
+            ! Estimate RCOND - U will contain approx null vector
+            call dtrco(tfjacb, n*nq, kp, rcond, u, 1)
+            if (rcond .le. epsfcn) then
+               elim = .true.
+               imax = idamax(kp, u, 1)
+               ! IMAX is the column to remove - use DCHEX and fix KPVT
+               if (imax .ne. kp) then
+                  call dchex(tfjacb, n*nq, kp, imax, kp, wrk2, n*nq, 1, &
+                             qraux, wrk3, 2)
+                  k = kpvt(imax)
+                  do i = imax, kp - 1
+                     kpvt(i) = kpvt(i + 1)
+                  end do
+                  kpvt(kp) = k
+               end if
+               kp = kp - 1
+            else
+               elim = .false.
+            end if
+         end do
+         irank = npp - kp
+      end if
+   end if
+
+   if (forvcv) return
+
+   ! Backsolve and unscramble
+   if (npp .ge. 1) then
+      do i = kp + 1, npp
+         wrk2(i, 1) = zero
+      end do
+      if (kp .ge. 1) then
+         call dtrsl(tfjacb, n*nq, kp, wrk2, 01, inf)
+         if (inf .ne. 0) then
+            istopc = 60000
+            return
+         end if
+      end if
+      do i = 1, npp
+         if (ss(1) .gt. zero) then
+            s(kpvt(i)) = wrk2(i, 1)/ss(kpvt(i))
+         else
+            s(kpvt(i)) = wrk2(i, 1)/abs(ss(1))
+         end if
+      end do
+   end if
+
+   if (isodr) then
+      !  NOTE: T and WRK1 have been initialized above,
+      !          where T    = WD * DELTA = D*G2
+      !          WRK1 = trans(FJACD)*(I-FJACD*inv(P)*trans(JFACD))
+      do i = 1, n
+         ! Compute WRK4, such that trans(WRK4)*WRK4 = E = (D**2 + ALPHA*TT**2)
+         call desubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, wrk4)
+         call dfctr(.false., wrk4, m, m, inf)
+         if (inf .ne. 0) then
+            istopc = 60000
+            return
+         end if
+
+         ! Compute WRK5 = inv(E)*D*G2
+         do j = 1, m
+            wrk5(j) = t(i, j)
+         end do
+         call dsolve(m, wrk4, m, wrk5, 4)
+         call dsolve(m, wrk4, m, wrk5, 2)
+
+         do l = 1, nq
+            wrk2(i, l) = f(i, l)
+            do k = 1, npp
+               wrk2(i, l) = wrk2(i, l) + fjacb(i, k, l)*s(k)
+            end do
+            do j = 1, m
+               wrk2(i, l) = wrk2(i, l) - fjacd(i, j, l)*wrk5(j)
+            end do
+         end do
+
+         do j = 1, m
+            wrk5(j) = zero
+            do l = 1, nq
+               wrk5(j) = wrk5(j) + wrk1(i, l, j)*wrk2(i, l)
+            end do
+            t(i, j) = -(wrk5(j) + t(i, j))
+         end do
+         call dsolve(m, wrk4, m, t(i, 1:m), 4)
+         call dsolve(m, wrk4, m, t(i, 1:m), 2)
+      end do
+
+   end if
+
+   ! Compute PHI(ALPHA) from scaled S and T
+   call dwght(npp, 1, reshape(ss, [npp, 1, 1]), npp, 1, reshape(s, [npp, 1]), tempret(1:npp, 1:1))
+   wrk(1:npp) = tempret(1:npp, 1)
+   if (isodr) then
+      call dwght(n, m, reshape(tt, [ldtt, 1, m]), ldtt, 1, t, tempret(1:n, 1:m))
+      wrk(npp + 1:npp + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
+      phi = dnrm2(npp + n*m, wrk, 1)
+   else
+      phi = dnrm2(npp, wrk, 1)
+   end if
+
+end subroutine dodstp
