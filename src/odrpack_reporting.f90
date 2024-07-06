@@ -1,5 +1,4 @@
-
-subroutine dodpc1                                                             &
+subroutine dodpc1                                                        &
     ( ipr, lunrpt,                                                       &
     anajac, cdjac, chkjac, initd, restrt, isodr, implct, dovcv, redoj,   &
     msgb1, msgb, msgd1, msgd,                                            &
