@@ -1,3 +1,398 @@
+subroutine dacces &
+   (n, m, np, nq, ldwe, ld2we, &
+    work, lwork, iwork, liwork, &
+    access, isodr, &
+    jpvt, omega, u, qraux, sd, vcv, wrk1, wrk2, wrk3, wrk4, wrk5, wrk6, &
+    nnzw, npp, &
+    job, partol, sstol, maxit, taufac, eta, neta, &
+    lunrpt, ipr1, ipr2, ipr2f, ipr3, &
+    wss, rvar, idf, &
+    tau, alpha, niter, nfev, njev, int2, olmavg, &
+    rcond, irank, actrs, pnorm, prers, rnorms, istop)
+!! Access or store values in the work arrays.
+! Routines Called  DIWINF,DWINF
+! Date Written   860529   (YYMMDD)
+! Revision Date  920619   (YYMMDD)
+
+   use odrpack_kinds, only: wp
+
+   integer, intent(in) :: n
+      !! The number of observations.
+   integer, intent(in) :: m
+      !! The number of columns of data in the explanatory variable.
+   integer, intent(in) :: np
+      !! The number of function parameters.
+   integer, intent(in) :: nq
+      !! The number of responses per observation.
+   integer, intent(in) :: ldwe
+      !! The leading dimension of array `we`.
+   integer, intent(in) :: ld2we
+      !! The second dimension of array `we`.
+   real(kind=wp), intent(inout) :: work(lwork)
+      !! The `real` (kind=wp) work space.
+   integer, intent(in) :: lwork
+      !! The length of vector `work`.
+   integer, intent(inout) :: iwork(liwork)
+      !! The integer work space.
+   integer, intent(in) :: liwork
+      !! The length of vector `iwork`.
+   logical, intent(in) :: access
+      !! The variable designating whether information is to be accessed from the work
+      !! arrays (`access`=TRUE) or stored in them (`access`=FALSE).
+   logical, intent(in) :: isodr
+      !! The variable designating whether the solution is to be found by ODR (`isodr`=TRUE) or
+      !! by OLS (`isodr`=FALSE).
+   integer, intent(out) :: jpvt
+      !! The pivot vector.
+   integer, intent(out) :: omega
+      !! The starting location in array `work` of array `omega`.
+   integer, intent(out) :: u
+      !! The starting location in array `work` of array `u`.
+   integer, intent(out) :: qraux
+      !! The starting location in array `work` of array `qraux`.
+   integer, intent(out) :: sd
+      !! The starting location in array `work` of array `sd`.
+   integer, intent(out) :: vcv
+      !! The starting location in array `work` of array `vcv`.
+   integer, intent(out) :: wrk1
+      !! The starting location in array `work` of array `wrk1`.
+   integer, intent(out) :: wrk2
+      !! The starting location in array `work` of array `wrk2`.
+   integer, intent(out) :: wrk3
+      !! The starting location in array `work` of array `wrk3`.
+   integer, intent(out) :: wrk4
+      !! The starting location in array `work` of array `wrk4`.
+   integer, intent(out) :: wrk5
+      !! The starting location in array `work` of array `wrk5`.
+   integer, intent(out) :: wrk6
+      !! The starting location in array `work` of array `wrk6`.
+   integer, intent(out) :: nnzw
+      !! The number of nonzero weighted observations.
+   integer, intent(out) :: npp
+      !! The number of function parameters actually estimated.
+   integer, intent(out) :: job
+      !! The variable controlling problem initialization and computational method.
+   real(kind=wp), intent(out) :: partol
+      !! The parameter convergence stopping tolerance.
+   real(kind=wp), intent(out) :: sstol
+      !! The sum-of-squares convergence stopping tolerance.
+   integer, intent(out) :: maxit
+      !! The maximum number of iterations allowed.
+   real(kind=wp), intent(out) :: taufac
+      !! The factor used to compute the initial trust region diameter.
+   real(kind=wp), intent(out) :: eta
+      !! The relative noise in the function results.
+   integer, intent(out) :: neta
+      !! The number of accurate digits in the function results.
+   integer, intent(out) :: lunrpt
+       !! The logical unit number used for computation reports.
+   integer, intent(out) :: ipr1
+      !! The value of the fourth digit (from the right) of `iprint`, which controls the
+      !! initial summary report.
+   integer, intent(out) :: ipr2
+      !! The value of the third digit (from the right) of `iprint`, which controls the
+      !! iteration reports.
+   integer, intent(out) :: ipr2f
+      !! The value of the second digit (from the right) of `iprint`, which controls the
+      !! frequency of the iteration reports.
+   integer, intent(out) :: ipr3
+      !! The value of the first digit (from the right) of `iprint`, which controls the final
+      !! summary report.
+   real(kind=wp), intent(out) :: wss(3)
+      !! The sum of the squares of the weighted `epsilons` and `deltas`, the sum of the squares
+      !! of the weighted `deltas`, and the sum of the squares of the weighted `epsilons`.
+   real(kind=wp), intent(out) :: rvar
+      !! The residual variance, i.e. standard deviation squared.
+   integer, intent(out) :: idf
+      !! The degrees of freedom of the fit, equal to the number of observations with nonzero
+      !! weighted derivatives minus the number of parameters being estimated.
+   real(kind=wp), intent(out) :: tau
+      !! The trust region diameter.
+   real(kind=wp), intent(out) :: alpha
+      !! The Levenberg-Marquardt parameter.
+   integer, intent(out) :: niter
+      !! The number of iterations taken.
+   integer, intent(out) :: nfev
+      !! The number of function evaluations.
+   integer, intent(out) :: njev
+      !! The number of Jacobian evaluations.
+   integer, intent(out) :: int2
+      !! The number of internal doubling steps.
+   real(kind=wp), intent(out) :: olmavg
+      !! The average number of Levenberg-Marquardt steps per iteration.
+   real(kind=wp), intent(out) :: rcond
+      !! The approximate reciprocal condition of `fjacb`.
+   integer, intent(out) :: irank
+      !! The rank deficiency of the Jacobian wrt `beta`.
+   real(kind=wp), intent(out) :: actrs
+      !! The saved actual relative reduction in the sum-of-squares.
+   real(kind=wp), intent(out) :: pnorm
+      !! The norm of the scaled estimated parameters.
+   real(kind=wp), intent(out) :: prers
+      !! The saved predicted relative reduction in the sum-of-squares.
+   real(kind=wp), intent(out) :: rnorms
+      !! The norm of the saved weighted `epsilons` and `deltas`.
+   integer, intent(out) :: istop
+      !! The variable designating whether there are problems computing the function at the
+      !! current `beta` and `delta`.
+
+   ! Local scalars
+   integer :: actrsi, alphai, betaci, betani, betasi, beta0i, boundi, deltai, deltni, deltsi, &
+              diffi, epsi, epsmai, etai, fjacbi, fjacdi, fni, fsi, idfi, int2i, iprini, &
+              iprint, iranki, istopi, jobi, jpvti, ldtti, liwkmn, loweri, luneri, lunrpi, &
+              lwkmn, maxiti, msgb, msgd, netai, nfevi, niteri, njevi, nnzwi, nppi, nrowi, &
+              ntoli, olmavi, omegai, partli, pnormi, prersi, qrauxi, rcondi, rnorsi, rvari, &
+              sdi, si, ssfi, ssi, sstoli, taufci, taui, ti, tti, ui, upperi, vcvi, we1i, &
+              wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, wssi, wssdei, wssepi, xplusi
+
+   ! External subroutines
+   external :: diwinf, dwinf
+
+   ! Variable Definitions (alphabetically)
+   !  ACCESS:  The variable designating whether information is to be accessed from the work
+   !           arrays (ACCESS=TRUE) or stored in them (ACCESS=FALSE).
+   !  ACTRS:   The saved actual relative reduction in the sum-of-squares.
+   !  ACTRSI:  The location in array WORK of variable ACTRS.
+   !  ALPHA:   The Levenberg-Marquardt parameter.
+   !  ALPHAI:  The location in array WORK of variable ALPHA.
+   !  BETACI:  The starting location in array WORK of array BETAC.
+   !  BETANI:  The starting location in array WORK of array BETAN.
+   !  BETASI:  The starting location in array WORK of array BETAS.
+   !  BETA0I:  The starting location in array WORK of array BETA0.
+   !  DELTAI:  The starting location in array WORK of array DELTA.
+   !  DELTNI:  The starting location in array WORK of array DELTAN.
+   !  DELTSI:  The starting location in array WORK of array DELTAS.
+   !  DIFFI:   The starting location in array WORK of array DIFF.
+   !  EPSI:    The starting location in array WORK of array EPS.
+   !  EPSMAI:  The location in array WORK of variable EPSMAC.
+   !  ETA:     The relative noise in the function results.
+   !  ETAI:    The location in array WORK of variable ETA.
+   !  FJACBI:  The starting location in array WORK of array FJACB.
+   !  FJACDI:  The starting location in array WORK of array FJACD.
+   !  FNI:     The starting location in array WORK of array FN.
+   !  FSI:     The starting location in array WORK of array FS.
+   !  IDF:     The degrees of freedom of the fit, equal to the number of observations with nonzero
+   !           weighted derivatives minus the number of parameters being estimated.
+   !  IDFI:    The starting location in array IWORK of variable IDF.
+   !  INT2:    The number of internal doubling steps.
+   !  INT2I:   The location in array IWORK of variable INT2.
+   !  IPR1:    The value of the fourth digit (from the right) of IPRINT, which controls the
+   !           initial summary report.
+   !  IPR2:    The value of the third digit (from the right) of IPRINT, which controls the
+   !           iteration reports.
+   !  IPR2F:   The value of the second digit (from the right) of IPRINT, which controls the
+   !           frequency of the iteration reports.
+   !  IPR3:    The value of the first digit (from the right) of IPRINT, which controls the final
+   !           summary report.
+   !  IPRINI:  The location in array IWORK of variable IPRINT.
+   !  IPRINT:  The print control variable.
+   !  IRANK:   The rank deficiency of the Jacobian wrt BETA.
+   !  IRANKI:  The location in array IWORK of variable IRANK.
+   !  ISODR:   The variable designating whether the solution is to be found by ODR (ISODR=TRUE) or
+   !           by OLS (ISODR=FALSE).
+   !  ISTOP:   The variable designating whether there are problems computing the function at the
+   !           current BETA and DELTA.
+   !  ISTOPI:  The location in array IWORK of variable ISTOP.
+   !  IWORK:   The integer work space.
+   !  JOB:     The variable controling problem initialization and computational method.
+   !  JOBI:    The location in array IWORK of variable JOB.
+   !  JPVT:    The pivot vector.
+   !  JPVTI:   The starting location in array IWORK of variable JPVT.
+   !  LDTTI:   The starting location in array IWORK of variable LDTT.
+   !  LDWE:    The leading dimension of array WE.
+   !  LD2WE:   The second dimension of array WE.
+   !  LIWORK:  The length of vector IWORK.
+   !  LUNERI:  The location in array IWORK of variable LUNERR.
+   !  LUNERR:  The logical unit number used for error messages.
+   !  LUNRPI:  The location in array IWORK of variable LUNRPT.
+   !  LUNRPT:  The logical unit number used for computation reports.
+   !  LWKMN:   The minimum acceptable length of array WORK.
+   !  LWORK:   The length of vector WORK.
+   !  M:       The number of columns of data in the explanatory variable.
+   !  MAXIT:   The maximum number of iterations allowed.
+   !  MAXITI:  The location in array IWORK of variable MAXIT.
+   !  MSGB:    The starting location in array IWORK of array MSGB.
+   !  MSGD:    The starting location in array IWORK of array MSGD.
+   !  N:       The number of observations.
+   !  NETA:    The number of accurate digits in the function results.
+   !  NETAI:   The location in array IWORK of variable NETA.
+   !  NFEV:    The number of function evaluations.
+   !  NFEVI:   The location in array IWORK of variable NFEV.
+   !  NITER:   The number of iterations taken.
+   !  NITERI:  The location in array IWORK of variable NITER.
+   !  NJEV:    The number of Jacobian evaluations.
+   !  NJEVI:   The location in array IWORK of variable NJEV.
+   !  NNZW:    The number of nonzero weighted observations.
+   !  NNZWI:   The location in array IWORK of variable NNZW.
+   !  NP:      The number of function parameters.
+   !  NPP:     The number of function parameters actually estimated.
+   !  NPPI:    The location in array IWORK of variable NPP.
+   !  NQ:      The number of responses per observation.
+   !  NROWI:   The location in array IWORK of variable NROW.
+   !  NTOLI:   The location in array IWORK of variable NTOL.
+   !  OLMAVG:  The average number of Levenberg-Marquardt steps per iteration.
+   !  OLMAVI:  The location in array WORK of variable OLMAVG.
+   !  OMEGA:   The starting location in array WORK of array OMEGA.
+   !  OMEGAI:  The starting location in array WORK of array OMEGA.
+   !  PARTLI:  The location in array work of variable PARTOL.
+   !  PARTOL:  The parameter convergence stopping tolerance.
+   !  PNORM:   The norm of the scaled estimated parameters.
+   !  PNORMI:  The location in array WORK of variable PNORM.
+   !  PRERS:   The saved predicted relative reduction in the sum-of-squares.
+   !  PRERSI:  The location in array WORK of variable PRERS.
+   !  QRAUX:   The starting location in array WORK of array QRAUX.
+   !  QRAUXI:  The starting location in array WORK of array QRAUX.
+   !  RCOND:   The approximate reciprocal condition of FJACB.
+   !  RCONDI:  The location in array WORK of variable RCOND.
+   !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or not (RESTRT=FALSE).
+   !  RNORMS:  The norm of the saved weighted EPSILONS and DELTAS.
+   !  RNORSI:  The location in array WORK of variable RNORMS.
+   !  RVAR:    The residual variance, i.e. standard deviation squared.
+   !  RVARI:   The location in array WORK of variable RVAR.
+   !  SCLB:    The scaling values used for BETA.
+   !  SCLD:    The scaling values used for DELTA.
+   !  SD:      The starting location in array WORK of array SD.
+   !  SDI:     The starting location in array WORK of array SD.
+   !  SI:      The starting location in array WORK of array S.
+   !  SSFI:    The starting location in array WORK of array SSF.
+   !  SSI:     The starting location in array WORK of array SS.
+   !  SSTOL:   The sum-of-squares convergence stopping tolerance.
+   !  SSTOLI:  The location in array WORK of variable SSTOL.
+   !  TAU:     The trust region diameter.
+   !  TAUFAC:  The factor used to compute the initial trust region diameter.
+   !  TAUFCI:  The location in array WORK of variable TAUFAC.
+   !  TAUI:    the location in array WORK of variable TAU.
+   !  TI:      The starting location in array WORK of array T.
+   !  TTI:     The starting location in array WORK of array TT.
+   !  U:       The starting location in array WORK of array U.
+   !  UI:      The starting location in array WORK of array U.
+   !  VCV:     The starting location in array WORK of array VCV.
+   !  VCVI:    The starting location in array WORK of array VCV.
+   !  WE1I:    The starting location in array WORK of array WE1.
+   !  WORK:    The REAL (KIND=wp) work space.
+   !  WRK1:    The starting location in array WORK of array WRK1.
+   !  WRK1I:   The starting location in array WORK of array WRK1.
+   !  WRK2:    The starting location in array WORK of array WRK2.
+   !  WRK2I:   The starting location in array WORK of array WRK2.
+   !  WRK3:    The starting location in array WORK of array wrk3.
+   !  WRK3I:   The starting location in array WORK of array wrk3.
+   !  WRK4:    The starting location in array WORK of array wrk4.
+   !  WRK4I:   The starting location in array WORK of array wrk4.
+   !  WRK5:    The starting location in array WORK of array wrk5.
+   !  WRK5I:   The starting location in array WORK of array wrk5.
+   !  WRK6:    The starting location in array WORK of array wrk6.
+   !  WRK6I:   The starting location in array WORK of array wrk6.
+   !  WRK7I:   The starting location in array WORK of array wrk7.
+   !  WSS:     The sum of the squares of the weighted EPSILONS and DELTAS, the sum of the squares
+   !           of the weighted DELTAS, and the sum of the squares of the weighted EPSILONS.
+   !  WSSI:    The starting location in array WORK of variable WSS(1).
+   !  WSSDEI:  The starting location in array WORK of variable WSS(2).
+   !  WSSEPI:  The starting location in array WORK of variable WSS(3).
+   !  XPLUSI:  The starting location in array WORK of array XPLUSD.
+
+   ! Find starting locations within integer workspace
+   call diwinf(m, np, nq, &
+               msgb, msgd, jpvti, istopi, &
+               nnzwi, nppi, idfi, &
+               jobi, iprini, luneri, lunrpi, &
+               nrowi, ntoli, netai, &
+               maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
+               boundi, &
+               liwkmn)
+
+   ! Find starting locations within REAL work space
+   call dwinf(n, m, np, nq, ldwe, ld2we, isodr, &
+              deltai, epsi, xplusi, fni, sdi, vcvi, &
+              rvari, wssi, wssdei, wssepi, rcondi, etai, &
+              olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
+              partli, sstoli, taufci, epsmai, &
+              beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
+              fsi, fjacbi, we1i, diffi, &
+              deltsi, deltni, ti, tti, omegai, fjacdi, &
+              wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
+              loweri, upperi, &
+              lwkmn)
+
+   if (access) then
+      ! Set starting locations for work vectors
+      jpvt = jpvti
+      omega = omegai
+      qraux = qrauxi
+      sd = sdi
+      vcv = vcvi
+      u = ui
+      wrk1 = wrk1i
+      wrk2 = wrk2i
+      wrk3 = wrk3i
+      wrk4 = wrk4i
+      wrk5 = wrk5i
+      wrk6 = wrk6i
+      ! Access values from the work vectors
+      actrs = work(actrsi)
+      alpha = work(alphai)
+      eta = work(etai)
+      olmavg = work(olmavi)
+      partol = work(partli)
+      pnorm = work(pnormi)
+      prers = work(prersi)
+      rcond = work(rcondi)
+      wss(1) = work(wssi)
+      wss(2) = work(wssdei)
+      wss(3) = work(wssepi)
+      rvar = work(rvari)
+      rnorms = work(rnorsi)
+      sstol = work(sstoli)
+      tau = work(taui)
+      taufac = work(taufci)
+
+      neta = iwork(netai)
+      irank = iwork(iranki)
+      job = iwork(jobi)
+      lunrpt = iwork(lunrpi)
+      maxit = iwork(maxiti)
+      nfev = iwork(nfevi)
+      niter = iwork(niteri)
+      njev = iwork(njevi)
+      nnzw = iwork(nnzwi)
+      npp = iwork(nppi)
+      idf = iwork(idfi)
+      int2 = iwork(int2i)
+
+      ! Set up print control variables
+      iprint = iwork(iprini)
+      ipr1 = mod(iprint, 10000)/1000
+      ipr2 = mod(iprint, 1000)/100
+      ipr2f = mod(iprint, 100)/10
+      ipr3 = mod(iprint, 10)
+
+   else
+      ! Store values into the work vectors
+      work(actrsi) = actrs
+      work(alphai) = alpha
+      work(olmavi) = olmavg
+      work(partli) = partol
+      work(pnormi) = pnorm
+      work(prersi) = prers
+      work(rcondi) = rcond
+      work(wssi) = wss(1)
+      work(wssdei) = wss(2)
+      work(wssepi) = wss(3)
+      work(rvari) = rvar
+      work(rnorsi) = rnorms
+      work(sstoli) = sstol
+      work(taui) = tau
+
+      iwork(iranki) = irank
+      iwork(istopi) = istop
+      iwork(nfevi) = nfev
+      iwork(niteri) = niter
+      iwork(njevi) = njev
+      iwork(idfi) = idf
+      iwork(int2i) = int2
+   end if
+
+end subroutine dacces
+
 pure subroutine dwinf &
    (n, m, np, nq, ldwe, ld2we, isodr, &
     deltai, epsi, xplusi, fni, sdi, vcvi, &
