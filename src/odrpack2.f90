@@ -1516,3 +1516,294 @@ subroutine dpack(n2, n1, v1, v2, ifix)
    end if
 
 end subroutine dpack
+
+subroutine dodvcv &
+   (n, m, np, nq, npp, &
+    f, fjacb, fjacd, &
+    wd, ldwd, ld2wd, ssf, ss, tt, ldtt, delta, &
+    epsfcn, isodr, &
+    vcv, sd, &
+    wrk6, omega, u, qraux, jpvt, &
+    s, t, irank, rcond, rss, idf, rvar, ifixb, &
+    wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
+!! Compute covariance matrix of estimated parameters.
+! Routines Called  DPODI,DODSTP
+! Date Written   901207   (YYMMDD)
+! Revision Date  920619   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero
+
+   integer, intent(in) :: n
+      !! The number of observations.
+   integer, intent(in) :: m
+      !! The number of columns of data in the explanatory variable.
+   integer, intent(in) :: np
+      !! The number of function parameters.
+   integer, intent(in) :: nq
+      !! The number of responses per observation.
+   integer, intent(in) :: npp
+      !! The number of function parameters being estimated.
+   real(kind=wp), intent(in) :: f(n, nq)
+      !! The (weighted) estimated values of `epsilon`.
+   real(kind=wp), intent(in) :: fjacb(n, np, nq)
+      !! The Jacobian with respect to `beta`.
+   real(kind=wp), intent(in) :: fjacd(n, m, nq)
+      !! The Jacobian with respect to `delta`.
+   real(kind=wp), intent(in) :: wd(ldwd, ld2wd, m)
+      !! The `delta` weights.
+   integer, intent(in) :: ldwd
+      !! The leading dimension of array `wd`.
+   integer, intent(in) :: ld2wd
+      !! The second dimension of array `wd`.
+   real(kind=wp), intent(in) :: ssf(np)
+      !! The scaling values used for `beta`.
+   real(kind=wp), intent(in) :: ss(np)
+      !! The scaling values for the unfixed `betas`.
+   real(kind=wp), intent(in) :: tt(ldtt, m)
+      !! The scaling values for `delta`.
+   integer, intent(in) :: ldtt
+      !! The leading dimension of array `tt`.
+   real(kind=wp), intent(in) :: delta(n, m)
+      !! The estimated errors in the explanatory variables.
+   real(kind=wp), intent(in) :: epsfcn
+      !! The function's precision.
+   logical, intent(in) :: isodr
+      !! The variable designating whether the solution is by ODR (`isodr=.TRUE.`) or by OLS (`isodr=.FALSE.`).
+   real(kind=wp), intent(out) :: vcv(np, np)
+      !! The covariance matrix of the estimated `betas`.
+   real(kind=wp), intent(out) :: sd(np)
+      !! The standard deviations of the estimated `betas`.
+   real(kind=wp), intent(out) :: wrk6(n*nq, np)
+      !! A work array of `(n*nq by np)` elements.
+   real(kind=wp), intent(out) :: omega(nq, nq)
+      !! The array defined such that `omega*trans(omega) = inv(I+fjacd*inv(e)*trans(fjacd)) = (I-fjacd*inv(p)*trans(fjacd))`.
+   real(kind=wp), intent(out) :: u(np)
+      !! The approximate null vector for `fjacb`.
+   real(kind=wp), intent(out) :: qraux(np)
+      !! The array required to recover the orthogonal part of the Q-R decomposition.
+   integer, intent(inout) :: jpvt(np)
+      !! The pivot vector.
+   real(kind=wp), intent(in) :: s(np)
+      !! The step for `beta`.
+   real(kind=wp), intent(in) :: t(n, m)
+      !! The step for `delta`.
+   integer, intent(out) :: irank
+      !! The rank deficiency of the Jacobian wrt `beta`.
+   real(kind=wp), intent(out) :: rcond
+      !! The approximate reciprocal condition of `fjacb`.
+   real(kind=wp), intent(out) :: rss
+      !! The residual sum of squares.
+   integer, intent(out) :: idf
+      !! The degrees of freedom of the fit, equal to the number of observations with nonzero weighted derivatives minus the number of parameters being estimated.
+   real(kind=wp), intent(out) :: rvar
+      !! The residual variance.
+   integer, intent(in) :: ifixb(np)
+      !! The values designating whether the elements of `beta` are fixed at their input values or not.
+   real(kind=wp), intent(inout) :: wrk1(n, nq, m)
+      !! A work array of `(n by nq by m)` elements.
+   real(kind=wp), intent(inout) :: wrk2(n, nq)
+      !! A work array of `(n by nq)` elements.
+   real(kind=wp), intent(inout) :: wrk3(np)
+      !! A work array of `(np)` elements.
+   real(kind=wp), intent(inout) :: wrk4(m, m)
+      !! A work array of `(m by m)` elements.
+   real(kind=wp), intent(inout) :: wrk5(m)
+      !! A work array of `(m)` elements.
+   real(kind=wp), intent(inout) :: wrk(lwrk)
+      !! A work array of `(lwrk)` elements, equivalenced to `wrk1` and `wrk2`.
+   integer, intent(in) :: lwrk
+      !! The length of vector `lwrk`.
+   integer, intent(out) :: istopc
+      !! The variable designating whether the computations were stoped due to a numerical error within subroutine `dodstp`.
+
+   ! Local scalars
+   real(kind=wp) :: temp
+   integer :: i, iunfix, j, junfix, kp
+   logical :: forvcv
+
+   ! External subroutines
+   external :: dpodi, dodstp
+
+   ! Variable definitions (alphabetically)
+   !  DELTA:   The estimated errors in the explanatory variables.
+   !  EPSFCN:  The function's precision.
+   !  F:       The (weighted) estimated values of EPSILON.
+   !  FJACB:   The Jacobian with respect to BETA.
+   !  FJACD:   The Jacobian with respect to DELTA.
+   !  FORVCV:  The variable designating whether subroutine DODSTP is called to set up for the
+   !           covariance matrix computations (FORVCV=TRUE) or not (FORVCV=FALSE).
+   !  I:       An indexing variable.
+   !  IDF:     The degrees of freedom of the fit, equal to the number of observations with nonzero
+   !           weighted derivatives minus the number of parameters being estimated.
+   !  IFIXB:   The values designating whether the elements of BETA are fixed at their input values
+   !           or not.
+   !  IMAX:    The index of the element of U having the largest absolute value.
+   !  IRANK:   The rank deficiency of the Jacobian wrt BETA.
+   !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by
+   !           OLS (ISODR=FALSE).
+   !  ISTOPC:  The variable designating whether the computations were stoped due to a numerical
+   !           error within subroutine DODSTP.
+   !  IUNFIX:  The index of the next unfixed parameter.
+   !  J:       An indexing variable.
+   !  JPVT:    The pivot vector.
+   !  JUNFIX:  The index of the next unfixed parameter.
+   !  KP:      The rank of the Jacobian wrt BETA.
+   !  L:       An indexing variable.
+   !  LDTT:    The leading dimension of array TT.
+   !  LDWD:    The leading dimension of array WD.
+   !  LD2WD:   The second dimension of array WD.
+   !  LWRK:    The length of vector WRK.
+   !  M:       The number of columns of data in the explanatory variable.
+   !  N:       The number of observations.
+   !  NP:      The number of function parameters.
+   !  NPP:     The number of function parameters being estimated.
+   !  NQ:      The number of responses per observation.
+   !  OMEGA:   The array defined S.T.
+   !           OMEGA*trans(OMEGA) = inv(I+FJACD*inv(E)*trans(FJACD))
+   !           = (I-FJACD*inv(P)*trans(FJACD))
+   !           where E = D**2 + ALPHA*TT**2 and P = trans(FJACD)*FJACD + D**2 + ALPHA*TT**2
+   !  QRAUX:   The array required to recover the orthogonal part of the Q-R decomposition.
+   !  RCOND:   The approximate reciprocal condition of FJACB.
+   !  RSS:     The residual sum of squares.
+   !  RVAR:    The residual variance.
+   !  S:       The step for BETA.
+   !  SD:      The standard deviations of the estimated BETAS.
+   !  SS:      The scaling values for the unfixed BETAS.
+   !  SSF:     The scaling values used for BETA.
+   !  T:       The step for DELTA.
+   !  TEMP:    A temporary storage location
+   !  TT:      The scaling values for DELTA.
+   !  U:       The approximate null vector for FJACB.
+   !  VCV:     The covariance matrix of the estimated BETAS.
+   !  WD:      The DELTA weights.
+   !  WRK:     A work array of (LWRK) elements, equivalenced to WRK1 and WRK2.
+   !  WRK1:    A work array of (N by NQ by M) elements.
+   !  WRK2:    A work array of (N by NQ) elements.
+   !  WRK3:    A work array of (NP) elements.
+   !  WRK4:    A work array of (M by M) elements.
+   !  WRK5:    A work array of (M) elements.
+   !  WRK6:    A work array of (N*NQ by P) elements.
+
+   forvcv = .true.
+   istopc = 0
+
+   call dodstp(n, m, np, nq, npp, &
+               f, fjacb, fjacd, &
+               wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
+               zero, epsfcn, isodr, &
+               wrk6, omega, u, qraux, jpvt, &
+               s, t, temp, irank, rcond, forvcv, &
+               wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
+   if (istopc .ne. 0) then
+      return
+   end if
+   kp = npp - irank
+   call dpodi(wrk6, n*nq, kp, wrk3, 1)
+
+   idf = 0
+   do i = 1, n
+      if (any(fjacb(i, :, :) .ne. zero)) then
+         idf = idf + 1
+         cycle
+      end if
+      if (isodr) then
+         if (any(fjacd(i, :, :) .ne. zero)) then
+            idf = idf + 1
+            cycle
+         end if
+      end if
+   end do
+!---------------------------------------------^--------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+
+   if (idf .gt. kp) then
+      idf = idf - kp
+      rvar = rss/idf
+   else
+      idf = 0
+      rvar = rss
+   end if
+
+   ! Store variances in SD, restoring original order
+   do i = 1, np
+      sd(i) = zero
+   end do
+   do i = 1, kp
+      sd(jpvt(i)) = wrk6(i, i)
+   end do
+   if (np .gt. npp) then
+      junfix = npp
+      do j = np, 1, -1
+         if (ifixb(j) .eq. 0) then
+            sd(j) = zero
+         else
+            sd(j) = sd(junfix)
+            junfix = junfix - 1
+         end if
+      end do
+   end if
+
+   ! Store covariance matrix in VCV, restoring original order
+   do i = 1, np
+      do j = 1, i
+         vcv(i, j) = zero
+      end do
+   end do
+   do i = 1, kp
+      do j = i + 1, kp
+         if (jpvt(i) .gt. jpvt(j)) then
+            vcv(jpvt(i), jpvt(j)) = wrk6(i, j)
+         else
+            vcv(jpvt(j), jpvt(i)) = wrk6(i, j)
+         end if
+      end do
+   end do
+   if (np .gt. npp) then
+      iunfix = npp
+      do i = np, 1, -1
+         if (ifixb(i) .eq. 0) then
+            do j = i, 1, -1
+               vcv(i, j) = zero
+            end do
+         else
+            junfix = npp
+            do j = np, 1, -1
+               if (ifixb(j) .eq. 0) then
+                  vcv(i, j) = zero
+               else
+                  vcv(i, j) = vcv(iunfix, junfix)
+                  junfix = junfix - 1
+               end if
+            end do
+            iunfix = iunfix - 1
+         end if
+      end do
+   end if
+
+   do i = 1, np
+      vcv(i, i) = sd(i)
+      sd(i) = sqrt(rvar*sd(i))
+      do j = 1, i
+         vcv(j, i) = vcv(i, j)
+      end do
+   end do
+
+   ! Unscale standard errors and covariance matrix
+   do i = 1, np
+      if (ssf(1) .gt. zero) then
+         sd(i) = sd(i)/ssf(i)
+      else
+         sd(i) = sd(i)/abs(ssf(1))
+      end if
+      do j = 1, np
+         if (ssf(1) .gt. zero) then
+            vcv(i, j) = vcv(i, j)/(ssf(i)*ssf(j))
+         else
+            vcv(i, j) = vcv(i, j)/(ssf(1)*ssf(1))
+         end if
+      end do
+   end do
+
+end subroutine dodvcv
+
