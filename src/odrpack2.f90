@@ -751,6 +751,277 @@ subroutine detaf &
 
 end subroutine detaf
 
+subroutine devjac &
+   (fcn, &
+    anajac, cdjac, &
+    n, m, np, nq, &
+    betac, beta, stpb, &
+    ifixb, ifixx, ldifx, &
+    x, ldx, delta, xplusd, stpd, ldstpd, &
+    ssf, tt, ldtt, neta, fn, &
+    stp, wrk1, wrk2, wrk3, wrk6, &
+    fjacb, isodr, fjacd, we1, ldwe, ld2we, &
+    njev, nfev, istop, info, &
+    lower, upper)
+!! Compute the weighted Jacobians wrt BETA and DELTA.
+! Routines Called  FCN, DDOT, DIFIX, DJACCD, DJACFD, DWGHT, DUNPAC
+! Date Written   860529   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero
+   use odrpack, only: tempret
+
+   external :: fcn
+      !! The user-supplied subroutine for evaluating the model.
+   logical, intent(in) :: anajac
+      !! The variable designating whether the Jacobians are computed by finite differences
+      !! (`anajac = .false.`) or not (`anajac = .true.`).
+   logical, intent(in) :: cdjac
+      !! The variable designating whether the Jacobians are computed by central differences
+      !! (`cdjac = .true.`) or by forward differences (`cdjac = .false.`).
+   integer, intent(in) :: n
+      !! The number of observations.
+   integer, intent(in) :: m
+      !! The number of columns of data in the independent variable.
+   integer, intent(in) :: np
+      !! The number of function parameters.
+   integer, intent(in) :: nq
+      !! The number of responses per observation.
+   real(kind=wp), intent(in) :: betac(np)
+      !! The current estimated values of the unfixed `beta`s.
+   real(kind=wp), intent(out) :: beta(np)
+      !! The function parameters.
+   real(kind=wp), intent(in) :: stpb(np)
+      !! The relative step used for computing finite difference derivatives with respect to `beta`.
+   integer, intent(in) :: ifixb(np)
+      !! The values designating whether the elements of `beta` are fixed at their input values or not.
+   integer, intent(in) :: ifixx(ldifx, m)
+      !! The values designating whether the elements of `delta` are fixed at their input values or not.
+   integer, intent(in) :: ldifx
+      !! The leading dimension of array `ifixx`.
+   real(kind=wp), intent(in) :: x(ldx, m)
+      !! The independent variable.
+   integer, intent(in) :: ldx
+      !! The leading dimension of array `x`.
+   real(kind=wp), intent(in) :: delta(n, m)
+      !! The estimated values of `delta`.
+   real(kind=wp), intent(out) :: xplusd(n, m)
+      !! The values of `x` + `delta`.
+   real(kind=wp), intent(in) :: stpd(ldstpd, m)
+      !! The relative step used for computing finite difference derivatives with respect to `delta`.
+   integer, intent(in) :: ldstpd
+      !! The leading dimension of array `stpd`.
+   real(kind=wp), intent(in) :: ssf(np)
+      !! The scale used for the `beta`s.
+   real(kind=wp), intent(in) :: tt(ldtt, m)
+      !! The scaling values used for `delta`.
+   integer, intent(in) :: ldtt
+      !! The leading dimension of array `tt`.
+   integer, intent(in) :: neta
+      !! The number of accurate digits in the function results.
+   real(kind=wp), intent(out) :: fn(n, nq)
+      !! The predicted values of the function at the current point.
+   real(kind=wp), intent(in) :: stp(n)
+      !! The step used for computing finite difference derivatives with respect to `delta`.
+   real(kind=wp), intent(out) :: wrk1(n, m, nq)
+      !! A work array of (N BY M BY NQ) elements.
+   real(kind=wp), intent(out) :: wrk2(n, nq)
+      !! A work array of (N BY NQ) elements.
+   real(kind=wp), intent(out) :: wrk3(np)
+      !! A work array of (NP) elements.
+   real(kind=wp), intent(out) :: wrk6(n, np, nq)
+      !! A work array of (N BY NP BY NQ) elements.
+   real(kind=wp), intent(out) :: fjacb(n, np, nq)
+      !! The Jacobian with respect to `beta`.
+   logical, intent(in) :: isodr
+      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or OLS (`isodr = .false.`).
+   real(kind=wp), intent(out) :: fjacd(n, m, nq)
+      !! The Jacobian with respect to `delta`.
+   real(kind=wp), intent(in) :: we1(ldwe, ld2we, nq)
+      !! The square roots of the EPSILON weights in array `we`.
+   integer, intent(in) :: ldwe
+      !! The leading dimension of arrays `we` and `we1`.
+   integer, intent(in) :: ld2we
+      !! The second dimension of arrays `we` and `we1`.
+   integer, intent(inout) :: njev
+      !! The number of Jacobian evaluations.
+   integer, intent(inout) :: nfev
+      !! The number of function evaluations.
+   integer, intent(out) :: istop
+      !! The variable designating that the user wishes the computations stopped.
+   integer, intent(out) :: info
+      !! The variable designating why the computations were stopped.
+   real(kind=wp), intent(in) :: lower(np)
+      !! The lower bound of `beta`.
+   real(kind=wp), intent(in) :: upper(np)
+      !! The upper bound of `beta`.
+
+   ! Local scalars
+   integer :: ideval, j, k, k1, l
+   logical :: ferror
+
+   ! External subroutines
+   external :: difix, djaccd, djacfd, dunpac
+
+   ! External functions
+   real(kind=wp), external :: ddot
+
+   ! Interface blocks
+   interface
+      subroutine dwght &
+         (n, m, wt, ldwt, ld2wt, t, wtt)
+         use odrpack_kinds, only: wp
+         integer &
+            ldwt, ld2wt, m, n
+         real(kind=wp) &
+            t(:, :), wt(:, :, :), wtt(:, :)
+      end subroutine
+   end interface
+
+! Routine names used as subprogram arguments
+!  FCN:     The user-supplied subroutine for evaluating the model.
+!
+! Variable Definitions (alphabetically)
+!  ANAJAC:  The variable designating whether the Jacobians are computed by finite differences
+!          (ANAJAC=FALSE) or not (ANAJAC=TRUE).
+!  BETA:    The function parameters.
+!  BETAC:   The current estimated values of the unfixed BETA's.
+!  CDJAC:   The variable designating whether the Jacobians are computed by central differences
+!           (CDJAC=TRUE) or by forward differences (CDJAC=FALSE).
+!  DELTA:   The estimated values of DELTA.
+!  FERROR:  The variable designating whether ODRPACK95 detected nonzero values in array DELTA
+!           in the OLS case, and thus whether the user may have overwritten important information
+!           by computing FJACD in the OLS case.
+!  FJACB:   The Jacobian with respect to BETA.
+!  FJACD:   The Jacobian with respect to DELTA.
+!  FN:      The predicted values of the function at the current point.
+!  IDEVAL:  The variable designating what computations are to be performed by user-supplied
+!           subroutine FCN.
+!  IFIXB:   The values designating whether the elements of BETA are fixed at their input values or not.
+!  IFIXX:   The values designating whether the elements of DELTA are fixed at their input values or not.
+!  INFO:    The variable designating why the computations were stopped.
+!  ISTOP:   The variable designating that the user wishes the computations stopped.
+!  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or OLS (ISODR=FALSE).
+!  J:       An indexing variable.
+!  K:       An indexing variable.
+!  K1:      An indexing variable.
+!  L:       An indexing variable.
+!  LDIFX:   The leading dimension of array IFIXX.
+!  LDSTPD:  The leading dimension of array STPD.
+!  LDTT:    The leading dimension of array TT.
+!  LDWE:    The leading dimension of arrays WE and WE1.
+!  LDX:     The leading dimension of array X.
+!  LD2WE:   The second dimension of arrays WE and WE1.
+!  M:       The number of columns of data in the independent variable.
+!  N:       The number of observations.
+!  NETA:    The number of accurate digits in the function results.
+!  NFEV:    The number of function evaluations.
+!  NJEV:    The number of Jacobian evaluations.
+!  NP:      The number of function parameters.
+!  NQ:      The number of responses per observation.
+!  SSF:     The scale used for the BETA's.
+!  STP:     The step used for computing finite difference derivatives with respect to DELTA.
+!  STPB:    The relative step used for computing finite difference derivatives with respect to BETA.
+!  STPD:    The relative step used for computing finite difference derivatives with respect to DELTA.
+!  TT:      The scaling values used for DELTA.
+!  WE1:     The square roots of the EPSILON weights in array WE.
+!  WRK1:    A work array of (N by M by NQ) elements.
+!  WRK2:    A work array of (N by NQ) elements.
+!  WRK3:    A work array of (NP) elements.
+!  WRK6:    A work array of (N BY NP BY NQ) elements.
+!  X:       The independent variable.
+!  XPLUSD:  The values of X + DELTA.
+
+   !  Insert current unfixed BETA estimates into BETA
+   call dunpac(np, betac, beta, ifixb)
+
+   ! Compute XPLUSD = X + DELTA
+   xplusd = x(1:n, :) + delta
+
+   ! Compute the Jacobian wrt the estimated BETAS (FJACB) and the Jacobian wrt DELTA (FJACD)
+   istop = 0
+   if (isodr) then
+      ideval = 110
+   else
+      ideval = 010
+   end if
+   if (anajac) then
+      call fcn(n, m, np, nq, &
+               n, m, np, &
+               beta, xplusd, &
+               ifixb, ifixx, ldifx, &
+               ideval, wrk2, fjacb, fjacd, &
+               istop)
+      if (istop .ne. 0) then
+         return
+      else
+         njev = njev + 1
+      end if
+      ! Make sure fixed elements of FJACD are zero
+      if (isodr) then
+         do l = 1, nq
+            call difix(n, m, ifixx, ldifx, fjacd(1, 1, l), n, fjacd(1, 1, &
+                                                                    l), n)
+         end do
+      end if
+   elseif (cdjac) then
+      call djaccd(fcn, &
+                  n, m, np, nq, &
+                  beta, x, ldx, delta, xplusd, ifixb, ifixx, ldifx, &
+                  stpb, stpd, ldstpd, &
+                  ssf, tt, ldtt, neta, fn, stp, wrk1, wrk2, wrk3, wrk6, &
+                  fjacb, isodr, fjacd, nfev, istop, info, &
+                  lower, upper)
+   else
+      call djacfd(fcn, &
+                  n, m, np, nq, &
+                  beta, x, ldx, delta, xplusd, ifixb, ifixx, ldifx, &
+                  stpb, stpd, ldstpd, &
+                  ssf, tt, ldtt, neta, fn, stp, wrk1, wrk2, wrk3, wrk6, &
+                  fjacb, isodr, fjacd, nfev, istop, info, &
+                  lower, upper)
+   end if
+   if (istop .lt. 0 .or. info .ge. 10000) then
+      return
+   elseif (.not. isodr) then
+      ! Try to detect whether the user has computed JFACD within FCN in the OLS case
+      ferror = ddot(n*m, delta, 1, delta, 1) .ne. zero
+!-----------------------------------------------------^------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+      if (ferror) then
+         info = 50300
+         return
+      end if
+   end if
+
+   ! Weight the Jacobian wrt the estimated BETAS
+   if (ifixb(1) .lt. 0) then
+      do k = 1, np
+         call dwght(n, nq, we1, ldwe, ld2we, fjacb(1:n, k, 1:nq), tempret(1:n, 1:nq))
+         fjacb(1:n, k, 1:nq) = tempret(1:n, 1:nq)
+      end do
+   else
+      k1 = 0
+      do k = 1, np
+         if (ifixb(k) .ge. 1) then
+            k1 = k1 + 1
+            call dwght(n, nq, we1, ldwe, ld2we, fjacb(1:n, k, 1:nq), tempret(1:n, 1:nq))
+            fjacb(1:n, k1, 1:nq) = tempret(1:n, 1:nq)
+         end if
+      end do
+   end if
+
+   ! Weight the Jacobian's wrt DELTA as appropriate
+   if (isodr) then
+      do j = 1, m
+         call dwght(n, nq, we1, ldwe, ld2we, fjacd(1:n, j, 1:nq), tempret(1:n, 1:nq))
+         fjacd(1:n, j, 1:nq) = tempret(1:n, 1:nq)
+      end do
+   end if
+
+end subroutine devjac
+
 pure subroutine dwinf &
    (n, m, np, nq, ldwe, ld2we, isodr, &
     deltai, epsi, xplusi, fni, sdi, vcvi, &
