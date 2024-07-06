@@ -10,7 +10,7 @@ subroutine dacces &
     tau, alpha, niter, nfev, njev, int2, olmavg, &
     rcond, irank, actrs, pnorm, prers, rnorms, istop)
 !! Access or store values in the work arrays.
-! Routines Called  DIWINF,DWINF
+! Routines Called  DIWINF, DWINF
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920619   (YYMMDD)
 
@@ -395,7 +395,7 @@ end subroutine dacces
 
 pure subroutine desubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, e)
 !! Compute E = WD + ALPHA*TT**2.
-! Routines Called (None)
+! Routines Called (NONE)
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
 
@@ -545,7 +545,7 @@ pure subroutine dwinf &
     wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
     loweri, upperi, &
     lwkmn)
-!! Set storage locations within REAL (KIND=wp) work space
+!! Set storage locations within REAL (KIND=wp) work space.
 ! Routines Called  (NONE)
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920619   (YYMMDD)
@@ -867,7 +867,7 @@ pure subroutine dwinf &
 end subroutine dwinf
 
 pure subroutine dwght(n, m, wt, ldwt, ld2wt, t, wtt)
-!! Scale matrix T using WT, i.e., compute WTT = WT*T
+!! Scale matrix T using WT, i.e., compute WTT = WT*T.
 ! Routines Called  (NONE)
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
@@ -967,7 +967,7 @@ subroutine dvevtr &
    (m, nq, indx, &
     v, ldv, ld2v, e, lde, ve, ldve, ld2ve, vev, ldvev, &
     wrk5)
-!! Compute  V*E*trans(V) for the (INDX)TH M by NQ array in V
+!! Compute  V*E*trans(V) for the (INDX)TH M by NQ array in V.
 ! Routines Called  DSOLVE
 ! Date Written   910613   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
@@ -1052,7 +1052,7 @@ subroutine dvevtr &
 end subroutine dvevtr
 
 subroutine dunpac(n2, v1, v2, ifix)
-!! Copy the elements of `v1` into the locations of `v2` which are unfixed
+!! Copy the elements of `v1` into the locations of `v2` which are unfixed.
 ! Routines Called  DCOPY
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
@@ -1101,7 +1101,7 @@ subroutine dsolve(n, t, ldt, b, job)
 !! Solve systems of the form:
 !!  T * X = B  or  trans(T) * X = B
 !! where T is an upper or lower triangular matrix of order N, and the solution X overwrites
-!! the RHS B. (adapted from LINPACK subroutine DTRSL)
+!! the RHS B. (adapted from LINPACK subroutine DTRSL).
 !! References:
 !!  Dongarra J.J., Bunch J.R., Moler C.B., Stewart G.W., *LINPACK Users Guide*, SIAM, 1979.
 ! Routines Called  DAXPY,DDOT
@@ -1231,7 +1231,7 @@ subroutine dsolve(n, t, ldt, b, job)
 end subroutine dsolve
 
 pure subroutine dsetn(n, m, x, ldx, nrow)
-!! Select the row at which the derivative will be checked
+!! Select the row at which the derivative will be checked.
 ! Routines Called  (None)
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
@@ -1279,8 +1279,9 @@ pure subroutine dsetn(n, m, x, ldx, nrow)
 end subroutine dsetn
 
 pure subroutine dscld(n, m, x, ldx, tt, ldtt)
-!! Select scaling values for DELTA according to the algorithm given in the ODRPACK95 reference guide
-! Routines Called  (None)
+!! Select scaling values for DELTA according to the algorithm given in the ODRPACK95 reference
+!! guide.
+! Routines Called (NONE)
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
 
@@ -1364,8 +1365,8 @@ pure subroutine dscld(n, m, x, ldx, tt, ldtt)
 end subroutine dscld
 
 pure subroutine dsclb(np, beta, ssf)
-!! Select scaling values for BETA according to the algorithm given in the ODRPACK95 reference guide
-! Routines Called  (NONE)
+!! Select scaling values for BETA according to the algorithm given in the ODRPACK95 reference guide.
+! Routines Called (NONE)
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
 
@@ -1437,8 +1438,8 @@ pure subroutine dsclb(np, beta, ssf)
 end subroutine dsclb
 
 pure subroutine dscale(n, m, scl, ldscl, t, ldt, sclt, ldsclt)
-!! Scale T by the inverse of SCL, I.E., compute T/SCL
-! Routines Called  (NONE)
+!! Scale T by the inverse of SCL, I.E., compute T/SCL.
+! Routines Called (NONE)
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
 
@@ -1513,8 +1514,8 @@ subroutine dpvd &
     nrow, j, lq, stp, &
     istop, nfev, pvd, &
     wrk1, wrk2, wrk6)
-!! Compute NROW-th function value using X(NROW,J) + DELTA(NROW,J) + STP
-! Routines Called  FCN
+!! Compute NROW-th function value using X(NROW,J) + DELTA(NROW,J) + STP.
+! Routines Called FCN
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
 
@@ -1615,7 +1616,7 @@ subroutine dpvb &
     nrow, j, lq, stp, &
     istop, nfev, pvb, &
     wrk1, wrk2, wrk6)
-!! Compute the NROW-th function value using BETA(J) + STP
+!! Compute the NROW-th function value using BETA(J) + STP.
 ! Routines Called  FCN
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
@@ -1708,9 +1709,9 @@ subroutine dpvb &
 end subroutine dpvb
 
 real(kind=wp) function dppt(p, idf) result(dpptr)
-!! Compute the percent point function value for the student's T distribution with IDF degrees
+!! Compute the percent point function value for the student's T distribution with `idf` degrees
 !! of freedom. (Adapted from DATAPAC subroutine TPPF, with modifications to facilitate
-!! conversion to REAL (KIND=wp) automatically)
+!! conversion to REAL automatically).
 ! Routines Called  DPPNML
 ! Date Written   901207   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
@@ -1903,8 +1904,8 @@ real(kind=wp) function dppnml(p) result(dppnmlr)
 !! and standard deviation 1, and with probability density function
 !!       F(X) = (1/SQRT(2*PI))*EXP(-X*X/2).
 !! (Adapted from DATAPAC subroutine TPPF, with modifications to facilitate conversion to
-!! REAL (KIND=wp) automatically)
-! Routines Called  (None)
+!! REAL (KIND=wp) automatically).
+! Routines Called  (NONE)
 ! Date Written   901207   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
 !***Author  Filliben, James J.,
@@ -2003,7 +2004,7 @@ real(kind=wp) function dppnml(p) result(dppnmlr)
 end function dppnml
 
 subroutine dpack(n2, n1, v1, v2, ifix)
-!! Select the unfixed elements of V2 and return them in V1.
+!! Select the unfixed elements of `v2` and return them in `v1`.
 ! Routines Called  DCOPY
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
