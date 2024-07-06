@@ -393,6 +393,146 @@ subroutine dacces &
 
 end subroutine dacces
 
+pure subroutine desubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, e)
+!! Compute E = WD + ALPHA*TT**2.
+! Routines Called (None)
+! Date Written   860529   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero
+
+   integer, intent(in) :: n
+      !! The number of observations.
+   integer, intent(in) :: m
+      !! The number of columns of data in the independent variable.
+   real(kind=wp), intent(in) :: wd(ldwd, ld2wd, m)
+      !! The squared `delta` weights, `d**2`.
+   integer, intent(in) :: ldwd
+      !! The leading dimension of array `wd`.
+   integer, intent(in) :: ld2wd
+      !! The second dimension of array `wd`.
+   real(kind=wp), intent(in) :: alpha
+      !! The Levenberg-Marquardt parameter.
+   real(kind=wp), intent(in) :: tt(ldtt, m)
+      !! The scaling values used for `delta`.
+   integer, intent(in) :: ldtt
+      !! The leading dimension of array `tt`.
+   integer, intent(in) :: i
+      !! An indexing variable.
+   real(kind=wp), intent(out) :: e(m, m)
+      !! The value of the array `e = wd + alpha*tt**2`.
+
+   ! Local scalars
+   integer :: j, j1, j2
+
+   ! Variable Definitions (alphabetically)
+   !  ALPHA:  The Levenberg-Marquardt parameter.
+   !  E:      The value of the array E = WD + ALPHA*TT**2
+   !  I:      An indexing variable.
+   !  J:      An indexing variable.
+   !  J1:     An indexing variable.
+   !  J2:     An indexing variable.
+   !  LDWD:   The leading dimension of array WD.
+   !  LD2WD:  The second dimension of array WD.
+   !  M:      The number of columns of data in the independent variable.
+   !  N:      The number of observations.
+   !  NP:     The number of responses per observation.
+   !  TT:     The scaling values used for DELTA.
+   !  WD:     The squared DELTA weights, D**2.
+
+   ! N.B. the locations of WD and TT accessed depend on the value of the first element of each
+   ! array and the leading dimensions of the multiply subscripted arrays.
+
+   if (n .eq. 0 .or. m .eq. 0) return
+
+   if (wd(1, 1, 1) .ge. zero) then
+      if (ldwd .ge. n) then
+         ! The elements of WD have been individually specified
+         if (ld2wd .eq. 1) then
+            ! The arrays stored in WD are diagonal
+            e = zero
+            do j = 1, m
+               e(j, j) = wd(i, 1, j)
+            end do
+         else
+            ! The arrays stored in WD are full positive semidefinite matrices
+            do j1 = 1, m
+               do j2 = 1, m
+                  e(j1, j2) = wd(i, j1, j2)
+               end do
+            end do
+         end if
+         !
+         if (tt(1, 1) .gt. zero) then
+            if (ldtt .ge. n) then
+               do j = 1, m
+                  e(j, j) = e(j, j) + alpha*tt(i, j)**2
+               end do
+            else
+               do j = 1, m
+                  e(j, j) = e(j, j) + alpha*tt(1, j)**2
+               end do
+            end if
+         else
+            do j = 1, m
+               e(j, j) = e(j, j) + alpha*tt(1, 1)**2
+            end do
+         end if
+      else
+         ! WD is an M by M matrix
+         if (ld2wd .eq. 1) then
+            ! The array stored in WD is diagonal
+            e = zero
+            do j = 1, m
+               e(j, j) = wd(1, 1, j)
+            end do
+         else
+            ! The array stored in WD is a full positive semidefinite matrix
+            do j1 = 1, m
+               do j2 = 1, m
+                  e(j1, j2) = wd(1, j1, j2)
+               end do
+            end do
+         end if
+
+         if (tt(1, 1) .gt. zero) then
+            if (ldtt .ge. n) then
+               do j = 1, m
+                  e(j, j) = e(j, j) + alpha*tt(i, j)**2
+               end do
+            else
+               do j = 1, m
+                  e(j, j) = e(j, j) + alpha*tt(1, j)**2
+               end do
+            end if
+         else
+            do j = 1, m
+               e(j, j) = e(j, j) + alpha*tt(1, 1)**2
+            end do
+         end if
+      end if
+   else
+      ! WD is a diagonal matrix with elements ABS(WD(1,1,1))
+      e = zero
+      if (tt(1, 1) .gt. zero) then
+         if (ldtt .ge. n) then
+            do j = 1, m
+               e(j, j) = abs(wd(1, 1, 1)) + alpha*tt(i, j)**2
+            end do
+         else
+            do j = 1, m
+               e(j, j) = abs(wd(1, 1, 1)) + alpha*tt(1, j)**2
+            end do
+         end if
+      else
+         do j = 1, m
+            e(j, j) = abs(wd(1, 1, 1)) + alpha*tt(1, 1)**2
+         end do
+      end if
+   end if
+
+end subroutine desubi
+
 pure subroutine dwinf &
    (n, m, np, nq, ldwe, ld2we, isodr, &
     deltai, epsi, xplusi, fni, sdi, vcvi, &
