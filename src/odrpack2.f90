@@ -533,6 +533,224 @@ pure subroutine desubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, e)
 
 end subroutine desubi
 
+subroutine detaf &
+   (fcn, &
+    n, m, np, nq, &
+    xplusd, beta, epsmac, nrow, &
+    partmp, pv0, &
+    ifixb, ifixx, ldifx, &
+    istop, nfev, eta, neta, &
+    wrk1, wrk2, wrk6, wrk7, &
+    info, &
+    lower, upper)
+!! Compute noise and number of good digits in function results.
+!! (Adapted from STARPAC subroutine ETAFUN)
+! Routines Called  FCN
+! Date Written   860529   (YYMMDD)
+! Revision Date  920619   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero, one, two, hundrd
+
+   external :: fcn
+      !! The user-supplied subroutine for evaluating the model.
+   integer, intent(in) :: n
+      !! The number of observations.
+   integer, intent(in) :: m
+      !! The number of columns of data in the explanatory variable.
+   integer, intent(in) :: np
+      !! The number of function parameters.
+   integer, intent(in) :: nq
+      !! The number of responses per observation.
+   real(kind=wp), intent(in) :: xplusd(n, m)
+      !! The values of `x` + `delta`.
+   real(kind=wp), intent(in) :: beta(np)
+      !! The function parameters.
+   real(kind=wp), intent(in) :: epsmac
+      !! The value of machine precision.
+   integer, intent(in) :: nrow
+      !! The row number at which the derivative is to be checked.
+   real(kind=wp), intent(out) :: partmp(np)
+      !! The model parameters.
+   real(kind=wp), intent(in) :: pv0(n, nq)
+      !! The original predicted values.
+   integer, intent(in) :: ifixb(np)
+      !! The values designating whether the elements of `beta` are fixed at their input values or not.
+   integer, intent(in) :: ifixx(ldifx, m)
+      !! The values designating whether the elements of `x` are fixed at their input values or not.
+   integer, intent(in) :: ldifx
+      !! The leading dimension of array `ifixx`.
+   integer, intent(out) :: istop
+      !! The variable designating whether there are problems computing the function at the current `beta` and `delta`.
+   integer, intent(out) :: nfev
+      !! The number of function evaluations.
+   real(kind=wp), intent(out) :: eta
+      !! The noise in the model results.
+   integer, intent(out) :: neta
+      !! The number of accurate digits in the model results.
+   real(kind=wp), intent(out) :: wrk1(n, m, nq)
+      !! A work array of (`n` by `m` by `nq`) elements.
+   real(kind=wp), intent(out) :: wrk2(n, nq)
+      !! A work array of (`n` by `nq`) elements.
+   real(kind=wp), intent(out) :: wrk6(n, np, nq)
+      !! A work array of (`n` by `np` by `nq`) elements.
+   real(kind=wp), intent(out) :: wrk7(-2:2, nq)
+      !! A work array of (5 by `nq`) elements.
+   integer, intent(out) :: info
+      !! The variable indicating the status of the computation.
+   real(kind=wp), intent(in) :: lower(np)
+      !! The lower bound of `beta`.
+   real(kind=wp), intent(in) :: upper(np)
+      !! The upper bound of `beta`.
+
+   ! Local scalars
+   real(kind=wp), parameter :: p1 = 0.1E0_wp, p2 = 0.2E0_wp, p5 = 0.5E0_wp
+   real(kind=wp) :: a, b, fac, shift, stp
+   integer :: j, k, l, sbk
+
+   ! Local arrays
+   real(kind=wp) :: parpts(-2:2, np)
+
+   ! Routine names used as subprogram arguments
+   !  FCN:     The user supplied subroutine for evaluating the model.
+   !
+   ! Variable Definitions (ALPHABETICALLY)
+   !  A:       Parameters of the local fit.
+   !  B:       Parameters of the local fit.
+   !  BETA:    The function parameters.
+   !  EPSMAC:  The value of machine precision.
+   !  ETA:     The noise in the model results.
+   !  FAC:     A factor used in the computations.
+   !  IFIXB:   The values designating whether the elements of BETA are fixed at their input values or not.
+   !  IFIXX:   The values designating whether the elements of X are fixed at their input values or not.
+   !  ISTOP:   The variable designating whether there are problems computing the function at the
+   !           current BETA and DELTA.
+   !  J:       An index variable.
+   !  K:       An index variable.
+   !  L:       AN INDEX VARIABLE.
+   !  LDIFX:   The leading dimension of array IFIXX.
+   !  LOWER:   The lower bound of BETA.
+   !  M:       The number of columns of data in the explanatory variable.
+   !  N:       The number of observations.
+   !  NETA:    The number of accurate digits in the model results.
+   !  NFEV:    The number of function evaluations.
+   !  NP:      The number of function parameters.
+   !  NQ:      The number of responses per observation.
+   !  NROW:    The row number at which the derivative is to be checked.
+   !  P1:      The value 0.1E0_wp.
+   !  P2:      The value 0.2E0_wp.
+   !  P5:      The value 0.5E0_wp.
+   !  PARPTS:  The points that PARTMP will take on during FCN evaluations.
+   !  PARTMP:  The model parameters.
+   !  PV0:     The original predicted values.
+   !  SHIFT:   When PARPTS cross the parameter bounds they are shifted by SHIFT.
+   !  SBK:     The sign of BETA(K).
+   !  STP:     A small value used to perturb the parameters.
+   !  UPPER:   The upper bound of BETA.
+   !  WRK1:    A work array of (N BY M BY NQ) elements.
+   !  WRK2:    A work array of (N BY NQ) elements.
+   !  WRK6:    A work array of (N BY NP BY NQ) elements.
+   !  WRK7:    A work array of (5 BY NQ) elements.
+   !  XPLUSD:  The values of X + DELTA.
+
+   stp = hundrd*epsmac
+   eta = epsmac
+
+   ! Create points to use in calculating FCN for ETA and NETA.
+   do j = -2, 2
+      if (j .eq. 0) then
+         parpts(0, :) = beta(:)
+      else
+         do k = 1, np
+            if (ifixb(1) .lt. 0) then
+               parpts(j, k) = beta(k) + j*stp*beta(k)
+            elseif (ifixb(k) .ne. 0) then
+               parpts(j, k) = beta(k) + j*stp*beta(k)
+            else
+               parpts(j, k) = beta(k)
+            end if
+         end do
+      end if
+   end do
+
+   ! Adjust the points used in calculating FCN to uphold the boundary constraints.
+   do k = 1, np
+      sbk = sign(one, parpts(2, k) - parpts(-2, k))
+      if (parpts(sbk*2, k) .gt. upper(k)) then
+         shift = upper(k) - parpts(sbk*2, k)
+         parpts(sbk*2, k) = upper(k)
+         do j = -sbk*2, sbk*1, sbk
+            parpts(j, k) = parpts(j, k) + shift
+         end do
+         if (parpts(-sbk*2, k) .lt. lower(k)) then
+            info = 90010
+            return
+         end if
+      end if
+      if (parpts(-sbk*2, k) .lt. lower(k)) then
+         shift = lower(k) - parpts(-sbk*2, k)
+         parpts(-sbk*2, k) = lower(k)
+         do j = -sbk*1, sbk*2, sbk
+            parpts(j, k) = parpts(j, k) + shift
+         end do
+         if (parpts(sbk*2, k) .gt. upper(k)) then
+            info = 90010
+            return
+         end if
+      end if
+   end do
+
+   ! Evaluate FCN for all points in PARPTS.
+   do j = -2, 2
+      if (all(parpts(j, :) .eq. beta(:))) then
+         do l = 1, nq
+            wrk7(j, l) = pv0(nrow, l)
+         end do
+      else
+         partmp(:) = parpts(j, :)
+         istop = 0
+         call fcn(n, m, np, nq, &
+                  n, m, np, &
+                  partmp(:), xplusd, &
+                  ifixb, ifixx, ldifx, &
+                  003, wrk2, wrk6, wrk1, istop)
+         if (istop .ne. 0) then
+            return
+         else
+            nfev = nfev + 1
+         end if
+         do l = 1, nq
+            wrk7(j, l) = wrk2(nrow, l)
+         end do
+      end if
+   end do
+
+   ! Calculate ETA and NETA.
+   do l = 1, nq
+      a = zero
+      b = zero
+      do j = -2, 2
+         a = a + wrk7(j, l)
+         b = b + j*wrk7(j, l)
+      end do
+      a = p2*a
+      b = p1*b
+      if ((wrk7(0, l) .ne. zero) .and. (abs(wrk7(1, l) + wrk7(-1, l)) .gt. hundrd*epsmac)) then
+!--------------------------------^---------------------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+         fac = one/abs(wrk7(0, l))
+      else
+         fac = one
+      end if
+      do j = -2, 2
+         wrk7(j, l) = abs((wrk7(j, l) - (a + j*b))*fac)
+         eta = max(wrk7(j, l), eta)
+      end do
+   end do
+   neta = max(two, p5 - log10(eta))
+
+end subroutine detaf
+
 pure subroutine dwinf &
    (n, m, np, nq, ldwe, ld2we, isodr, &
     deltai, epsi, xplusi, fni, sdi, vcvi, &
