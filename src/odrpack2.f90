@@ -1116,6 +1116,127 @@ subroutine dfctr(oksemi, a, lda, n, info)
 
 end subroutine dfctr
 
+pure subroutine dflags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
+!! Set flags indicating conditions specified by JOB.
+! Routines Called  (NONE)
+! Date Written   860529   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
+
+   integer, intent(in) :: job
+      !! The variable controlling problem initialization and computational method.
+   logical, intent(out) :: restrt
+      !! The variable designating whether the call is a restart (`restrt = .true.`) or not (`restrt = .false.`).
+   logical, intent(out) :: initd
+      !! The variable designating whether DELTA is to be initialized to zero (`initd = .true.`)
+      !! or to the first N by M elements of array WORK (`initd = .false.`).
+   logical, intent(out) :: dovcv
+      !! The variable designating whether the covariance matrix is to be computed
+      !! (`dovcv = .true.`) or not (`dovcv = .false.`).
+   logical, intent(out) :: redoj
+      !! The variable designating whether the Jacobian matrix is to be recomputed for the
+      !! computation of the covariance matrix (`redoj = .true.`) or not (`redoj = .false.`).
+   logical, intent(out) :: anajac
+      !! The variable designating whether the Jacobians are computed by finite differences
+      !! (`anajac = .false.`) or not (`anajac = .true.`).
+   logical, intent(out) :: cdjac
+      !! The variable designating whether the Jacobians are computed by central differences
+      !! (`cdjac = .true.`) or by forward differences (`cdjac = .false.`).
+   logical, intent(out) :: chkjac
+      !! The variable designating whether the user-supplied Jacobians are to be checked
+      !! (`chkjac = .true.`) or not (`chkjac = .false.`).
+   logical, intent(out) :: isodr
+      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or by OLS (`isodr = .false.`).
+   logical, intent(out) :: implct
+      !! The variable designating whether the solution is by implicit ODR (`implct = .true.`)
+      !! or explicit ODR (`implct = .false.`).
+
+   ! Local scalars
+   integer :: j
+
+   ! Variable Definitions (alphabetically)
+   !  ANAJAC:  The variable designating whether the Jacobians are computed by finite differences
+   !           (ANAJAC=FALSE) or not (ANAJAC=TRUE).
+   !  CDJAC:   The variable designating whether the Jacobians are computed by central differences
+   !           (CDJAC=TRUE) or by forward differences (CDJAC=FALSE).
+   !  CHKJAC:  The variable designating whether the user-supplied Jacobians are to be checked
+   !           (CHKJAC=TRUE) or not (CHKJAC=FALSE).
+   !  DOVCV:   The variable designating whether the covariance matrix is to be computed
+   !           (DOVCV=TRUE) or not (DOVCV=FALSE).
+   !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE) or
+   !           explicit ODR (IMPLCT=FALSE).
+   !  INITD:   The variable designating whether DELTA is to be initialized to zero (INITD=TRUE) or
+   !           to the first N by M elements of array WORK (INITD=FALSE).
+   !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by OLS (ISODR=FALSE).
+   !  J:       The value of a specific digit of JOB.
+   !  JOB:     The variable controling problem initialization and computational method.
+   !  REDOJ:   The variable designating whether the Jacobian matrix is to be recomputed for the
+   !           computation of the covariance matrix (REDOJ=TRUE) or not (REDOJ=FALSE).
+   !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or not (RESTRT=FALSE).
+
+   if (job .ge. 0) then
+
+      restrt = job .ge. 10000
+      initd = mod(job, 10000)/1000 .eq. 0
+      j = mod(job, 1000)/100
+
+      if (j .eq. 0) then
+         dovcv = .true.
+         redoj = .true.
+      elseif (j .eq. 1) then
+         dovcv = .true.
+         redoj = .false.
+      else
+         dovcv = .false.
+         redoj = .false.
+      end if
+
+      j = mod(job, 100)/10
+      if (j .eq. 0) then
+         anajac = .false.
+         cdjac = .false.
+         chkjac = .false.
+      elseif (j .eq. 1) then
+         anajac = .false.
+         cdjac = .true.
+         chkjac = .false.
+      elseif (j .eq. 2) then
+         anajac = .true.
+         cdjac = .false.
+         chkjac = .true.
+      else
+         anajac = .true.
+         cdjac = .false.
+         chkjac = .false.
+      end if
+
+      j = mod(job, 10)
+      if (j .eq. 0) then
+         isodr = .true.
+         implct = .false.
+      elseif (j .eq. 1) then
+         isodr = .true.
+         implct = .true.
+      else
+         isodr = .false.
+         implct = .false.
+      end if
+
+   else
+
+      restrt = .false.
+      initd = .true.
+      dovcv = .true.
+      redoj = .true.
+      anajac = .false.
+      cdjac = .false.
+      chkjac = .false.
+      isodr = .true.
+      implct = .false.
+
+   end if
+
+end subroutine dflags
+
 subroutine dodstp &
    (n, m, np, nq, npp, &
     f, fjacb, fjacd, &
@@ -1125,8 +1246,8 @@ subroutine dodstp &
     s, t, phi, irank, rcond, forvcv, &
     wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
 !! Compute locally constrained steps S and T, and PHI(ALPHA).
-! Routines Called  IDAMAX,DCHEX,DESUBI,DFCTR,DNRM2,DQRDC,DQRSL,DROT,
-!                  DROTG,DSOLVE,DTRCO,DTRSL,DVEVTR,DWGHT
+! Routines Called  IDAMAX, DCHEX, DESUBI, DFCTR, DNRM2, DQRDC, DQRSL, DROT,
+!                  DROTG, DSOLVE, DTRCO, DTRSL, DVEVTR, DWGHT
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920619   (YYMMDD)
 
