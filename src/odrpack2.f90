@@ -1021,6 +1021,101 @@ subroutine devjac &
 
 end subroutine devjac
 
+subroutine dfctr(oksemi, a, lda, n, info)
+!! Factor the positive (semi)definite matrix A using a modified Cholesky factorization
+!! (adapted from LINPACK subroutine DPOFA)
+! Routines Called  DDOT
+! Date Written   910706   (YYMMDD)
+! Revision Date  920619   (YYMMDD)
+! References  Dongarra J.J., Bunch J.R., Moler C.B., Stewart G.W., *LINPACK Users Guide*, SIAM, 1979.
+
+   use odrpack_kinds, only: wp, zero, ten
+
+   logical, intent(in) :: oksemi
+      !! The indicating whether the factored array can be positive semidefinite
+      !! (`oksemi = .true.`) or whether it must be found to be positive definite
+      !! (`oksemi = .false.`).
+   real(kind=wp), intent(inout) :: a(lda, n)
+      !! The array to be factored. Upon return, `a` contains the upper triangular matrix
+      !! `r` so that `a = trans(r)*r` where the strict lower triangle is set to zero.
+      !! If `info .ne. 0`, the factorization is not complete.
+   integer, intent(in) :: lda
+      !! The leading dimension of array `a`.
+   integer, intent(in) :: n
+      !! The number of rows and columns of data in array `a`.
+   integer, intent(out) :: info
+      !! An indicator variable, where if:
+      !!   `info = 0` then factorization was completed.
+      !!   `info = k` signals an error condition. The leading minor of order `k` is not
+      !!   positive (semi)definite.
+
+   ! Local scalars
+   real(kind=wp) :: xi, s, t
+   integer j, k
+
+   ! External functions
+   real(kind=wp), external :: ddot
+
+   ! Variable Definitions (alphabetically)
+   !  A:       The array to be factored.  Upon return, A contains the upper triangular matrix
+   !           R so that A = trans(R)*R where the strict lower triangle is set to zero.
+   !           If INFO .NE. 0, the factorization is not complete.
+   !  I:       An indexing variable.
+   !  INFO:    An idicator variable, where if
+   !           INFO = 0  then factorization was completed
+   !           INFO = K  signals an error condition.  The leading minor of order  K  is not
+   !           positive (semi)definite.
+   !  J:       An indexing variable.
+   !  LDA:     The leading dimension of array A.
+   !  N:       The number of rows and columns of data in array A.
+   !  OKSEMI:  The indicating whether the factored array can be positive semidefinite
+   !           (OKSEMI=TRUE) or whether it must be found to be positive definite (OKSEMI=FALSE).
+   !  XI:      A value used to test for non positive semidefiniteness.
+
+   ! Set relative tolerance for detecting non positive semidefiniteness.
+   xi = -ten*epsilon(zero)
+
+   !  Compute factorization, storing in upper triangular portion of A
+   do j = 1, n
+      info = j
+      s = zero
+      do k = 1, j - 1
+         if (a(k, k) .eq. zero) then
+!--------------------------------^---------------------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+            t = zero
+         else
+            t = a(k, j) - ddot(k - 1, a(1, k), 1, a(1, j), 1)
+            t = t/a(k, k)
+         end if
+         a(k, j) = t
+         s = s + t*t
+      end do
+      s = a(j, j) - s
+
+      ! ...Exit
+      if (a(j, j) .lt. zero .or. s .lt. xi*abs(a(j, j))) then
+         return
+      elseif (.not. oksemi .and. s .le. zero) then
+         return
+      elseif (s .le. zero) then
+         a(j, j) = zero
+      else
+         a(j, j) = sqrt(s)
+      end if
+   end do
+   info = 0
+
+   ! Zero out lower portion of A
+   do j = 2, n
+      do k = 1, j - 1
+         a(j, k) = zero
+      end do
+   end do
+
+end subroutine dfctr
+
 subroutine dodstp &
    (n, m, np, nq, npp, &
     f, fjacb, fjacd, &
@@ -1520,7 +1615,7 @@ subroutine dodvcv &
    real(kind=wp), intent(out) :: wrk6(n*nq, np)
       !! A work array of `(n*nq by np)` elements.
    real(kind=wp), intent(out) :: omega(nq, nq)
-      !! The array defined such that `omega*trans(omega) = inv(I+fjacd*inv(e)*trans(fjacd)) 
+      !! The array defined such that `omega*trans(omega) = inv(I+fjacd*inv(e)*trans(fjacd))
       !!= (I-fjacd*inv(p)*trans(fjacd))`.
    real(kind=wp), intent(out) :: u(np)
       !! The approximate null vector for `fjacb`.
@@ -1539,7 +1634,7 @@ subroutine dodvcv &
    real(kind=wp), intent(out) :: rss
       !! The residual sum of squares.
    integer, intent(out) :: idf
-      !! The degrees of freedom of the fit, equal to the number of observations with nonzero 
+      !! The degrees of freedom of the fit, equal to the number of observations with nonzero
       !!weighted derivatives minus the number of parameters being estimated.
    real(kind=wp), intent(out) :: rvar
       !! The residual variance.
