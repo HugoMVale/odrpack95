@@ -393,6 +393,58 @@ subroutine dacces &
 
 end subroutine dacces
 
+real(kind=wp) function derstep(itype, k, betak, ssf, stpb, neta) result(derstepr)
+!! Compute step size for center and forward difference calculations
+! Routines Called  DHSTEP
+! Date Written   20040616   (YYYYMMDD)
+! Revision Date  20040616   (YYYYMMDD)
+
+   use odrpack_kinds, only: wp, zero, one
+
+   integer, intent(in) :: itype
+      !! 0 - calc foward difference step, 1 - calc center difference step.
+   integer, intent(in) :: k
+      !! Index into beta where `betak` resides.
+   real(kind=wp), intent(in) :: betak
+      !! The `k`-th function parameter.
+   real(kind=wp), intent(in) :: ssf(k)
+      !! The scale used for the `betas`s.
+   real(kind=wp), intent(in) :: stpb(k)
+      !! The relative step used for computing finite difference derivatives with respect to `beta`.
+   integer, intent(in) :: neta
+      !! Number of good digits in the function results.
+
+   ! Local scalars
+   real(kind=wp) :: typj
+
+   ! External functions
+   real(kind=wp), external :: dhstep
+
+   ! Variable definitions (alphabetically)
+   !  BETAK:   The K-th function parameter.
+   !  ITYPE:   0 - calc foward difference step, 1 - calc center difference step.
+   !  K:       Index into beta where BETAK resides.
+   !  NETA:    Number of good digits in the function results.
+   !  SSF:     The scale used for the BETA'S.
+   !  STPB:    The relative step used for computing finite difference derivatives with respect to BETA.
+   !  TYPJ:    The typical size of the J-th unkonwn BETA.
+
+   if (betak .eq. zero) then
+!-----------------------^------------------------------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+      if (ssf(1) .lt. zero) then
+         typj = one/abs(ssf(1))
+      else
+         typj = one/ssf(k)
+      end if
+   else
+      typj = abs(betak)
+   end if
+   derstepr = sign(one, betak)*typj*dhstep(itype, neta, 1, k, stpb, 1)
+
+end function derstep
+
 pure subroutine desubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, e)
 !! Compute E = WD + ALPHA*TT**2.
 ! Routines Called (NONE)
