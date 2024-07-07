@@ -2708,7 +2708,7 @@ subroutine dsolve(n, t, ldt, b, job)
    end if
 
 end subroutine dsolve
-   
+
 subroutine dunpac(n2, v1, v2, ifix)
 !! Copy the elements of `v1` into the locations of `v2` which are unfixed.
 ! Routines Called  DCOPY
@@ -2752,7 +2752,7 @@ subroutine dunpac(n2, v1, v2, ifix)
       n1 = n2
       call dcopy(n2, v1, 1, v2, 1)
    end if
-   
+
 end subroutine dunpac
 
 subroutine dvevtr &
