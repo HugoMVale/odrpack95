@@ -960,8 +960,7 @@ subroutine devjac &
       ! Make sure fixed elements of FJACD are zero
       if (isodr) then
          do l = 1, nq
-            call difix(n, m, ifixx, ldifx, fjacd(1, 1, l), n, fjacd(1, 1, &
-                                                                    l), n)
+            call difix(n, m, ifixx, ldifx, fjacd(1, 1, l), n, fjacd(1, 1, l), n)
          end do
       end if
    elseif (cdjac) then
@@ -1324,8 +1323,7 @@ subroutine dodstp &
    end if
 
    call dqrdc(tfjacb, n*nq, n*nq, kp, qraux, kpvt, wrk3, ipvt)
-   call dqrsl(tfjacb, n*nq, n*nq, kp, &
-              qraux, wrk2, dum, wrk2, dum, dum, dum, 1000, inf)
+   call dqrsl(tfjacb, n*nq, n*nq, kp, qraux, wrk2, dum, wrk2, dum, dum, dum, 1000, inf)
    if (inf .ne. 0) then
       istopc = 60000
       return
@@ -1343,8 +1341,7 @@ subroutine dodstp &
          do k2 = k1, kp
             call drotg(tfjacb(k2, 1, k2), wrk3(k2), co, si)
             if (kp - k2 .ge. 1) then
-               call drot(kp - k2, tfjacb(k2, 1, k2 + 1), n*nq, &
-                         wrk3(k2 + 1), 1, co, si)
+               call drot(kp - k2, tfjacb(k2, 1, k2 + 1), n*nq, wrk3(k2 + 1), 1, co, si)
             end if
             temp = co*wrk2(k2, 1) + si*s(kpvt(k1))
             s(kpvt(k1)) = -si*wrk2(k2, 1) + co*s(kpvt(k1))
@@ -1369,8 +1366,7 @@ subroutine dodstp &
                imax = idamax(kp, u, 1)
                ! IMAX is the column to remove - use DCHEX and fix KPVT
                if (imax .ne. kp) then
-                  call dchex(tfjacb, n*nq, kp, imax, kp, wrk2, n*nq, 1, &
-                             qraux, wrk3, 2)
+                  call dchex(tfjacb, n*nq, kp, imax, kp, wrk2, n*nq, 1, qraux, wrk3, 2)
                   k = kpvt(imax)
                   do i = imax, kp - 1
                      kpvt(i) = kpvt(i + 1)
@@ -1524,7 +1520,8 @@ subroutine dodvcv &
    real(kind=wp), intent(out) :: wrk6(n*nq, np)
       !! A work array of `(n*nq by np)` elements.
    real(kind=wp), intent(out) :: omega(nq, nq)
-      !! The array defined such that `omega*trans(omega) = inv(I+fjacd*inv(e)*trans(fjacd)) = (I-fjacd*inv(p)*trans(fjacd))`.
+      !! The array defined such that `omega*trans(omega) = inv(I+fjacd*inv(e)*trans(fjacd)) 
+      !!= (I-fjacd*inv(p)*trans(fjacd))`.
    real(kind=wp), intent(out) :: u(np)
       !! The approximate null vector for `fjacb`.
    real(kind=wp), intent(out) :: qraux(np)
@@ -1542,7 +1539,8 @@ subroutine dodvcv &
    real(kind=wp), intent(out) :: rss
       !! The residual sum of squares.
    integer, intent(out) :: idf
-      !! The degrees of freedom of the fit, equal to the number of observations with nonzero weighted derivatives minus the number of parameters being estimated.
+      !! The degrees of freedom of the fit, equal to the number of observations with nonzero 
+      !!weighted derivatives minus the number of parameters being estimated.
    real(kind=wp), intent(out) :: rvar
       !! The residual variance.
    integer, intent(in) :: ifixb(np)
