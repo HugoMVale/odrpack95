@@ -1359,6 +1359,152 @@ pure subroutine difix(n, m, ifix, ldifix, t, ldt, tfix, ldtfix)
 
 end subroutine difix
 
+pure subroutine diwinf &
+   (m, np, nq, &
+    msgbi, msgdi, ifix2i, istopi, &
+    nnzwi, nppi, idfi, &
+    jobi, iprini, luneri, lunrpi, &
+    nrowi, ntoli, netai, &
+    maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
+    boundi, &
+    liwkmn)
+!! Set storage locations within integer work space.
+! Routines Called  (NONE)
+! Date Written   860529   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
+
+   integer, intent(in) :: m
+      !! The number of columns of data in the independent variable.
+   integer, intent(in) :: np
+      !! The number of function parameters.
+   integer, intent(in) :: nq
+      !! The number of responses per observation.
+   integer, intent(out) :: msgbi
+      !! The starting location in array `iwork` of array `msgb`.
+   integer, intent(out) :: msgdi
+      !! The starting location in array `iwork` of array `msgd`.
+   integer, intent(out) :: ifix2i
+      !! The starting location in array `iwork` of array `ifix2`.
+   integer, intent(out) :: istopi
+      !! The location in array `iwork` of variable `istop`.
+   integer, intent(out) :: nnzwi
+      !! The location in array `iwork` of variable `nnzw`.
+   integer, intent(out) :: nppi
+      !! The location in array `iwork` of variable `npp`.
+   integer, intent(out) :: idfi
+      !! The location in array `iwork` of variable `idf`.
+   integer, intent(out) :: jobi
+      !! The location in array `iwork` of variable `job`.
+   integer, intent(out) :: iprini
+      !! The location in array `iwork` of variable `iprint`.
+   integer, intent(out) :: luneri
+      !! The location in array `iwork` of variable `lunerr`.
+   integer, intent(out) :: lunrpi
+      !! The location in array `iwork` of variable `lunrpt`.
+   integer, intent(out) :: nrowi
+      !! The location in array `iwork` of variable `nrow`.
+   integer, intent(out) :: ntoli
+      !! The location in array `iwork` of variable `ntol`.
+   integer, intent(out) :: netai
+      !! The location in array `iwork` of variable `neta`.
+   integer, intent(out) :: maxiti
+      !! The location in array `iwork` of variable `maxit`.
+   integer, intent(out) :: niteri
+      !! The location in array `iwork` of variable `niter`.
+   integer, intent(out) :: nfevi
+      !! The location in array `iwork` of variable `nfev`.
+   integer, intent(out) :: njevi
+      !! The location in array `iwork` of variable `njev`.
+   integer, intent(out) :: int2i
+      !! The location in array `iwork` of variable `int2`.
+   integer, intent(out) :: iranki
+      !! The location in array `iwork` of variable `irank`.
+   integer, intent(out) :: ldtti
+      !! The location in array `iwork` of variable `ldtt`.
+   integer, intent(out) :: boundi
+      !! The location in array `iwork` of variable `bound`.
+   integer, intent(out) :: liwkmn
+      !! The minimum acceptable length of array `iwork`.
+
+   ! Variable Definitions (alphabetically)
+   !  IDFI:    The location in array IWORK of variable IDF.
+   !  IFIX2I:  The starting location in array IWORK of array IFIX2.
+   !  INT2I:   The location in array IWORK of variable INT2.
+   !  IPRINI:  The location in array IWORK of variable IPRINT.
+   !  IRANKI:  The location in array IWORK of variable IRANK.
+   !  ISTOPI:  The location in array IWORK of variable ISTOP.
+   !  JOBI:    The location in array IWORK of variable JOB.
+   !  LDTTI:   The location in array IWORK of variable LDTT.
+   !  LIWKMN:  The minimum acceptable length of array IWORK.
+   !  LUNERI:  The location in array IWORK of variable LUNERR.
+   !  LUNRPI:  The location in array IWORK of variable LUNRPT.
+   !  M:       The number of columns of data in the independent variable.
+   !  MAXITI:  The location in array iwork of variable MAXIT.
+   !  MSGBI:   The starting location in array IWORK of array MSGB.
+   !  MSGDI:   The starting location in array IWORK of array MSGD.
+   !  NETAI:   The location in array IWORK of variable NETA.
+   !  NFEVI:   The location in array IWORK of variable NFEV.
+   !  NITERI:  The location in array IWORK of variabel NITER.
+   !  NJEVI:   The location in array IWORK of variable NJEV.
+   !  NNZWI:   The location in array IWORK of variable NNZW.
+   !  NP:      The number of function parameters.
+   !  NPPI:    The location in array IWORK of variable NPP.
+   !  NQ:      The number of responses per observation.
+   !  NROWI:   The location in array IWORK of variable NROW.
+   !  NTOLI:   The location in array IWORK of variable NTOL.
+
+   if (np .ge. 1 .and. m .ge. 1) then
+      msgbi = 1
+      msgdi = msgbi + nq*np + 1
+      ifix2i = msgdi + nq*m + 1
+      istopi = ifix2i + np
+      nnzwi = istopi + 1
+      nppi = nnzwi + 1
+      idfi = nppi + 1
+      jobi = idfi + 1
+      iprini = jobi + 1
+      luneri = iprini + 1
+      lunrpi = luneri + 1
+      nrowi = lunrpi + 1
+      ntoli = nrowi + 1
+      netai = ntoli + 1
+      maxiti = netai + 1
+      niteri = maxiti + 1
+      nfevi = niteri + 1
+      njevi = nfevi + 1
+      int2i = njevi + 1
+      iranki = int2i + 1
+      ldtti = iranki + 1
+      boundi = ldtti + 1
+      liwkmn = boundi + np - 1
+   else
+      msgbi = 1
+      msgdi = 1
+      ifix2i = 1
+      istopi = 1
+      nnzwi = 1
+      nppi = 1
+      idfi = 1
+      jobi = 1
+      iprini = 1
+      luneri = 1
+      lunrpi = 1
+      nrowi = 1
+      ntoli = 1
+      netai = 1
+      maxiti = 1
+      niteri = 1
+      nfevi = 1
+      njevi = 1
+      int2i = 1
+      iranki = 1
+      ldtti = 1
+      boundi = 1
+      liwkmn = 1
+   end if
+
+end subroutine diwinf
+
 subroutine dodstp &
    (n, m, np, nq, npp, &
     f, fjacb, fjacd, &
