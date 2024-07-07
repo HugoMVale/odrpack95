@@ -1505,6 +1505,299 @@ pure subroutine diwinf &
 
 end subroutine diwinf
 
+subroutine diniwk &
+   (n, m, np, work, lwork, iwork, liwork, &
+    x, ldx, ifixx, ldifx, scld, ldscld, &
+    beta, sclb, &
+    sstol, partol, maxit, taufac, &
+    job, iprint, lunerr, lunrpt, &
+    lower, upper, &
+    epsmai, sstoli, partli, maxiti, taufci, &
+    jobi, iprini, luneri, lunrpi, &
+    ssfi, tti, ldtti, deltai, &
+    loweri, upperi, boundi)
+!! Initialize work vectors as necessary.
+! Routines Called  DFLAGS,DSCLB,DSCLD
+! Date Written   860529   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero, one, two, three
+
+   integer, intent(in) :: n
+      !! The number of observations.
+   integer, intent(in) :: m
+      !! The number of columns of data in the independent variable.
+   integer, intent(in) :: np
+      !! The number of function parameters.
+   real(kind=wp), intent(out) :: work(lwork)
+      !! The real work space.
+   integer, intent(in) :: lwork
+      !! The length of vector `work`.
+   integer, intent(out) :: iwork(liwork)
+      !! The integer work space.
+   integer, intent(in) :: liwork
+      !! The length of vector `iwork`.
+   real(kind=wp), intent(in) :: x(ldx, m)
+      !! The independent variable.
+   integer, intent(in) :: ldx
+      !! The leading dimension of array `x`.
+   integer, intent(in) :: ifixx(ldifx, m)
+      !! The values designating whether the elements of `x` are fixed at their input values or not.
+   integer, intent(in) :: ldifx
+      !! The leading dimension of array `ifixx`.
+   real(kind=wp), intent(in) :: scld(ldscld, m)
+      !! The scaling values for `delta`.
+   integer, intent(in) :: ldscld
+      !! The leading dimension of array `scld`.
+   real(kind=wp), intent(in) :: beta(np)
+      !! The function parameters.
+   real(kind=wp), intent(in) :: sclb(np)
+      !! The scaling values for `beta`.
+   real(kind=wp), intent(in) :: sstol
+      !! The sum-of-squares convergence stopping criteria.
+   real(kind=wp), intent(in) :: partol
+      !! The parameter convergence stopping criteria.
+   integer, intent(in) :: maxit
+      !! The maximum number of iterations allowed.
+   real(kind=wp), intent(in) :: taufac
+      !! The factor used to compute the initial trust region diameter.
+   integer, intent(in) :: job
+      !! The variable controlling problem initialization and computational method.
+   integer, intent(in) :: iprint
+      !! The print control variable.
+   integer, intent(in) :: lunerr
+      !! The logical unit number used for error messages.
+   integer, intent(in) :: lunrpt
+      !! The logical unit number used for computation reports.
+   real(kind=wp), intent(in) :: lower(np)
+      !! The lower bounds for the function parameters.
+   real(kind=wp), intent(in) :: upper(np)
+      !! The upper bounds for the function parameters.
+   integer, intent(in) :: epsmai
+      !! The location in array `work` of variable `epsmac`.
+   integer, intent(in) :: sstoli
+      !! The location in array `work` of variable `sstol`.
+   integer, intent(in) :: partli
+      !! The location in array `work` of variable `partol`.
+   integer, intent(in) :: maxiti
+      !! The location in array `iwork` of variable `maxit`.
+   integer, intent(in) :: taufci
+      !! The location in array `work` of variable `taufac`.
+   integer, intent(in) :: jobi
+      !! The location in array `iwork` of variable `job`.
+   integer, intent(in) :: iprini
+      !! The location in array `iwork` of variable `iprint`.
+   integer, intent(in) :: luneri
+      !! The location in array `iwork` of variable `lunerr`.
+   integer, intent(in) :: lunrpi
+      !! The location in array `iwork` of variable `lunrpt`.
+   integer, intent(in) :: ssfi
+      !! The starting location in array `work` of array `ssf`.
+   integer, intent(in) :: tti
+      !! The starting location in array `work` of the array `tt`.
+   integer, intent(in) :: ldtti
+      !! The leading dimension of array `tt`.
+   integer, intent(in) :: deltai
+      !! The starting location in array `work` of array `delta`.
+   integer, intent(in) :: loweri
+      !! The starting location in array `iwork` of array `lower`.
+   integer, intent(in) :: upperi
+      !! The starting location in array `iwork` of array `upper`.
+   integer, intent(in) :: boundi
+      !! The location in array `iwork` of variable `bound`.
+
+   ! Local scalars
+   integer :: i, j, istart
+   logical :: anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
+
+   ! External subroutines
+   external :: dcopy, dflags, dsclb, dscld
+
+   ! Variable Definitions (alphabetically)
+   !  ANAJAC:  The variable designating whether the Jacobians are computed by finite differences
+   !           (ANAJAC=FALSE) or not (ANAJAC=TRUE).
+   !  BETA:    The function parameters.
+   !  CDJAC:   The variable designating whether the Jacobians are computed by central differences
+   !           (CDJAC=TRUE) or by forward differences (CDJAC=FALSE).
+   !  CHKJAC:  The variable designating whether the user-supplied Jacobians are to be checked
+   !           (CHKJAC=TRUE) or not (CHKJAC=FALSE).
+   !  DELTAI:  The starting location in array WORK of array DELTA.
+   !  DOVCV:   The variable designating whether the covariance matrix is to be computed (DOVCV=TRUE)
+   !           or not (DOVCV=FALSE).
+   !  EPSMAI:  The location in array WORK of variable EPSMAC.
+   !  I:       An indexing variable.
+   !  IFIXX:   The values designating whether the elements of X are fixed at their input values or not.
+   !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE) or
+   !           explicit ODR (IMPLCT=FALSE).
+   !  INITD:   The variable designating whether DELTA is to be initialized to zero (INITD=TRUE) or
+   !           to the values in the first N by M elements of array WORK (INITD=FALSE).
+   !  IPRINI:  The location in array IWORK of variable IPRINT.
+   !  IPRINT:  The print control variable.
+   !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by OLS
+   !           ISODR=FALSE).
+   !  IWORK:   The integer work space.
+   !  J:       An indexing variable.
+   !  JOB:     The variable controling problem initialization and computational method.
+   !  JOBI:    The location in array IWORK of variable JOB.
+   !  LDIFX:   The leading dimension of array IFIXX.
+   !  LDSCLD:  The leading dimension of array SCLD.
+   !  LDTTI:   The leading dimension of array TT.
+   !  LDX:     The leading dimension of array X.
+   !  LIWORK:  The length of vector IWORK.
+   !  LUNERI:  The location in array IWORK of variable LUNERR.
+   !  LUNERR:  The logical unit number used for error messages.
+   !  LUNRPI:  The location in array iwork of variable LUNRPT.
+   !  LUNRPT:  The logical unit number used for computation reports.
+   !  LWORK:   The length of vector WORK.
+   !  M:       The number of columns of data in the independent variable.
+   !  MAXIT:   The maximum number of iterations allowed.
+   !  MAXITI:  The location in array IWORK of variable MAXIT.
+   !  N:       The number of observations.
+   !  NP:      The number of function parameters.
+   !  PARTLI:  The location in array work of variable partol.
+   !  PARTOL:  The parameter convergence stopping criteria.
+   !  REDOJ:   The variable designating whether the Jacobian matrix is to be recomputed for the
+   !           computation of the covariance matrix (REDOJ=TRUE) or not (REDOJ=FALSE).
+   !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or not
+   !           (RESTRT=FALSE).
+   !  SCLB:    The scaling values for BETA.
+   !  SCLD:    The scaling values for DELTA.
+   !  SSFI:    The starting location in array WORK of array SSF.
+   !  SSTOL:   The sum-of-squares convergence stopping criteria.
+   !  SSTOLI:  The location in array WORK of variable SSTOL.
+   !  TAUFAC:  The factor used to compute the initial trust region diameter.
+   !  TAUFCI:  The location in array WORK of variable TAUFAC.
+   !  TTI:     The starting location in array WORK of the ARRAY TT.
+   !  WORK:    The REAL (KIND=wp) work space.
+   !  X:       The independent variable.
+
+   call dflags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
+
+   ! Store value of machine precision in work vector
+   work(epsmai) = epsilon(zero)
+
+   ! Set tolerance for stopping criteria based on the change in the parameters (see also
+   ! subprogram DODCNT)
+   if (partol .lt. zero) then
+      work(partli) = work(epsmai)**(two/three)
+   else
+      work(partli) = min(partol, one)
+   end if
+
+   ! Set tolerance for stopping criteria based on the change in the sum of squares of the
+   ! weighted observational errors
+   if (sstol .lt. zero) then
+      work(sstoli) = sqrt(work(epsmai))
+   else
+      work(sstoli) = min(sstol, one)
+   end if
+
+   ! Set factor for computing trust region diameter at first iteration
+   if (taufac .le. zero) then
+      work(taufci) = one
+   else
+      work(taufci) = min(taufac, one)
+   end if
+
+   ! Set maximum number of iterations
+   if (maxit .lt. 0) then
+      iwork(maxiti) = 50
+   else
+      iwork(maxiti) = maxit
+   end if
+
+   ! Store problem initialization and computational method control variable
+   if (job .le. 0) then
+      iwork(jobi) = 0
+   else
+      iwork(jobi) = job
+   end if
+
+   ! Set print control
+   if (iprint .lt. 0) then
+      iwork(iprini) = 2001
+   else
+      iwork(iprini) = iprint
+   end if
+
+   ! Set logical unit number for error messages
+   if (lunerr .lt. 0) then
+      iwork(luneri) = 6
+   else
+      iwork(luneri) = lunerr
+   end if
+
+   ! Set logical unit number for computation reports
+   if (lunrpt .lt. 0) then
+      iwork(lunrpi) = 6
+   else
+      iwork(lunrpi) = lunrpt
+   end if
+
+   ! Compute scaling for BETA's and DELTA's
+   if (sclb(1) .le. zero) then
+      call dsclb(np, beta, work(ssfi))
+   else
+      call dcopy(np, sclb, 1, work(ssfi), 1)
+   end if
+   if (isodr) then
+      if (scld(1, 1) .le. zero) then
+         iwork(ldtti) = n
+         call dscld(n, m, x, ldx, work(tti), iwork(ldtti))
+      else
+         if (ldscld .eq. 1) then
+            iwork(ldtti) = 1
+            call dcopy(m, scld(1, 1), 1, work(tti), 1)
+         else
+            iwork(ldtti) = n
+            do j = 1, m
+               call dcopy(n, scld(1, j), 1, &
+                          work(tti + (j - 1)*iwork(ldtti)), 1)
+            end do
+         end if
+      end if
+   end if
+
+   ! Initialize DELTA's as necessary
+   if (isodr) then
+      if (initd) then
+         !call dzero( n, m, work( deltai), n)
+         work(deltai:deltai + (n*m - 1)) = zero
+      else
+         if (ifixx(1, 1) .ge. 0) then
+            if (ldifx .eq. 1) then
+               do j = 1, m
+                  if (ifixx(1, j) .eq. 0) then
+                     istart = deltai + (j - 1)*n
+                     work(istart:istart + (n - 1)) = zero
+                     !call dzero( n,1, work( deltai+( j-1)* n), n)
+                  end if
+               end do
+            else
+               do j = 1, m
+                  do i = 1, n
+                     if (ifixx(i, j) .eq. 0) then
+                        work(deltai - 1 + i + (j - 1)*n) = zero
+                     end if
+                  end do
+               end do
+            end if
+         end if
+      end if
+   else
+      !call dzero( n, m, work( deltai), n)
+      work(deltai:deltai + (n*m - 1)) = zero
+   end if
+
+   ! Copy bounds into WORK
+   work(loweri:loweri + np - 1) = lower(1:np)
+   work(upperi:upperi + np - 1) = upper(1:np)
+
+   ! Initialize parameters on bounds in IWORK
+   iwork(boundi:boundi + np - 1) = 0
+
+end subroutine diniwk
+
 subroutine dodstp &
    (n, m, np, nq, npp, &
     f, fjacb, fjacd, &
@@ -1583,7 +1876,8 @@ subroutine dodstp &
    real(kind=wp), intent(out) :: rcond
       !! The approximate reciprocal condition number of `tfjacb`.
    logical, intent(in) :: forvcv
-      !! The variable designating whether this subroutine was called to set up for the covariance matrix computations (`forvcv`=TRUE) or not (`forvcv`=FALSE).
+      !! The variable designating whether this subroutine was called to set up for the
+      !! covariance matrix computations (`forvcv`=TRUE) or not (`forvcv`=FALSE).
    real(kind=wp), intent(out) :: wrk1(n, nq, m)
       !! A work array of (`n` by `nq` by `m`) elements.
    real(kind=wp), intent(out) :: wrk2(n, nq)
@@ -1599,7 +1893,8 @@ subroutine dodstp &
    integer, intent(in) :: lwrk
       !! The length of vector `wrk`.
    integer, intent(out) :: istopc
-      !! The variable designating whether the computations were stopped due to a numerical error within subroutine `dodstp`.
+      !! The variable designating whether the computations were stopped due to a numerical
+      !! error within subroutine `dodstp`.
 
    ! Local scalars
    real(kind=wp) :: co, si, temp
