@@ -1237,6 +1237,55 @@ pure subroutine dflags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, 
 
 end subroutine dflags
 
+real(kind=wp) pure function dhstep(itype, neta, i, j, stp, ldstp) result(dhstepr)
+!! Set relative step size for finite difference derivatives.
+! Routines Called  (NONE)
+! Date Written   860529   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero, two, three, ten
+
+   integer, intent(in) :: itype
+      !! The finite difference method being used, where: `itype = 0` indicates forward finite
+      !! differences, and `itype = 1` indicates central finite differences.
+   integer, intent(in) :: neta
+      !! The number of good digits in the function results.
+   integer, intent(in) :: i
+      !! An identifier for selecting user-supplied step sizes.
+   integer, intent(in) :: j
+      !! An identifier for selecting user-supplied step sizes.
+   real(kind=wp), intent(in) :: stp(ldstp, j)
+      !! The step size for the finite difference derivative.
+   integer, intent(in) :: ldstp
+      !! The leading dimension of array `stp`.
+
+   ! Variable Definitions (alphabetically)
+   !  I:       An identifier for selecting user supplied step sizes.
+   !  ITYPE:   The finite difference method being used, where
+   !           ITYPE = 0 indicates forward finite differences, and
+   !           ITYPE = 1 indicates central finite differences.
+   !  J:       An identifier for selecting user supplied step sizes.
+   !  LDSTP:   The leading dimension of array STP.
+   !  NETA:    The number of good digits in the function results.
+   !  STP:     The step size for the finite difference derivative.
+
+   if (stp(1, 1) .le. zero) then
+      if (itype .eq. 0) then
+         ! Use default forward finite difference step size
+         dhstepr = ten**(-abs(neta)/two - two)
+      else
+         ! Use default central finite difference step size
+         dhstepr = ten**(-abs(neta)/three)
+      end if
+
+   elseif (ldstp .eq. 1) then
+      dhstepr = stp(1, j)
+   else
+      dhstepr = stp(i, j)
+   end if
+
+end function dhstep
+
 subroutine dodstp &
    (n, m, np, nq, npp, &
     f, fjacb, fjacd, &
