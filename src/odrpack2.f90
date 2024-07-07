@@ -1286,6 +1286,79 @@ real(kind=wp) pure function dhstep(itype, neta, i, j, stp, ldstp) result(dhstepr
 
 end function dhstep
 
+pure subroutine difix(n, m, ifix, ldifix, t, ldt, tfix, ldtfix)
+!! Set elements of T to zero according to IFIX.
+! Routines Called  (NONE)
+! Date Written   910612   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero
+
+   integer, intent(in) :: n
+      !! The number of rows of data in the array.
+   integer, intent(in) :: m
+      !! The number of columns of data in the array.
+   integer, intent(in) :: ifix(ldifix, m)
+      !! The array designating whether an element of `t` is to be set to zero.
+   integer, intent(in) :: ldifix
+   ! The leading dimension of array `ifix`.
+   real(kind=wp), intent(in) :: t(ldt, m)
+      !! The array being set to zero according to the elements of `ifix`.
+   integer, intent(in) :: ldt
+      !! The leading dimension of array `t`.
+   real(kind=wp), intent(out) :: tfix(ldtfix, m)
+      !! The resulting array.
+   integer, intent(in) :: ldtfix
+      !! The leading dimension of array `tfix`.
+
+   ! Local scalars
+   integer :: i, j
+
+   ! Variable Definitions (alphabetically)
+   !  I:       An indexing variable.
+   !  IFIX:    The array designating whether an element of T is to be set to zero.
+   !  J:       an indexing variable.
+   !  LDT:     The leading dimension of array T.
+   !  LDIFIX:  The leading dimension of array IFIX.
+   !  LDTFIX:  The leading dimension of array TFIX.
+   !  M:       The number of columns of data in the array.
+   !  N:       The number of rows of data in the array.
+   !  T:       The array being set to zero according to the elements of IFIX.
+   !  TFIX:    The resulting array.
+
+   if (n .eq. 0 .or. m .eq. 0) return
+
+   if (ifix(1, 1) .ge. zero) then
+!---------------------------^--------------------------------------------------
+!!! FPT - 3085 Objects of .EQ., .NE. .GT. etc. are of different data types
+!------------------------------------------------------------------------------
+      if (ldifix .ge. n) then
+         do j = 1, m
+            do i = 1, n
+               if (ifix(i, j) .eq. 0) then
+                  tfix(i, j) = zero
+               else
+                  tfix(i, j) = t(i, j)
+               end if
+            end do
+         end do
+      else
+         do j = 1, m
+            if (ifix(1, j) .eq. 0) then
+               do i = 1, n
+                  tfix(i, j) = zero
+               end do
+            else
+               do i = 1, n
+                  tfix(i, j) = t(i, j)
+               end do
+            end if
+         end do
+      end if
+   end if
+
+end subroutine difix
+
 subroutine dodstp &
    (n, m, np, nq, npp, &
     f, fjacb, fjacd, &
