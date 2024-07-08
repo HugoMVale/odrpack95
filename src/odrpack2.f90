@@ -601,7 +601,7 @@ subroutine detaf &
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920619   (YYMMDD)
 
-   use odrpack_kinds, only: wp, zero, one, two, hundrd
+   use odrpack_kinds, only: wp, zero, one, two, hundred
 
    external :: fcn
       !! The user-supplied subroutine for evaluating the model.
@@ -704,7 +704,7 @@ subroutine detaf &
    !  WRK7:    A work array of (5 BY NQ) elements.
    !  XPLUSD:  The values of X + DELTA.
 
-   stp = hundrd*epsmac
+   stp = hundred*epsmac
    eta = epsmac
 
    ! Create points to use in calculating FCN for ETA and NETA.
@@ -786,7 +786,7 @@ subroutine detaf &
       end do
       a = p2*a
       b = p1*b
-      if ((wrk7(0, l) .ne. zero) .and. (abs(wrk7(1, l) + wrk7(-1, l)) .gt. hundrd*epsmac)) then
+      if ((wrk7(0, l) .ne. zero) .and. (abs(wrk7(1, l) + wrk7(-1, l)) .gt. hundred*epsmac)) then
 !--------------------------------^---------------------------------------------
 !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
 !------------------------------------------------------------------------------
@@ -4101,3 +4101,120 @@ pure subroutine dwinf &
    end if
 
 end subroutine dwinf
+
+subroutine mbfb(np, beta, lower, upper, ssf, stpb, neta, eta, interval)
+!! Ensure range of bounds is large enough for derivative checking.
+!! Move beta away from bounds so that derivatives can be calculated.
+! ROUTINES CALLED  DHSTEP
+! DATE WRITTEN   20040624   (YYYYMMDD)
+! REVISION DATE  20040624   (YYYYMMDD)
+
+   use odrpack_kinds, only: wp, zero, one, three, ten, hundred
+
+   integer, intent(in) :: np
+   !! The number of parameters `np`.
+   real(kind=wp), intent(inout) :: beta(np)
+   !! Function parameters.
+   real(kind=wp), intent(in) :: lower(np)
+   !! !! Lower bound on `beta`.
+   real(kind=wp), intent(in) :: upper(np)
+   !! Upper bound on `beta`.
+   real(kind=wp), intent(in) :: ssf(np)
+   !! The scale used for the `beta`s.
+   real(kind=wp), intent(in) :: stpb(np)
+   !! The relative step used for computing finite difference derivatives with respect to `beta`.
+   integer, intent(in) :: neta
+   !! Number of good digits in the function results.
+   real(kind=wp), intent(in) :: eta
+   !! The relative noise in the function results.
+   integer, intent(out) :: interval(np)
+   !! Specifies which difference methods and step sizes are supported by the current interval `upper-lower`.
+
+   ! Local scalars
+   integer :: k
+   real(kind=wp) :: h, h0, h1, hc, hc0, hc1, stpr, stpl, typj
+
+   ! External functions
+   real(kind=wp), external :: dhstep
+
+   ! VARIABLE DEFINITIONS (ALPHABETICALLY)
+   !  BETA:     BETA for the jacobian checker.  BETA will be moved far enough from the bounds so
+   !            that the derivative checker may proceed.
+   !  H:        Relative step size for forward differences.
+   !  H0:       Initial relative step size for forward differences.
+   !  H1:       Default relative step size for forward differences.
+   !  HC:       Relative step size for center differences.
+   !  HC0:      Initial relative step size for center differences.
+   !  HC1:      Default relative step size for center differences.
+   !  INTERVAL: Specifies which difference methods and step sizes are supported by the current
+   !            interval UPPER-LOWER.
+   !  K:        Index variable for BETA.
+   !  NETA:     Number of good digits in the function results.
+   !  SSF:      The scale used for the BETA'S.
+   !  STPB:     The relative step used for computing finite difference derivatives with respect
+   !            to BETA.
+   !  STPL:     Maximum step to the left of BETA (-) the derivative checker will use.
+   !  STPR:     Maximum step to the right of BETA (+) the derivative checker will use.
+   !  TYPJ:     The typical size of the J-th unkonwn BETA.
+
+   interval(:) = 111
+   do k = 1, np
+      h0 = dhstep(0, neta, 1, k, stpb, 1)
+      hc0 = h0
+      h1 = sqrt(eta)
+      hc1 = eta**(one/three)
+      h = max(ten*h1, min(hundred*h0, one))
+      hc = max(ten*hc1, min(hundred*hc0, one))
+      if (beta(k) .eq. zero) then
+!-----------------------------^------------------------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+         if (ssf(1) .lt. zero) then
+            typj = one/abs(ssf(1))
+         else
+            typj = one/ssf(k)
+         end if
+      else
+         typj = abs(beta(k))
+      end if
+      stpr = (h*typj*sign(one, beta(k)) + beta(k)) - beta(k)
+      stpl = (hc*typj*sign(one, beta(k)) + beta(k)) - beta(k)
+      ! Check outer interval
+      if (lower(k) + 2*abs(stpl) .gt. upper(k)) then
+         if (interval(k) .ge. 100) then
+            interval(k) = interval(k) - 100
+         end if
+      elseif (beta(k) + stpl .gt. upper(k) .or. beta(k) - stpl .gt. &
+              upper(k)) &
+         then
+         beta(k) = upper(k) - abs(stpl)
+      elseif (beta(k) + stpl .lt. lower(k) .or. beta(k) - stpl .lt. &
+              lower(k)) &
+         then
+         beta(k) = lower(k) + abs(stpl)
+      end if
+      ! Check middle interval
+      if (lower(k) + 2*abs(stpr) .gt. upper(k)) then
+         if (mod(interval(k), 100) .ge. 10) then
+            interval(k) = interval(k) - 10
+         end if
+      elseif (beta(k) + stpr .gt. upper(k) .or. beta(k) - stpr .gt. &
+              upper(k)) &
+         then
+         beta(k) = upper(k) - abs(stpr)
+      elseif (beta(k) + stpr .lt. lower(k) .or. beta(k) - stpr .lt. &
+              lower(k)) &
+         then
+         beta(k) = lower(k) + abs(stpr)
+      end if
+      ! Check inner interval
+      if (lower(k) + abs(stpr) .gt. upper(k)) then
+         interval(k) = 0
+      elseif (beta(k) + stpr .gt. upper(k)) then
+         beta(k) = upper(k) - stpr
+      elseif (beta(k) + stpr .lt. lower(k)) then
+         beta(k) = lower(k) - stpr
+      end if
+   end do
+
+end subroutine mbfb
