@@ -1850,6 +1850,345 @@ subroutine diniwk &
 
 end subroutine diniwk
 
+subroutine djck &
+   (fcn, &
+    n, m, np, nq, &
+    beta, betaj, xplusd, &
+    ifixb, ifixx, ldifx, stpb, stpd, ldstpd, &
+    ssf, tt, ldtt, &
+    eta, neta, ntol, nrow, isodr, epsmac, &
+    pv0i, fjacb, fjacd, &
+    msgb, msgd, diff, istop, nfev, njev, &
+    wrk1, wrk2, wrk6, &
+    interval)
+!! Driver routine for the derivative checking process.
+!! (adapted from STARPAC subroutine DCKCNT)
+! Routines Called  FCN,DHSTEP,DJCKM
+! Date Written   860529   (YYMMDD)
+! Revision Date  920619   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero, one, p5 => half
+
+   external :: fcn
+      !! The user supplied subroutine for evaluating the model.
+   integer, intent(in) :: n
+      !! The number of observations.
+   integer, intent(in) :: m
+      !! The number of columns of data in the explanatory variable.
+   integer, intent(in) :: np
+      !! The number of function parameters.
+   integer, intent(in) :: nq
+      !! The number of responses per observation.
+   real(kind=wp), intent(in) :: beta(np)
+      !! The function parameters.
+   real(kind=wp), intent(in) :: betaj(np)
+      !! The function parameters offset such that steps don't cross bounds.
+   real(kind=wp), intent(in) :: xplusd(n, m)
+      !! The values of `x + delta`.
+   integer, intent(in) :: ifixb(np)
+      !! The values designating whether the elements of `beta` are fixed at their input values or not.
+   integer, intent(in) :: ifixx(ldifx, m)
+      !! The values designating whether the elements of `x` are fixed at their input values or not.
+   integer, intent(in) :: ldifx
+      !! The leading dimension of array `ifixx`.
+   real(kind=wp), intent(in) :: stpb(np)
+      !! The step size for finite difference derivatives wrt `beta`.
+   real(kind=wp), intent(in) :: stpd(ldstpd, m)
+      !! The step size for finite difference derivatives wrt `delta`.
+   integer, intent(in) :: ldstpd
+      !! The leading dimension of array `stpd`.
+   real(kind=wp), intent(in) :: ssf(np)
+      !! The scaling values used for `beta`.
+   real(kind=wp), intent(in) :: tt(ldtt, m)
+      !! The scaling values used for `delta`.
+   integer, intent(in) :: ldtt
+      !! The leading dimension of array `tt`.
+   real(kind=wp), intent(in) :: eta
+      !! The relative noise in the function results.
+   integer, intent(in) :: neta
+      !! The number of reliable digits in the model results.
+   integer, intent(out) :: ntol
+      !! The number of digits of agreement required between the numerical derivatives and the user supplied derivatives.
+   integer, intent(in) :: nrow
+      !! The row number of the explanatory variable array at which the derivative is checked.
+   logical, intent(in) :: isodr
+      !! The variable designating whether the solution is by ODR (`isodr=.TRUE.`) or by OLS (`isodr=.FALSE.`).
+   real(kind=wp), intent(in) :: epsmac
+      !! The value of machine precision.
+   real(kind=wp), intent(in) :: pv0i(n, nq)
+      !! The predicted values using the user supplied parameter estimates.
+   real(kind=wp), intent(out) :: fjacb(n, np, nq)
+      !! The Jacobian with respect to `beta`.
+   real(kind=wp), intent(out) :: fjacd(n, m, nq)
+      !! The Jacobian with respect to `delta`.
+   integer, intent(out) :: msgb(1 + nq*np)
+      !! The error checking results for the Jacobian wrt `beta`.
+   integer, intent(out) :: msgd(1 + nq*m)
+      !! The error checking results for the Jacobian wrt `delta`.
+   real(kind=wp), intent(out) :: diff(nq, np + m)
+      !! The relative differences between the user supplied and finite difference derivatives for each derivative checked.
+   integer, intent(out) :: istop
+      !! The variable designating whether there are problems computing the function at the current `beta` and `delta`
+   integer, intent(inout) :: nfev
+      !! The number of function evaluations.
+   integer, intent(inout) :: njev
+      !! The number of Jacobian evaluations.
+   real(kind=wp), intent(out) :: wrk1(n, m, nq)
+      !! A work array of `(n, m, nq)` elements.
+   real(kind=wp), intent(out) :: wrk2(n, nq)
+      !! A work array of `(n, nq)` elements.
+   real(kind=wp), intent(out) :: wrk6(n, np, nq)
+      !! A work array of `(n, np, nq)` elements.
+   integer, intent(in) :: interval(np)
+      !! Specifies which checks can be performed when checking derivatives based on the interval of the bound constraints.
+
+   ! Local scalars
+   real(kind=wp) :: diffj, h0, hc0, pv, tol, typj
+   integer :: ideval, j, lq, msgb1, msgd1
+   logical :: isfixd, iswrtb
+
+   ! Local arrays
+   real(kind=wp) :: pv0(n, nq)
+
+   ! External subroutines
+   external :: djckm
+
+   ! External functions
+   real(kind=wp), external :: dhstep
+
+   ! Routine names used as subprogram arguments
+   !  FCN:     The user supplied subroutine for evaluating the model.
+   !
+   ! Variable Definitions (alphabetically)
+   !  BETA:     The function parameters.
+   !  BETAJ:    The function parameters offset such that steps don't cross bounds.
+   !  DIFF:     The relative differences between the user supplied and finite difference
+   !            derivatives for each derivative checked.
+   !  DIFFJ:    The relative differences between the user supplied and finite difference
+   !            derivatives for the derivative being checked.
+   !  EPSMAC:   The value of machine precision.
+   !  ETA:      The relative noise in the function results.
+   !  FJACB:    The Jacobian with respect to BETA.
+   !  FJACD:    The Jacobian with respect to DELTA.
+   !  H0:       The initial relative step size for forward differences.
+   !  HC0:      The initial relative step size for central differences.
+   !  IDEVAL:   The variable designating what computations are to be performed by user supplied
+   !            subroutine FCN.
+   !  IFIXB:    The values designating whether the elements of BETA are fixed at their input
+   !            values or not.
+   !  IFIXX:    The values designating whether the elements of X are fixed at their input values or not.
+   !  INTERVAL: Specifies which checks can be performed when checking derivatives based on the
+   !            interval of the bound constraints.
+   !  ISFIXD:   The variable designating whether the parameter is fixed (ISFIXD=TRUE) or not (ISFIXD=FALSE).
+   !  ISTOP:    The variable designating whether there are problems computing the function at the
+   !            current BETA and DELTA.
+   !  ISODR:    The variable designating whether the solution is by ODR (ISODR=.TRUE.) or by
+   !            OLS (ISODR=.FALSE.).
+   !  ISWRTB:   The variable designating whether the derivatives wrt BETA (ISWRTB=TRUE) or DELTA
+   !            (ISWRTB=FALSE) are being checked.
+   !  J:        An index variable.
+   !  LDIFX:    The leading dimension of array IFIXX.
+   !  LDSTPD:   The leading dimension of array STPD.
+   !  LDTT:     The leading dimension of array TT.
+   !  LQ:       The response currently being examined.
+   !  M:        The number of columns of data in the explanatory variable.
+   !  MSGB:     The error checking results for the Jacobian wrt BETA.
+   !  MSGB1:    The error checking results for the Jacobian wrt BETA.
+   !  MSGD:     The error checking results for the Jacobian wrt DELTA.
+   !  MSGD1:    The error checking results for the Jacobian wrt DELTA.
+   !  N:        The number of observations.
+   !  NETA:     The number of reliable digits in the model results, either set by the user or
+   !            computed by DETAF.
+   !  NFEV:     The number of function evaluations.
+   !  NJEV:     The number of Jacobian evaluations.
+   !  NP:       The number of function parameters.
+   !  NQ:       The number of responses per observation.
+   !  NROW:     The row number of the explanatory variable array at which the derivative is checked.
+   !  NTOL:     The number of digits of agreement required between the numerical derivatives and
+   !            the user supplied derivatives.
+   !  PV:       The scalar in which the predicted value from the model for row NROW is stored.
+   !  PV0:      The predicted values using the current parameter estimates (possibly offset from
+   !            the user supplied estimates to create distance between parameters and the bounds
+   !            on the parameters).
+   !  PV0I:     The predicted values using the user supplied parameter estimates.
+   !  SSF:      The scaling values used for BETA.
+   !  STPB:     The step size for finite difference derivatives wrt BETA.
+   !  STPD:     The step size for finite difference derivatives wrt DELTA.
+   !  TOL:      The agreement tolerance.
+   !  TT:       The scaling values used for DELTA.
+   !  TYPJ:     The typical size of the J-th unknown BETA or DELTA.
+   !  WRK1:     A work array of (N BY M BY NQ) elements.
+   !  WRK2:     A work array of (N BY NQ) elements.
+   !  WRK6:     A work array of (N BY NP BY NQ) elements.
+   !  XPLUSD:   The values of X + DELTA.
+
+   ! Set tolerance for checking derivatives
+   tol = eta**(0.25E0_wp)
+   ntol = max(one, p5 - log10(tol))
+
+   ! Compute, if necessary, PV0
+   pv0 = pv0i
+   if (any(beta(:) .ne. betaj(:))) then
+      istop = 0
+      ideval = 001
+      call fcn(n, m, np, nq, &
+               n, m, np, &
+               betaj, xplusd, &
+               ifixb, ifixx, ldifx, &
+               ideval, pv0, fjacb, fjacd, &
+               istop)
+      if (istop .ne. 0) then
+         return
+      else
+         njev = njev + 1
+      end if
+   end if
+
+   ! Compute user-supplied derivative values
+   istop = 0
+   if (isodr) then
+      ideval = 110
+   else
+      ideval = 010
+   end if
+   call fcn(n, m, np, nq, &
+            n, m, np, &
+            betaj, xplusd, &
+            ifixb, ifixx, ldifx, &
+            ideval, wrk2, fjacb, fjacd, &
+            istop)
+   if (istop .ne. 0) then
+      return
+   else
+      njev = njev + 1
+   end if
+
+   ! Check derivatives wrt BETA for each response of observation NROW
+   msgb1 = 0
+   msgd1 = 0
+
+   do lq = 1, nq
+
+      ! Set predicted value of model at current parameter estimates
+      pv = pv0(nrow, lq)
+
+      iswrtb = .true.
+      do j = 1, np
+
+         if (ifixb(1) .lt. 0) then
+            isfixd = .false.
+         elseif (ifixb(j) .eq. 0) then
+            isfixd = .true.
+         else
+            isfixd = .false.
+         end if
+
+         if (isfixd) then
+            msgb(1 + lq + (j - 1)*nq) = -1
+         else
+            if (beta(j) .eq. zero) then
+!-----------------------------------^------------------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+               if (ssf(1) .lt. zero) then
+                  typj = one/abs(ssf(1))
+               else
+                  typj = one/ssf(j)
+               end if
+            else
+               typj = abs(beta(j))
+            end if
+
+            h0 = dhstep(0, neta, 1, j, stpb, 1)
+            hc0 = h0
+
+            ! Check derivative wrt the J-th parameter at the NROW-th row
+            if (interval(j) .ge. 1) then
+               call djckm(fcn, &
+                          n, m, np, nq, &
+                          betaj, xplusd, &
+                          ifixb, ifixx, ldifx, &
+                          eta, tol, nrow, epsmac, j, lq, typj, h0, hc0, &
+                          iswrtb, pv, fjacb(nrow, j, lq), &
+                          diffj, msgb1, msgb(2), istop, nfev, &
+                          wrk1, wrk2, wrk6, interval)
+               if (istop .ne. 0) then
+                  msgb(1) = -1
+                  return
+               else
+                  diff(lq, j) = diffj
+               end if
+            else
+               msgb(1 + j) = 9
+            end if
+         end if
+
+      end do
+
+      ! Check derivatives wrt X for each response of observation NROW
+      if (isodr) then
+         iswrtb = .false.
+         do j = 1, m
+
+            if (ifixx(1, 1) .lt. 0) then
+               isfixd = .false.
+            elseif (ldifx .eq. 1) then
+               if (ifixx(1, j) .eq. 0) then
+                  isfixd = .true.
+               else
+                  isfixd = .false.
+               end if
+            else
+               isfixd = .false.
+            end if
+
+            if (isfixd) then
+               msgd(1 + lq + (j - 1)*nq) = -1
+            else
+               if (xplusd(nrow, j) .eq. zero) then
+!----------------------------------------------^-------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+                  if (tt(1, 1) .lt. zero) then
+                     typj = one/abs(tt(1, 1))
+                  elseif (ldtt .eq. 1) then
+                     typj = one/tt(1, j)
+                  else
+                     typj = one/tt(nrow, j)
+                  end if
+               else
+                  typj = abs(xplusd(nrow, j))
+               end if
+
+               h0 = dhstep(0, neta, nrow, j, stpd, ldstpd)
+               hc0 = dhstep(1, neta, nrow, j, stpd, ldstpd)
+
+               ! Check derivative wrt the J-th column of DELTA at row NROW
+               call djckm(fcn, &
+                          n, m, np, nq, &
+                          betaj, xplusd, &
+                          ifixb, ifixx, ldifx, &
+                          eta, tol, nrow, epsmac, j, lq, typj, h0, hc0, &
+                          iswrtb, pv, fjacd(nrow, j, lq), &
+                          diffj, msgd1, msgd(2), istop, nfev, &
+                          wrk1, wrk2, wrk6, interval)
+               if (istop .ne. 0) then
+                  msgd(1) = -1
+                  return
+               else
+                  diff(lq, np + j) = diffj
+               end if
+            end if
+
+         end do
+      end if
+   end do
+
+   msgb(1) = msgb1
+   msgd(1) = msgd1
+
+end subroutine djck
+
 subroutine dodstp &
    (n, m, np, nq, npp, &
     f, fjacb, fjacd, &
