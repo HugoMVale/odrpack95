@@ -2189,6 +2189,261 @@ subroutine djck &
 
 end subroutine djck
 
+subroutine djckc &
+   (fcn, &
+    n, m, np, nq, &
+    beta, xplusd, ifixb, ifixx, ldifx, &
+    eta, tol, nrow, epsmac, j, lq, hc, iswrtb, &
+    fd, typj, pvpstp, stp0, &
+    pv, d, &
+    diffj, msg, istop, nfev, &
+    wrk1, wrk2, wrk6)
+!! Check whether high curvature could be the cause of thedisagreement between the numerical
+!! and analytic derviatives (adapted from STARPAC subroutine DCKCRV).
+! Routines Called  DJCKF, DPVB, DPVD
+! Date Written   860529   (YYMMDD)
+! Revision Date  920619   (YYMMDD)
+
+   use odrpack_kinds, only: wp, one, two, ten
+
+   external :: fcn
+      !! The user supplied subroutine for evaluating the model.
+   integer, intent(in) :: n
+      !! The number of observations.
+   integer, intent(in) :: m
+      !! The number of columns of data in the explanatory variable.
+   integer, intent(in) :: np
+      !! The number of function parameters.
+   integer, intent(in) :: nq
+      !! The number of responses per observation.
+   real(kind=wp), intent(inout) :: beta(np)
+      !! The function parameters.
+   real(kind=wp), intent(inout) :: xplusd(n, m)
+      !! The values of `x` + `delta`.
+   integer, intent(in) :: ifixb(np)
+      !! The values designating whether the elements of `beta` are fixed at their input values or not.
+   integer, intent(in) :: ifixx(ldifx, m)
+      !! The values designating whether the elements of `x` are fixed at their input values or not.
+   integer, intent(in) :: ldifx
+      !! The leading dimension of array `ifixx`.
+   real(kind=wp), intent(in) :: eta
+      !! The relative noise in the model.
+   real(kind=wp), intent(in) :: tol
+      !! The agreement tolerance.
+   integer, intent(in) :: nrow
+      !! The row number of the explanatory variable array at which the derivative is to be checked.
+   real(kind=wp), intent(in) :: epsmac
+      !! The value of machine precision.
+   integer, intent(in) :: j
+      !! The index of the partial derivative being examined.
+   integer, intent(in) :: lq
+      !! The response currently being examined.
+   real(kind=wp), intent(in) :: hc
+      !! The relative step size for central finite differences.
+   logical, intent(in) :: iswrtb
+      !! The variable designating whether the derivatives wrt `beta` (`iswrtb`=TRUE) or
+      !! `delta`(`iswrtb`=FALSE) are being checked.
+   real(kind=wp), intent(out) :: fd !also in?
+      !! The forward difference derivative wrt the `j`th parameter.
+   real(kind=wp), intent(in) :: typj
+      !! The typical size of the `j`-th unknown `beta` or `delta`.
+   real(kind=wp), intent(out) :: pvpstp
+      !! The predicted value for row `nrow` of the model based on the current parameter estimates
+      !! for all but the `j`th parameter value, which is `beta(j)` + `stp0`.
+   real(kind=wp), intent(in) :: stp0
+      !! The initial step size for the finite difference derivative.
+   real(kind=wp), intent(in) :: pv
+      !! The predicted value of the model for row `nrow`.
+   real(kind=wp), intent(in) :: d
+      !! The derivative with respect to the `j`th unknown parameter.
+   real(kind=wp), intent(out) :: diffj
+      !! The relative differences between the user supplied and finite difference derivatives
+      !! for the derivative being checked.
+   integer, intent(out) :: msg(nq, j)
+      !! The error checking results.
+   integer, intent(out) :: istop
+      !! The variable designating whether there are problems computing the function at the
+      !! current `beta` and `delta`.
+   integer, intent(inout) :: nfev
+      !! The number of function evaluations.
+   real(kind=wp), intent(out) :: wrk1(n, m, nq)
+      !! A work array of (`n` by `m` by `nq`) elements.
+   real(kind=wp), intent(out) :: wrk2(n, nq)
+      !! A work array of (`n` by `nq`) elements.
+   real(kind=wp), intent(out) :: wrk6(n, np, nq)
+      !! A work array of (`n` by `np` by `nq`) elements.
+
+   ! Local scalars
+   real(kind=wp), parameter :: p01 = 0.01E0_wp
+   real(kind=wp) :: curve, pvmcrv, pvpcrv, stp, stpcrv
+
+   ! External subroutines
+   external :: djckf, dpvb, dpvd
+
+   ! Routine names used as subprogram arguments
+   !  FCN:     The user supplied subroutine for evaluating the model.
+   !
+   ! Variable Definitions (alphabetically)
+   !  BETA:    The function parameters.
+   !  CURVE:   A measure of the curvature in the model.
+   !  D:       The derivative with respect to the Jth unknown parameter.
+   !  DIFFJ:   The relative differences between the user supplied and finite difference
+   !           derivatives for the derivative being checked.
+   !  EPSMAC:  The value of machine precision.
+   !  ETA:     The relative noise in the model
+   !  FD:      The forward difference derivative wrt the Jth parameter.
+   !  HC:      The relative step size for central finite differences.
+   !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
+   !           values or not.
+   !  IFIXX:   The values designating whether the elements of X are fixed at their input values
+   !           or not.
+   !  ISTOP:   The variable designating whether there are problems computing the function at the
+   !           current BETA and DELTA.
+   !  ISWRTB:  The variable designating whether the derivatives wrt BETA (ISWRTB=TRUE) or
+   !           DELTA(ISWRTB=FALSE) are being checked.
+   !  J:       The index of the partial derivative being examined.
+   !  LDIFX:   The leading dimension of array IFIXX.
+   !  LQ:      The response currently being examined.
+   !  M:       The number of columns of data in the explanatory variable.
+   !  MSG:     The error checking results.
+   !  N:       The number of observations.
+   !  NFEV:    The number of function evaluations.
+   !  NP:      The number of function parameters.
+   !  NQ:      The number of responses per observation.
+   !  NROW:    The row number of the explanatory variable array at which the derivative is to be
+   !           checked.
+   !  PV:      The predicted value of the model for row NROW.
+   !  PVMCRV:  The predicted value for row  NROW of the model based on the current parameter
+   !           estimates for all but the Jth parameter value, which is BETA(J)-STPCRV.
+   !  PVPCRV:  The predicted value for row NROW of the model based on the current parameter
+   !           estimates for all but the Jth parameter value, which is BETA(J)+STPCRV.
+   !  PVPSTP:  The predicted value for row NROW of the model based on the current parameter
+   !           estimates for all but the Jth parameter value, which is BETA(J) + STP0.
+   !  P01:     The value 0.01E0_wp.
+   !  STP0:    The initial step size for the finite difference derivative.
+   !  STP:     A step size for the finite difference derivative.
+   !  STPCRV:  The step size selected to check for curvature in the model.
+   !  TOL:     The agreement tolerance.
+   !  TYPJ:    The typical size of the J-th unknown BETA or DELTA.
+   !  WRK1:    A work array of (N BY M BY NQ) elements.
+   !  WRK2:    A work array of (N BY NQ) elements.
+   !  WRK6:    A work array of (N BY NP BY NQ) elements.
+   !  XPLUSD:  The values of X + DELTA.
+
+   if (iswrtb) then
+
+      ! Perform central difference computations for derivatives wrt BETA
+      stpcrv = (hc*typj*sign(one, beta(j)) + beta(j)) - beta(j)
+      call dpvb(fcn, &
+                n, m, np, nq, &
+                beta, xplusd, ifixb, ifixx, ldifx, &
+                nrow, j, lq, stpcrv, &
+                istop, nfev, pvpcrv, &
+                wrk1, wrk2, wrk6)
+      if (istop .ne. 0) then
+         return
+      end if
+      call dpvb(fcn, &
+                n, m, np, nq, &
+                beta, xplusd, ifixb, ifixx, ldifx, &
+                nrow, j, lq, -stpcrv, &
+                istop, nfev, pvmcrv, &
+                wrk1, wrk2, wrk6)
+      if (istop .ne. 0) then
+         return
+      end if
+   else
+
+      ! Perform central difference computations for derivatives wrt DELTA
+      stpcrv = (hc*typj*sign(one, xplusd(nrow, j)) + xplusd(nrow, j)) - xplusd(nrow, j)
+      call dpvd(fcn, &
+                n, m, np, nq, &
+                beta, xplusd, ifixb, ifixx, ldifx, &
+                nrow, j, lq, stpcrv, &
+                istop, nfev, pvpcrv, &
+                wrk1, wrk2, wrk6)
+      if (istop .ne. 0) then
+         return
+      end if
+      call dpvd(fcn, &
+                n, m, np, nq, &
+                beta, xplusd, ifixb, ifixx, ldifx, &
+                nrow, j, lq, -stpcrv, &
+                istop, nfev, pvmcrv, &
+                wrk1, wrk2, wrk6)
+      if (istop .ne. 0) then
+         return
+      end if
+   end if
+
+   ! Estimate curvature by second derivative of model
+   curve = abs((pvpcrv - pv) + (pvmcrv - pv))/(stpcrv*stpcrv)
+   curve = curve + eta*(abs(pvpcrv) + abs(pvmcrv) + two*abs(pv))/(stpcrv**2)
+
+   ! Check if finite precision arithmetic could be the culprit.
+   call djckf(fcn, &
+              n, m, np, nq, &
+              beta, xplusd, ifixb, ifixx, ldifx, &
+              eta, tol, nrow, j, lq, iswrtb, &
+              fd, typj, pvpstp, stp0, curve, pv, d, &
+              diffj, msg, istop, nfev, &
+              wrk1, wrk2, wrk6)
+   if (istop .ne. 0) then
+      return
+   end if
+   if (msg(lq, j) .eq. 0) then
+      return
+   end if
+
+   ! Check if high curvature could be the problem.
+   stp = two*max(tol*abs(d)/curve, epsmac)
+   if (stp .lt. abs(ten*stp0)) then
+      stp = min(stp, p01*abs(stp0))
+   end if
+
+   if (iswrtb) then
+      ! Perform computations for derivatives wrt BETA
+      stp = (stp*sign(one, beta(j)) + beta(j)) - beta(j)
+      call dpvb(fcn, &
+                n, m, np, nq, &
+                beta, xplusd, ifixb, ifixx, ldifx, &
+                nrow, j, lq, stp, &
+                istop, nfev, pvpstp, &
+                wrk1, wrk2, wrk6)
+      if (istop .ne. 0) then
+         return
+      end if
+   else
+
+      ! Perform computations for derivatives wrt DELTA
+      stp = (stp*sign(one, xplusd(nrow, j)) + xplusd(nrow, j)) - xplusd(nrow, j)
+      call dpvd(fcn, &
+                n, m, np, nq, &
+                beta, xplusd, ifixb, ifixx, ldifx, &
+                nrow, j, lq, stp, &
+                istop, nfev, pvpstp, &
+                wrk1, wrk2, wrk6)
+      if (istop .ne. 0) then
+         return
+      end if
+   end if
+
+   ! Compute the new numerical derivative
+   fd = (pvpstp - pv)/stp
+   diffj = min(diffj, abs(fd - d)/abs(d))
+
+   ! Check whether the new numerical derivative is ok
+   if (abs(fd - d) .le. tol*abs(d)) then
+      msg(lq, j) = 0
+
+      ! Check if finite precision may be the culprit (fudge factor = 2)
+   elseif (abs(stp*(fd - d)) .lt. two*eta*(abs(pv) + abs(pvpstp)) + &
+           curve*(epsmac*typj)**2) then
+      msg(lq, j) = 5
+   end if
+
+end subroutine djckc
+
 subroutine dodstp &
    (n, m, np, nq, npp, &
     f, fjacb, fjacd, &
