@@ -29,7 +29,7 @@ subroutine dacces &
    integer, intent(in) :: ld2we
       !! The second dimension of array `we`.
    real(kind=wp), intent(inout) :: work(lwork)
-      !! The `real` (kind=wp) work space.
+      !! The real work space.
    integer, intent(in) :: lwork
       !! The length of vector `work`.
    integer, intent(inout) :: iwork(liwork)
@@ -662,9 +662,6 @@ subroutine detaf &
    ! Local arrays
    real(kind=wp) :: parpts(-2:2, np)
 
-   ! Routine names used as subprogram arguments
-   !  FCN:     The user supplied subroutine for evaluating the model.
-   !
    ! Variable Definitions (ALPHABETICALLY)
    !  A:       Parameters of the local fit.
    !  B:       Parameters of the local fit.
@@ -672,6 +669,7 @@ subroutine detaf &
    !  EPSMAC:  The value of machine precision.
    !  ETA:     The noise in the model results.
    !  FAC:     A factor used in the computations.
+   !  FCN:     The user supplied subroutine for evaluating the model.
    !  IFIXB:   The values designating whether the elements of BETA are fixed at their input values or not.
    !  IFIXX:   The values designating whether the elements of X are fixed at their input values or not.
    !  ISTOP:   The variable designating whether there are problems computing the function at the
@@ -930,9 +928,6 @@ subroutine devjac &
       end subroutine
    end interface
 
-! Routine names used as subprogram arguments
-!  FCN:     The user-supplied subroutine for evaluating the model.
-!
 ! Variable Definitions (alphabetically)
 !  ANAJAC:  The variable designating whether the Jacobians are computed by finite differences
 !          (ANAJAC=FALSE) or not (ANAJAC=TRUE).
@@ -944,6 +939,7 @@ subroutine devjac &
 !  FERROR:  The variable designating whether ODRPACK95 detected nonzero values in array DELTA
 !           in the OLS case, and thus whether the user may have overwritten important information
 !           by computing FJACD in the OLS case.
+!  FCN:     The user-supplied subroutine for evaluating the model.
 !  FJACB:   The Jacobian with respect to BETA.
 !  FJACD:   The Jacobian with respect to DELTA.
 !  FN:      The predicted values of the function at the current point.
@@ -1956,9 +1952,6 @@ subroutine djck &
    ! External functions
    real(kind=wp), external :: dhstep
 
-   ! Routine names used as subprogram arguments
-   !  FCN:     The user supplied subroutine for evaluating the model.
-   !
    ! Variable Definitions (alphabetically)
    !  BETA:     The function parameters.
    !  BETAJ:    The function parameters offset such that steps don't cross bounds.
@@ -1968,6 +1961,7 @@ subroutine djck &
    !            derivatives for the derivative being checked.
    !  EPSMAC:   The value of machine precision.
    !  ETA:      The relative noise in the function results.
+   !  FCN:      The user supplied subroutine for evaluating the model.
    !  FJACB:    The Jacobian with respect to BETA.
    !  FJACD:    The Jacobian with respect to DELTA.
    !  H0:       The initial relative step size for forward differences.
@@ -2280,9 +2274,6 @@ subroutine djckc &
    ! External subroutines
    external :: djckf, dpvb, dpvd
 
-   ! Routine names used as subprogram arguments
-   !  FCN:     The user supplied subroutine for evaluating the model.
-   !
    ! Variable Definitions (alphabetically)
    !  BETA:    The function parameters.
    !  CURVE:   A measure of the curvature in the model.
@@ -2290,7 +2281,8 @@ subroutine djckc &
    !  DIFFJ:   The relative differences between the user supplied and finite difference
    !           derivatives for the derivative being checked.
    !  EPSMAC:  The value of machine precision.
-   !  ETA:     The relative noise in the model
+   !  ETA:     The relative noise in the model.
+   !  FCN:     The user supplied subroutine for evaluating the model.
    !  FD:      The forward difference derivative wrt the Jth parameter.
    !  HC:      The relative step size for central finite differences.
    !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
@@ -2529,16 +2521,14 @@ subroutine djckf &
    ! External subroutines
    external :: dpvb, dpvd
 
-   ! Routine names used as subprogram arguments
-   !  FCN:     The user supplied subroutine for evaluating the model.
-   !
    ! Variable Definitions (alphabetically)
    !  BETA:    The function parameters.
    !  CURVE:   A measure of the curvature in the model.
    !  D:       The derivative with respect to the Jth unknown parameter.
    !  DIFFJ:   The relative differences between the user supplied and finite difference
    !           derivatives for the derivative being checked.
-   !  ETA:     The relative noise in the model
+   !  ETA:     The relative noise in the model.
+   !  FCN:     The user supplied subroutine for evaluating the model.
    !  FD:      The forward difference derivative wrt the Jth parameter.
    !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
    !           values or not.
@@ -2717,8 +2707,6 @@ subroutine djckm &
    ! External subroutines
    external :: djckc, djckz, dpvb, dpvd
 
-   ! Routine names used as subprogram arguments
-   !  FCN:      The user supplied subroutine for evaluating the model.
    ! Variable Definitions (alphabetically)
    !  BETA:     The function parameters.
    !  BIG:      A big value, used to initialize DIFFJ.
@@ -2727,6 +2715,7 @@ subroutine djckm &
    !            derivatives for the derivative being checked.
    !  EPSMAC:   The value of machine precision.
    !  ETA:      The relative noise in the function results.
+   !  FCN:      The user supplied subroutine for evaluating the model.
    !  FD:       The forward difference derivative wrt the Jth parameter.
    !  H:        The relative step size for forward differences.
    !  H0:       The initial relative step size for forward differences.
@@ -4032,11 +4021,10 @@ subroutine dpvb &
    ! Local scalars
    real(kind=wp) :: betaj
 
-   ! Routine names used as subprogram arguments
-   !  FCN:     The user-supplied subroutine for evaluating the model.
    ! Variable Definitions (alphabetically)
    !  BETA:    The function parameters.
    !  BETAJ:   The current estimate of the jth parameter.
+   !  FCN:     The user-supplied subroutine for evaluating the model.
    !  IFIXB:   The values designating whether the elements of BETA are fixed at their input values or not.
    !  IFIXX:   The values designating whether the elements of X are fixed at their input values or not.
    !  ISTOP:   The variable designating whether there are problems computing the function at the current BETA and DELTA.
@@ -4131,11 +4119,9 @@ subroutine dpvd &
    ! Local scalars
    real(kind=wp) :: xpdj
 
-   ! Routine names used as subprogram arguments
-   !  FCN:     The user-supplied subroutine for evaluating the model.
-   !
    ! Variable Definitions (alphabetically)
    !  BETA:    The function parameters.
+   !  FCN:     The user-supplied subroutine for evaluating the model.
    !  IFIXB:   The values designating whether the elements of BETA are
    !           fixed at their input values or not.
    !  IFIXX:   The values designating whether the elements of X are fixed at their input values or not.
