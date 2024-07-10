@@ -1349,7 +1349,7 @@ pure subroutine difix(n, m, ifix, ldifix, t, ldt, tfix, ldtfix)
    integer, intent(in) :: ifix(ldifix, m)
       !! The array designating whether an element of `t` is to be set to zero.
    integer, intent(in) :: ldifix
-   ! The leading dimension of array `ifix`.
+      !! The leading dimension of array `ifix`.
    real(kind=wp), intent(in) :: t(ldt, m)
       !! The array being set to zero according to the elements of `ifix`.
    integer, intent(in) :: ldt
@@ -1565,7 +1565,7 @@ subroutine diniwk &
     ssfi, tti, ldtti, deltai, &
     loweri, upperi, boundi)
 !! Initialize work vectors as necessary.
-! Routines Called  DFLAGS,DSCLB,DSCLD
+! Routines Called  DFLAGS, DSCLB, DSCLD
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
 
@@ -2193,7 +2193,8 @@ subroutine djckc &
     diffj, msg, istop, nfev, &
     wrk1, wrk2, wrk6)
 !! Check whether high curvature could be the cause of thedisagreement between the numerical
-!! and analytic derviatives (adapted from STARPAC subroutine DCKCRV).
+!! and analytic derviatives.
+!! (adapted from STARPAC subroutine DCKCRV)
 ! Routines Called  DJCKF, DPVB, DPVD
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920619   (YYMMDD)
@@ -2445,8 +2446,9 @@ subroutine djckf &
     diffj, msg, istop, nfev, &
     wrk1, wrk2, wrk6)
 !! Check whether finite precision arithmetic could be the cause of the disagreement between
-!! the derivatives (adapted from STARPAC subroutine DCKFPA).
-! Routines Called  DPVB,DPVD
+!! the derivatives.
+!! (adapted from STARPAC subroutine DCKFPA)
+! Routines Called  DPVB, DPVD
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920619   (YYMMDD)
 
@@ -2627,8 +2629,8 @@ subroutine djckm &
     iswrtb, pv, d, &
     diffj, msg1, msg, istop, nfev, &
     wrk1, wrk2, wrk6, interval)
-!! Check user supplied analytic derivatives against numerical derivatives
-!! (adapted from STARPAC subroutine DCKMN).
+!! Check user supplied analytic derivatives against numerical derivatives.
+!! (adapted from STARPAC subroutine DCKMN)
 ! Routines Called  DJCKC, DJCKZ, DPVB, DPVD
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920619   (YYMMDD)
@@ -2885,6 +2887,181 @@ subroutine djckm &
    end if
 
 end subroutine djckm
+
+subroutine djckz &
+   (fcn, &
+    n, m, np, nq, &
+    beta, xplusd, ifixb, ifixx, ldifx, &
+    nrow, epsmac, j, lq, iswrtb, &
+    tol, d, fd, typj, pvpstp, stp0, pv, &
+    diffj, msg, istop, nfev, &
+    wrk1, wrk2, wrk6)
+!! Recheck the derivatives in the case where the finite difference derivative disagrees with
+!! the analytic derivative and the analytic derivative is zero.
+!! (adapted from STARPAC subroutine DCKZRO)
+! Routines Called  DPVB, DPVD
+! Date Written   860529   (YYMMDD)
+! Revision Date  920619   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero, one, two, three
+
+   external :: fcn
+   !! The user supplied subroutine for evaluating the model.
+   integer, intent(in) :: n
+      !! The number of observations.
+   integer, intent(in) :: m
+      !! The number of columns of data in the explanatory variable.
+   integer, intent(in) :: np
+      !! The number of function parameters.
+   integer, intent(in) :: nq
+      !! The number of responses per observation.
+   real(kind=wp), intent(inout) :: beta(np)
+      !! The function parameters.
+   real(kind=wp), intent(inout) :: xplusd(n, m)
+      !! The values of `x` + `delta`.
+   integer, intent(in) :: ifixb(np)
+      !! The values designating whether the elements of `beta` are fixed at their input values or not.
+   integer, intent(in) :: ifixx(ldifx, m)
+      !! The values designating whether the elements of `x` are fixed at their input values or not.
+   integer, intent(in) :: ldifx
+      !! The leading dimension of array `ifixx`.
+   integer, intent(in) :: nrow
+      !! The row number of the explanatory variable array at which the derivative is to be checked.
+   real(kind=wp), intent(in) :: epsmac
+   !! The value of machine precision.
+   integer, intent(in) :: j
+      !! The index of the partial derivative being examined.
+   integer, intent(in) :: lq
+      !! The response currently being examined.
+   logical, intent(in) :: iswrtb
+      !! The variable designating whether the derivatives wrt `beta` (`iswrtb`=TRUE) or `x`
+      !!(`iswrtb`=FALSE) are being checked.
+   real(kind=wp), intent(in) :: tol
+      !! The agreement tolerance.
+   real(kind=wp), intent(in) :: d
+      !! The derivative with respect to the `j`th unknown parameter.
+   real(kind=wp), intent(out) :: fd
+      !! The forward difference derivative wrt the `j`th parameter.
+   real(kind=wp), intent(in) :: typj
+      !! The typical size of the `j`-th unknown `beta` or `delta`.
+   real(kind=wp), intent(out) :: pvpstp
+      !! The predicted value for row `nrow` of the model using the current parameter estimates
+      !!for all but the `j`th parameter value, which is `beta(j)` + `stp0`.
+   real(kind=wp), intent(in) :: stp0
+      !! The initial step size for the finite difference derivative.
+   real(kind=wp), intent(out) :: pv
+      !! The predicted value from the model for row `nrow`.
+   real(kind=wp), intent(out) :: diffj
+      !! The relative differences between the user supplied and finite difference derivatives
+      !! for the derivative being checked.
+   integer, intent(out) :: msg(nq, j)
+      !! The error checking results.
+   integer, intent(out) :: istop
+      !! The variable designating whether there are problems computing the function at the
+      !!current `beta` and `delta`.
+   integer, intent(inout) :: nfev
+      !! The number of function evaluations.
+   real(kind=wp), intent(out) :: wrk1(n, m, nq)
+      !! A work array of (`n` by `m` by `nq`) elements.
+   real(kind=wp), intent(out) :: wrk2(n, nq)
+      !! A work array of (`n` by `nq`) elements.
+   real(kind=wp), intent(out) :: wrk6(n, np, nq)
+      !! A work array of (`n` by `np` by `nq`) elements.
+
+   ! Local scalars
+   real(kind=wp) :: cd, pvmstp
+
+   ! External subroutines
+   external :: dpvb, dpvd
+
+   ! Variable Definitions (alphabetically)
+   !  BETA:    The function parameters.
+   !  CD:      The central difference derivative wrt the Jth parameter.
+   !  D:       The derivative with respect to the Jth unknown parameter.
+   !  DIFFJ:   The relative differences between the user supplied and finite difference
+   !           derivatives for the derivative being checked.
+   !  EPSMAC:  The value of machine precision.
+   !  FCN:     The user supplied subroutine for evaluating the model.
+   !  FD:      The forward difference derivative wrt the Jth parameter.
+   !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
+   !           values or not.
+   !  IFIXX:   The values designating whether the elements of X are fixed at their input values
+   !           or not.
+   !  ISTOP:   The variable designating whether there are problems computing the function at the
+   !           current BETA and DELTA.
+   !  ISWRTB:  The variable designating whether the derivatives wrt BETA (ISWRTB=TRUE) or
+   !           X (ISWRTB=FALSE) are being checked.
+   !  J:       The index of the partial derivative being examined.
+   !  LDIFX:   The leading dimension of array IFIXX.
+   !  LQ:      The response currently being examined.
+   !  M:       The number of columns of data in the explanatory variable.
+   !  MSG:     The error checking results.
+   !  N:       The number of observations.
+   !  NFEV:    The number of function evaluations.
+   !  NP:      The number of function parameters.
+   !  NQ:      The number of responses per observation.
+   !  NROW:    The row number of the explanatory variable array at which the derivative is to be
+   !           checked.
+   !  PV:      The predicted value from the model for row NROW.
+   !  PVMSTP:  The predicted value for row NROW of the model using the current parameter
+   !           estimates for all but the Jth parameter value, which is BETA(J) - STP0.
+   !  PVPSTP:  The predicted value for row NROW of the model using the current parameter
+   !           estimates for all but the JTH parameter value, which is BETA(J) + STP0.
+   !  STP0:    The initial step size for the finite difference derivative.
+   !  TOL:     The agreement tolerance.
+   !  TYPJ:    The typical size of the J-th unknown BETA or DELTA.
+   !  WRK1:    A work array of (N BY M BY NQ) elements.
+   !  WRK2:    A work array of (N BY NQ) elements.
+   !  WRK6:    A work array of (N BY NP BY NQ) elements.
+   !  XPLUSD:  The values of X + DELTA.
+
+   ! Recalculate numerical derivative using central difference and step size of 2*STP0
+   if (iswrtb) then
+      ! Perform computations for derivatives wrt BETA
+      call dpvb(fcn, &
+                n, m, np, nq, &
+                beta, xplusd, ifixb, ifixx, ldifx, &
+                nrow, j, lq, -stp0, &
+                istop, nfev, pvmstp, &
+                wrk1, wrk2, wrk6)
+   else
+      ! Perform computations for derivatives wrt DELTA
+      call dpvd(fcn, &
+                n, m, np, nq, &
+                beta, xplusd, ifixb, ifixx, ldifx, &
+                nrow, j, lq, -stp0, &
+                istop, nfev, pvmstp, &
+                wrk1, wrk2, wrk6)
+   end if
+
+   if (istop .ne. 0) then
+      return
+   end if
+
+   cd = (pvpstp - pvmstp)/(two*stp0)
+   diffj = min(abs(cd - d), abs(fd - d))
+
+   ! Check for agreement
+   if (diffj .le. tol*abs(d)) then
+      ! Finite difference and analytic derivatives now agree.
+      if (d .eq. zero) then
+!----------------------^-------------------------------------------------------
+!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
+!------------------------------------------------------------------------------
+         msg(lq, j) = 1
+      else
+         msg(lq, j) = 0
+      end if
+
+   elseif (diffj*typj .le. abs(pv*epsmac**(one/three))) then
+      ! Derivatives are both close to zero
+      msg(lq, j) = 2
+   else
+      ! Derivatives are not both close to zero
+      msg(lq, j) = 3
+   end if
+
+end subroutine djckz
 
 subroutine dodstp &
    (n, m, np, nq, npp, &
@@ -3338,7 +3515,7 @@ subroutine dodvcv &
     s, t, irank, rcond, rss, idf, rvar, ifixb, &
     wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
 !! Compute covariance matrix of estimated parameters.
-! Routines Called  DPODI,DODSTP
+! Routines Called  DPODI, DODSTP
 ! Date Written   901207   (YYMMDD)
 ! Revision Date  920619   (YYMMDD)
 
@@ -3725,17 +3902,17 @@ real(kind=wp) function dppnml(p) result(dppnmlr)
       !! 0.0 and 1.0E0_wp, exclusive.
 
    ! Local scalars
-   real(kind=wp) :: aden, anum, p0, p1, p2, p3, p4, q0, q1, q2, q3, q4, r, t
-
-   ! Data statements
-   data &
-      p0, p1, p2, p3, p4 &
-      /-0.322232431088E0_wp, -1.0E0_wp, -0.342242088547E0_wp, &
-      -0.204231210245E-1_wp, -0.453642210148E-4_wp/
-   data &
-      q0, q1, q2, q3, q4 &
-      /0.993484626060E-1_wp, 0.588581570495E0_wp, &
-      0.531103462366E0_wp, 0.103537752850E0_wp, 0.38560700634E-2_wp/
+   real(kind=wp), parameter :: p0 = -0.322232431088E0_wp, &
+                               p1 = -1.0E0_wp, &
+                               p2 = -0.342242088547E0_wp, &
+                               p3 = -0.204231210245E-1_wp, &
+                               p4 = -0.453642210148E-4_wp, &
+                               q0 = 0.993484626060E-1_wp, &
+                               q1 = 0.588581570495E0_wp, &
+                               q2 = 0.531103462366E0_wp, &
+                               q3 = 0.103537752850E0_wp, &
+                               q4 = 0.38560700634E-2_wp
+   real(kind=wp) :: aden, anum, r, t
 
    ! Variable Definitions (alphabetically)
    !  ADEN:    A value used in the approximation.
@@ -3812,28 +3989,28 @@ real(kind=wp) function dppt(p, idf) result(dpptr)
       !! The (positive integer) degrees of freedom.
 
    ! Local scalars
-   real(kind=wp) :: arg, b21, b31, b32, b33, b34, b41, b42, b43, b44, b45, &
-                    b51, b52, b53, b54, b55, b56, c, con, d1, d3, d5, d7, d9, df, &
-                    ppfn, s, term1, term2, term3, term4, term5, z
+   real(kind=wp), parameter :: b21 = 4.0E0_wp, &
+                               b31 = 96.0E0_wp, &
+                               b32 = 5.0E0_wp, &
+                               b33 = 16.0E0_wp, &
+                               b34 = 3.0E0_wp, &
+                               b41 = 384.0E0_wp, &
+                               b42 = 3.0E0_wp, &
+                               b43 = 19.0E0_wp, &
+                               b44 = 17.0E0_wp, &
+                               b45 = -15.0E0_wp, &
+                               b51 = 9216.0E0_wp, &
+                               b52 = 79.0E0_wp, &
+                               b53 = 776.0E0_wp, &
+                               b54 = 1482.0E0_wp, &
+                               b55 = -1920.0E0_wp, &
+                               b56 = -945.0E0_wp
+   real(kind=wp) :: arg, c, con, d1, d3, d5, d7, d9, df, ppfn, s, term1, term2, term3, term4, &
+                    term5, z
    integer :: ipass, maxit
 
    ! External functions
    real(kind=wp), external :: dppnml
-
-   ! Data statements
-   data &
-      b21 &
-      /4.0E0_wp/
-   data &
-      b31, b32, b33, b34 &
-      /96.0E0_wp, 5.0E0_wp, 16.0E0_wp, 3.0E0_wp/
-   data &
-      b41, b42, b43, b44, b45 &
-      /384.0E0_wp, 3.0E0_wp, 19.0E0_wp, 17.0E0_wp, -15.0E0_wp/
-   data &
-      b51, b52, b53, b54, b55, b56 &
-      /9216.0E0_wp, 79.0E0_wp, 776.0E0_wp, 1482.0E0_wp, -1920.0E0_wp, &
-      -945.0E0_wp/
 
    ! Variable definitions (alphabetically)
    !  ARG:    A value used in the approximation.
@@ -5145,23 +5322,23 @@ subroutine mbfb(np, beta, lower, upper, ssf, stpb, neta, eta, interval)
    use odrpack_kinds, only: wp, zero, one, three, ten, hundred
 
    integer, intent(in) :: np
-   !! The number of parameters `np`.
+      !! The number of parameters `np`.
    real(kind=wp), intent(inout) :: beta(np)
-   !! Function parameters.
+      !! Function parameters.
    real(kind=wp), intent(in) :: lower(np)
-   !! !! Lower bound on `beta`.
+      !! !! Lower bound on `beta`.
    real(kind=wp), intent(in) :: upper(np)
-   !! Upper bound on `beta`.
+      !! Upper bound on `beta`.
    real(kind=wp), intent(in) :: ssf(np)
-   !! The scale used for the `beta`s.
+      !! The scale used for the `beta`s.
    real(kind=wp), intent(in) :: stpb(np)
-   !! The relative step used for computing finite difference derivatives with respect to `beta`.
+      !! The relative step used for computing finite difference derivatives with respect to `beta`.
    integer, intent(in) :: neta
-   !! Number of good digits in the function results.
+      !! Number of good digits in the function results.
    real(kind=wp), intent(in) :: eta
-   !! The relative noise in the function results.
+      !! The relative noise in the function results.
    integer, intent(out) :: interval(np)
-   !! Specifies which difference methods and step sizes are supported by the current interval `upper-lower`.
+      !! Specifies which difference methods and step sizes are supported by the current interval `upper-lower`.
 
    ! Local scalars
    integer :: k
