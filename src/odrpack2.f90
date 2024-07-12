@@ -1164,6 +1164,249 @@ subroutine dfctr(oksemi, a, lda, n, info)
 
 end subroutine dfctr
 
+subroutine dfctrw &
+   (n, m, nq, npp, &
+    isodr, &
+    we, ldwe, ld2we, wd, ldwd, ld2wd, &
+    wrk0, wrk4, &
+    we1, nnzw, info)
+!! Check input parameters, indicating errors found using nonzero values of argument `info` as
+!! described in the ODRPACK95 reference guide.
+! Routines Called  DFCTR
+! Date Written   860529   (YYMMDD)
+! Revision Date  920619   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero
+
+   integer, intent(in) :: n
+      !! The number of observations.
+   integer, intent(in) :: m
+      !! The number of columns of data in the explanatory variable.
+   integer, intent(in) :: nq
+      !! The number of responses per observation.
+   integer, intent(in) :: npp
+      !! The number of function parameters being estimated.
+   logical, intent(in) :: isodr
+      !! The variable designating whether the solution is by ODR (ISODR=TRUE) or by OLS (ISODR=FALSE).
+   real(kind=wp), intent(in) :: we(ldwe, ld2we, nq)
+      !! The (squared) EPSILON weights.
+   integer, intent(in) :: ldwe
+      !! The leading dimension of array `we`.
+   integer, intent(in) :: ld2we
+      !! The second dimension of array `we`.
+   real(kind=wp), intent(in) :: wd(ldwd, ld2wd, m)
+      !! The (squared) DELTA weights.
+   integer, intent(in) :: ldwd
+   ! The leading dimension of array `wd`.
+   integer, intent(in) :: ld2wd
+      !! The second dimension of array `wd`.
+   real(kind=wp), intent(out) :: wrk0(nq, nq)
+      !! A work array of `(nq, nq)` elements.
+   real(kind=wp), intent(out) :: wrk4(m, m)
+      !! A work array of `(m, m)` elements.
+   real(kind=wp), intent(out) :: we1(ldwe, ld2we, nq)
+      !! The factored EPSILON weights, S.T. trans(WE1)*WE1 = WE.
+   integer, intent(out) :: nnzw
+      !! The number of nonzero weighted observations.
+   integer, intent(out) :: info
+      !! The variable designating why the computations were stopped.
+
+   ! Local scalars
+   integer :: i, inf, j, j1, j2, l, l1, l2
+   logical :: notzro, exited
+
+   ! External subroutines
+   external :: dfctr
+
+   ! Variable Definitions (alphabetically)
+   !  I:       An indexing variable.
+   !  INFO:    The variable designating why the computations were stopped.
+   !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by
+   !           OLS (ISODR=FALSE).
+   !  J:       An indexing variable.
+   !  J1:      An indexing variable.
+   !  J2:      An indexing variable.
+   !  L:       An indexing variable.
+   !  L1:      An indexing variable.
+   !  L2:      An indexing variable.
+   !  LAST:    The last row of the array to be accessed.
+   !  LDWD:    The leading dimension of array WD.
+   !  LDWE:    The leading dimension of array WE.
+   !  LD2WD:   The second dimension of array WD.
+   !  LD2WE:   The second dimension of array WE.
+   !  M:       The number of columns of data in the explanatory variable.
+   !  N:       The number of observations.
+   !  NNZW:    The number of nonzero weighted observations.
+   !  NOTZRO:  The variable designating whether a given component of the weight array WE
+   !           contains a nonzero element (NOTZRO=FALSE) or not (NOTZRO=TRUE).
+   !  NPP:     The number of function parameters being estimated.
+   !  NQ:      The number of responses per observations.
+   !  WE:      The (squared) EPSILON weights.
+   !  WE1:     The factored EPSILON weights, S.T. trans(WE1)*WE1 = WE.
+   !  WD:      The (squared) DELTA weights.
+   !  WRK0:    A work array of (NQ BY NQ) elements.
+   !  WRK4:    A work array of (M BY M) elements.
+
+   ! Check EPSILON weights, and store factorization in WE1
+
+   exited = .false.
+
+   if (we(1, 1, 1) .lt. zero) then
+      ! WE contains a scalar
+      we1(1, 1, 1) = -sqrt(abs(we(1, 1, 1)))
+      nnzw = n
+   else
+      nnzw = 0
+      if (ldwe .eq. 1) then
+         if (ld2we .eq. 1) then
+            ! WE contains a diagonal matrix
+            do l = 1, nq
+               if (we(1, 1, l) .gt. zero) then
+                  nnzw = n
+                  we1(1, 1, l) = sqrt(we(1, 1, l))
+               elseif (we(1, 1, l) .lt. zero) then
+                  info = 30010
+                  exited = .true.
+                  exit
+               end if
+            end do
+         else
+            ! WE contains a full NQ by NQ semidefinite matrix
+            do l1 = 1, nq
+               do l2 = l1, nq
+                  wrk0(l1, l2) = we(1, l1, l2)
+               end do
+            end do
+            call dfctr(.true., wrk0, nq, nq, inf)
+            if (inf .ne. 0) then
+               info = 30010
+               exited = .true.
+            else
+               do l1 = 1, nq
+                  do l2 = 1, nq
+                     we1(1, l1, l2) = wrk0(l1, l2)
+                  end do
+                  if (we1(1, l1, l1) .ne. zero) then
+                     nnzw = n
+                  end if
+               end do
+            end if
+         end if
+      else
+         if (ld2we .eq. 1) then
+            ! WE contains an array of  diagonal matrix
+            do i = 1, n
+               notzro = .false.
+               do l = 1, nq
+                  if (we(i, 1, l) .gt. zero) then
+                     notzro = .true.
+                     we1(i, 1, l) = sqrt(we(i, 1, l))
+                  elseif (we(i, 1, l) .lt. zero) then
+                     info = 30010
+                     exited = .true.
+                     exit
+                  end if
+               end do
+               if (exited) exit
+               if (notzro) then
+                  nnzw = nnzw + 1
+               end if
+            end do
+         else
+            ! WE contains an array of full NQ by NQ semidefinite matrices
+            do i = 1, n
+               do l1 = 1, nq
+                  do l2 = l1, nq
+                     wrk0(l1, l2) = we(i, l1, l2)
+                  end do
+               end do
+               call dfctr(.true., wrk0, nq, nq, inf)
+               if (inf .ne. 0) then
+                  info = 30010
+                  exited = .true.
+                  exit
+               else
+                  notzro = .false.
+                  do l1 = 1, nq
+                     do l2 = 1, nq
+                        we1(i, l1, l2) = wrk0(l1, l2)
+                     end do
+                     if (we1(i, l1, l1) .ne. zero) then
+                        notzro = .true.
+                     end if
+                  end do
+               end if
+               if (notzro) then
+                  nnzw = nnzw + 1
+               end if
+            end do
+         end if
+      end if
+   end if
+
+   ! Check for a sufficient number of nonzero EPSILON weights
+   if (.not. exited) then
+      if (nnzw .lt. npp) info = 30020
+   end if
+
+   ! Check DELTA weights
+   if (.not. isodr .or. wd(1, 1, 1) .lt. zero) then
+      ! Problem is not ODR, or WD contains a scalar
+      return
+   else
+      if (ldwd .eq. 1) then
+         if (ld2wd .eq. 1) then
+            ! WD contains a diagonal matrix
+            do j = 1, m
+               if (wd(1, 1, j) .le. zero) then
+                  info = max(30001, info + 1)
+                  return
+               end if
+            end do
+         else
+            ! WD contains a full M by M positive definite matrix
+            do j1 = 1, m
+               do j2 = j1, m
+                  wrk4(j1, j2) = wd(1, j1, j2)
+               end do
+            end do
+            call dfctr(.false., wrk4, m, m, inf)
+            if (inf .ne. 0) then
+               info = max(30001, info + 1)
+               return
+            end if
+         end if
+      else
+         if (ld2wd .eq. 1) then
+            ! WD contains an array of diagonal matrices
+            do i = 1, n
+               do j = 1, m
+                  if (wd(i, 1, j) .le. zero) then
+                     info = max(30001, info + 1)
+                     return
+                  end if
+               end do
+            end do
+         else
+            ! WD contains an array of full M by M positive definite matrices
+            do i = 1, n
+               do j1 = 1, m
+                  do j2 = j1, m
+                     wrk4(j1, j2) = wd(i, j1, j2)
+                  end do
+               end do
+               call dfctr(.false., wrk4, m, m, inf)
+               if (inf .ne. 0) then
+                  info = max(30001, info + 1)
+                  return
+               end if
+            end do
+         end if
+      end if
+   end if
+
+end subroutine dfctrw
+
 pure subroutine dflags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
 !! Set flags indicating conditions specified by JOB.
 ! Routines Called  (NONE)
