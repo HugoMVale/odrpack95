@@ -2428,7 +2428,7 @@ subroutine djacfd &
 
    use odrpack_kinds, only: wp, zero, one
 
-   external :: fcn
+   procedure() :: fcn
       !! The user supplied subroutine for evaluating the model.
    integer, intent(in) :: n
       !! The number of observations.
@@ -4187,6 +4187,292 @@ pure subroutine dodchk &
    end if
 
 end subroutine dodchk
+
+subroutine dodcnt &
+   (fcn, n, m, np, nq, beta, y, ldy, x, ldx, &
+    we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
+    job, ndigit, taufac, sstol, partol, maxit, iprint, lunerr, lunrpt, &
+    stpb, stpd, ldstpd, sclb, scld, ldscld, &
+    work, lwork, iwork, liwork, &
+    info, &
+    lower, upper)
+!! Driver routine for finding the weighted explicit or implicit orthogonal distance
+!! regression (ODR) or ordinary linear or nonlinear least squares (OLS) solution.
+! Routines Called  DODDRV
+! Date Written   860529   (YYMMDD)
+! Revision Date  920304   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero, one, three
+
+   procedure() :: fcn
+      !! The user-supplied subroutine for evaluating the model.
+   integer, intent(in) :: n
+      !! The number of observations.
+   integer, intent(in) :: m
+      !! The number of columns of data in the independent variable.
+   integer, intent(in) :: np
+      !! The number of function parameters.
+   integer, intent(in) :: nq
+      !! The number of responses per observation.
+   real(kind=wp), intent(inout) :: beta(np)
+      !! The function parameters.
+   real(kind=wp), intent(in) :: y(ldy, nq)
+      !! The dependent variable. Unused when the model is implicit.
+   integer, intent(in) :: ldy
+      !! The leading dimension of array `y`.
+   real(kind=wp), intent(in) :: x(ldx, m)
+      !! The independent variable.
+   integer, intent(in) :: ldx
+      !! The leading dimension of array `x`.
+   real(kind=wp), intent(in) :: we(ldwe, ld2we, nq)
+      !! The `epsilon` weights.
+   integer, intent(in) :: ldwe
+      !! The leading dimension of array `we`.
+   integer, intent(in) :: ld2we
+      !! The second dimension of array `we`.
+   real(kind=wp), intent(in) :: wd(ldwd, ld2wd, m)
+      !! The `delta` weights.
+   integer, intent(in) :: ldwd
+      !! The leading dimension of array `wd`.
+   integer, intent(in) :: ld2wd
+      !! The second dimension of array `wd`.
+   integer, intent(in) :: ifixb(np)
+      !! The values designating whether the elements of `beta` are fixed at their input values or not.
+   integer, intent(in) :: ifixx(ldifx, m)
+      !! The values designating whether the elements of `x` are fixed at their input values or not.
+   integer, intent(in) :: ldifx
+      !! The leading dimension of array `ifixx`.
+   integer, intent(in) :: job
+      !! The variable controlling problem initialization and computational method.
+   integer, intent(in) :: ndigit
+      !! The number of accurate digits in the function results, as supplied by the user.
+   real(kind=wp), intent(in) :: taufac
+      !! The factor used to compute the initial trust region diameter.
+   real(kind=wp), intent(in) :: sstol
+      !! The sum-of-squares convergence stopping tolerance.
+   real(kind=wp), intent(in) :: partol
+      !! The user-supplied parameter convergence stopping tolerance.
+   integer, intent(in) :: maxit
+      !! The maximum number of iterations allowed.
+   integer, intent(in) :: iprint
+      !! The print control variables.
+   integer, intent(in) :: lunerr
+      !! The logical unit number used for error messages.
+   integer, intent(in) :: lunrpt
+      !! The logical unit number used for computation reports.
+   real(kind=wp), intent(in) :: stpb(np)
+      !! The relative step for computing finite difference derivatives with respect to `beta`.
+   real(kind=wp), intent(in) :: stpd(ldstpd, m)
+      !! The relative step for computing finite difference derivatives with respect to `delta`.
+   integer, intent(in) :: ldstpd
+      !! The leading dimension of array `stpd`.
+   real(kind=wp), intent(in) :: sclb(np)
+      !! The scaling values for `beta`.
+   real(kind=wp), intent(in) :: scld(ldscld, m)
+      !! The scaling value for `delta`.
+   integer, intent(in) :: ldscld
+      !! The leading dimension of array `scld`.
+   real(kind=wp), intent(inout) :: work(lwork)
+      !! The real work space.
+   integer, intent(in) :: lwork
+      !! The length of vector `work`.
+   integer, intent(inout) :: iwork(liwork)
+      !! The integer work space.
+   integer, intent(in) :: liwork
+      !! The length of vector `iwork`.
+   integer, intent(out) :: info
+      !! The variable designating why the computations were stopped.
+   real(kind=wp), intent(in) :: lower(np)
+      !! The lower bound on `beta`.
+   real(kind=wp), intent(in) :: upper(np)
+      !! The upper bound on `beta`.
+
+   ! Local scalars
+   real(kind=wp), parameter :: pcheck = 1.0E3_wp, pstart = 1.0E1_wp, pfac = 1.0E1_wp
+   real(kind=wp) :: cnvtol, tstimp
+   integer :: iprnti, ipr1, ipr2, ipr2f, ipr3, jobi, job1, job2, job3, job4, job5, &
+              maxiti, maxit1
+   logical :: done, fstitr, head, implct, prtpen
+
+   ! Local arrays
+   real(kind=wp) :: pnlty(1, 1, 1)
+
+   ! External subroutines
+   external :: doddrv
+
+   ! Variable Definitions (alphabetically)
+   !  BETA:    The function parameters.
+   !  CNVTOL:  The convergence tolerance for implicit models.
+   !  DONE:    The variable designating whether the inplicit solution has been found (DONE=TRUE)
+   !           or not (DONE=FALSE).
+   !  FCN:     The user-supplied subroutine for evaluating the model.
+   !  FSTITR:  The variable designating whether this is the first iteration (FSTITR=TRUE)
+   !           or not (FSTITR=FALSE).
+   !  HEAD:    The variable designating whether the heading is to be printed (HEAD=TRUE)
+   !           or not (HEAD=FALSE).
+   !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
+   !           values or not.
+   !  IFIXX:   The values designating whether the elements of X are fixed at their input
+   !           values or not.
+   !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
+   !           or explicit ODR (IMPLCT=FALSE).
+   !  INFO:    The variable designating why the computations were stopped.
+   !  IPRINT:  The print control variables.
+   !  IPRNTI:  The print control variables.
+   !  IPR1:    The 1st digit of the print control variable.
+   !  IPR2:    The 2nd digit of the print control variable.
+   !  IPR3:    The 3rd digit of the print control variable.
+   !  IPR4:    The 4th digit of the print control variable.
+   !  IWORK:   The integer work space.
+   !  JOB:     The variable controling problem initialization and computational method.
+   !  JOBI:    The variable controling problem initialization and computational method.
+   !  JOB1:    The 1st digit of the variable JOB.
+   !  JOB2:    The 2nd digit of the variable JOB.
+   !  JOB3:    The 3rd digit of the variable JOB.
+   !  JOB4:    The 4th digit of the variable JOB.
+   !  JOB5:    The 5th digit of the variable JOB.
+   !  LDIFX:   The leading dimension of array IFIXX.
+   !  LDSCLD:  The leading dimension of array SCLD.
+   !  LDSTPD:  The leading dimension of array STPD.
+   !  LDWD:    The leading dimension of array WD.
+   !  LDWE:    The leading dimension of array WE.
+   !  LDX:     The leading dimension of array X.
+   !  LDY:     The leading dimension of array Y.
+   !  LD2WD:   The second dimension of array WD.
+   !  LD2WE:   The second dimension of array WE.
+   !  LIWORK:  The length of vector IWORK.
+   !  LOWER:   The lower bound for BETA.
+   !  LUNERR:  The logical unit number used for error messages.
+   !  LUNRPT:  The logical unit number used for computation reports.
+   !  LWORK:   The length of vector work.
+   !  M:       The number of columns of data in the independent variable.
+   !  MAXIT:   The maximum number of iterations allowed.
+   !  MAXITI:  For implicit models, the number of iterations allowed for the current penalty
+   !           parameter value.
+   !  MAXIT1:  For implicit models, the number of iterations allowed for the next penalty
+   !           parameter value.
+   !  N:       The number of observations.
+   !  NDIGIT:  The number of accurate digits in the function results, as supplied by the user.
+   !  NP:      The number of function parameters.
+   !  NQ:      The number of responses per observation.
+   !  PARTOL:  The user supplied parameter convergence stopping tolerance.
+   !  PCHECK:  The value designating the minimum penalty parameter allowed before the implicit
+   !           problem can be considered solved.
+   !  PFAC:    The factor for increasing the penalty parameter.
+   !  PNLTY:   The penalty parameter for an implicit model.
+   !  PRTPEN:  The value designating whether the penalty parameter is to be printed in the
+   !           iteration report (PRTPEN=TRUE) or not (PRTPEN=FALSE).
+   !  PSTART:  The factor for increasing the penalty parameter.
+   !  SCLB:    The scaling values for BETA.
+   !  SCLD:    The scaling values for DELTA.
+   !  STPB:    The relative step for computing finite difference derivatives with respect to BETA.
+   !  STPD:    The relative step for computing finite difference derivatives with respect to DELTA.
+   !  SSTOL:   The sum-of-squares convergence stopping tolerance.
+   !  TAUFAC:  The factor used to compute the initial trust region diameter.
+   !  TSTIMP:  The relative change in the parameters between the initial values and the solution.
+   !  UPPER:   The upper bound for BETA.
+   !  WD:      The DELTA weights.
+   !  WE:      The EPSILON weights.
+   !  WORK:    The real work space.
+   !  X:       The independent variable.
+   !  Y:       The dependent variable. Unused when the model is implicit.
+
+   implct = mod(job, 10) .eq. 1
+   fstitr = .true.
+   head = .true.
+   prtpen = .false.
+
+   if (implct) then
+      !  Set up for implicit problem
+      if (iprint .ge. 0) then
+         ipr1 = mod(iprint, 10000)/1000
+         ipr2 = mod(iprint, 1000)/100
+         ipr2f = mod(iprint, 100)/10
+         ipr3 = mod(iprint, 10)
+      else
+         ipr1 = 2
+         ipr2 = 0
+         ipr2f = 0
+         ipr3 = 1
+      end if
+      iprnti = ipr1*1000 + ipr2*100 + ipr2f*10
+
+      job5 = mod(job, 100000)/10000
+      job4 = mod(job, 10000)/1000
+      job3 = mod(job, 1000)/100
+      job2 = mod(job, 100)/10
+      job1 = mod(job, 10)
+      jobi = job5*10000 + job4*1000 + job3*100 + job2*10 + job1
+
+      if (we(1, 1, 1) .le. zero) then
+         pnlty(1, 1, 1) = -pstart
+      else
+         pnlty(1, 1, 1) = -we(1, 1, 1)
+      end if
+
+      if (partol .lt. zero) then
+         cnvtol = epsilon(zero)**(one/three)
+      else
+         cnvtol = min(partol, one)
+      end if
+
+      if (maxit .ge. 1) then
+         maxiti = maxit
+      else
+         maxiti = 100
+      end if
+
+      done = maxiti .eq. 0
+      prtpen = .true.
+
+      do while (.true.)
+         call doddrv &
+            (head, fstitr, prtpen, &
+             fcn, n, m, np, nq, beta, y, ldy, x, ldx, &
+             pnlty, 1, 1, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
+             jobi, ndigit, taufac, sstol, cnvtol, maxiti, &
+             iprnti, lunerr, lunrpt, &
+             stpb, stpd, ldstpd, sclb, scld, ldscld, &
+             work, lwork, iwork, liwork, &
+             maxit1, tstimp, info, lower, upper)
+
+         if (done) then
+            return
+         else
+            done = maxit1 .le. 0 .or. (abs(pnlty(1, 1, 1)) .ge. pcheck .and. tstimp .le. cnvtol)
+         end if
+
+         if (done) then
+            if (tstimp .le. cnvtol) then
+               info = (info/10)*10 + 2
+            else
+               info = (info/10)*10 + 4
+            end if
+            jobi = 10000 + 1000 + job3*100 + job2*10 + job1
+            maxiti = 0
+            iprnti = ipr3
+         else
+            prtpen = .true.
+            pnlty(1, 1, 1) = pfac*pnlty(1, 1, 1)
+            jobi = 10000 + 1000 + 000 + job2*10 + job1
+            maxiti = maxit1
+            iprnti = 0000 + ipr2*100 + ipr2f*10
+         end if
+      end do
+   else
+      ! Explicit problem
+      call doddrv &
+         (head, fstitr, prtpen, &
+          fcn, n, m, np, nq, beta, y, ldy, x, ldx, &
+          we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
+          job, ndigit, taufac, sstol, partol, maxit, &
+          iprint, lunerr, lunrpt, &
+          stpb, stpd, ldstpd, sclb, scld, ldscld, &
+          work, lwork, iwork, liwork, &
+          maxit1, tstimp, info, lower, upper)
+   end if
+
+end subroutine dodcnt
 
 subroutine dodstp &
    (n, m, np, nq, npp, &
@@ -6489,13 +6775,9 @@ subroutine mbfb(np, beta, lower, upper, ssf, stpb, neta, eta, interval)
          if (interval(k) .ge. 100) then
             interval(k) = interval(k) - 100
          end if
-      elseif (beta(k) + stpl .gt. upper(k) .or. beta(k) - stpl .gt. &
-              upper(k)) &
-         then
+      elseif (beta(k) + stpl .gt. upper(k) .or. beta(k) - stpl .gt. upper(k)) then
          beta(k) = upper(k) - abs(stpl)
-      elseif (beta(k) + stpl .lt. lower(k) .or. beta(k) - stpl .lt. &
-              lower(k)) &
-         then
+      elseif (beta(k) + stpl .lt. lower(k) .or. beta(k) - stpl .lt. lower(k)) then
          beta(k) = lower(k) + abs(stpl)
       end if
       ! Check middle interval
@@ -6503,13 +6785,9 @@ subroutine mbfb(np, beta, lower, upper, ssf, stpb, neta, eta, interval)
          if (mod(interval(k), 100) .ge. 10) then
             interval(k) = interval(k) - 10
          end if
-      elseif (beta(k) + stpr .gt. upper(k) .or. beta(k) - stpr .gt. &
-              upper(k)) &
-         then
+      elseif (beta(k) + stpr .gt. upper(k) .or. beta(k) - stpr .gt. upper(k)) then
          beta(k) = upper(k) - abs(stpr)
-      elseif (beta(k) + stpr .lt. lower(k) .or. beta(k) - stpr .lt. &
-              lower(k)) &
-         then
+      elseif (beta(k) + stpr .lt. lower(k) .or. beta(k) - stpr .lt. lower(k)) then
          beta(k) = lower(k) + abs(stpr)
       end if
       ! Check inner interval
