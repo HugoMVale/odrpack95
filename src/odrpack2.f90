@@ -171,7 +171,7 @@ subroutine dacces &
    !  FJACDI:  The starting location in array WORK of array FJACD.
    !  FNI:     The starting location in array WORK of array FN.
    !  FSI:     The starting location in array WORK of array FS.
-   !  IDF:     The degrees of freedom of the fit, equal to the number of observations with 
+   !  IDF:     The degrees of freedom of the fit, equal to the number of observations with
    !           nonzero weighted derivatives minus the number of parameters being estimated.
    !  IDFI:    The starting location in array IWORK of variable IDF.
    !  INT2:    The number of internal doubling steps.
@@ -190,7 +190,7 @@ subroutine dacces &
    !  IRANKI:  The location in array IWORK of variable IRANK.
    !  ISODR:   The variable designating whether the solution is to be found by ODR (ISODR=TRUE)
    !           or by OLS (ISODR=FALSE).
-   !  ISTOP:   The variable designating whether there are problems computing the function at 
+   !  ISTOP:   The variable designating whether there are problems computing the function at
    !           the current BETA and DELTA.
    !  ISTOPI:  The location in array IWORK of variable ISTOP.
    !  IWORK:   The integer work space.
@@ -881,7 +881,7 @@ subroutine devjac &
    real(kind=wp), intent(out) :: fjacb(n, np, nq)
       !! The Jacobian with respect to `beta`.
    logical, intent(in) :: isodr
-      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or 
+      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or
       !! by OLS (`isodr = .false.`).
    real(kind=wp), intent(out) :: fjacd(n, m, nq)
       !! The Jacobian with respect to `delta`.
@@ -1177,7 +1177,7 @@ subroutine dfctrw &
    integer, intent(in) :: npp
       !! The number of function parameters being estimated.
    logical, intent(in) :: isodr
-      !! The variable designating whether the solution is by ODR (`isodr = .true`) or 
+      !! The variable designating whether the solution is by ODR (`isodr = .true`) or
       !! by OLS (`isodr = .false`).
    real(kind=wp), intent(in) :: we(ldwe, ld2we, nq)
       !! The (squared) EPSILON weights.
@@ -1450,13 +1450,13 @@ pure subroutine dflags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, 
    !           or explicit ODR (IMPLCT=FALSE).
    !  INITD:   The variable designating whether DELTA is to be initialized to zero (INITD=TRUE)
    !           or to the first N by M elements of array WORK (INITD=FALSE).
-   !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or 
+   !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or
    !           by OLS (ISODR=FALSE).
    !  J:       The value of a specific digit of JOB.
    !  JOB:     The variable controling problem initialization and computational method.
    !  REDOJ:   The variable designating whether the Jacobian matrix is to be recomputed for the
    !           computation of the covariance matrix (REDOJ=TRUE) or not (REDOJ=FALSE).
-   !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or 
+   !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or
    !           not (RESTRT=FALSE).
 
    if (job .ge. 0) then
@@ -2152,7 +2152,7 @@ subroutine djaccd &
    real(kind=wp), intent(out) :: fjacb(n, np, nq)
       !! The Jacobian with respect to `beta`.
    logical, intent(in) :: isodr
-      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or 
+      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or
       !! by OLS (`isodr = .false.`).
    real(kind=wp), intent(out) :: fjacd(n, m, nq)
       !! The Jacobian with respect to `delta`.
@@ -2483,7 +2483,7 @@ subroutine djacfd &
    real(kind=wp), intent(out) :: fjacb(n, np, nq)
       !! The Jacobian with respect to `beta`.
    logical, intent(in) :: isodr
-      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or 
+      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or
       !! by OLS (`isodr = .false.`).
    real(kind=wp), intent(out) :: fjacd(n, m, nq)
       !! The Jacobian with respect to `delta`.
@@ -2773,7 +2773,7 @@ subroutine djck &
    integer, intent(in) :: nrow
       !! The row number of the explanatory variable array at which the derivative is checked.
    logical, intent(in) :: isodr
-      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or 
+      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or
       !! by OLS (`isodr = .false.`).
    real(kind=wp), intent(in) :: epsmac
       !! The value of machine precision.
@@ -3920,6 +3920,274 @@ subroutine djckz &
 
 end subroutine djckz
 
+pure subroutine dodchk &
+   (n, m, np, nq, &
+    isodr, anajac, implct, &
+    beta, ifixb, &
+    ldx, ldifx, ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
+    ldy, &
+    lwork, lwkmn, liwork, liwkmn, &
+    sclb, scld, stpb, stpd, &
+    info, &
+    lower, upper)
+!! Check input parameters, indicating errors found using nonzero values of argument `info`.
+! Routines Called  (None)
+! Date Written   860529   (YYMMDD)
+! Revision Date  920619   (YYMMDD)
+
+   use odrpack_kinds, only: wp, zero
+
+   integer, intent(in) :: n
+      !! The number of observations.
+   integer, intent(in) :: m
+      !! The number of columns of data in the explanatory variable.
+   integer, intent(in) :: np
+      !! The number of function parameters.
+   integer, intent(in) :: nq
+      !! The number of responses per observation.
+   logical, intent(in) :: isodr
+      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or
+      !! by OLS (`isodr = .false.`).
+   logical, intent(in) :: anajac
+      !! The variable designating whether the Jacobians are computed by finite differences
+      !! (`anajac = .false.`) or not (`anajac = .true.`).
+   logical, intent(in) :: implct
+      !! The variable designating whether the solution is by implicit ODR (`implct = .true.`)
+      !! or explicit ODR (`implct = .false.`).
+   real(kind=wp), intent(in) :: beta(np)
+      !! The function parameters.
+   integer, intent(in) :: ifixb(np)
+      !! The values designating whether the elements of `beta` are fixed at their input values or not.
+   integer, intent(in) :: ldx
+      !! The leading dimension of array `x`.
+   integer, intent(in) :: ldifx
+      !! The leading dimension of array `ifixx`.
+   integer, intent(in) :: ldscld
+      !! The leading dimension of array `scld`.
+   integer, intent(in) :: ldstpd
+      !! The leading dimension of array `stpd`.
+   integer, intent(in) :: ldwe
+   !! The leading dimension of array `we`.
+   integer, intent(in) :: ld2we
+      !! The second dimension of array `we`.
+   integer, intent(in) :: ldwd
+      !! The leading dimension of array `wd`.
+   integer, intent(in) :: ld2wd
+      !! The second dimension of array `wd`.
+   integer, intent(in) :: ldy
+      !! The leading dimension of array `y`.
+   integer, intent(in) :: lwork
+      !! The length of vector `work`.
+   integer, intent(in) :: lwkmn
+      !! The minimum acceptable length of array `work`.
+   integer, intent(in) :: liwork
+      !! The length of vector `iwork`.
+   integer, intent(in) :: liwkmn
+      !! The minimum acceptable length of array `iwork`.
+   real(kind=wp), intent(in) :: sclb(np)
+      !! The scaling values for `beta`.
+   real(kind=wp), intent(in) :: scld(ldscld, m)
+      !! The scaling value for `delta`.
+   real(kind=wp), intent(in) :: stpb(np)
+      !! The step for the finite difference derivative wrt `beta`.
+   real(kind=wp), intent(in) :: stpd(ldstpd, m)
+      !! The step for the finite difference derivative wrt `delta`.
+   integer, intent(out) :: info
+      !! The variable designating why the computations were stopped.
+   real(kind=wp), intent(in) :: lower(np)
+      !! The lower bound on `beta`.
+   real(kind=wp), intent(in) :: upper(np)
+      !! The upper bound on `beta`.
+
+   ! Local scalars
+   integer :: last, npp
+
+   ! Variable Definitions (alphabetically)
+   !  ANAJAC:  The variable designating whether the Jacobians are computed by finite
+   !           differences (ANAJAC=FALSE) or not (ANAJAC=TRUE).
+   !  I:       An indexing variable.
+   !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
+   !           values or not.
+   !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
+   !           or explicit ODR (IMPLCT=FALSE).
+   !  INFO:    The variable designating why the computations were stopped.
+   !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or
+   !           by OLS (ISODR=FALSE).
+   !  J:       An indexing variable.
+   !  K:       An indexing variable.
+   !  LAST:    The last row of the array to be accessed.
+   !  LDIFX:   The leading dimension of array IFIXX.
+   !  LDSCLD:  The leading dimension of array SCLD.
+   !  LDSTPD:  The leading dimension of array STPD.
+   !  LDWD:    The leading dimension of array WD.
+   !  LDWE:    The leading dimension of array WE.
+   !  LDX:     The leading dimension of array X.
+   !  LDY:     The leading dimension of array X.
+   !  LD2WD:   The second dimension of array WD.
+   !  LD2WE:   The second dimension of array WE.
+   !  LIWKMN:  The minimum acceptable length of array IWORK.
+   !  LIWORK:  The length of vector IWORK.
+   !  LWKMN:   The minimum acceptable length of array WORK.
+   !  LWORK:   The length of vector WORK.
+   !  M:       The number of columns of data in the explanatory variable.
+   !  N:       The number of observations.
+   !  NP:      The number of function parameters.
+   !  NPP:     The number of function parameters being estimated.
+   !  NQ:      The number of responses per observations.
+   !  SCLB:    The scaling values for BETA.
+   !  SCLD:    The scaling value for DELTA.
+   !  STPB:    The step for the finite difference derivitive wrt BETA.
+   !  STPD:    The step for the finite difference derivitive wrt DELTA.
+
+   ! Find actual number of parameters being estimated
+   if ((np .le. 0) .or. (ifixb(1) .lt. 0)) then
+      npp = np
+   else
+      npp = count(ifixb(1:np) .ne. 0)
+   end if
+
+   ! Check problem specification parameters
+   if ((n .le. 0) .or. (m .le. 0) .or. (npp .le. 0 .or. npp .gt. n) .or. (nq .le. 0)) then
+      info = 10000
+      if (n .le. 0) then
+         info = info + 1000
+      end if
+      if (m .le. 0) then
+         info = info + 100
+      end if
+      if (npp .le. 0 .or. npp .gt. n) then
+         info = info + 10
+      end if
+      if (nq .le. 0) then
+         info = info + 1
+      end if
+      return
+   end if
+
+   ! Check dimension specification parameters
+   if ((.not. implct .and. (ldy .lt. n)) .or. &
+       (ldx .lt. n) .or. &
+       ((ldwe .ne. 1) .and. (ldwe .lt. n)) .or. &
+       ((ld2we .ne. 1) .and. (ld2we .lt. nq)) .or. &
+       (isodr .and. ((ldwd .ne. 1) .and. (ldwd .lt. n))) .or. &
+       (isodr .and. ((ld2wd .ne. 1) .and. (ld2wd .lt. m))) .or. &
+       (isodr .and. ((ldifx .ne. 1) .and. (ldifx .lt. n))) .or. &
+       (isodr .and. ((ldstpd .ne. 1) .and. (ldstpd .lt. n))) .or. &
+       (isodr .and. ((ldscld .ne. 1) .and. (ldscld .lt. n))) .or. &
+       (lwork .lt. lwkmn) .or. &
+       (liwork .lt. liwkmn)) then
+
+      info = 20000
+
+      if (.not. implct .and. ldy .lt. n) then
+         info = info + 1000
+      end if
+
+      if (ldx .lt. n) then
+         info = info + 2000
+      end if
+
+      if ((ldwe .ne. 1 .and. ldwe .lt. n) .or. (ld2we .ne. 1 .and. ld2we .lt. nq)) then
+         info = info + 100
+      end if
+
+      if (isodr .and. &
+          ((ldwd .ne. 1 .and. ldwd .lt. n) .or. (ld2wd .ne. 1 .and. ld2wd .lt. m))) then
+         info = info + 200
+      end if
+
+      if (isodr .and. (ldifx .ne. 1 .and. ldifx .lt. n)) then
+         info = info + 10
+      end if
+
+      if (isodr .and. (ldstpd .ne. 1 .and. ldstpd .lt. n)) then
+         info = info + 20
+      end if
+
+      if (isodr .and. &
+          (ldscld .ne. 1 .and. ldscld .lt. n)) then
+         info = info + 40
+      end if
+
+      if (lwork .lt. lwkmn) then
+         info = info + 1
+      end if
+
+      if (liwork .lt. liwkmn) then
+         info = info + 2
+      end if
+
+   end if
+
+   ! Check DELTA scaling
+   if (isodr .and. scld(1, 1) .gt. zero) then
+      if (ldscld .ge. n) then
+         last = n
+      else
+         last = 1
+      end if
+      if (any(scld(1:last, 1:m) .le. zero)) then
+         info = 30200
+      end if
+   end if
+
+   ! Check BETA scaling
+   if (sclb(1) .gt. zero) then
+      if (any(sclb(1:np) .le. zero)) then
+         if (info .eq. 0) then
+            info = 30100
+         else
+            info = info + 100
+         end if
+      end if
+   end if
+
+   ! Check DELTA finite difference step sizes
+   if (anajac .and. isodr .and. stpd(1, 1) .gt. zero) then
+      if (ldstpd .ge. n) then
+         last = n
+      else
+         last = 1
+      end if
+      if (any(stpd(1:last, 1:m) .le. zero)) then
+         if (info .eq. 0) then
+            info = 32000
+         else
+            info = info + 2000
+         end if
+      end if
+   end if
+
+   ! Check BETA finite difference step sizes
+   if (anajac .and. stpb(1) .gt. zero) then
+      if (any(stpb(1:np) .le. zero)) then
+         if (info .eq. 0) then
+            info = 31000
+         else
+            info = info + 1000
+         end if
+      end if
+   end if
+
+   !  Check bounds
+   if (any(upper(1:np) .lt. lower(1:np))) then
+      if (info .eq. 0) then
+         info = 91000
+      end if
+   end if
+
+   if (any( &
+       ((upper(1:np) .lt. beta(1:np)) .or. (lower(1:np) .gt. beta(1:np))) &
+       .and. .not. (upper(1:np) .lt. lower(1:np)))) then
+      if (info .ge. 90000) then
+         info = info + 100
+      else
+         info = 90100
+      end if
+   end if
+
+end subroutine dodchk
+
 subroutine dodstp &
    (n, m, np, nq, npp, &
     f, fjacb, fjacd, &
@@ -4792,8 +5060,8 @@ real(kind=wp) function dppnml(p) result(dppnmlr)
 end function dppnml
 
 real(kind=wp) function dppt(p, idf) result(dpptr)
-!! Compute the percent point function value for the student's T distribution with `idf` 
-!! degrees of freedom. 
+!! Compute the percent point function value for the student's T distribution with `idf`
+!! degrees of freedom.
 !! (Adapted from DATAPAC subroutine TPPF, with modifications to facilitate conversion to REAL
 !! automatically).
 ! Routines Called  DPPNML
@@ -5445,13 +5713,13 @@ end subroutine dsetn
 
 subroutine dsolve(n, t, ldt, b, job)
 !! Solve systems of the form:
-!!   
+!!
 !!  `t * x = b  or  trans(t) * x = b`
 !!
 !! where `t` is an upper or lower triangular matrix of order `n`, and the solution `x`
-!! overwrites the RHS `b`. 
+!! overwrites the RHS `b`.
 !! (adapted from LINPACK subroutine DTRSL).
-!!   
+!!
 !! References:
 !! * Dongarra J.J., Bunch J.R., Moler C.B., Stewart G.W., *LINPACK Users Guide*, SIAM, 1979.
 ! Routines Called  DAXPY,DDOT
@@ -5509,7 +5777,7 @@ subroutine dsolve(n, t, ldt, b, job)
       end if
    end do
    if (j1 .eq. 0) return
-   
+
    ! Find last nonzero diagonal entry in T
    jn = 0
    do j = n, j1, -1
