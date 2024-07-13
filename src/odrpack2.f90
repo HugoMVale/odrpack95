@@ -38,10 +38,10 @@ subroutine dacces &
       !! The length of vector `iwork`.
    logical, intent(in) :: access
       !! The variable designating whether information is to be accessed from the work
-      !! arrays (`access`=TRUE) or stored in them (`access`=FALSE).
+      !! arrays (`access = .true.`) or stored in them (`access = .false.`).
    logical, intent(in) :: isodr
-      !! The variable designating whether the solution is to be found by ODR (`isodr`=TRUE) or
-      !! by OLS (`isodr`=FALSE).
+      !! The variable designating whether the solution is to be found by ODR (`isodr = .true.`)
+      !! or by OLS (`isodr = .false.`).
    integer, intent(out) :: jpvt
       !! The pivot vector.
    integer, intent(out) :: omega
@@ -102,7 +102,7 @@ subroutine dacces &
       !! The sum of the squares of the weighted `epsilons` and `deltas`, the sum of the squares
       !! of the weighted `deltas`, and the sum of the squares of the weighted `epsilons`.
    real(kind=wp), intent(out) :: rvar
-      !! The residual variance, i.e. standard deviation squared.
+      !! The residual variance, i.e. the standard deviation squared.
    integer, intent(out) :: idf
       !! The degrees of freedom of the fit, equal to the number of observations with nonzero
       !! weighted derivatives minus the number of parameters being estimated.
@@ -171,8 +171,8 @@ subroutine dacces &
    !  FJACDI:  The starting location in array WORK of array FJACD.
    !  FNI:     The starting location in array WORK of array FN.
    !  FSI:     The starting location in array WORK of array FS.
-   !  IDF:     The degrees of freedom of the fit, equal to the number of observations with nonzero
-   !           weighted derivatives minus the number of parameters being estimated.
+   !  IDF:     The degrees of freedom of the fit, equal to the number of observations with 
+   !           nonzero weighted derivatives minus the number of parameters being estimated.
    !  IDFI:    The starting location in array IWORK of variable IDF.
    !  INT2:    The number of internal doubling steps.
    !  INT2I:   The location in array IWORK of variable INT2.
@@ -188,10 +188,10 @@ subroutine dacces &
    !  IPRINT:  The print control variable.
    !  IRANK:   The rank deficiency of the Jacobian wrt BETA.
    !  IRANKI:  The location in array IWORK of variable IRANK.
-   !  ISODR:   The variable designating whether the solution is to be found by ODR (ISODR=TRUE) or
-   !           by OLS (ISODR=FALSE).
-   !  ISTOP:   The variable designating whether there are problems computing the function at the
-   !           current BETA and DELTA.
+   !  ISODR:   The variable designating whether the solution is to be found by ODR (ISODR=TRUE)
+   !           or by OLS (ISODR=FALSE).
+   !  ISTOP:   The variable designating whether there are problems computing the function at 
+   !           the current BETA and DELTA.
    !  ISTOPI:  The location in array IWORK of variable ISTOP.
    !  IWORK:   The integer work space.
    !  JOB:     The variable controling problem initialization and computational method.
@@ -394,7 +394,7 @@ subroutine dacces &
 end subroutine dacces
 
 real(kind=wp) function derstep(itype, k, betak, ssf, stpb, neta) result(derstepr)
-!! Compute step size for center and forward difference calculations
+!! Compute step size for center and forward difference calculations.
 ! Routines Called  DHSTEP
 ! Date Written   20040616   (YYYYMMDD)
 ! Revision Date  20040616   (YYYYMMDD)
@@ -404,11 +404,11 @@ real(kind=wp) function derstep(itype, k, betak, ssf, stpb, neta) result(derstepr
    integer, intent(in) :: itype
       !! 0 - calc foward difference step, 1 - calc center difference step.
    integer, intent(in) :: k
-      !! Index into beta where `betak` resides.
+      !! Index into `beta` where `betak` resides.
    real(kind=wp), intent(in) :: betak
       !! The `k`-th function parameter.
    real(kind=wp), intent(in) :: ssf(k)
-      !! The scale used for the `betas`s.
+      !! The scale used for the `beta`s.
    real(kind=wp), intent(in) :: stpb(k)
       !! The relative step used for computing finite difference derivatives with respect to `beta`.
    integer, intent(in) :: neta
@@ -430,9 +430,6 @@ real(kind=wp) function derstep(itype, k, betak, ssf, stpb, neta) result(derstepr
    !  TYPJ:    The typical size of the J-th unkonwn BETA.
 
    if (betak .eq. zero) then
-!-----------------------^------------------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
       if (ssf(1) .lt. zero) then
          typj = one/abs(ssf(1))
       else
@@ -446,7 +443,7 @@ real(kind=wp) function derstep(itype, k, betak, ssf, stpb, neta) result(derstepr
 end function derstep
 
 pure subroutine desubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, e)
-!! Compute E = WD + ALPHA*TT**2.
+!! Compute `e = wd + alpha*tt**2`.
 ! Routines Called (NONE)
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
@@ -603,7 +600,7 @@ subroutine detaf &
 
    use odrpack_kinds, only: wp, zero, one, two, hundred
 
-   external :: fcn
+   procedure() :: fcn
       !! The user-supplied subroutine for evaluating the model.
    integer, intent(in) :: n
       !! The number of observations.
@@ -614,7 +611,7 @@ subroutine detaf &
    integer, intent(in) :: nq
       !! The number of responses per observation.
    real(kind=wp), intent(in) :: xplusd(n, m)
-      !! The values of `x` + `delta`.
+      !! The values of `x + delta`.
    real(kind=wp), intent(in) :: beta(np)
       !! The function parameters.
    real(kind=wp), intent(in) :: epsmac
@@ -632,7 +629,8 @@ subroutine detaf &
    integer, intent(in) :: ldifx
       !! The leading dimension of array `ifixx`.
    integer, intent(out) :: istop
-      !! The variable designating whether there are problems computing the function at the current `beta` and `delta`.
+      !! The variable designating whether there are problems computing the function at the
+      !! current `beta` and `delta`.
    integer, intent(out) :: nfev
       !! The number of function evaluations.
    real(kind=wp), intent(out) :: eta
@@ -640,13 +638,13 @@ subroutine detaf &
    integer, intent(out) :: neta
       !! The number of accurate digits in the model results.
    real(kind=wp), intent(out) :: wrk1(n, m, nq)
-      !! A work array of (`n` by `m` by `nq`) elements.
+      !! A work array of `(n, m, nq)` elements.
    real(kind=wp), intent(out) :: wrk2(n, nq)
-      !! A work array of (`n` by `nq`) elements.
+      !! A work array of `(n, nq)` elements.
    real(kind=wp), intent(out) :: wrk6(n, np, nq)
-      !! A work array of (`n` by `np` by `nq`) elements.
+      !! A work array of `(n, np, nq)` elements.
    real(kind=wp), intent(out) :: wrk7(-2:2, nq)
-      !! A work array of (5 by `nq`) elements.
+      !! A work array of `(5, nq)` elements.
    integer, intent(out) :: info
       !! The variable indicating the status of the computation.
    real(kind=wp), intent(in) :: lower(np)
@@ -655,7 +653,7 @@ subroutine detaf &
       !! The upper bound of `beta`.
 
    ! Local scalars
-   real(kind=wp), parameter :: p1 = 0.1E0_wp, p2 = 0.2E0_wp, p5 = 0.5E0_wp
+   real(kind=wp), parameter :: p1 = 0.1_wp, p2 = 0.2_wp, p5 = 0.5_wp
    real(kind=wp) :: a, b, fac, shift, stp
    integer :: j, k, l, sbk
 
@@ -670,8 +668,10 @@ subroutine detaf &
    !  ETA:     The noise in the model results.
    !  FAC:     A factor used in the computations.
    !  FCN:     The user supplied subroutine for evaluating the model.
-   !  IFIXB:   The values designating whether the elements of BETA are fixed at their input values or not.
-   !  IFIXX:   The values designating whether the elements of X are fixed at their input values or not.
+   !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
+   !           values or not.
+   !  IFIXX:   The values designating whether the elements of X are fixed at their input values
+   !           or not.
    !  ISTOP:   The variable designating whether there are problems computing the function at the
    !           current BETA and DELTA.
    !  J:       An index variable.
@@ -705,7 +705,7 @@ subroutine detaf &
    stp = hundred*epsmac
    eta = epsmac
 
-   ! Create points to use in calculating FCN for ETA and NETA.
+   ! Create points to use in calculating FCN for ETA and NETA
    do j = -2, 2
       if (j .eq. 0) then
          parpts(0, :) = beta(:)
@@ -722,7 +722,7 @@ subroutine detaf &
       end if
    end do
 
-   ! Adjust the points used in calculating FCN to uphold the boundary constraints.
+   ! Adjust the points used in calculating FCN to uphold the boundary constraints
    do k = 1, np
       sbk = sign(one, parpts(2, k) - parpts(-2, k))
       if (parpts(sbk*2, k) .gt. upper(k)) then
@@ -749,7 +749,7 @@ subroutine detaf &
       end if
    end do
 
-   ! Evaluate FCN for all points in PARPTS.
+   ! Evaluate FCN for all points in PARPTS
    do j = -2, 2
       if (all(parpts(j, :) .eq. beta(:))) then
          do l = 1, nq
@@ -774,7 +774,7 @@ subroutine detaf &
       end if
    end do
 
-   ! Calculate ETA and NETA.
+   ! Calculate ETA and NETA
    do l = 1, nq
       a = zero
       b = zero
@@ -785,9 +785,6 @@ subroutine detaf &
       a = p2*a
       b = p1*b
       if ((wrk7(0, l) .ne. zero) .and. (abs(wrk7(1, l) + wrk7(-1, l)) .gt. hundred*epsmac)) then
-!--------------------------------^---------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
          fac = one/abs(wrk7(0, l))
       else
          fac = one
@@ -813,7 +810,7 @@ subroutine devjac &
     fjacb, isodr, fjacd, we1, ldwe, ld2we, &
     njev, nfev, istop, info, &
     lower, upper)
-!! Compute the weighted Jacobians wrt BETA and DELTA.
+!! Compute the weighted Jacobians wrt `beta` and `delta`.
 ! Routines Called  FCN, DDOT, DIFIX, DJACCD, DJACFD, DWGHT, DUNPAC
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
@@ -821,7 +818,7 @@ subroutine devjac &
    use odrpack_kinds, only: wp, zero
    use odrpack, only: tempret
 
-   external :: fcn
+   procedure() :: fcn
       !! The user-supplied subroutine for evaluating the model.
    logical, intent(in) :: anajac
       !! The variable designating whether the Jacobians are computed by finite differences
@@ -856,7 +853,7 @@ subroutine devjac &
    real(kind=wp), intent(in) :: delta(n, m)
       !! The estimated values of `delta`.
    real(kind=wp), intent(out) :: xplusd(n, m)
-      !! The values of `x` + `delta`.
+      !! The values of `x + delta`.
    real(kind=wp), intent(in) :: stpd(ldstpd, m)
       !! The relative step used for computing finite difference derivatives with respect to `delta`.
    integer, intent(in) :: ldstpd
@@ -874,21 +871,22 @@ subroutine devjac &
    real(kind=wp), intent(out) :: stp(n)
       !! The step used for computing finite difference derivatives with respect to `delta`.
    real(kind=wp), intent(out) :: wrk1(n, m, nq)
-      !! A work array of (N BY M BY NQ) elements.
+      !! A work array of `(n, m, nq)` elements.
    real(kind=wp), intent(out) :: wrk2(n, nq)
-      !! A work array of (N BY NQ) elements.
+      !! A work array of `(n, nq)` elements.
    real(kind=wp), intent(out) :: wrk3(np)
-      !! A work array of (NP) elements.
+      !! A work array of `(np)` elements.
    real(kind=wp), intent(out) :: wrk6(n, np, nq)
-      !! A work array of (N BY NP BY NQ) elements.
+      !! A work array of `(n, np, nq)` elements.
    real(kind=wp), intent(out) :: fjacb(n, np, nq)
       !! The Jacobian with respect to `beta`.
    logical, intent(in) :: isodr
-      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or OLS (`isodr = .false.`).
+      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or 
+      !! by OLS (`isodr = .false.`).
    real(kind=wp), intent(out) :: fjacd(n, m, nq)
       !! The Jacobian with respect to `delta`.
    real(kind=wp), intent(in) :: we1(ldwe, ld2we, nq)
-      !! The square roots of the EPSILON weights in array `we`.
+      !! The square roots of the `epsilon` weights in array `we`.
    integer, intent(in) :: ldwe
       !! The leading dimension of arrays `we` and `we1`.
    integer, intent(in) :: ld2we
@@ -921,66 +919,64 @@ subroutine devjac &
       subroutine dwght &
          (n, m, wt, ldwt, ld2wt, t, wtt)
          use odrpack_kinds, only: wp
-         integer &
-            ldwt, ld2wt, m, n
-         real(kind=wp) &
-            t(:, :), wt(:, :, :), wtt(:, :)
+         integer :: ldwt, ld2wt, m, n
+         real(kind=wp) :: t(:, :), wt(:, :, :), wtt(:, :)
       end subroutine
    end interface
 
-! Variable Definitions (alphabetically)
-!  ANAJAC:  The variable designating whether the Jacobians are computed by finite differences
-!          (ANAJAC=FALSE) or not (ANAJAC=TRUE).
-!  BETA:    The function parameters.
-!  BETAC:   The current estimated values of the unfixed BETA's.
-!  CDJAC:   The variable designating whether the Jacobians are computed by central differences
-!           (CDJAC=TRUE) or by forward differences (CDJAC=FALSE).
-!  DELTA:   The estimated values of DELTA.
-!  FERROR:  The variable designating whether ODRPACK95 detected nonzero values in array DELTA
-!           in the OLS case, and thus whether the user may have overwritten important information
-!           by computing FJACD in the OLS case.
-!  FCN:     The user-supplied subroutine for evaluating the model.
-!  FJACB:   The Jacobian with respect to BETA.
-!  FJACD:   The Jacobian with respect to DELTA.
-!  FN:      The predicted values of the function at the current point.
-!  IDEVAL:  The variable designating what computations are to be performed by user-supplied
-!           subroutine FCN.
-!  IFIXB:   The values designating whether the elements of BETA are fixed at their input values or not.
-!  IFIXX:   The values designating whether the elements of DELTA are fixed at their input values or not.
-!  INFO:    The variable designating why the computations were stopped.
-!  ISTOP:   The variable designating that the user wishes the computations stopped.
-!  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or OLS (ISODR=FALSE).
-!  J:       An indexing variable.
-!  K:       An indexing variable.
-!  K1:      An indexing variable.
-!  L:       An indexing variable.
-!  LDIFX:   The leading dimension of array IFIXX.
-!  LDSTPD:  The leading dimension of array STPD.
-!  LDTT:    The leading dimension of array TT.
-!  LDWE:    The leading dimension of arrays WE and WE1.
-!  LDX:     The leading dimension of array X.
-!  LD2WE:   The second dimension of arrays WE and WE1.
-!  M:       The number of columns of data in the independent variable.
-!  N:       The number of observations.
-!  NETA:    The number of accurate digits in the function results.
-!  NFEV:    The number of function evaluations.
-!  NJEV:    The number of Jacobian evaluations.
-!  NP:      The number of function parameters.
-!  NQ:      The number of responses per observation.
-!  SSF:     The scale used for the BETA's.
-!  STP:     The step used for computing finite difference derivatives with respect to DELTA.
-!  STPB:    The relative step used for computing finite difference derivatives with respect to BETA.
-!  STPD:    The relative step used for computing finite difference derivatives with respect to DELTA.
-!  TT:      The scaling values used for DELTA.
-!  WE1:     The square roots of the EPSILON weights in array WE.
-!  WRK1:    A work array of (N by M by NQ) elements.
-!  WRK2:    A work array of (N by NQ) elements.
-!  WRK3:    A work array of (NP) elements.
-!  WRK6:    A work array of (N BY NP BY NQ) elements.
-!  X:       The independent variable.
-!  XPLUSD:  The values of X + DELTA.
+   ! Variable Definitions (alphabetically)
+   !  ANAJAC:  The variable designating whether the Jacobians are computed by finite differences
+   !          (ANAJAC=FALSE) or not (ANAJAC=TRUE).
+   !  BETA:    The function parameters.
+   !  BETAC:   The current estimated values of the unfixed BETA's.
+   !  CDJAC:   The variable designating whether the Jacobians are computed by central differences
+   !           (CDJAC=TRUE) or by forward differences (CDJAC=FALSE).
+   !  DELTA:   The estimated values of DELTA.
+   !  FERROR:  The variable designating whether ODRPACK95 detected nonzero values in array DELTA
+   !           in the OLS case, and thus whether the user may have overwritten important information
+   !           by computing FJACD in the OLS case.
+   !  FCN:     The user-supplied subroutine for evaluating the model.
+   !  FJACB:   The Jacobian with respect to BETA.
+   !  FJACD:   The Jacobian with respect to DELTA.
+   !  FN:      The predicted values of the function at the current point.
+   !  IDEVAL:  The variable designating what computations are to be performed by user-supplied
+   !           subroutine FCN.
+   !  IFIXB:   The values designating whether the elements of BETA are fixed at their input values or not.
+   !  IFIXX:   The values designating whether the elements of DELTA are fixed at their input values or not.
+   !  INFO:    The variable designating why the computations were stopped.
+   !  ISTOP:   The variable designating that the user wishes the computations stopped.
+   !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or OLS (ISODR=FALSE).
+   !  J:       An indexing variable.
+   !  K:       An indexing variable.
+   !  K1:      An indexing variable.
+   !  L:       An indexing variable.
+   !  LDIFX:   The leading dimension of array IFIXX.
+   !  LDSTPD:  The leading dimension of array STPD.
+   !  LDTT:    The leading dimension of array TT.
+   !  LDWE:    The leading dimension of arrays WE and WE1.
+   !  LDX:     The leading dimension of array X.
+   !  LD2WE:   The second dimension of arrays WE and WE1.
+   !  M:       The number of columns of data in the independent variable.
+   !  N:       The number of observations.
+   !  NETA:    The number of accurate digits in the function results.
+   !  NFEV:    The number of function evaluations.
+   !  NJEV:    The number of Jacobian evaluations.
+   !  NP:      The number of function parameters.
+   !  NQ:      The number of responses per observation.
+   !  SSF:     The scale used for the BETA's.
+   !  STP:     The step used for computing finite difference derivatives with respect to DELTA.
+   !  STPB:    The relative step used for computing finite difference derivatives with respect to BETA.
+   !  STPD:    The relative step used for computing finite difference derivatives with respect to DELTA.
+   !  TT:      The scaling values used for DELTA.
+   !  WE1:     The square roots of the EPSILON weights in array WE.
+   !  WRK1:    A work array of (N by M by NQ) elements.
+   !  WRK2:    A work array of (N by NQ) elements.
+   !  WRK3:    A work array of (NP) elements.
+   !  WRK6:    A work array of (N BY NP BY NQ) elements.
+   !  X:       The independent variable.
+   !  XPLUSD:  The values of X + DELTA.
 
-   !  Insert current unfixed BETA estimates into BETA
+   ! Insert current unfixed BETA estimates into BETA
    call dunpac(np, betac, beta, ifixb)
 
    ! Compute XPLUSD = X + DELTA
@@ -1033,9 +1029,6 @@ subroutine devjac &
    elseif (.not. isodr) then
       ! Try to detect whether the user has computed JFACD within FCN in the OLS case
       ferror = ddot(n*m, delta, 1, delta, 1) .ne. zero
-!-----------------------------------------------------^------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
       if (ferror) then
          info = 50300
          return
@@ -1070,7 +1063,7 @@ subroutine devjac &
 end subroutine devjac
 
 subroutine dfctr(oksemi, a, lda, n, info)
-!! Factor the positive (semi)definite matrix A using a modified Cholesky factorization
+!! Factor the positive (semi)definite matrix A using a modified Cholesky factorization.
 !! (adapted from LINPACK subroutine DPOFA)
 ! Routines Called  DDOT
 ! Date Written   910706   (YYMMDD)
@@ -1123,15 +1116,12 @@ subroutine dfctr(oksemi, a, lda, n, info)
    ! Set relative tolerance for detecting non positive semidefiniteness.
    xi = -ten*epsilon(zero)
 
-   !  Compute factorization, storing in upper triangular portion of A
+   ! Compute factorization, storing in upper triangular portion of A
    do j = 1, n
       info = j
       s = zero
       do k = 1, j - 1
          if (a(k, k) .eq. zero) then
-!--------------------------------^---------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
             t = zero
          else
             t = a(k, j) - ddot(k - 1, a(1, k), 1, a(1, j), 1)
@@ -1187,7 +1177,8 @@ subroutine dfctrw &
    integer, intent(in) :: npp
       !! The number of function parameters being estimated.
    logical, intent(in) :: isodr
-      !! The variable designating whether the solution is by ODR (ISODR=TRUE) or by OLS (ISODR=FALSE).
+      !! The variable designating whether the solution is by ODR (`isodr = .true`) or 
+      !! by OLS (`isodr = .false`).
    real(kind=wp), intent(in) :: we(ldwe, ld2we, nq)
       !! The (squared) EPSILON weights.
    integer, intent(in) :: ldwe
@@ -1195,7 +1186,7 @@ subroutine dfctrw &
    integer, intent(in) :: ld2we
       !! The second dimension of array `we`.
    real(kind=wp), intent(in) :: wd(ldwd, ld2wd, m)
-      !! The (squared) DELTA weights.
+      !! The (squared) `delta` weights.
    integer, intent(in) :: ldwd
    ! The leading dimension of array `wd`.
    integer, intent(in) :: ld2wd
@@ -1205,7 +1196,7 @@ subroutine dfctrw &
    real(kind=wp), intent(out) :: wrk4(m, m)
       !! A work array of `(m, m)` elements.
    real(kind=wp), intent(out) :: we1(ldwe, ld2we, nq)
-      !! The factored EPSILON weights, S.T. trans(WE1)*WE1 = WE.
+      !! The factored `epsilon` weights, such that `trans(we1)*we1 = we`.
    integer, intent(out) :: nnzw
       !! The number of nonzero weighted observations.
    integer, intent(out) :: info
@@ -1408,7 +1399,7 @@ subroutine dfctrw &
 end subroutine dfctrw
 
 pure subroutine dflags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
-!! Set flags indicating conditions specified by JOB.
+!! Set flags indicating conditions specified by `job`.
 ! Routines Called  (NONE)
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
@@ -1416,10 +1407,11 @@ pure subroutine dflags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, 
    integer, intent(in) :: job
       !! The variable controlling problem initialization and computational method.
    logical, intent(out) :: restrt
-      !! The variable designating whether the call is a restart (`restrt = .true.`) or not (`restrt = .false.`).
+      !! The variable designating whether the call is a restart (`restrt = .true.`)
+      !! or not (`restrt = .false.`).
    logical, intent(out) :: initd
-      !! The variable designating whether DELTA is to be initialized to zero (`initd = .true.`)
-      !! or to the first N by M elements of array WORK (`initd = .false.`).
+      !! The variable designating whether `delta` is to be initialized to zero (`initd = .true.`)
+      !! or to the first `n` by `m` elements of array `work` (`initd = .false.`).
    logical, intent(out) :: dovcv
       !! The variable designating whether the covariance matrix is to be computed
       !! (`dovcv = .true.`) or not (`dovcv = .false.`).
@@ -1436,7 +1428,8 @@ pure subroutine dflags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, 
       !! The variable designating whether the user-supplied Jacobians are to be checked
       !! (`chkjac = .true.`) or not (`chkjac = .false.`).
    logical, intent(out) :: isodr
-      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or by OLS (`isodr = .false.`).
+      !! The variable designating whether the solution is by ODR (`isodr = .true.`)
+      !! or by OLS (`isodr = .false.`).
    logical, intent(out) :: implct
       !! The variable designating whether the solution is by implicit ODR (`implct = .true.`)
       !! or explicit ODR (`implct = .false.`).
@@ -1453,16 +1446,18 @@ pure subroutine dflags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, 
    !           (CHKJAC=TRUE) or not (CHKJAC=FALSE).
    !  DOVCV:   The variable designating whether the covariance matrix is to be computed
    !           (DOVCV=TRUE) or not (DOVCV=FALSE).
-   !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE) or
-   !           explicit ODR (IMPLCT=FALSE).
-   !  INITD:   The variable designating whether DELTA is to be initialized to zero (INITD=TRUE) or
-   !           to the first N by M elements of array WORK (INITD=FALSE).
-   !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by OLS (ISODR=FALSE).
+   !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
+   !           or explicit ODR (IMPLCT=FALSE).
+   !  INITD:   The variable designating whether DELTA is to be initialized to zero (INITD=TRUE)
+   !           or to the first N by M elements of array WORK (INITD=FALSE).
+   !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or 
+   !           by OLS (ISODR=FALSE).
    !  J:       The value of a specific digit of JOB.
    !  JOB:     The variable controling problem initialization and computational method.
    !  REDOJ:   The variable designating whether the Jacobian matrix is to be recomputed for the
    !           computation of the covariance matrix (REDOJ=TRUE) or not (REDOJ=FALSE).
-   !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or not (RESTRT=FALSE).
+   !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or 
+   !           not (RESTRT=FALSE).
 
    if (job .ge. 0) then
 
@@ -1578,7 +1573,7 @@ real(kind=wp) pure function dhstep(itype, neta, i, j, stp, ldstp) result(dhstepr
 end function dhstep
 
 pure subroutine difix(n, m, ifix, ldifix, t, ldt, tfix, ldtfix)
-!! Set elements of T to zero according to IFIX.
+!! Set elements of `t` to zero according to `ifix`.
 ! Routines Called  (NONE)
 ! Date Written   910612   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
@@ -1620,9 +1615,6 @@ pure subroutine difix(n, m, ifix, ldifix, t, ldt, tfix, ldtfix)
    if (n .eq. 0 .or. m .eq. 0) return
 
    if (ifix(1, 1) .ge. zero) then
-!---------------------------^--------------------------------------------------
-!!! FPT - 3085 Objects of .EQ., .NE. .GT. etc. are of different data types
-!------------------------------------------------------------------------------
       if (ldifix .ge. n) then
          do j = 1, m
             do i = 1, n
@@ -2097,15 +2089,15 @@ subroutine djaccd &
     ssf, tt, ldtt, neta, fn, stp, wrk1, wrk2, wrk3, wrk6, &
     fjacb, isodr, fjacd, nfev, istop, info, &
     lower, upper)
-!! Compute central difference approximations to the Jacobian wrt the estimated BETAS and
-!! wrt the DELTAS.
+!! Compute central difference approximations to the Jacobian wrt the estimated `beta`s and
+!! wrt the `delta`s.
 ! Routines Called  FCN, DHSTEP
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920619   (YYMMDD)
 
    use odrpack_kinds, only: wp, zero, one
 
-   external :: fcn
+   procedure() :: fcn
       !! The user supplied subroutine for evaluating the model.
    integer, intent(in) :: n
       !! The number of observations.
@@ -2124,7 +2116,7 @@ subroutine djaccd &
    real(kind=wp), intent(in) :: delta(n, m)
       !! The estimated errors in the explanatory variables.
    real(kind=wp), intent(inout) :: xplusd(n, m)
-      !! The values of `x` + `delta`.
+      !! The values of `x + delta`.
    integer, intent(in) :: ifixb(np)
       !! The values designating whether the elements of `beta` are fixed at their input values or not.
    integer, intent(in) :: ifixx(ldifx, m)
@@ -2160,13 +2152,15 @@ subroutine djaccd &
    real(kind=wp), intent(out) :: fjacb(n, np, nq)
       !! The Jacobian with respect to `beta`.
    logical, intent(in) :: isodr
-      !! The variable designating whether the solution is by ODR (ISODR=TRUE) or by OLS (ISODR=FALSE).
+      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or 
+      !! by OLS (`isodr = .false.`).
    real(kind=wp), intent(out) :: fjacd(n, m, nq)
       !! The Jacobian with respect to `delta`.
    integer, intent(inout) :: nfev
       !! The number of function evaluations.
    integer, intent(out) :: istop
-      !! The variable designating whether there are problems computing the function at the current `beta` and `delta`.
+      !! The variable designating whether there are problems computing the function at the
+      !! current `beta` and `delta`.
    integer, intent(out) :: info
       !! The variable designating why the computations were stopped.
    real(kind=wp), intent(in) :: lower(np)
@@ -2268,9 +2262,6 @@ subroutine djaccd &
          end if
          istop = 0
          if (beta(k) .eq. betak) then
-!--------------------------------^---------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
             wrk2(1:n, 1:nq) = fn(1:n, 1:nq)
          else
             call fcn(n, m, np, nq, &
@@ -2298,9 +2289,6 @@ subroutine djaccd &
          end if
          istop = 0
          if (beta(k) .eq. betak) then
-!--------------------------------^---------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
             wrk2(1:n, 1:nq) = fn(1:n, 1:nq)
          else
             call fcn(n, m, np, nq, &
@@ -2356,9 +2344,6 @@ subroutine djaccd &
          else
             do i = 1, n
                if (xplusd(i, j) .eq. zero) then
-!-------------------------------------------^----------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
                   if (tt(1, 1) .lt. zero) then
                      typj = one/abs(tt(1, 1))
                   elseif (ldtt .eq. 1) then
@@ -2435,8 +2420,8 @@ subroutine djacfd &
     ssf, tt, ldtt, neta, fn, stp, wrk1, wrk2, wrk3, wrk6, &
     fjacb, isodr, fjacd, nfev, istop, info, &
     lower, upper)
-!! Compute forward difference approximations to the Jacobian wrt the estimated BETAS and
-!! wrt the DELTAS.
+!! Compute forward difference approximations to the Jacobian wrt the estimated `beta`s and
+!! wrt the `delta`s.
 ! Routines Called  FCN, DHSTEP, DERSTEP
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920619   (YYMMDD)
@@ -2462,7 +2447,7 @@ subroutine djacfd &
    real(kind=wp), intent(in) :: delta(n, m)
       !! The estimated errors in the explanatory variables.
    real(kind=wp), intent(inout) :: xplusd(n, m)
-      !! The values of `x` + `delta`.
+      !! The values of `x + delta`.
    integer, intent(in) :: ifixb(np)
       !! The values designating whether the elements of `beta` are fixed at their input values or not.
    integer, intent(in) :: ifixx(ldifx, m)
@@ -2498,13 +2483,15 @@ subroutine djacfd &
    real(kind=wp), intent(out) :: fjacb(n, np, nq)
       !! The Jacobian with respect to `beta`.
    logical, intent(in) :: isodr
-      !! The variable designating whether the solution is by ODR (ISODR=TRUE) or by OLS (ISODR=FALSE).
+      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or 
+      !! by OLS (`isodr = .false.`).
    real(kind=wp), intent(out) :: fjacd(n, m, nq)
       !! The Jacobian with respect to `delta`.
    integer, intent(inout) :: nfev
       !! The number of function evaluations.
    integer, intent(out) :: istop
-      !! The variable designating whether there are problems computing the function at the current `beta` and `delta`.
+      !! The variable designating whether there are problems computing the function at the
+      !! current `beta` and `delta`.
    integer, intent(out) :: info
       !! The variable designating why the computations were stopped.
    real(kind=wp), intent(in) :: lower(np)
@@ -2657,9 +2644,6 @@ subroutine djacfd &
          else
             do i = 1, n
                if (xplusd(i, j) .eq. zero) then
-!-------------------------------------------^----------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
                   if (tt(1, 1) .lt. zero) then
                      typj = one/abs(tt(1, 1))
                   elseif (ldtt .eq. 1) then
@@ -2739,13 +2723,13 @@ subroutine djck &
     interval)
 !! Driver routine for the derivative checking process.
 !! (adapted from STARPAC subroutine DCKCNT)
-! Routines Called  FCN,DHSTEP,DJCKM
+! Routines Called  FCN, DHSTEP, DJCKM
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920619   (YYMMDD)
 
    use odrpack_kinds, only: wp, zero, one, p5 => half
 
-   external :: fcn
+   procedure() :: fcn
       !! The user supplied subroutine for evaluating the model.
    integer, intent(in) :: n
       !! The number of observations.
@@ -2784,11 +2768,13 @@ subroutine djck &
    integer, intent(in) :: neta
       !! The number of reliable digits in the model results.
    integer, intent(out) :: ntol
-      !! The number of digits of agreement required between the numerical derivatives and the user supplied derivatives.
+      !! The number of digits of agreement required between the numerical derivatives and the
+      !! user supplied derivatives.
    integer, intent(in) :: nrow
       !! The row number of the explanatory variable array at which the derivative is checked.
    logical, intent(in) :: isodr
-      !! The variable designating whether the solution is by ODR (`isodr=.TRUE.`) or by OLS (`isodr=.FALSE.`).
+      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or 
+      !! by OLS (`isodr = .false.`).
    real(kind=wp), intent(in) :: epsmac
       !! The value of machine precision.
    real(kind=wp), intent(in) :: pv0i(n, nq)
@@ -2802,9 +2788,11 @@ subroutine djck &
    integer, intent(out) :: msgd(1 + nq*m)
       !! The error checking results for the Jacobian wrt `delta`.
    real(kind=wp), intent(out) :: diff(nq, np + m)
-      !! The relative differences between the user supplied and finite difference derivatives for each derivative checked.
+      !! The relative differences between the user supplied and finite difference derivatives
+      !! for each derivative checked.
    integer, intent(out) :: istop
-      !! The variable designating whether there are problems computing the function at the current `beta` and `delta`
+      !! The variable designating whether there are problems computing the function at the
+      !! current `beta` and `delta`
    integer, intent(inout) :: nfev
       !! The number of function evaluations.
    integer, intent(inout) :: njev
@@ -2816,7 +2804,8 @@ subroutine djck &
    real(kind=wp), intent(out) :: wrk6(n, np, nq)
       !! A work array of `(n, np, nq)` elements.
    integer, intent(in) :: interval(np)
-      !! Specifies which checks can be performed when checking derivatives based on the interval of the bound constraints.
+      !! Specifies which checks can be performed when checking derivatives based on the
+      !! interval of the bound constraints.
 
    ! Local scalars
    real(kind=wp) :: diffj, h0, hc0, pv, tol, typj
@@ -2961,9 +2950,6 @@ subroutine djck &
             msgb(1 + lq + (j - 1)*nq) = -1
          else
             if (beta(j) .eq. zero) then
-!-----------------------------------^------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
                if (ssf(1) .lt. zero) then
                   typj = one/abs(ssf(1))
                else
@@ -3020,9 +3006,6 @@ subroutine djck &
                msgd(1 + lq + (j - 1)*nq) = -1
             else
                if (xplusd(nrow, j) .eq. zero) then
-!----------------------------------------------^-------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
                   if (tt(1, 1) .lt. zero) then
                      typj = one/abs(tt(1, 1))
                   elseif (ldtt .eq. 1) then
@@ -3072,7 +3055,7 @@ subroutine djckc &
     pv, d, &
     diffj, msg, istop, nfev, &
     wrk1, wrk2, wrk6)
-!! Check whether high curvature could be the cause of thedisagreement between the numerical
+!! Check whether high curvature could be the cause of the disagreement between the numerical
 !! and analytic derviatives.
 !! (adapted from STARPAC subroutine DCKCRV)
 ! Routines Called  DJCKF, DPVB, DPVD
@@ -3081,7 +3064,7 @@ subroutine djckc &
 
    use odrpack_kinds, only: wp, one, two, ten
 
-   external :: fcn
+   procedure() :: fcn
       !! The user supplied subroutine for evaluating the model.
    integer, intent(in) :: n
       !! The number of observations.
@@ -3116,15 +3099,15 @@ subroutine djckc &
    real(kind=wp), intent(in) :: hc
       !! The relative step size for central finite differences.
    logical, intent(in) :: iswrtb
-      !! The variable designating whether the derivatives wrt `beta` (`iswrtb`=TRUE) or
-      !! `delta`(`iswrtb`=FALSE) are being checked.
+      !! The variable designating whether the derivatives wrt `beta` (`iswrtb = .true.`) or
+      !! `delta` (`iswrtb = .false.`) are being checked.
    real(kind=wp), intent(out) :: fd
       !! The forward difference derivative wrt the `j`th parameter.
    real(kind=wp), intent(in) :: typj
       !! The typical size of the `j`-th unknown `beta` or `delta`.
    real(kind=wp), intent(out) :: pvpstp
       !! The predicted value for row `nrow` of the model based on the current parameter estimates
-      !! for all but the `j`th parameter value, which is `beta(j)` + `stp0`.
+      !! for all but the `j`th parameter value, which is `beta(j) + stp0`.
    real(kind=wp), intent(in) :: stp0
       !! The initial step size for the finite difference derivative.
    real(kind=wp), intent(out) :: pv
@@ -3142,14 +3125,14 @@ subroutine djckc &
    integer, intent(inout) :: nfev
       !! The number of function evaluations.
    real(kind=wp), intent(out) :: wrk1(n, m, nq)
-      !! A work array of (`n` by `m` by `nq`) elements.
+      !! A work array of `(n, m, nq)` elements.
    real(kind=wp), intent(out) :: wrk2(n, nq)
-      !! A work array of (`n` by `nq`) elements.
+      !! A work array of `(n, nq)` elements.
    real(kind=wp), intent(out) :: wrk6(n, np, nq)
-      !! A work array of (`n` by `np` by `nq`) elements.
+      !! A work array of `(n, np, nq)` elements.
 
    ! Local scalars
-   real(kind=wp), parameter :: p01 = 0.01E0_wp
+   real(kind=wp), parameter :: p01 = 0.01_wp
    real(kind=wp) :: curve, pvmcrv, pvpcrv, stp, stpcrv
 
    ! External subroutines
@@ -3334,7 +3317,7 @@ subroutine djckf &
 
    use odrpack_kinds, only: wp, one, two, hundred
 
-   external :: fcn
+   procedure() :: fcn
       !! The user supplied subroutine for evaluating the model.
    integer, intent(in) :: n
       !! The number of observations.
@@ -3347,7 +3330,7 @@ subroutine djckf &
    real(kind=wp), intent(inout) :: beta(np)
       !! The function parameters.
    real(kind=wp), intent(inout) :: xplusd(n, m)
-      !! The values of `x` + `delta`.
+      !! The values of `x + delta`.
    integer, intent(in) :: ifixb(np)
       !! The values designating whether the elements of `beta` are fixed at their input values or not.
    integer, intent(in) :: ifixx(ldifx, m)
@@ -3365,13 +3348,15 @@ subroutine djckf &
    integer, intent(in) :: lq
       !! The response currently being examined.
    logical, intent(in) :: iswrtb
-      !! The variable designating whether the derivatives wrt `beta` (`iswrtb`=TRUE) or `delta`(`iswrtb`=FALSE) are being checked.
+      !! The variable designating whether the derivatives wrt `beta` (`iswrtb = .true.`)
+      !! or `delta` (`iswrtb = .false.`) are being checked.
    real(kind=wp), intent(out) :: fd
       !! The forward difference derivative wrt the `j`th parameter.
    real(kind=wp), intent(in) :: typj
-      !! The typical size of the `j`-th unknown `beta` or `delta`.
+      !! The typical size of the `j`th unknown `beta` or `delta`.
    real(kind=wp), intent(out) :: pvpstp
-      !! The predicted value for row `nrow` of the model based on the current parameter estimates for all but the `j`th parameter value, which is `beta(j)` + `stp0`.
+      !! The predicted value for row `nrow` of the model based on the current parameter
+      !! estimates for all but the `j`th parameter value, which is `beta(j) + stp0`.
    real(kind=wp), intent(in) :: stp0
       !! The step size for the finite difference derivative.
    real(kind=wp), intent(inout) :: curve
@@ -3381,22 +3366,24 @@ subroutine djckf &
    real(kind=wp), intent(in) :: d
       !! The derivative with respect to the `j`th unknown parameter.
    real(kind=wp), intent(out) :: diffj
-      !! The relative differences between the user supplied and finite difference derivatives for the derivative being checked.
+      !! The relative differences between the user supplied and finite difference derivatives
+      !! for the derivative being checked.
    integer, intent(out) :: msg(nq, j)
       !! The error checking results.
    integer, intent(out) :: istop
-      !! The variable designating whether there are problems computing the function at the current `beta` and `delta`.
+      !! The variable designating whether there are problems computing the function at the
+      !! current `beta` and `delta`.
    integer, intent(inout) :: nfev
       !! The number of function evaluations.
    real(kind=wp), intent(out) :: wrk1(n, m, nq)
-      !! A work array of (`n` by `m` by `nq`) elements.
+      !! A work array of `(n, m, nq)` elements.
    real(kind=wp), intent(out) :: wrk2(n, nq)
-      !! A work array of (`n` by `nq`) elements.
+      !! A work array of `(n, nq)` elements.
    real(kind=wp), intent(out) :: wrk6(n, np, nq)
-      !! A work array of (`n` by `np` by `nq`) elements.
+      !! A work array of `(n, np, nq)` elements.
 
    ! Local scalars
-   real(kind=wp), parameter :: p1 = 0.1E0_wp
+   real(kind=wp), parameter :: p1 = 0.1_wp
    real(kind=wp) :: stp
    logical :: large
 
@@ -3446,7 +3433,7 @@ subroutine djckf &
    !  XPLUSD:  The values of X + DELTA.
 
    ! Finite precision arithmetic could be the problem.
-   ! Try a larger step size based on estimate of condition error
+   ! Try a larger step size based on estimate of condition error.
    stp = eta*(abs(pv) + abs(pvpstp))/(tol*abs(d))
    if (stp .gt. abs(p1*stp0)) then
       stp = max(stp, hundred*abs(stp0))
@@ -3469,8 +3456,7 @@ subroutine djckf &
                 wrk1, wrk2, wrk6)
    else
       ! Perform computations for derivatives wrt DELTA
-      stp = (stp*sign(one, xplusd(nrow, j)) + xplusd(nrow, j)) - &
-            xplusd(nrow, j)
+      stp = (stp*sign(one, xplusd(nrow, j)) + xplusd(nrow, j)) - xplusd(nrow, j)
       call dpvd(fcn, &
                 n, m, np, nq, &
                 beta, xplusd, ifixb, ifixx, ldifx, &
@@ -3517,7 +3503,7 @@ subroutine djckm &
 
    use odrpack_kinds, only: wp, zero, one, two, three, ten, hundred
 
-   external :: fcn
+   procedure() :: fcn
       !! The user supplied subroutine for evaluating the model.
    integer, intent(in) :: n
       !! The number of observations.
@@ -3530,7 +3516,7 @@ subroutine djckm &
    real(kind=wp), intent(inout) :: beta(np)
       !! The function parameters.
    real(kind=wp), intent(inout) :: xplusd(n, m)
-      !! The values of `x` + `delta`.
+      !! The values of `x + delta`.
    integer, intent(in) :: ifixb(np)
       !! The values designating whether the elements of `beta` are fixed at their input values or not.
    integer, intent(in) :: ifixx(ldifx, m)
@@ -3550,38 +3536,42 @@ subroutine djckm &
    integer, intent(in) :: lq
       !! The response currently being examined.
    real(kind=wp), intent(in) :: typj
-      !! The typical size of the `j`-th unknown `beta` or `delta`.
+      !! The typical size of the `j`th unknown `beta` or `delta`.
    real(kind=wp), intent(in) :: h0
       !! The initial step size for the finite difference derivative.
    real(kind=wp), intent(in) :: hc0
       !! The relative step size for central finite differences.
    logical, intent(in) :: iswrtb
-      !! The variable designating whether the derivatives wrt `beta` (`iswrtb`=TRUE) or `delta`(`iswrtb`=FALSE) are being checked.
+      !! The variable designating whether the derivatives wrt `beta` (`iswrtb = .true.`)
+      !! or `delta` (`iswrtb = .false.`) are being checked.
    real(kind=wp), intent(out) :: pv
       !! The predicted value for row `nrow`.
    real(kind=wp), intent(in) :: d
       !! The derivative with respect to the `j`th unknown parameter.
    real(kind=wp), intent(out) :: diffj
-      !! The relative differences between the user supplied and finite difference derivatives for the derivative being checked.
+      !! The relative differences between the user supplied and finite difference derivatives
+      !! for the derivative being checked.
    integer, intent(out) :: msg1
       !! The first set of error checking results.
    integer, intent(out) :: msg(nq, j)
       !! The error checking results.
    integer, intent(out) :: istop
-      !! The variable designating whether there are problems computing the function at the current `beta` and `delta`.
+      !! The variable designating whether there are problems computing the function at the
+      !! current `beta` and `delta`.
    integer, intent(inout) :: nfev
       !! The number of function evaluations.
    real(kind=wp), intent(out) :: wrk1(n, m, nq)
-      !! A work array of (`n` by `m` by `nq`) elements.
+      !! A work array of `(n, m, nq)` elements.
    real(kind=wp), intent(out) :: wrk2(n, nq)
-      !! A work array of (`n` by `nq`) elements.
+      !! A work array of `(n, nq)` elements.
    real(kind=wp), intent(out) :: wrk6(n, np, nq)
-      !! A work array of (N BY NP BY NQ) elements.
+      !! A work array of `(n, np, nq)` elements.
    integer, intent(in) :: interval(np)
-      !! A work array of (`n` by `np` by `nq`) elements.
+      !! Specifies which checks can be performed when checking derivatives based on the
+      !! interval of the bound constraints.
 
    ! Local scalars
-   real(kind=wp), parameter :: p01 = 0.01E0_wp, p1 = 0.1E0_wp
+   real(kind=wp), parameter :: p01 = 0.01_wp, p1 = 0.1_wp
    real(kind=wp), parameter :: big = 1.0E19_wp, tol2 = 5.0E-2_wp
    real(kind=wp) :: fd, h, hc, h1, hc1, pvpstp, stp0
    integer :: i
@@ -3697,9 +3687,6 @@ subroutine djckm &
 
          ! Set relative difference for derivative checking report
          if ((d .eq. zero) .or. (fd .eq. zero)) then
-!--------------------------^---------------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
             diffj = abs(fd - d)
          else
             diffj = abs(fd - d)/abs(d)
@@ -3707,9 +3694,6 @@ subroutine djckm &
 
          ! Set message flag
          if (d .eq. zero) then
-!-------------------------^----------------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
             ! JTH analytic and numerical derivatives are both zero.
             msg(lq, j) = 1
 
@@ -3721,9 +3705,6 @@ subroutine djckm &
       else
          ! Numerical and analytic derivatives disagree.  Check why
          if ((d .eq. zero) .or. (fd .eq. zero)) then
-!--------------------------^---------------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
             if (interval(j) .ge. 10 .or. .not. iswrtb) then
                call djckz(fcn, &
                           n, m, np, nq, &
@@ -3785,8 +3766,8 @@ subroutine djckz &
 
    use odrpack_kinds, only: wp, zero, one, two, three
 
-   external :: fcn
-   !! The user supplied subroutine for evaluating the model.
+   procedure() :: fcn
+      !! The user supplied subroutine for evaluating the model.
    integer, intent(in) :: n
       !! The number of observations.
    integer, intent(in) :: m
@@ -3798,7 +3779,7 @@ subroutine djckz &
    real(kind=wp), intent(inout) :: beta(np)
       !! The function parameters.
    real(kind=wp), intent(inout) :: xplusd(n, m)
-      !! The values of `x` + `delta`.
+      !! The values of `x + delta`.
    integer, intent(in) :: ifixb(np)
       !! The values designating whether the elements of `beta` are fixed at their input values or not.
    integer, intent(in) :: ifixx(ldifx, m)
@@ -3808,14 +3789,14 @@ subroutine djckz &
    integer, intent(in) :: nrow
       !! The row number of the explanatory variable array at which the derivative is to be checked.
    real(kind=wp), intent(in) :: epsmac
-   !! The value of machine precision.
+      !! The value of machine precision.
    integer, intent(in) :: j
       !! The index of the partial derivative being examined.
    integer, intent(in) :: lq
       !! The response currently being examined.
    logical, intent(in) :: iswrtb
-      !! The variable designating whether the derivatives wrt `beta` (`iswrtb`=TRUE) or `x`
-      !!(`iswrtb`=FALSE) are being checked.
+      !! The variable designating whether the derivatives wrt `beta` (`iswrtb = .true.`)
+      !! or `delta` (`iswrtb = .false.`) are being checked.
    real(kind=wp), intent(in) :: tol
       !! The agreement tolerance.
    real(kind=wp), intent(in) :: d
@@ -3823,10 +3804,10 @@ subroutine djckz &
    real(kind=wp), intent(out) :: fd
       !! The forward difference derivative wrt the `j`th parameter.
    real(kind=wp), intent(in) :: typj
-      !! The typical size of the `j`-th unknown `beta` or `delta`.
+      !! The typical size of the `j`th unknown `beta` or `delta`.
    real(kind=wp), intent(out) :: pvpstp
       !! The predicted value for row `nrow` of the model using the current parameter estimates
-      !!for all but the `j`th parameter value, which is `beta(j)` + `stp0`.
+      !! for all but the `j`th parameter value, which is `beta(j) + stp0`.
    real(kind=wp), intent(in) :: stp0
       !! The initial step size for the finite difference derivative.
    real(kind=wp), intent(out) :: pv
@@ -3838,15 +3819,15 @@ subroutine djckz &
       !! The error checking results.
    integer, intent(out) :: istop
       !! The variable designating whether there are problems computing the function at the
-      !!current `beta` and `delta`.
+      !! current `beta` and `delta`.
    integer, intent(inout) :: nfev
       !! The number of function evaluations.
    real(kind=wp), intent(out) :: wrk1(n, m, nq)
-      !! A work array of (`n` by `m` by `nq`) elements.
+      !! A work array of `(n, m, nq)` elements.
    real(kind=wp), intent(out) :: wrk2(n, nq)
-      !! A work array of (`n` by `nq`) elements.
+      !! A work array of `(n, nq)` elements.
    real(kind=wp), intent(out) :: wrk6(n, np, nq)
-      !! A work array of (`n` by `np` by `nq`) elements.
+      !! A work array of `(n, np, nq)` elements.
 
    ! Local scalars
    real(kind=wp) :: cd, pvmstp
@@ -3923,16 +3904,12 @@ subroutine djckz &
 
    ! Check for agreement
    if (diffj .le. tol*abs(d)) then
-      ! Finite difference and analytic derivatives now agree.
+      ! Finite difference and analytic derivatives now agree
       if (d .eq. zero) then
-!----------------------^-------------------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
          msg(lq, j) = 1
       else
          msg(lq, j) = 0
       end if
-
    elseif (diffj*typj .le. abs(pv*epsmac**(one/three))) then
       ! Derivatives are both close to zero
       msg(lq, j) = 2
@@ -3951,7 +3928,7 @@ subroutine dodstp &
     tfjacb, omega, u, qraux, kpvt, &
     s, t, phi, irank, rcond, forvcv, &
     wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
-!! Compute locally constrained steps S and T, and PHI(ALPHA).
+!! Compute locally constrained steps `s` and `t`, and `phi(alpha)`.
 ! Routines Called  IDAMAX, DCHEX, DESUBI, DFCTR, DNRM2, DQRDC, DQRSL, DROT,
 !                  DROTG, DSOLVE, DTRCO, DTRSL, DVEVTR, DWGHT
 ! Date Written   860529   (YYMMDD)
@@ -3983,7 +3960,7 @@ subroutine dodstp &
    integer, intent(in) :: ld2wd
       !! The second dimension of array `wd`.
    real(kind=wp), intent(in) :: ss(np)
-      !! The scaling values for the unfixed `betas`.
+      !! The scaling values for the unfixed `beta`s.
    real(kind=wp), intent(in) :: tt(ldtt, m)
       !! The scaling values for `delta`.
    integer, intent(in) :: ldtt
@@ -3995,15 +3972,16 @@ subroutine dodstp &
    real(kind=wp), intent(in) :: epsfcn
       !! The function's precision.
    logical, intent(in) :: isodr
-      !! The variable designating whether the solution is by ODR (`isodr`=TRUE) or by OLS (`isodr`=FALSE).
+      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or
+      !! by OLS (`isodr = .false.`).
    real(kind=wp), intent(out) :: tfjacb(n, nq, np)
-      !! The array `omega`*`fjacb`.
+      !! The array `omega*fjacb`.
    real(kind=wp), intent(out) :: omega(nq, nq)
-      !! The array defined S.T.
-      !! `omega`*trans(`omega`) = inv(I+`fjacd`*inv(E)*trans(`fjacd`))
-      !! = (I-`fjacd`*inv(P)*trans(`fjacd`))
-      !! where E = D**2 + `alpha`*`tt`**2
-      !! P = trans(`fjacd`)*`fjacd` + D**2 + `alpha`*`tt`**2
+      !! The array defined such that:
+      !! `omega*trans(omega) = inv(I + fjacd*inv(e)*trans(fjacd))
+      !! = (I - fjacd*inv(p)*trans(fjacd))`
+      !! where `e = d**2 + alpha*tt**2` and
+      !! `p = trans(fjacd)*fjacd + d**2 + alpha*tt**2`.
    real(kind=wp), intent(out) :: u(np)
       !! The approximate null vector for `tfjacb`.
    real(kind=wp), intent(out) :: qraux(np)
@@ -4022,19 +4000,19 @@ subroutine dodstp &
       !! The approximate reciprocal condition number of `tfjacb`.
    logical, intent(in) :: forvcv
       !! The variable designating whether this subroutine was called to set up for the
-      !! covariance matrix computations (`forvcv`=TRUE) or not (`forvcv`=FALSE).
+      !! covariance matrix computations (`forvcv = .true.`) or not (`forvcv = .false.`).
    real(kind=wp), intent(out) :: wrk1(n, nq, m)
-      !! A work array of (`n` by `nq` by `m`) elements.
+      !! A work array of `(n, nq, m)` elements.
    real(kind=wp), intent(out) :: wrk2(n, nq)
-      !! A work array of (`n` by `nq`) elements.
+      !! A work array of `(n, nq)` elements.
    real(kind=wp), intent(out) :: wrk3(np)
-      !! A work array of (`np`) elements.
+      !! A work array of `(np)` elements.
    real(kind=wp), intent(out) :: wrk4(m, m)
-      !! A work array of (`m` by `m`) elements.
+      !! A work array of `(m, m)` elements.
    real(kind=wp), intent(out) :: wrk5(m)
-      !! A work array of (`m`) elements.
+      !! A work array of `(m)` elements.
    real(kind=wp), intent(out) :: wrk(lwrk)
-      !! A work array of (`lwrk`) elements, equivalenced to `wrk1` and `wrk2`.
+      !! A work array of `(lwrk)` elements, _equivalenced_ to `wrk1` and `wrk2`.
    integer, intent(in) :: lwrk
       !! The length of vector `wrk`.
    integer, intent(out) :: istopc
@@ -4061,10 +4039,8 @@ subroutine dodstp &
       subroutine dwght &
          (n, m, wt, ldwt, ld2wt, t, wtt)
          use odrpack_kinds, only: wp
-         integer &
-            ldwt, ld2wt, m, n
-         real(kind=wp) &
-            t(:, :), wt(:, :, :), wtt(:, :)
+         integer :: ldwt, ld2wt, m, n
+         real(kind=wp) :: t(:, :), wt(:, :, :), wtt(:, :)
       end subroutine
    end interface
 
@@ -4133,9 +4109,6 @@ subroutine dodstp &
 
    !  Set up KPVT if ALPHA = 0
    if (alpha .eq. zero) then
-!-----------------------^------------------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
       kp = npp
       do k = 1, np
          kpvt(k) = k
@@ -4160,9 +4133,9 @@ subroutine dodstp &
             istopc = 60000
             return
          end if
-         !  Compute OMEGA, such that
-         !             trans(OMEGA)*OMEGA = I+FJACD*inv(E)*trans(FJACD)
-         !             inv(trans(OMEGA)*OMEGA) = I-FJACD*inv(P)*trans(FJACD)
+         ! Compute OMEGA, such that
+         ! trans(OMEGA)*OMEGA = I+FJACD*inv(E)*trans(FJACD)
+         ! inv(trans(OMEGA)*OMEGA) = I-FJACD*inv(P)*trans(FJACD)
          call dvevtr(m, nq, i, fjacd, n, m, wrk4, m, wrk1, n, nq, omega, nq, wrk5)
          do l = 1, nq
             omega(l, l) = one + omega(l, l)
@@ -4235,9 +4208,6 @@ subroutine dodstp &
    ! Compute S
    ! Do QR factorization (with column pivoting of TFJACB if ALPHA = 0)
    if (alpha .eq. zero) then
-!-----------------------^------------------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
       ipvt = 1
       do k = 1, np
          kpvt(k) = 0
@@ -4255,9 +4225,6 @@ subroutine dodstp &
 
    ! Eliminate alpha part using givens rotations
    if (alpha .ne. zero) then
-!-----------------------^------------------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
       s(1:npp) = zero
       do k1 = 1, kp
          wrk3(1:kp) = zero
@@ -4277,9 +4244,6 @@ subroutine dodstp &
    ! Compute solution - eliminate variables if necessary
    if (npp .ge. 1) then
       if (alpha .eq. zero) then
-!--------------------------^---------------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
          kp = npp
          elim = .true.
          do while (elim .and. kp .ge. 1)
@@ -4426,7 +4390,7 @@ subroutine dodvcv &
    real(kind=wp), intent(in) :: ssf(np)
       !! The scaling values used for `beta`.
    real(kind=wp), intent(in) :: ss(np)
-      !! The scaling values for the unfixed `betas`.
+      !! The scaling values for the unfixed `beta`s.
    real(kind=wp), intent(in) :: tt(ldtt, m)
       !! The scaling values for `delta`.
    integer, intent(in) :: ldtt
@@ -4436,16 +4400,17 @@ subroutine dodvcv &
    real(kind=wp), intent(in) :: epsfcn
       !! The function's precision.
    logical, intent(in) :: isodr
-      !! The variable designating whether the solution is by ODR (`isodr=.TRUE.`) or by OLS (`isodr=.FALSE.`).
+      !! The variable designating whether the solution is by ODR (`isodr = .true.`) or
+      !! by OLS (`isodr = .false.`).
    real(kind=wp), intent(out) :: vcv(np, np)
-      !! The covariance matrix of the estimated `betas`.
+      !! The covariance matrix of the estimated `beta`s.
    real(kind=wp), intent(out) :: sd(np)
-      !! The standard deviations of the estimated `betas`.
+      !! The standard deviations of the estimated `beta`s.
    real(kind=wp), intent(out) :: wrk6(n*nq, np)
-      !! A work array of `(n*nq by np)` elements.
+      !! A work array of `(n*nq, np)` elements.
    real(kind=wp), intent(out) :: omega(nq, nq)
-      !! The array defined such that `omega*trans(omega) = inv(I+fjacd*inv(e)*trans(fjacd))
-      !!= (I-fjacd*inv(p)*trans(fjacd))`.
+      !! The array defined such that `omega*trans(omega) = inv(I + fjacd*inv(e)*trans(fjacd))
+      !! = (I - fjacd*inv(p)*trans(fjacd))`.
    real(kind=wp), intent(out) :: u(np)
       !! The approximate null vector for `fjacb`.
    real(kind=wp), intent(out) :: qraux(np)
@@ -4464,27 +4429,28 @@ subroutine dodvcv &
       !! The residual sum of squares.
    integer, intent(out) :: idf
       !! The degrees of freedom of the fit, equal to the number of observations with nonzero
-      !!weighted derivatives minus the number of parameters being estimated.
+      !! weighted derivatives minus the number of parameters being estimated.
    real(kind=wp), intent(out) :: rvar
       !! The residual variance.
    integer, intent(in) :: ifixb(np)
       !! The values designating whether the elements of `beta` are fixed at their input values or not.
    real(kind=wp), intent(out) :: wrk1(n, nq, m)
-      !! A work array of `(n by nq by m)` elements.
+      !! A work array of `(n, nq, m)` elements.
    real(kind=wp), intent(out) :: wrk2(n, nq)
-      !! A work array of `(n by nq)` elements.
+      !! A work array of `(n, nq)` elements.
    real(kind=wp), intent(out) :: wrk3(np)
       !! A work array of `(np)` elements.
    real(kind=wp), intent(out) :: wrk4(m, m)
-      !! A work array of `(m by m)` elements.
+      !! A work array of `(m, m)` elements.
    real(kind=wp), intent(out) :: wrk5(m)
       !! A work array of `(m)` elements.
    real(kind=wp), intent(out) :: wrk(lwrk)
-      !! A work array of `(lwrk)` elements, equivalenced to `wrk1` and `wrk2`.
+      !! A work array of `(lwrk)` elements, _equivalenced_ to `wrk1` and `wrk2`.
    integer, intent(in) :: lwrk
       !! The length of vector `lwrk`.
    integer, intent(out) :: istopc
-      !! The variable designating whether the computations were stoped due to a numerical error within subroutine `dodstp`.
+      !! The variable designating whether the computations were stoped due to a numerical
+      !! error within subroutine `dodstp`.
 
    ! Local scalars
    real(kind=wp) :: temp
@@ -4583,9 +4549,6 @@ subroutine dodvcv &
          end if
       end if
    end do
-!---------------------------------------------^--------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
 
    if (idf .gt. kp) then
       idf = idf - kp
@@ -4686,15 +4649,15 @@ subroutine dpack(n2, n1, v1, v2, ifix)
    use odrpack_kinds, only: wp
 
    integer, intent(in) :: n2
-      !! The number of items in V2.
+      !! The number of items in `v2`.
    integer, intent(out) :: n1
-      !! The number of items in V1.
+      !! The number of items in `v1`.
    real(kind=wp), intent(out) :: v1(n2)
-      !! The vector of the unfixed items from V2.
+      !! The vector of the unfixed items from `v2`.
    real(kind=wp), intent(in) :: v2(n2)
       !! The vector of the fixed and unfixed items from which the unfixed elements are to be extracted.
    integer, intent(in) :: ifix(n2)
-      !! The values designating whether the elements of V2 are fixed at their input values or not.
+      !! The values designating whether the elements of `v2` are fixed at their input values or not.
 
    ! Local scalars
    integer :: i
@@ -4704,11 +4667,13 @@ subroutine dpack(n2, n1, v1, v2, ifix)
 
    ! Variable definitions (alphabetically)
    !  I:       An indexing variable.
-   !  IFIX:    The values designating whether the elements of V2 are fixed at their input values or not.
+   !  IFIX:    The values designating whether the elements of V2 are fixed at their input
+   !           values or not.
    !  N1:      The number of items in V1.
    !  N2:      The number of items in V2.
    !  V1:      The vector of the unfixed items from V2.
-   !  V2:      The vector of the fixed and unfixed items from which the unfixed elements are to be extracted.
+   !  V2:      The vector of the fixed and unfixed items from which the unfixed elements are
+   !           to be extracted.
 
    n1 = 0
    if (ifix(1) .ge. 0) then
@@ -4730,7 +4695,7 @@ real(kind=wp) function dppnml(p) result(dppnmlr)
 !! and standard deviation 1, and with probability density function
 !!       F(X) = (1/SQRT(2*PI))*EXP(-X*X/2).
 !! (Adapted from DATAPAC subroutine TPPF, with modifications to facilitate conversion to
-!! REAL (KIND=wp) automatically).
+!! REAL automatically).
 ! Routines Called  (NONE)
 ! Date Written   901207   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
@@ -4779,7 +4744,7 @@ real(kind=wp) function dppnml(p) result(dppnmlr)
 
    real(kind=wp), intent(in) :: p
       !! The probability at which the percent point is to be evaluated. `p` must lie between
-      !! 0.0 and 1.0E0_wp, exclusive.
+      !! 0.0 and 1.0, exclusive.
 
    ! Local scalars
    real(kind=wp), parameter :: p0 = -0.322232431088E0_wp, &
@@ -4797,7 +4762,7 @@ real(kind=wp) function dppnml(p) result(dppnmlr)
    ! Variable Definitions (alphabetically)
    !  ADEN:    A value used in the approximation.
    !  ANUM:    A value used in the approximation.
-   !  P:       The probability at which the percent point is to be evaluated.  P must be between
+   !  P:       The probability at which the percent point is to be evaluated. P must be between
    !           0.0E0_wp and 1.0E0_wp, exclusive.
    !  P0:      A parameter used in the approximation.
    !  P1:      A parameter used in the approximation.
@@ -4813,9 +4778,6 @@ real(kind=wp) function dppnml(p) result(dppnmlr)
    !  T:       A value used in the approximation.
 
    if (p .eq. half) then
-!-------------------^----------------------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
       dppnmlr = zero
    else
       r = p
@@ -4830,9 +4792,10 @@ real(kind=wp) function dppnml(p) result(dppnmlr)
 end function dppnml
 
 real(kind=wp) function dppt(p, idf) result(dpptr)
-!! Compute the percent point function value for the student's T distribution with `idf` degrees
-!! of freedom. (Adapted from DATAPAC subroutine TPPF, with modifications to facilitate
-!! conversion to REAL automatically).
+!! Compute the percent point function value for the student's T distribution with `idf` 
+!! degrees of freedom. 
+!! (Adapted from DATAPAC subroutine TPPF, with modifications to facilitate conversion to REAL
+!! automatically).
 ! Routines Called  DPPNML
 ! Date Written   901207   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
@@ -4864,7 +4827,7 @@ real(kind=wp) function dppt(p, idf) result(dpptr)
 
    real(kind=wp), intent(in) :: p
       !! The probability at which the percent point is to be evaluated. `p` must lie between
-      !! 0.0 and 1.0E0_wp, exclusive.
+      !! 0.0 and 1.0, exclusive.
    integer, intent(in) :: idf
       !! The (positive integer) degrees of freedom.
 
@@ -5027,14 +4990,14 @@ subroutine dpvb &
     nrow, j, lq, stp, &
     istop, nfev, pvb, &
     wrk1, wrk2, wrk6)
-!! Compute the NROW-th function value using BETA(J) + STP.
+!! Compute the `nrow`th function value using `beta(j) + stp`.
 ! Routines Called  FCN
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
 
    use odrpack_kinds, only: wp
 
-   external :: fcn
+   procedure() :: fcn
       !! The user-supplied subroutine for evaluating the model.
    integer, intent(in) :: n
       !! The number of observations.
@@ -5047,7 +5010,7 @@ subroutine dpvb &
    real(kind=wp), intent(inout) :: beta(np)
       !! The function parameters.
    real(kind=wp), intent(in) :: xplusd(n, m)
-      !! The values of X + DELTA.
+      !! The values of `x + delta`.
    integer, intent(in) :: ifixb(np)
       !! The values designating whether the elements of `beta` are fixed at their input values or not.
    integer, intent(in) :: ifixx(ldifx, m)
@@ -5063,7 +5026,8 @@ subroutine dpvb &
    real(kind=wp), intent(in) :: stp
       !! The step size for the finite difference derivative.
    integer, intent(out) :: istop
-      !! The variable designating whether there are problems computing the function at the current `beta` and `delta`.
+      !! The variable designating whether there are problems computing the function at the
+      !! current `beta` and `delta`.
    integer, intent(inout) :: nfev
       !! The number of function evaluations.
    real(kind=wp), intent(out) :: pvb
@@ -5082,9 +5046,12 @@ subroutine dpvb &
    !  BETA:    The function parameters.
    !  BETAJ:   The current estimate of the jth parameter.
    !  FCN:     The user-supplied subroutine for evaluating the model.
-   !  IFIXB:   The values designating whether the elements of BETA are fixed at their input values or not.
-   !  IFIXX:   The values designating whether the elements of X are fixed at their input values or not.
-   !  ISTOP:   The variable designating whether there are problems computing the function at the current BETA and DELTA.
+   !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
+   !           values or not.
+   !  IFIXX:   The values designating whether the elements of X are fixed at their input
+   !           values or not.
+   !  ISTOP:   The variable designating whether there are problems computing the function at
+   !           the current BETA and DELTA.
    !  J:       The index of the partial derivative being examined.
    !  LDIFX:   The leading dimension of array IFIXX.
    !  LQ:      The response currently being examined.
@@ -5093,7 +5060,8 @@ subroutine dpvb &
    !  NFEV:    The number of function evaluations.
    !  NP:      The number of function parameters.
    !  NQ:      The number of responses per observation.
-   !  NROW:    The row number of the independent variable array at which the derivative is to be checked.
+   !  NROW:    The row number of the independent variable array at which the derivative is
+   !           to be checked.
    !  PVB:     The function value for the selected observation & response.
    !  STP:     The step size for the finite difference derivative.
    !  XPLUSD:  The values of X + DELTA.
@@ -5125,14 +5093,14 @@ subroutine dpvd &
     nrow, j, lq, stp, &
     istop, nfev, pvd, &
     wrk1, wrk2, wrk6)
-!! Compute NROW-th function value using X(NROW,J) + DELTA(NROW,J) + STP.
+!! Compute `nrow`th function value using `x(nrow, j) + delta(nrow, j) + stp`.
 ! Routines Called FCN
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
 
    use odrpack_kinds, only: wp
 
-   external :: fcn
+   procedure() :: fcn
       !! The user-supplied subroutine for evaluating the model.
    integer, intent(in) :: n
       !! The number of observations.
@@ -5145,7 +5113,7 @@ subroutine dpvd &
    real(kind=wp), intent(in) :: beta(np)
       !! The function parameters.
    real(kind=wp), intent(inout) :: xplusd(n, m)
-      !! The values of X + DELTA.
+      !! The values of `x + delta`.
    integer, intent(in) :: ifixb(np)
       !! The values designating whether the elements of `beta` are fixed at their input values or not.
    integer, intent(in) :: ifixx(ldifx, m)
@@ -5161,7 +5129,8 @@ subroutine dpvd &
    real(kind=wp), intent(in) :: stp
       !! The step size for the finite difference derivative.
    integer, intent(out) :: istop
-      !! The variable designating whether there are problems computing the function at the current `beta` and `delta`.
+      !! The variable designating whether there are problems computing the function at the
+      !! current `beta` and `delta`.
    integer, intent(out) :: nfev
       !! The number of function evaluations.
    real(kind=wp), intent(out) :: pvd
@@ -5219,7 +5188,7 @@ subroutine dpvd &
 end subroutine dpvd
 
 pure subroutine dscale(n, m, scl, ldscl, t, ldt, sclt, ldsclt)
-!! Scale T by the inverse of SCL, I.E., compute T/SCL.
+!! Scale `t` by the inverse of `scl`, i.e., compute `t/scl`.
 ! Routines Called (NONE)
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
@@ -5289,7 +5258,8 @@ pure subroutine dscale(n, m, scl, ldscl, t, ldt, sclt, ldsclt)
 end subroutine dscale
 
 pure subroutine dsclb(np, beta, ssf)
-!! Select scaling values for BETA according to the algorithm given in the ODRPACK95 reference guide.
+!! Select scaling values for `beta` according to the algorithm given in the ODRPACK95
+!! reference guide.
 ! Routines Called (NONE)
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
@@ -5310,9 +5280,8 @@ pure subroutine dsclb(np, beta, ssf)
 
    ! Variable Definitions (alphabetically)
    !  BETA:    The function parameters.
-   !  BIGDIF:  The variable designating whether there is a significant
-   !           difference in the magnitudes of the nonzero elements of
-   !  BETA (BIGDIF=.TRUE.) or not (BIGDIF=.FALSE.).
+   !  BIGDIF:  The variable designating whether there is a significant difference in the
+   !           magnitudes of the nonzero elements of BETA (BIGDIF=.TRUE.) or not (BIGDIF=.FALSE.).
    !  BMAX:    The largest nonzero magnitude.
    !  BMIN:    The smallest nonzero magnitude.
    !  K:       An indexing variable.
@@ -5325,9 +5294,6 @@ pure subroutine dsclb(np, beta, ssf)
    end do
 
    if (bmax .eq. zero) then
-!------------------------------------------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
       !  All input values of BETA are zero
       ssf(1:np) = one
    else
@@ -5335,18 +5301,12 @@ pure subroutine dsclb(np, beta, ssf)
       bmin = bmax
       do k = 1, np
          if (beta(k) .ne. zero) then
-!--------------------------------^---------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
             bmin = min(bmin, abs(beta(k)))
          end if
       end do
       bigdif = log10(bmax) - log10(bmin) .ge. one
       do k = 1, np
          if (beta(k) .eq. zero) then
-!--------------------------------^---------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
             ssf(k) = ten/bmin
          else
             if (bigdif) then
@@ -5362,8 +5322,8 @@ pure subroutine dsclb(np, beta, ssf)
 end subroutine dsclb
 
 pure subroutine dscld(n, m, x, ldx, tt, ldtt)
-!! Select scaling values for DELTA according to the algorithm given in the ODRPACK95 reference
-!! guide.
+!! Select scaling values for `delta` according to the algorithm given in the ODRPACK95
+!! reference guide.
 ! Routines Called (NONE)
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
@@ -5409,9 +5369,6 @@ pure subroutine dscld(n, m, x, ldx, tt, ldtt)
          xmax = max(xmax, abs(x(i, j)))
       end do
       if (xmax .eq. zero) then
-!-------------------------^----------------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
          !  All input values of X(I,J), I=1,...,N, are zero
          do i = 1, n
             tt(i, j) = one
@@ -5421,18 +5378,12 @@ pure subroutine dscld(n, m, x, ldx, tt, ldtt)
          xmin = xmax
          do i = 1, n
             if (x(i, j) .ne. zero) then
-!-----------------------------------^------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
                xmin = min(xmin, abs(x(i, j)))
             end if
          end do
          bigdif = log10(xmax) - log10(xmin) .ge. one
          do i = 1, n
             if (x(i, j) .ne. zero) then
-!-----------------------------------^------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
                if (bigdif) then
                   tt(i, j) = one/abs(x(i, j))
                else
@@ -5489,19 +5440,20 @@ pure subroutine dsetn(n, m, x, ldx, nrow)
          return
       end if
    end do
-!--------------------------------^---------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
 
 end subroutine dsetn
 
 subroutine dsolve(n, t, ldt, b, job)
 !! Solve systems of the form:
-!!  T * X = B  or  trans(T) * X = B
-!! where T is an upper or lower triangular matrix of order N, and the solution X overwrites
-!! the RHS B. (adapted from LINPACK subroutine DTRSL).
+!!   
+!!  `t * x = b  or  trans(t) * x = b`
+!!
+!! where `t` is an upper or lower triangular matrix of order `n`, and the solution `x`
+!! overwrites the RHS `b`. 
+!! (adapted from LINPACK subroutine DTRSL).
+!!   
 !! References:
-!!  Dongarra J.J., Bunch J.R., Moler C.B., Stewart G.W., *LINPACK Users Guide*, SIAM, 1979.
+!! * Dongarra J.J., Bunch J.R., Moler C.B., Stewart G.W., *LINPACK Users Guide*, SIAM, 1979.
 ! Routines Called  DAXPY,DDOT
 ! Date Written   920220   (YYMMDD)
 ! Revision Date  920619   (YYMMDD)
@@ -5518,10 +5470,10 @@ subroutine dsolve(n, t, ldt, b, job)
       !! On input: the right hand side; On exit: the solution.
    integer, intent(in) :: job
       !! What kind of system is to be solved:
-      !!   1   Solve T*X=B, T lower triangular,
-      !!   2   Solve T*X=B, T upper triangular,
-      !!   3   Solve trans(T)*X=B, T lower triangular,
-      !!   4   Solve trans(T)*X=B, T upper triangular.
+      !!   1: Solve `t * x = b`, where `t` is lower triangular,
+      !!   2: Solve `t * x = b`, where `t` is upper triangular,
+      !!   3: Solve `trans(t) * x = b`, where `t` is lower triangular,
+      !!   4: Solve `trans(t) * x = b`, where `t` is upper triangular.
 
    ! Local scalars
    real(kind=wp) :: temp
@@ -5551,34 +5503,30 @@ subroutine dsolve(n, t, ldt, b, job)
    j1 = 0
    do j = 1, n
       if (j1 .eq. 0 .and. t(j, j) .ne. zero) then
-   !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
          j1 = j
       elseif (t(j, j) .eq. zero) then
-   !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
          b(j) = zero
       end if
    end do
    if (j1 .eq. 0) return
-   !  Find last nonzero diagonal entry in T
+   
+   ! Find last nonzero diagonal entry in T
    jn = 0
    do j = n, j1, -1
       if (jn .eq. 0 .and. t(j, j) .ne. zero) then
-   !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
          jn = j
       elseif (t(j, j) .eq. zero) then
-   !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
          b(j) = zero
       end if
    end do
 
    if (job .eq. 1) then
-      !  Solve T*X=B for T lower triangular
+      ! Solve T*X=B for T lower triangular
       b(j1) = b(j1)/t(j1, j1)
       do j = j1 + 1, jn
          temp = -b(j - 1)
          call daxpy(jn - j + 1, temp, t(j, j - 1), 1, b(j), 1)
          if (t(j, j) .ne. zero) then
-   !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
             b(j) = b(j)/t(j, j)
          else
             b(j) = zero
@@ -5586,13 +5534,12 @@ subroutine dsolve(n, t, ldt, b, job)
       end do
 
    elseif (job .eq. 2) then
-      !  Solve T*X=B for T upper triangular.
+      ! Solve T*X=B for T upper triangular.
       b(jn) = b(jn)/t(jn, jn)
       do j = jn - 1, j1, -1
          temp = -b(j + 1)
          call daxpy(j, temp, t(1, j + 1), 1, b(1), 1)
          if (t(j, j) .ne. zero) then
-   !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
             b(j) = b(j)/t(j, j)
          else
             b(j) = zero
@@ -5600,12 +5547,11 @@ subroutine dsolve(n, t, ldt, b, job)
       end do
 
    elseif (job .eq. 3) then
-      !  Solve trans(T)*X=B for T lower triangular.
+      ! Solve trans(T)*X=B for T lower triangular.
       b(jn) = b(jn)/t(jn, jn)
       do j = jn - 1, j1, -1
          b(j) = b(j) - ddot(jn - j + 1, t(j + 1, j), 1, b(j + 1), 1)
          if (t(j, j) .ne. zero) then
-   !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
             b(j) = b(j)/t(j, j)
          else
             b(j) = zero
@@ -5613,12 +5559,11 @@ subroutine dsolve(n, t, ldt, b, job)
       end do
 
    elseif (job .eq. 4) then
-      !  Solve trans(T)*X=B for T upper triangular.
+      ! Solve trans(T)*X=B for T upper triangular
       b(j1) = b(j1)/t(j1, j1)
       do j = j1 + 1, jn
          b(j) = b(j) - ddot(j - 1, t(1, j), 1, b(1), 1)
          if (t(j, j) .ne. zero) then
-   !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
             b(j) = b(j)/t(j, j)
          else
             b(j) = zero
@@ -5641,7 +5586,8 @@ subroutine dunpac(n2, v1, v2, ifix)
    real(kind=wp), intent(in) :: v1(n2)
       !! The vector of the unfixed items.
    real(kind=wp), intent(out) :: v2(n2)
-      !! The vector of the fixed and unfixed items into which the elements of `v1` are to be inserted.
+      !! The vector of the fixed and unfixed items into which the elements of `v1` are to
+      !! be inserted.
    integer, intent(in) :: ifix(n2)
       !! The values designating whether the elements of `v2` are fixed at their input values or not.
 
@@ -5653,11 +5599,13 @@ subroutine dunpac(n2, v1, v2, ifix)
 
    ! Variable Definitions (alphabetically)
    !  I:       An indexing variable.
-   !  IFIX:    The values designating whether the elements of V2 are fixed at their input values or not.
+   !  IFIX:    The values designating whether the elements of V2 are fixed at their input
+   !           values or not.
    !  N1:      The number of items in V1.
    !  N2:      The number of items in V2.
    !  V1:      The vector of the unfixed items.
-   !  V2:      The vector of the fixed and unfixed items into which the elements of V1 are to be inserted.
+   !  V2:      The vector of the fixed and unfixed items into which the elements of V1 are
+   !           to be inserted.
 
    n1 = 0
    if (ifix(1) .ge. 0) then
@@ -5678,7 +5626,7 @@ subroutine dvevtr &
    (m, nq, indx, &
     v, ldv, ld2v, e, lde, ve, ldve, ld2ve, vev, ldvev, &
     wrk5)
-!! Compute  V*E*trans(V) for the (INDX)TH M by NQ array in V.
+!! Compute `v*e*trans(v)` for the (`indx`)th `m` by `nq` array in `v`.
 ! Routines Called  DSOLVE
 ! Date Written   910613   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
@@ -5706,7 +5654,7 @@ subroutine dvevtr &
    real(kind=wp), intent(in) :: v(ldv, ld2v, nq)
       !! An array of `nq` by `m` matrices.
    real(kind=wp), intent(in) :: e(lde, m)
-      !! The `m` by `m` matrix of the factors so `ete = (d**2 + alpha*t**2)`.
+      !! The `m` by `m` matrix of the factors, so `ete = (d**2 + alpha*t**2)`.
    real(kind=wp), intent(out) :: ve(ldve, ld2ve, m)
       !! The `nq` by `m` array `ve = v * inv(e)`.
    real(kind=wp), intent(out) :: vev(ldvev, nq)
@@ -5763,7 +5711,7 @@ subroutine dvevtr &
 end subroutine dvevtr
 
 pure subroutine dwght(n, m, wt, ldwt, ld2wt, t, wtt)
-!! Scale matrix T using WT, i.e., compute WTT = WT*T.
+!! Scale matrix `t` using `wt`, i.e., compute `wtt = wt*t`.
 ! Routines Called  (NONE)
 ! Date Written   860529   (YYMMDD)
 ! Revision Date  920304   (YYMMDD)
@@ -6015,7 +5963,8 @@ pure subroutine dwinf &
    !  FJACDI:  The starting location in array WORK of array FJACD.
    !  FNI:     The starting location in array WORK of array FN.
    !  FSI:     The starting location in array WORK of array FS.
-   !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by OLS (ISODR=FALSE).
+   !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or
+   !           by OLS (ISODR=FALSE).
    !  LDWE:    The leading dimension of array WE.
    !  LD2WE:   The second dimension of array WE.
    !  LWKMN:   The minimum acceptable length of vector work.
@@ -6218,7 +6167,8 @@ subroutine mbfb(np, beta, lower, upper, ssf, stpb, neta, eta, interval)
    real(kind=wp), intent(in) :: eta
       !! The relative noise in the function results.
    integer, intent(out) :: interval(np)
-      !! Specifies which difference methods and step sizes are supported by the current interval `upper-lower`.
+      !! Specifies which difference methods and step sizes are supported by the current
+      !! interval `upper-lower`.
 
    ! Local scalars
    integer :: k
@@ -6256,9 +6206,6 @@ subroutine mbfb(np, beta, lower, upper, ssf, stpb, neta, eta, interval)
       h = max(ten*h1, min(hundred*h0, one))
       hc = max(ten*hc1, min(hundred*hc0, one))
       if (beta(k) .eq. zero) then
-!-----------------------------^------------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
          if (ssf(1) .lt. zero) then
             typj = one/abs(ssf(1))
          else
