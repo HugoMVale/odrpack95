@@ -916,11 +916,11 @@ subroutine devjac &
 
    ! Interface blocks
    interface
-      subroutine dwght &
-         (n, m, wt, ldwt, ld2wt, t, wtt)
+      subroutine dwght(n, m, wt, ldwt, ld2wt, t, wtt)
          use odrpack_kinds, only: wp
-         integer :: ldwt, ld2wt, m, n
-         real(kind=wp) :: t(:, :), wt(:, :, :), wtt(:, :)
+         integer, intent(in) :: n, m, ldwt, ld2wt
+         real(kind=wp), intent(in) :: t(:, :), wt(:, :, :)
+         real(kind=wp), intent(out) :: wtt(:, :)
       end subroutine
    end interface
 
@@ -4590,11 +4590,11 @@ subroutine dodstp &
 
    ! Interface blocks
    interface
-      subroutine dwght &
-         (n, m, wt, ldwt, ld2wt, t, wtt)
+      subroutine dwght(n, m, wt, ldwt, ld2wt, t, wtt)
          use odrpack_kinds, only: wp
-         integer :: ldwt, ld2wt, m, n
-         real(kind=wp) :: t(:, :), wt(:, :, :), wtt(:, :)
+         integer, intent(in) :: n, m, ldwt, ld2wt
+         real(kind=wp), intent(in) :: t(:, :), wt(:, :, :)
+         real(kind=wp), intent(out) :: wtt(:, :)
       end subroutine
    end interface
 
