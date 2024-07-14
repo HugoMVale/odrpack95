@@ -2,9 +2,6 @@ module odrpack
 
    use odrpack_kinds, only: wp
    implicit none
-   private
-
-   public :: odr
    
 contains
 
