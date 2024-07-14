@@ -16,6 +16,9 @@ odrpack_lic = files(
 srcs = files(
   'src/lpkbls.f',
   'src/odrpack.f90',
+  'src/odrpack_core.f90',
+  'src/odrpack_capi.f90',
+  'src/odrpack_reports.f90',
   'src/odrpack_kinds.F90',
 )
 
