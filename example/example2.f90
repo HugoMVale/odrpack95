@@ -1,13 +1,54 @@
+module example2_fnc
+!! Model function for example2.
+
+   use odrpack_kinds, only: wp, one, zero
+   implicit none
+
+contains
+
+   pure subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
+                       ldifx, ideval, f, fjacb, fjacd, istop)
+
+      integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
+      integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
+      real(kind=wp), intent(in) :: beta(np), xplusd(ldn, m)
+      real(kind=wp), intent(out) :: f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq)
+      integer, intent(out) :: istop
+
+      ! Local variables
+      integer :: i
+
+      ! Check for unacceptable values for this problem
+      if (beta(1) .gt. zero) then
+         istop = 1
+         return
+      else
+         istop = 0
+      end if
+
+      ! Compute predicted values
+      if (mod(ideval, 10) .ge. 1) then
+         do i = 1, nq
+            f(:, i) = beta(3)*(xplusd(:, 1) - beta(1))**2 + &
+                      2*beta(4)*(xplusd(:, 1) - beta(1))*(xplusd(:, 2) - beta(2)) + &
+                      beta(5)*(xplusd(:, 2) - beta(2))**2 - one
+         end do
+      end if
+
+   end subroutine fcn
+
+end module example2_fnc
+
 program example2
-!! Implicit ODR job.
+   !! Implicit ODR job.
    use odrpack, only: odr
    use odrpack_kinds, only: wp
+   use example2_fnc, only: fcn
    implicit none
 
    ! Variable declarations
    integer :: i, info, j, job, lunerr, lunrpt, m, n, np, nq
    real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :)
-   external :: fcn
 
    ! Set up report files
    lunerr = 9
@@ -26,7 +67,7 @@ program example2
    do i = 1, n
       read (5, fmt=*) (x(i, j), j=1, m)
    end do
-   close(5)
+   close (5)
 
    ! Specify task: Implicit orthogonal distance regression
    !       With forward finite difference derivatives
@@ -45,37 +86,3 @@ program example2
             info=info)
 
 end program example2
-
-subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
-               ldifx, ideval, f, fjacb, fjacd, istop)
-
-   use odrpack_kinds, only: wp, one, zero
-   implicit none
-
-   integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
-   integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
-   real(kind=wp), intent(in) :: beta(np), xplusd(ldn, m)
-   real(kind=wp), intent(out) :: f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq)
-   integer, intent(out) :: istop
-
-   ! Local variables
-   integer :: i
-
-   ! Check for unacceptable values for this problem
-   if (beta(1) .gt. zero) then
-      istop = 1
-      return
-   else
-      istop = 0
-   end if
-
-   ! Compute predicted values
-   if (mod(ideval, 10) .ge. 1) then
-      do i = 1, nq
-            f(:, i) = beta(3)*(xplusd(:, 1) - beta(1))**2 + &
-                      2*beta(4)*(xplusd(:, 1) - beta(1))*(xplusd(:, 2) - beta(2)) + &
-                      beta(5)*(xplusd(:, 2) - beta(2))**2 - one
-      end do
-   end if
-
-end subroutine fcn

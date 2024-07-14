@@ -1,8 +1,61 @@
+module example3_fnc
+!! Model function for example3.
+
+   use odrpack_kinds, only: wp, one, zero
+   implicit none
+
+contains
+
+   pure subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
+                       ldifx, ideval, f, fjacb, fjacd, istop)
+
+      integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
+      integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
+      real(kind=wp), intent(in) :: beta(np), xplusd(ldn, m)
+      real(kind=wp), intent(out) :: f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq)
+      integer, intent(out) :: istop
+
+      ! Local variables
+      real(kind=wp) :: freq, omega, ctheta, stheta, theta, phi, r
+      real(kind=wp), parameter :: pi = 4*atan(one)
+      integer :: i
+
+      ! Check for unacceptable values for this problem
+      do i = 1, n
+         if (xplusd(i, 1) .lt. zero) then
+            istop = 1
+            return
+         end if
+      end do
+      istop = 0
+
+      theta = pi*beta(4)*0.5E0_wp
+      ctheta = cos(theta)
+      stheta = sin(theta)
+
+      ! Compute predicted values
+      if (mod(ideval, 10) .ge. 1) then
+         do i = 1, n
+            freq = xplusd(i, 1)
+            omega = (2.0E0_wp*pi*freq*exp(-beta(3)))**beta(4)
+            phi = atan2((omega*stheta), (1 + omega*ctheta))
+            r = (beta(1) - beta(2))*sqrt((1 + omega*ctheta)**2 + (omega*stheta)**2)**(-beta(5))
+            f(i, 1) = beta(2) + r*cos(beta(5)*phi)
+            f(i, 2) = r*sin(beta(5)*phi)
+         end do
+      end if
+
+   end subroutine fcn
+
+end module example3_fnc
+
 program example3
 !! Explicit ODR job, with parameter bounds, weights, delta initialized by user, and central
 !! difference derivatives.
-   use odrpack, only: odr
+
    use odrpack_kinds, only: wp
+   use odrpack, only: odr
+   use example3_fnc, only: fcn
    implicit none
 
    ! Variable declarations
@@ -10,7 +63,6 @@ program example3
    integer, allocatable :: ifixx(:, :)
    real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :), wd(:, :, :), we(:, :, :), &
                                  delta(:, :)
-   external :: fcn
 
    ! Set up report files
    lunerr = 9
@@ -29,7 +81,7 @@ program example3
    do i = 1, n
       read (5, fmt=*) (x(i, j), j=1, m), (y(i, j), j=1, nq)
    end do
-   close(5)
+   close (5)
 
    ! Specify task as explicit orthogonal distance regression
    !       With central difference derivatives
@@ -94,47 +146,3 @@ program example3
             info=info)
 
 end program example3
-
-subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
-               ldifx, ideval, f, fjacb, fjacd, istop)
-
-   use odrpack_kinds, only: wp, one, zero
-   implicit none
-
-   integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
-   integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
-   real(kind=wp), intent(in) :: beta(np), xplusd(ldn, m)
-   real(kind=wp), intent(out) :: f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq)
-   integer, intent(out) :: istop
-
-   ! Local variables
-   real(kind=wp) :: freq, omega, ctheta, stheta, theta, phi, r
-   real(kind=wp), parameter :: pi = 4*atan(one)
-   integer :: i
-
-   ! Check for unacceptable values for this problem
-   do i = 1, n
-      if (xplusd(i, 1) .lt. zero) then
-         istop = 1
-         return
-      end if
-   end do
-   istop = 0
-
-   theta = pi*beta(4)*0.5E0_wp
-   ctheta = cos(theta)
-   stheta = sin(theta)
-
-   ! Compute predicted values
-   if (mod(ideval, 10) .ge. 1) then
-      do i = 1, n
-         freq = xplusd(i, 1)
-         omega = (2.0E0_wp*pi*freq*exp(-beta(3)))**beta(4)
-         phi = atan2((omega*stheta), (1 + omega*ctheta))
-         r = (beta(1) - beta(2))*sqrt((1 + omega*ctheta)**2 + (omega*stheta)**2)**(-beta(5))
-         f(i, 1) = beta(2) + r*cos(beta(5)*phi)
-         f(i, 2) = r*sin(beta(5)*phi)
-      end do
-   end if
-
-end subroutine fcn

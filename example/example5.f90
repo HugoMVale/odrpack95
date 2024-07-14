@@ -1,8 +1,48 @@
+module example5_fnc
+!! Model function for example5.
+
+   use odrpack_kinds, only: wp
+   implicit none
+
+contains
+
+   pure subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
+                       ldifx, ideval, f, fjacb, fjacd, istop)
+
+      integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
+      integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
+      real(kind=wp), intent(in) :: beta(np), xplusd(ldn, m)
+      real(kind=wp), intent(out) :: f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq)
+      integer, intent(out) :: istop
+
+      istop = 0
+
+      ! Calculate model
+      if (mod(ideval, 10) .ne. 0) then
+         f(:, 1) = beta(1)*exp(beta(2)*xplusd(:, 1))
+      end if
+
+      ! Calculate model partials with respect to `beta`
+      if (mod(ideval/10, 10) .ne. 0) then
+         fjacb(:, 1, 1) = exp(beta(2)*xplusd(:, 1))
+         fjacb(:, 2, 1) = beta(1)*xplusd(:, 1)*exp(beta(2)*xplusd(:, 1))
+      end if
+
+      ! Calculate model partials with respect to `delta`
+      if (mod(ideval/100, 10) .ne. 0) then
+         fjacd(:, 1, 1) = beta(1)*beta(2)*exp(beta(2)*xplusd(:, 1))
+      end if
+
+   end subroutine fcn
+
+end module example5_fnc
+
 program example5
 !! Explicit ODR job, with parameter bounds, user-supplied derivatives, and output of work
 !! arrays.
-   use odrpack, only: odr
    use odrpack_kinds, only: wp
+   use odrpack, only: odr
+   use example5_fnc, only: fcn
    implicit none
 
    real(kind=wp), allocatable :: beta(:), l(:), u(:), x(:, :), y(:, :)
@@ -10,7 +50,6 @@ program example5
    integer, pointer :: iwork(:)
    integer :: np, n, m, nq, job
    !integer :: i,
-   external :: fcn
 
    np = 2
    n = 4
@@ -38,35 +77,3 @@ program example5
    ! end do
 
 end program example5
-
-subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
-               ldifx, ideval, f, fjacb, fjacd, istop)
-
-   use odrpack_kinds, only: wp
-   implicit none
-
-   integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
-   integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
-   real(kind=wp), intent(in) :: beta(np), xplusd(ldn, m)
-   real(kind=wp), intent(out) :: f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq)
-   integer, intent(out) :: istop
-
-   istop = 0
-
-   ! Calculate model
-   if (mod(ideval, 10) .ne. 0) then
-      f(:, 1) = beta(1)*exp(beta(2)*xplusd(:, 1))
-   end if
-
-   ! Calculate model partials with respect to `beta`
-   if (mod(ideval/10, 10) .ne. 0) then
-      fjacb(:, 1, 1) = exp(beta(2)*xplusd(:, 1))
-      fjacb(:, 2, 1) = beta(1)*xplusd(:, 1)*exp(beta(2)*xplusd(:, 1))
-   end if
-
-   ! Calculate model partials with respect to `delta`
-   if (mod(ideval/100, 10) .ne. 0) then
-      fjacd(:, 1, 1) = beta(1)*beta(2)*exp(beta(2)*xplusd(:, 1))
-   end if
-
-end subroutine fcn

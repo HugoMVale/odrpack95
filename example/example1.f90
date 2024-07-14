@@ -1,14 +1,69 @@
+module example1_fnc
+!! Model function for example1.
+
+   use odrpack_kinds, only: wp, one, zero
+   implicit none
+
+contains
+
+   pure subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
+                       ldifx, ideval, f, fjacb, fjacd, istop)
+
+      integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
+      integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
+      real(kind=wp), intent(in) :: beta(np), xplusd(ldn, m)
+      real(kind=wp), intent(out) :: f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq)
+      integer, intent(out) :: istop
+
+      ! Local variables
+      integer :: i
+
+      ! Check for unacceptable values for this problem
+      if (beta(1) .lt. zero) then
+         istop = 1
+         return
+      else
+         istop = 0
+      end if
+
+      ! Compute predicted values
+      if (mod(ideval, 10) .ge. 1) then
+      do i = 1, nq
+         f(:, i) = beta(1) + beta(2)*(exp(beta(3)*xplusd(:, 1)) - one)**2
+      end do
+      end if
+
+      ! Compute derivatives with respect to 'beta'
+      if (mod(ideval/10, 10) .ge. 1) then
+      do i = 1, nq
+         fjacb(:, 1, i) = one
+         fjacb(:, 2, i) = (exp(beta(3)*xplusd(:, 1)) - one)**2
+         fjacb(:, 3, i) = beta(2)*2*(exp(beta(3)*xplusd(:, 1)) - one)*exp(beta(3)*xplusd(:, 1))*xplusd(:, 1)
+      end do
+      end if
+
+      ! Compute derivatives with respect to 'delta'
+      if (mod(ideval/100, 10) .ge. 1) then
+      do i = 1, nq
+         fjacd(:, 1, i) = beta(2)*2*(exp(beta(3)*xplusd(:, 1)) - one)*exp(beta(3)*xplusd(:, 1))*beta(3)
+      end do
+      end if
+
+   end subroutine fcn
+
+end module example1_fnc
+
 program example1
 !! Explicit ODR job, with user-supplied analytic derivatives and nondefault ifixx.
    use odrpack, only: odr
    use odrpack_kinds, only: wp
+   use example1_fnc, only: fcn
    implicit none
 
    ! Variable declarations
    integer :: i, info, iprint, j, job, lunerr, lunrpt, m, n, np, nq
    integer, allocatable :: ifixx(:, :)
    real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :)
-   external :: fcn
 
    ! Set up report files
    lunerr = 9
@@ -32,7 +87,7 @@ program example1
          ifixx(i, 1) = 1
       end if
    end do
-   close(5)
+   close (5)
 
    ! Specify task: Explicit orthogonal distance regression
    !       With user supplied derivatives (checked)
@@ -57,50 +112,3 @@ program example1
 
 end program example1
 
-subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
-               ldifx, ideval, f, fjacb, fjacd, istop)
-
-   use odrpack_kinds, only: wp, zero, one
-   implicit none
-
-   integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
-   integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
-   real(kind=wp), intent(in) :: beta(np), xplusd(ldn, m)
-   real(kind=wp), intent(out) :: f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq)
-   integer, intent(out) :: istop
-
-   ! Local variables
-   integer :: i
-
-   ! Check for unacceptable values for this problem
-   if (beta(1) .lt. zero) then
-      istop = 1
-      return
-   else
-      istop = 0
-   end if
-
-   ! Compute predicted values
-   if (mod(ideval, 10) .ge. 1) then
-      do i = 1, nq
-         f(:, i) = beta(1) + beta(2)*(exp(beta(3)*xplusd(:, 1)) - one)**2
-      end do
-   end if
-
-   ! Compute derivatives with respect to 'beta'
-   if (mod(ideval/10, 10) .ge. 1) then
-      do i = 1, nq
-         fjacb(:, 1, i) = one
-         fjacb(:, 2, i) = (exp(beta(3)*xplusd(:, 1)) - one)**2
-         fjacb(:, 3, i) = beta(2)*2*(exp(beta(3)*xplusd(:, 1)) - one)*exp(beta(3)*xplusd(:, 1))*xplusd(:, 1)
-      end do
-   end if
-
-   ! Compute derivatives with respect to 'delta'
-   if (mod(ideval/100, 10) .ge. 1) then
-      do i = 1, nq
-         fjacd(:, 1, i) = beta(2)*2*(exp(beta(3)*xplusd(:, 1)) - one)*exp(beta(3)*xplusd(:, 1))*beta(3)
-      end do
-   end if
-
-end subroutine fcn
