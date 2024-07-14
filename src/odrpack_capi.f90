@@ -1,7 +1,10 @@
-module odrpack_c
+module odrpack_capi
+   !! C bindings for 'odrpack'.
+
    use, intrinsic :: iso_c_binding, only: c_bool, c_char, c_double, c_f_pointer, c_int, c_ptr
-   use odrpack, only: odr
    use odrpack_kinds, only: wp
+   use odrpack, only: odr
+   use odrpack_core, only: dwinf
    implicit none
    private
 
@@ -368,7 +371,6 @@ contains
       type(workidx_t), intent(out) :: workidx
          !! 0-based indexes of real work array.
 
-      external :: dwinf
       integer :: deltai, epsi, xplusi, fni, sdi, vcvi, rvari, wssi, wssdei, wssepi, &
                  rcondi, etai, olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, partli, &
                  sstoli, taufci, epsmai, beta0i, betaci, betasi, betani, si, ssi, ssfi, &
@@ -376,7 +378,7 @@ contains
                  fjacdi, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, loweri, upperi, &
                  lwkmn
 
-      call dwinf(n, m, np, nq, ldwe, ld2we, isodr, &
+      call dwinf(n, m, np, nq, ldwe, ld2we, logical(isodr, kind=kind(.true.)), &
                  deltai, epsi, xplusi, fni, sdi, vcvi, &
                  rvari, wssi, wssdei, wssepi, rcondi, etai, &
                  olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
@@ -442,4 +444,4 @@ contains
 
    end subroutine dwinf_c
 
-end module odrpack_c
+end module odrpack_capi
