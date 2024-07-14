@@ -33,7 +33,7 @@ module odrpack_core
          integer, intent(in) :: ifixb(np)
             !! Indicators for "fixing" parameters (`beta`).
          integer, intent(in) :: ifixx(ldifx, m)
-            !!  Indicators for "fixing" explanatory variable (`x`).
+            !! Indicators for "fixing" explanatory variable (`x`).
          integer, intent(in) :: ldifx
             !! Leading dimension of array `ifixx`.
          integer, intent(in) :: ideval
@@ -47,9 +47,9 @@ module odrpack_core
          integer, intent(out) :: istop
             !! Stopping condition, with meaning as follows. 0 means current `beta` and
             !! `x+delta` were acceptable and values were computed successfully. 1 means current
-            !! `beta` and `x+delta` are not acceptable;  ODRPACK95 should select values closer
+            !! `beta` and `x+delta` are not acceptable;  'odrpack' should select values closer
             !! to most recently used values if possible. -1 means current `beta` and `x+delta`
-            !! are not acceptable; ODRPACK95 should stop.
+            !! are not acceptable; 'odrpack' should stop.
       end subroutine fcn_t
    end interface
 
@@ -133,7 +133,7 @@ contains
       real(kind=wp), intent(out) :: wrk1(n, nq, m)
          !! A work array of `(n, nq, m)` elements.
       real(kind=wp), intent(out) :: wrk2(n, nq)
-         !! A work array of (n, nq) elements.
+         !! A work array of `(n, nq)` elements.
       real(kind=wp), intent(out) :: wrk3(np)
          !! A work array of `(np)` elements.
       real(kind=wp), intent(out) :: wrk4(m, m)
@@ -735,7 +735,8 @@ contains
       use odrpack_kinds, only: zero, one
    
       integer, intent(in) :: itype
-         !! 0 - calc foward difference step, 1 - calc center difference step.
+         !! The finite difference method being used, where: `itype = 0` indicates forward 
+         !! finite differences, and `itype = 1` indicates central finite differences.
       integer, intent(in) :: k
          !! Index into `beta` where `betak` resides.
       real(kind=wp), intent(in) :: betak
@@ -787,7 +788,7 @@ contains
       integer, intent(in) :: m
          !! The number of columns of data in the independent variable.
       real(kind=wp), intent(in) :: wd(ldwd, ld2wd, m)
-         !! The squared `delta` weights, `d**2`.
+         !! The squared `delta` weights.
       integer, intent(in) :: ldwd
          !! The leading dimension of array `wd`.
       integer, intent(in) :: ld2wd
@@ -925,7 +926,7 @@ contains
        info, &
        lower, upper)
    !! Compute noise and number of good digits in function results.
-   !! (Adapted from STARPAC subroutine ETAFUN)
+   !! (Adapted from STARPAC subroutine ETAFUN.)
    ! Routines Called  FCN
    ! Date Written   860529   (YYMMDD)
    ! Revision Date  920619   (YYMMDD)
@@ -1382,7 +1383,7 @@ contains
    
    subroutine dfctr(oksemi, a, lda, n, info)
    !! Factor the positive (semi)definite matrix `a` using a modified Cholesky factorization.
-   !! (adapted from LINPACK subroutine DPOFA)
+   !! (Adapted from LINPACK subroutine DPOFA.)
    ! Routines Called  DDOT
    ! Date Written   910706   (YYMMDD)
    ! Revision Date  920619   (YYMMDD)
@@ -1498,7 +1499,7 @@ contains
          !! The variable designating whether the solution is by ODR (`isodr = .true`) or
          !! by OLS (`isodr = .false`).
       real(kind=wp), intent(in) :: we(ldwe, ld2we, nq)
-         !! The (squared) EPSILON weights.
+         !! The (squared) `epsilon` weights.
       integer, intent(in) :: ldwe
          !! The leading dimension of array `we`.
       integer, intent(in) :: ld2we
@@ -1847,8 +1848,8 @@ contains
       use odrpack_kinds, only: zero, two, three, ten
    
       integer, intent(in) :: itype
-         !! The finite difference method being used, where: `itype = 0` indicates forward finite
-         !! differences, and `itype = 1` indicates central finite differences.
+         !! The finite difference method being used, where: `itype = 0` indicates forward 
+         !! finite differences, and `itype = 1` indicates central finite differences.
       integer, intent(in) :: neta
          !! The number of good digits in the function results.
       integer, intent(in) :: i
@@ -3031,7 +3032,7 @@ contains
        wrk1, wrk2, wrk6, &
        interval)
    !! Driver routine for the derivative checking process.
-   !! (adapted from STARPAC subroutine DCKCNT)
+   !! (Adapted from STARPAC subroutine DCKCNT.)
    ! Routines Called  FCN, DHSTEP, DJCKM
    ! Date Written   860529   (YYMMDD)
    ! Revision Date  920619   (YYMMDD)
@@ -3360,7 +3361,7 @@ contains
        wrk1, wrk2, wrk6)
    !! Check whether high curvature could be the cause of the disagreement between the numerical
    !! and analytic derviatives.
-   !! (adapted from STARPAC subroutine DCKCRV)
+   !! (Adapted from STARPAC subroutine DCKCRV.)
    ! Routines Called  DJCKF, DPVB, DPVD
    ! Date Written   860529   (YYMMDD)
    ! Revision Date  920619   (YYMMDD)
@@ -3405,18 +3406,18 @@ contains
          !! The variable designating whether the derivatives wrt `beta` (`iswrtb = .true.`) or
          !! `delta` (`iswrtb = .false.`) are being checked.
       real(kind=wp), intent(out) :: fd
-         !! The forward difference derivative wrt the `j`th parameter.
+         !! The forward difference derivative wrt the `j`-th parameter.
       real(kind=wp), intent(in) :: typj
          !! The typical size of the `j`-th unknown `beta` or `delta`.
       real(kind=wp), intent(out) :: pvpstp
          !! The predicted value for row `nrow` of the model based on the current parameter estimates
-         !! for all but the `j`th parameter value, which is `beta(j) + stp0`.
+         !! for all but the `j`-th parameter value, which is `beta(j) + stp0`.
       real(kind=wp), intent(in) :: stp0
          !! The initial step size for the finite difference derivative.
       real(kind=wp), intent(out) :: pv
          !! The predicted value of the model for row `nrow`.
       real(kind=wp), intent(in) :: d
-         !! The derivative with respect to the `j`th unknown parameter.
+         !! The derivative with respect to the `j`-th unknown parameter.
       real(kind=wp), intent(out) :: diffj
          !! The relative differences between the user supplied and finite difference derivatives
          !! for the derivative being checked.
@@ -3610,7 +3611,7 @@ contains
        wrk1, wrk2, wrk6)
    !! Check whether finite precision arithmetic could be the cause of the disagreement between
    !! the derivatives.
-   !! (adapted from STARPAC subroutine DCKFPA)
+   !! (Adapted from STARPAC subroutine DCKFPA.)
    ! Routines Called  DPVB, DPVD
    ! Date Written   860529   (YYMMDD)
    ! Revision Date  920619   (YYMMDD)
@@ -3651,12 +3652,12 @@ contains
          !! The variable designating whether the derivatives wrt `beta` (`iswrtb = .true.`)
          !! or `delta` (`iswrtb = .false.`) are being checked.
       real(kind=wp), intent(out) :: fd
-         !! The forward difference derivative wrt the `j`th parameter.
+         !! The forward difference derivative wrt the `j`-th parameter.
       real(kind=wp), intent(in) :: typj
-         !! The typical size of the `j`th unknown `beta` or `delta`.
+         !! The typical size of the `j`-th unknown `beta` or `delta`.
       real(kind=wp), intent(out) :: pvpstp
          !! The predicted value for row `nrow` of the model based on the current parameter
-         !! estimates for all but the `j`th parameter value, which is `beta(j) + stp0`.
+         !! estimates for all but the `j`-th parameter value, which is `beta(j) + stp0`.
       real(kind=wp), intent(in) :: stp0
          !! The step size for the finite difference derivative.
       real(kind=wp), intent(inout) :: curve
@@ -3664,7 +3665,7 @@ contains
       real(kind=wp), intent(out) :: pv
          !! The predicted value for row `nrow`.
       real(kind=wp), intent(in) :: d
-         !! The derivative with respect to the `j`th unknown parameter.
+         !! The derivative with respect to the `j`-th unknown parameter.
       real(kind=wp), intent(out) :: diffj
          !! The relative differences between the user supplied and finite difference derivatives
          !! for the derivative being checked.
@@ -3793,7 +3794,7 @@ contains
        diffj, msg1, msg, istop, nfev, &
        wrk1, wrk2, wrk6, interval)
    !! Check user supplied analytic derivatives against numerical derivatives.
-   !! (adapted from STARPAC subroutine DCKMN)
+   !! (Adapted from STARPAC subroutine DCKMN.)
    ! Routines Called  DJCKC, DJCKZ, DPVB, DPVD
    ! Date Written   860529   (YYMMDD)
    ! Revision Date  920619   (YYMMDD)
@@ -3833,7 +3834,7 @@ contains
       integer, intent(in) :: lq
          !! The response currently being examined.
       real(kind=wp), intent(in) :: typj
-         !! The typical size of the `j`th unknown `beta` or `delta`.
+         !! The typical size of the `j`-th unknown `beta` or `delta`.
       real(kind=wp), intent(in) :: h0
          !! The initial step size for the finite difference derivative.
       real(kind=wp), intent(in) :: hc0
@@ -3844,7 +3845,7 @@ contains
       real(kind=wp), intent(out) :: pv
          !! The predicted value for row `nrow`.
       real(kind=wp), intent(in) :: d
-         !! The derivative with respect to the `j`th unknown parameter.
+         !! The derivative with respect to the `j`-th unknown parameter.
       real(kind=wp), intent(out) :: diffj
          !! The relative differences between the user supplied and finite difference derivatives
          !! for the derivative being checked.
@@ -4053,7 +4054,7 @@ contains
        wrk1, wrk2, wrk6)
    !! Recheck the derivatives in the case where the finite difference derivative disagrees with
    !! the analytic derivative and the analytic derivative is zero.
-   !! (adapted from STARPAC subroutine DCKZRO)
+   !! (Adapted from STARPAC subroutine DCKZRO.)
    ! Routines Called  DPVB, DPVD
    ! Date Written   860529   (YYMMDD)
    ! Revision Date  920619   (YYMMDD)
@@ -4094,14 +4095,14 @@ contains
       real(kind=wp), intent(in) :: tol
          !! The agreement tolerance.
       real(kind=wp), intent(in) :: d
-         !! The derivative with respect to the `j`th unknown parameter.
+         !! The derivative with respect to the `j`-th unknown parameter.
       real(kind=wp), intent(out) :: fd
-         !! The forward difference derivative wrt the `j`th parameter.
+         !! The forward difference derivative wrt the `j`-th parameter.
       real(kind=wp), intent(in) :: typj
-         !! The typical size of the `j`th unknown `beta` or `delta`.
+         !! The typical size of the `j`-th unknown `beta` or `delta`.
       real(kind=wp), intent(out) :: pvpstp
          !! The predicted value for row `nrow` of the model using the current parameter estimates
-         !! for all but the `j`th parameter value, which is `beta(j) + stp0`.
+         !! for all but the `j`-th parameter value, which is `beta(j) + stp0`.
       real(kind=wp), intent(in) :: stp0
          !! The initial step size for the finite difference derivative.
       real(kind=wp), intent(out) :: pv
@@ -5236,12 +5237,12 @@ contains
    
    real(kind=wp) pure function dppnml(p) result(dppnmlr)
    !! Compute the percent point function value for the normal (Gaussian) distribution with mean 0
-   !! and standard deviation 1, and with probability density function
+   !! and standard deviation 1, and with probability density function:
    !!
    !!       `f(x) = (1/sqrt(2*pi))*exp(-x^2/2)`
    !!
    !! (Adapted from DATAPAC subroutine TPPF, with modifications to facilitate conversion to
-   !! REAL automatically).
+   !! real(kind=wp) automatically).
    ! Routines Called  (NONE)
    ! Date Written   901207   (YYMMDD)
    ! Revision Date  920304   (YYMMDD)
@@ -5340,8 +5341,8 @@ contains
    real(kind=wp) pure function dppt(p, idf) result(dpptr)
    !! Compute the percent point function value for the student's T distribution with `idf`
    !! degrees of freedom.
-   !! (Adapted from DATAPAC subroutine TPPF, with modifications to facilitate conversion to REAL
-   !! automatically).
+   !! (Adapted from DATAPAC subroutine TPPF, with modifications to facilitate conversion to
+   !! real(kind=wp) automatically.)
    ! Routines Called  DPPNML
    ! Date Written   901207   (YYMMDD)
    ! Revision Date  920304   (YYMMDD)
@@ -5533,7 +5534,7 @@ contains
        nrow, j, lq, stp, &
        istop, nfev, pvb, &
        wrk1, wrk2, wrk6)
-   !! Compute the `nrow`th function value using `beta(j) + stp`.
+   !! Compute the `nrow`-th function value using `beta(j) + stp`.
    ! Routines Called  FCN
    ! Date Written   860529   (YYMMDD)
    ! Revision Date  920304   (YYMMDD)
@@ -5634,7 +5635,7 @@ contains
        nrow, j, lq, stp, &
        istop, nfev, pvd, &
        wrk1, wrk2, wrk6)
-   !! Compute `nrow`th function value using `x(nrow, j) + delta(nrow, j) + stp`.
+   !! Compute `nrow`-th function value using `x(nrow, j) + delta(nrow, j) + stp`.
    ! Routines Called FCN
    ! Date Written   860529   (YYMMDD)
    ! Revision Date  920304   (YYMMDD)
@@ -5989,7 +5990,7 @@ contains
    !!
    !! where `t` is an upper or lower triangular matrix of order `n`, and the solution `x`
    !! overwrites the RHS `b`.
-   !! (adapted from LINPACK subroutine DTRSL).
+   !! (Adapted from LINPACK subroutine DTRSL.)
    !!
    !! References:
    !! * Dongarra J.J., Bunch J.R., Moler C.B., Stewart G.W., *LINPACK Users Guide*, SIAM, 1979.
