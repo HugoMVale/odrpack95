@@ -1,4 +1,4 @@
-subroutine dodpc1                                                        &
+impure subroutine dodpc1                                                 &
     ( ipr, lunrpt,                                                       &
     anajac, cdjac, chkjac, initd, restrt, isodr, implct, dovcv, redoj,   &
     msgb1, msgb, msgd1, msgd,                                            &
@@ -15,7 +15,8 @@ subroutine dodpc1                                                        &
 !***End Prologue  DODPC1
 !
 !...Used modules
-   use odrpack_kinds,only: wp
+   use odrpack_kinds, only: wp
+   use odrpack_core, only: dhstep
 !
 !...Scalar arguments
    real(kind = wp)                                                       &
@@ -42,12 +43,7 @@ subroutine dodpc1                                                        &
 !
 !...Local arrays
    character tempc0*2, tempc1*5, tempc2*13
-!
-!...External functions
-   real(kind = wp)                                                       &
-    dhstep
-   external                                                              &
-    dhstep
+
 !
 !...Data statements
    data                                                                  &
@@ -645,7 +641,7 @@ subroutine dodpc1                                                        &
     (' ')
 end subroutine dodpc1
 
-subroutine dodpc2                                                             &
+impure subroutine dodpc2                                                 &
     ( ipr, lunrpt, fstitr, implct, prtpen,                               &
     pnlty,                                                               &
     niter, nfev, wss, actred, prered, alpha, tau, pnorm, np, beta)
@@ -829,7 +825,7 @@ subroutine dodpc2                                                             &
     (70X,I3,' To',I3,1P,3E16.8)
 end subroutine dodpc2
 
-subroutine dodpc3                                                             &
+impure subroutine dodpc3                                                 &
     ( ipr, lunrpt,                                                       &
     isodr, implct, didvcv, dovcv, redoj, anajac,                         &
     n, m, np, nq, npp,                                                   &
@@ -846,7 +842,8 @@ subroutine dodpc3                                                             &
 !***End Prologue  DODPC3
 !
 !...Used modules
-   use odrpack_kinds,only: wp
+   use odrpack_kinds, only: wp
+   use odrpack_core, only: dppt
 !
 !...Scalar arguments
    real(kind = wp)                                                       &
@@ -870,12 +867,7 @@ subroutine dodpc3                                                             &
    integer                                                               &
     d1, d2, d3, d4, d5, i, j, k, l, nplm1
    character fmt1*90
-!
-!...External functions
-   real(kind = wp)                                                       &
-    dppt
-   external                                                              &
-    dppt
+
 !
 !...Variable Definitions (alphabetically)
 !       ANAJAC:  The variable designating whether the JACOBIANS are computed
@@ -1387,7 +1379,7 @@ subroutine dodpc3                                                             &
 !
 end subroutine dodpc3
 
-subroutine dodpcr                                                             &
+impure subroutine dodpcr                                                 &
     ( ipr, lunrpt,                                                       &
     head, prtpen, fstitr, didvcv, iflag,                                 &
     n, m, np, nq, npp, nnzw,                                             &
@@ -1410,6 +1402,7 @@ subroutine dodpcr                                                             &
 !
 !...Used modules
    use odrpack_kinds,only: wp
+   use odrpack_core, only: dflags
 !
 !...Scalar arguments
    real(kind = wp)                                                       &
@@ -1436,10 +1429,9 @@ subroutine dodpcr                                                             &
    logical                                                               &
     anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
    character typ*3
-!
+
 !...External subroutines
-   external                                                              &
-    dflags, dodpc1, dodpc2, dodpc3, dodphd
+   external :: dodpc1, dodpc2, dodpc3, dodphd
 !
 !...Variable Definitions (alphabetically)
 !       ACTRED:  The actual relative reduction in the sum-of-squares.
@@ -1613,7 +1605,7 @@ subroutine dodpcr                                                             &
 !
 end subroutine dodpcr
 
-subroutine dodpe1                                                             &
+impure subroutine dodpe1                                                 &
     ( unit, info, d1, d2, d3, d4, d5,                                    &
     n, m, nq,                                                            &
     ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd,                            &
@@ -2127,7 +2119,7 @@ subroutine dodpe1                                                             &
     (/' ERROR :  LOWER has incorrect size. ')
 end subroutine dodpe1
 
-subroutine dodpe2                                                             &
+impure subroutine dodpe2                                                 &
     ( unit,                                                              &
     n, m, np, nq,                                                        &
     fjacb, fjacd,                                                        &
@@ -2416,7 +2408,7 @@ subroutine dodpe2                                                             &
     (10X,'X(',I2,',',I2,')',1X,1P,3E16.8)
 end subroutine dodpe2
 
-subroutine dodpe3                                                             &
+impure subroutine dodpe3                                                  &
     ( unit, d2, d3)
 !***Begin Prologue  DODPE3
 !***Refer to  ODR
@@ -2503,7 +2495,7 @@ subroutine dodpe3                                                             &
     ' continue.')
 end subroutine dodpe3
 
-subroutine dodper                                                             &
+impure subroutine dodper                                                 &
     ( info, lunerr,                                                      &
     n, m, np, nq,                                                        &
     ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd,                            &
@@ -2683,7 +2675,7 @@ subroutine dodper                                                             &
 !
 end subroutine dodper
 
-subroutine dodphd                                                             &
+impure subroutine dodphd                                                 &
     ( head, unit)
 !***Begin Prologue  DODPHD
 !***Refer to  ODR
