@@ -1,60 +1,12 @@
 module odrpack
 
    use odrpack_kinds, only: wp
+   use odrpack_core, only: fcn_t, tempret, doddrv
    implicit none
    private
 
-   public :: odr, tempret
-
-   ! A temporary work array for holding return values before copying to a lower rank array.
-   real(kind=wp), allocatable :: tempret(:, :)
-
-   abstract interface
-      subroutine fcn_t(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, ldifx, &
-                       ideval, f, fjacb, fjacd, istop)
-      !! User-supplied subroutine for evaluating the model.
-         import :: wp
-         integer, intent(in) :: n
-            !! Number of observations.
-         integer, intent(in) :: m
-            !! Number of columns of data in the independent variable.
-         integer, intent(in) :: np
-            !! Number of function parameters.
-         integer, intent(in) :: nq
-            !! Number of responses per observation.
-         integer, intent(in) :: ldn
-            !! Leading dimension declarator equal or exceeding `n`.
-         integer, intent(in) :: ldm
-            !! Leading dimension declarator equal or exceeding `m`.
-         integer, intent(in) :: ldnp
-            !! Leading dimension declarator equal or exceeding `np`.
-         real(kind=wp), intent(in) :: beta(np)
-            !! Current values of parameters.
-         real(kind=wp), intent(in) :: xplusd(ldn, m)
-            !! Current value of explanatory variable, i.e., `x + delta`.
-         integer, intent(in) :: ifixb(np)
-            !! Indicators for "fixing" parameters (`beta`).
-         integer, intent(in) :: ifixx(ldifx, m)
-            !!  Indicators for "fixing" explanatory variable (`x`).	
-         integer, intent(in) :: ldifx
-            !! Leading dimension of array `ifixx`.
-         integer, intent(in) :: ideval
-            !! Indicator for selecting computation to be performed.
-         real(kind=wp), intent(out) :: f(ldn, nq)
-            !! Predicted function values.
-         real(kind=wp), intent(out) :: fjacb(ldn, ldnp, nq)
-            !! Jacobian with respect to `beta`.
-         real(kind=wp), intent(out) :: fjacd(ldn, ldm, nq)
-            !! Jacobian with respect to errors `delta`.
-         integer, intent(out) :: istop
-            !! Stopping condition, with meaning as follows. 0 means current `beta` and
-            !! `x+delta` were acceptable and values were computed successfully. 1 means current
-            !! `beta` and `x+delta` are not acceptable;  ODRPACK95 should select values closer
-            !! to most recently used values if possible. -1 means current `beta` and `x+delta`
-            !! are not acceptable; ODRPACK95 should stop.
-      end subroutine fcn_t
-   end interface
-
+   public :: odr, dodcnt
+   
 contains
 
    subroutine odr &
@@ -203,6 +155,10 @@ contains
       real(kind=wp), pointer, save :: lwork(:)
       integer, pointer, save :: liwork(:)  
       logical :: head
+
+      ! External ODRPACK procedures
+      ! @todo: place in module
+      external :: dodphd, dodpe1
 
       ! Set LINFO to zero indicating no errors have been found thus far
       linfo = 0
@@ -747,7 +703,7 @@ contains
          !! The independent variable.
       integer, intent(in) :: ldx
          !! The leading dimension of array `x`.
-      real(kind=wp), intent(in) :: we(ldwe, ld2we, nq)
+      real(kind=wp), intent(inout) :: we(ldwe, ld2we, nq)
          !! The `epsilon` weights.
       integer, intent(in) :: ldwe
          !! The leading dimension of array `we`.
@@ -821,10 +777,7 @@ contains
    
       ! Local arrays
       real(kind=wp) :: pnlty(1, 1, 1)
-   
-      ! External subroutines
-      external :: doddrv
-   
+     
       ! Variable Definitions (alphabetically)
       !  BETA:    The function parameters.
       !  CNVTOL:  The convergence tolerance for implicit models.

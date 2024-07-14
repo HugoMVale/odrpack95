@@ -816,7 +816,7 @@ subroutine devjac &
 ! Revision Date  920304   (YYMMDD)
 
    use odrpack_kinds, only: wp, zero
-   use odrpack, only: tempret
+   use odrpack_core, only: tempret
 
    procedure() :: fcn
       !! The user-supplied subroutine for evaluating the model.
@@ -4203,7 +4203,7 @@ subroutine dodstp &
 ! Revision Date  920619   (YYMMDD)
 
    use odrpack_kinds, only: wp, zero, one
-   use odrpack, only: tempret
+   use odrpack_core, only: tempret
 
    integer, intent(in) :: n
       !! The number of observations.
