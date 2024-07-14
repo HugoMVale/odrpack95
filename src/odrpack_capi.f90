@@ -23,35 +23,52 @@ module odrpack_capi
       !! User-supplied subroutine for evaluating the model.
          import :: c_int, c_double
          integer(c_int), intent(in) :: n
+            !! Number of observations.
          integer(c_int), intent(in) :: m
+            !! Number of columns of data in the independent variable.
          integer(c_int), intent(in) :: np
+            !! Number of function parameters.
          integer(c_int), intent(in) :: nq
+            !! Number of responses per observation.
          integer(c_int), intent(in) :: ldn
+            !! Leading dimension declarator equal or exceeding `n`.
          integer(c_int), intent(in) :: ldm
+            !! Leading dimension declarator equal or exceeding `m`.
          integer(c_int), intent(in) :: ldnp
+            !! Leading dimension declarator equal or exceeding `np`.
          real(c_double), intent(in) :: beta(np)
+            !! Current values of parameters.
          real(c_double), intent(in) :: xplusd(ldn, m)
+            !! Current value of explanatory variable, i.e., `x + delta`.
          integer(c_int), intent(in) :: ifixb(np)
+            !! Indicators for "fixing" parameters (`beta`).
          integer(c_int), intent(in) :: ifixx(ldifx, m)
+            !! Indicators for "fixing" explanatory variable (`x`).
          integer(c_int), intent(in) :: ldifx
+            !! Leading dimension of array `ifixx`.
          integer(c_int), intent(in) :: ideval
+            !! Indicator for selecting computation to be performed.
          real(c_double), intent(out) :: f(ldn, nq)
+            !! Predicted function values.
          real(c_double), intent(out) :: fjacb(ldn, ldnp, nq)
+            !! Jacobian with respect to `beta`.
          real(c_double), intent(out) :: fjacd(ldn, ldm, nq)
+            !! Jacobian with respect to errors `delta`.
          integer(c_int), intent(out) :: istop
+            !! Stopping condition.
       end subroutine
    end interface
 
    interface
       integer(c_int) function strlen(string) bind(C)
-      !! Length of a C-string
+      !! Length of a C-string.
          import :: c_int, c_ptr
          type(c_ptr), intent(in), value :: string
       end function
    end interface
 
    type, bind(C) :: workidx_t
-   !! Work array indices
+   !! 0-based indices of the variables stored in the real work array.
       integer(c_int) :: delta
       integer(c_int) :: eps
       integer(c_int) :: xplus
@@ -109,7 +126,7 @@ module odrpack_capi
 contains
 
    subroutine odr_basic_c(fcn, n, m, np, nq, beta, y, x, lower, upper, job) bind(C)
-   !! "Basic" wrapper for the ODR routine including mandatory arguments and very few optional
+   !! "Basic" wrapper for the `odr` routine including mandatory arguments and very few optional
    !! arguments.
       procedure(fcn_tc) :: fcn
          !! User-supplied subroutine for evaluating the model.
@@ -149,7 +166,7 @@ contains
       job, &
       iprint, lunerr, lunrpt, &
       info) bind(C)
-   !! "Short" wrapper for the ODR routine including mandatory arguments and most commonly used 
+   !! "Short" wrapper for the `odr` routine including mandatory arguments and most commonly used 
    !! optional arguments. Similar to the short-call statement of the original ODRPACK `DODR`. 
       procedure(fcn_tc) :: fcn
          !! User-supplied subroutine for evaluating the model.
@@ -218,7 +235,7 @@ contains
       sstol, partol, maxit, &
       iprint, lunerr, lunrpt, &
       info) bind(C)
-   !! "Long" wrapper for the ODR routine including mandatory arguments and all optional
+   !! "Long" wrapper for the `odr` routine including mandatory arguments and all optional
    !! arguments.
       procedure(fcn_tc) :: fcn
          !! User-supplied subroutine for evaluating the model.
@@ -313,10 +330,10 @@ contains
    subroutine open_file(lun, filename_cptr, ierr) bind(C)
    !! Open a new file associated with a specified logical unit number.
       integer(c_int), intent(inout) :: lun
-         !! Logical unit number. If `lun>0`, the user-supplied logical unit number is used.
+         !! Logical unit number. If `lun > 0`, the user-supplied logical unit number is used.
          !! Otherwise, a new logical unit number is assigned.
       type(c_ptr), intent(in), value :: filename_cptr
-         !! String containing the file name.
+         !! C-string containing the file name.
       integer(c_int), intent(out) :: ierr
          !! Error code returned by `iostat`.
 
@@ -353,7 +370,7 @@ contains
    end subroutine close_file
 
    subroutine dwinf_c(n, m, np, nq, ldwe, ld2we, isodr, workidx) bind(C)
-   !! Set storage locations within real work space
+   !! Get storage locations within real work space.
       integer(c_int), intent(in) :: n
          !! Number of observations.
       integer(c_int), intent(in) :: m
@@ -367,7 +384,8 @@ contains
       integer(c_int), intent(in) :: ld2we
          !! Second dimension of array `we`.
       logical(c_bool), intent(in) :: isodr
-         !!Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
+         !! Variable designating whether the solution is by ODR (`isodr = .true.`) or 
+         !! by OLS (`isodr = .false.`).
       type(workidx_t), intent(out) :: workidx
          !! 0-based indexes of real work array.
 
