@@ -87,6 +87,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 !...Used modules
    use odrpack, only: odr
    use odrpack_kinds, only: wp
+   use odrpack_core, only: dwght
    implicit none
 
 !...Parameters
@@ -243,16 +244,6 @@ subroutine dodrx(tstfac, passed, lunsum)
       (idpymp(i), i=1, 23) &
       /1, 1, 3, 1, 1, 4, 1, 1, 2, 1, 1023, 40100, 2, 2, 3, 90100, 91000, 2, 90010, &
       90020, 90010, 21, 1/
-
-!...Interface blocks
-   interface
-      subroutine dwght &
-         (n, m, wt, ldwt, ld2wt, t, wtt)
-         use odrpack_kinds, only: wp
-         integer :: ldwt, ld2wt, m, n
-         real(kind=wp) :: t(:, :), wt(:, :, :), wtt(:, :)
-      end subroutine
-   end interface
 
 !...Routine names used as subprogram arguments
 !       DODRXF:  The user-supplied routine for evaluating the model.
