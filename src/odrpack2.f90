@@ -1063,7 +1063,7 @@ subroutine devjac &
 end subroutine devjac
 
 subroutine dfctr(oksemi, a, lda, n, info)
-!! Factor the positive (semi)definite matrix A using a modified Cholesky factorization.
+!! Factor the positive (semi)definite matrix `a` using a modified Cholesky factorization.
 !! (adapted from LINPACK subroutine DPOFA)
 ! Routines Called  DDOT
 ! Date Written   910706   (YYMMDD)
@@ -5247,7 +5247,9 @@ end subroutine dpack
 real(kind=wp) function dppnml(p) result(dppnmlr)
 !! Compute the percent point function value for the normal (Gaussian) distribution with mean 0
 !! and standard deviation 1, and with probability density function
-!!       F(X) = (1/SQRT(2*PI))*EXP(-X*X/2).
+!!
+!!       `f(x) = (1/sqrt(2*pi))*exp(-x^2/2)`
+!!
 !! (Adapted from DATAPAC subroutine TPPF, with modifications to facilitate conversion to
 !! REAL automatically).
 ! Routines Called  (NONE)
