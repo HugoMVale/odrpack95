@@ -1,5 +1,5 @@
-module example4_fnc
-!! Model function for example4.
+module example4_model
+!! Model for example4.
 
    use odrpack_kinds, only: wp, one, zero
    implicit none
@@ -92,7 +92,7 @@ contains
 
    end subroutine mpf
 
-end module example4_fnc
+end module example4_model
 
 program example4
 !! Default ODR job, with parameter bounds.
@@ -105,7 +105,7 @@ program example4
 !! run the code, and compare the results to the current call statement.
    use odrpack_kinds, only: wp
    use odrpack, only: odr
-   use example4_fnc, only: fcn
+   use example4_model, only: fcn
    implicit none
 
    real(kind=wp) :: beta(3) = [1.1E-0_wp, 3.3E+0_wp, 8.7_wp]

@@ -1,5 +1,5 @@
-module example1_fnc
-!! Model function for example1.
+module example1_model
+!! Model for example1.
 
    use odrpack_kinds, only: wp, one, zero
    implicit none
@@ -8,7 +8,7 @@ contains
 
    pure subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
                        ldifx, ideval, f, fjacb, fjacd, istop)
-
+   !! User-supplied subroutine for evaluating the model.
       integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
       integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
       real(kind=wp), intent(in) :: beta(np), xplusd(ldn, m)
@@ -51,13 +51,13 @@ contains
 
    end subroutine fcn
 
-end module example1_fnc
+end module example1_model
 
 program example1
 !! Explicit ODR job, with user-supplied analytic derivatives and nondefault ifixx.
    use odrpack, only: odr
    use odrpack_kinds, only: wp
-   use example1_fnc, only: fcn
+   use example1_model, only: fcn
    implicit none
 
    ! Variable declarations

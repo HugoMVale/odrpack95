@@ -1,5 +1,5 @@
-module example3_fnc
-!! Model function for example3.
+module example3_model
+!! Model for example3.
 
    use odrpack_kinds, only: wp, one, zero
    implicit none
@@ -8,7 +8,7 @@ contains
 
    pure subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
                        ldifx, ideval, f, fjacb, fjacd, istop)
-
+   !! User-supplied subroutine for evaluating the model.
       integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
       integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
       real(kind=wp), intent(in) :: beta(np), xplusd(ldn, m)
@@ -47,7 +47,7 @@ contains
 
    end subroutine fcn
 
-end module example3_fnc
+end module example3_model
 
 program example3
 !! Explicit ODR job, with parameter bounds, weights, delta initialized by user, and central
@@ -55,7 +55,7 @@ program example3
 
    use odrpack_kinds, only: wp
    use odrpack, only: odr
-   use example3_fnc, only: fcn
+   use example3_model, only: fcn
    implicit none
 
    ! Variable declarations
