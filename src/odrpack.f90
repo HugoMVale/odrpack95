@@ -76,52 +76,52 @@ contains
    !! Driver routine for finding the weighted explicit or implicit orthogonal distance
    !! regression (ODR) or ordinary linear or nonlinear least squares (OLS) solution (long call
    !! statement).
-      ! Date Written:   860529   (YYMMDD)
-      ! Revision Date:  20040301 (YYYYMMDD)
-      ! Category No.:  G2E,I1B1
-      ! Keywords:  Orthogonal distance regression,
-      !   Nonlinear least squares,
-      !   Measurement error models,
-      !   Errors in variables
-      ! Authors:
-      !   Boggs, Paul T.
-      !     Applied and Computational Mathematics Division
-      !     National Institute of Standards and Technology
-      !     Gaithersburg, MD 20899
-      !   Byrd, Richard H.
-      !     Department of Computer Science
-      !     University of Colorado, Boulder, CO 80309
-      !   Rogers, Janet E.
-      !     Applied and Computational Mathematics Division
-      !     National Institute of Standards and Technology
-      !     Boulder, CO 80303-3328
-      !   Schnabel, Robert B.
-      !     Department of Computer Science
-      !     University of Colorado, Boulder, CO 80309
-      !     and
-      !     Applied and Computational Mathematics Division
-      !     National Institute of Standards and Technology
-      !     Boulder, CO 80303-3328
-      ! Purpose:  REAL (KIND=wp) driver routine for finding the weighted explicit or implicit
-      !   orthogonal distance regression (ODR) or ordinary linear or nonlinear least squares (OLS)
-      !   solution (long call statement)
-      ! Description:
-      !   For details, see ODRPACK95 User's Reference Guide.
-      ! References:
-      !   Boggs, P. T., R. H. Byrd, J. R. Donaldson, and R. B. Schnabel (1989),
-      !     "Algorithm 676 --- ODRPACK: Software for Weighted Orthogonal Distance Regression,"
-      !     ACM Trans. Math. Software., 15(4):348-364.
-      !       Boggs, P. T., R. H. Byrd, J. E. Rogers, and
-      !   R. B. Schnabel (1992),
-      !     "User's Reference Guide for ODRPACK Version 2.01,
-      !     Software for Weighted Orthogonal Distance Regression,"
-      !     National Institute of Standards and Technology
-      !     Internal Report Number 92-4834.
-      !  Boggs, P. T., R. H. Byrd, and R. B. Schnabel (1987),
-      !    "A Stable and Efficient Algorithm for Nonlinear Orthogonal Distance Regression,"
-      !    SIAM J. Sci. Stat. Comput., 8(6):1052-1078.
+   ! Date Written:   860529   (YYMMDD)
+   ! Revision Date:  20040301 (YYYYMMDD)
+   ! Category No.:  G2E,I1B1
+   ! Keywords:  Orthogonal distance regression,
+   !   Nonlinear least squares,
+   !   Measurement error models,
+   !   Errors in variables
+   ! Authors:
+   !   Boggs, Paul T.
+   !     Applied and Computational Mathematics Division
+   !     National Institute of Standards and Technology
+   !     Gaithersburg, MD 20899
+   !   Byrd, Richard H.
+   !     Department of Computer Science
+   !     University of Colorado, Boulder, CO 80309
+   !   Rogers, Janet E.
+   !     Applied and Computational Mathematics Division
+   !     National Institute of Standards and Technology
+   !     Boulder, CO 80303-3328
+   !   Schnabel, Robert B.
+   !     Department of Computer Science
+   !     University of Colorado, Boulder, CO 80309
+   !     and
+   !     Applied and Computational Mathematics Division
+   !     National Institute of Standards and Technology
+   !     Boulder, CO 80303-3328
+   ! Purpose:  REAL (KIND=wp) driver routine for finding the weighted explicit or implicit
+   !   orthogonal distance regression (ODR) or ordinary linear or nonlinear least squares (OLS)
+   !   solution (long call statement)
+   ! Description:
+   !   For details, see ODRPACK95 User's Reference Guide.
+   ! References:
+   !   Boggs, P. T., R. H. Byrd, J. R. Donaldson, and R. B. Schnabel (1989),
+   !     "Algorithm 676 --- ODRPACK: Software for Weighted Orthogonal Distance Regression,"
+   !     ACM Trans. Math. Software., 15(4):348-364.
+   !       Boggs, P. T., R. H. Byrd, J. E. Rogers, and
+   !   R. B. Schnabel (1992),
+   !     "User's Reference Guide for ODRPACK Version 2.01,
+   !     Software for Weighted Orthogonal Distance Regression,"
+   !     National Institute of Standards and Technology
+   !     Internal Report Number 92-4834.
+   !  Boggs, P. T., R. H. Byrd, and R. B. Schnabel (1987),
+   !    "A Stable and Efficient Algorithm for Nonlinear Orthogonal Distance Regression,"
+   !    SIAM J. Sci. Stat. Comput., 8(6):1052-1078.
 
-      use odrpack_kinds, only: wp, negone, ZERO
+      use odrpack_kinds, only: negone, zero
 
       procedure(fcn_t) :: fcn
          !! User-supplied subroutine for evaluating the model.
@@ -146,9 +146,11 @@ contains
       real(kind=wp), intent(in), optional :: wd(:, :, :)
          !! `delta` weights. `Shape: (1<=ldwd<=n, 1<=ld2wd<=m, m)`. See p. 26.
       integer, intent(in), optional :: ifixb(:)
-         !! Values designating whether the elements of `beta` are fixed at their input values or not. `Shape: (np)`.
+         !! Values designating whether the elements of `beta` are fixed at their input values
+         !! or not. `Shape: (np)`.
       integer, intent(in), optional :: ifixx(:, :)
-         !! Values designating whether the elements of `x` are fixed at their input values or not. `Shape: (1<=ldifx<=n, m)`. See p. 27.
+         !! Values designating whether the elements of `x` are fixed at their input values
+         !! or not. `Shape: (1<=ldifx<=n, m)`. See p. 27.
       integer, intent(in), optional :: job
          !! Variable controlling problem initialization and computational method.
       integer, intent(in), optional :: ndigit
@@ -168,9 +170,11 @@ contains
       integer, intent(in), optional :: lunrpt
          !! Logical unit number for computation reports.
       real(kind=wp), intent(in), optional :: stpb(:)
-         !! Relative step for computing finite difference derivatives with respect to `beta`. `Shape: (np)`.
+         !! Relative step for computing finite difference derivatives with respect to `beta`.
+         !! `Shape: (np)`.
       real(kind=wp), intent(in), optional :: stpd(:, :)
-         !! Relative step for computing finite difference derivatives with respect to `delta`. `Shape: (1<=ldstpd<=n, m)`. See p. 31.
+         !! Relative step for computing finite difference derivatives with respect to `delta`.
+         !! `Shape: (1<=ldstpd<=n, m)`. See p. 31.
       real(kind=wp), intent(in), optional :: sclb(:)
       !! Scaling values for `beta`. `Shape: (np)`.
       real(kind=wp), intent(in), optional :: scld(:, :)
@@ -199,9 +203,6 @@ contains
       real(kind=wp), pointer, save :: lwork(:)
       integer, pointer, save :: liwork(:)  
       logical :: head
-
-      ! TODO: interface or inside module?
-      external :: dodcnt
 
       ! Set LINFO to zero indicating no errors have been found thus far
       linfo = 0
@@ -382,15 +383,15 @@ contains
       end if
 
       ! Set array variable defaults except IWORK
-      lwork(1:n*m) = ZERO
+      lwork(1:n*m) = zero
       lifixb(1) = -1
       lifixx(1, 1) = -1
-      llower(1:np) = -huge(ZERO)
+      llower(1:np) = -huge(zero)
       lsclb(1) = negone
       lscld(1, 1) = negone
       lstpb(1) = negone
       lstpd(1, 1) = negone
-      lupper(1:np) = huge(ZERO)
+      lupper(1:np) = huge(zero)
       lwe(1, 1, 1) = negone
       lwd(1, 1, 1) = negone
 
@@ -467,7 +468,7 @@ contains
          if (size(sclb) .lt. np) then
             linfo1 = linfo1 + 1024
          end if
-         if (sclb(1) .le. ZERO) then
+         if (sclb(1) .le. zero) then
             lsclb(1) = sclb(1)
          else
             lsclb(1:np) = sclb(1:np)
@@ -479,14 +480,14 @@ contains
          if (any(size(scld) .le. (/0, 0/))) then
             linfo1 = linfo1 + 2048
          end if
-         if (.not. (scld(1, 1) .le. ZERO .or. ldscld .eq. 1 .or. ldscld .ge. n) &
+         if (.not. (scld(1, 1) .le. zero .or. ldscld .eq. 1 .or. ldscld .ge. n) &
              .or. size(scld, 2) .lt. m) then
             linfo1 = linfo1 + 2048
          end if
          if (ldscld .gt. n) then
             ldscld = n
          end if
-         if (scld(1, 1) .le. ZERO) then
+         if (scld(1, 1) .le. zero) then
             lscld(1, 1) = scld(1, 1)
          else
             lscld(1:ldscld, 1:m) = scld(1:ldscld, 1:m)
@@ -501,7 +502,7 @@ contains
          if (size(stpb) .lt. np) then
             linfo1 = linfo1 + 256
          end if
-         if (stpb(1) .le. ZERO) then
+         if (stpb(1) .le. zero) then
             lstpb(1) = stpb(1)
          else
             lstpb(1:np) = stpb(1:np)
@@ -513,14 +514,14 @@ contains
          if (any(size(stpd) .le. (/0, 0/))) then
             linfo1 = linfo1 + 512
          end if
-         if (.not. (stpd(1, 1) .le. ZERO .or. ldstpd .eq. 1 .or. ldstpd .ge. n) &
+         if (.not. (stpd(1, 1) .le. zero .or. ldstpd .eq. 1 .or. ldstpd .ge. n) &
              .or. size(stpd, 2) .lt. m) then
             linfo1 = linfo1 + 512
          end if
          if (ldstpd .gt. n) then
             ldstpd = n
          end if
-         if (stpd(1, 1) .le. ZERO) then
+         if (stpd(1, 1) .le. zero) then
             lstpd(1, 1) = stpd(1, 1)
          else
             lstpd(1:ldstpd, 1:m) = stpd(1:ldstpd, 1:m)
@@ -537,7 +538,7 @@ contains
          if (any(size(we) .le. (/0, 0, 0/))) then
             linfo1 = linfo1 + 16
          end if
-         if (.not. (we(1, 1, 1) .lt. ZERO .or. &
+         if (.not. (we(1, 1, 1) .lt. zero .or. &
                     ((ldwe .eq. 1 .or. ldwe .ge. n) .and. &
                      (ld2we .eq. 1 .or. ld2we .ge. nq))) .or. size(we, 3) .lt. nq) then
             linfo1 = linfo1 + 16
@@ -548,7 +549,7 @@ contains
          if (ld2we .gt. nq) then
             ld2we = nq
          end if
-         if (we(1, 1, 1) .lt. ZERO) then
+         if (we(1, 1, 1) .lt. zero) then
             lwe(1, 1, 1) = we(1, 1, 1)
          else
             lwe(1:ldwe, 1:ld2we, 1:nq) = we(1:ldwe, 1:ld2we, 1:nq)
@@ -561,7 +562,7 @@ contains
          if (any(size(wd) .le. (/0, 0, 0/))) then
             linfo1 = linfo1 + 32
          end if
-         if (.not. (wd(1, 1, 1) .lt. ZERO .or. &
+         if (.not. (wd(1, 1, 1) .lt. zero .or. &
                     ((ldwd .eq. 1 .or. ldwd .ge. n) .and. &
                      (ld2wd .eq. 1 .or. ld2wd .ge. m))) .or. size(wd, 3) .lt. m) then
             linfo1 = linfo1 + 32
@@ -710,670 +711,292 @@ contains
 
    end subroutine odr
 
+   subroutine dodcnt &
+      (fcn, n, m, np, nq, beta, y, ldy, x, ldx, &
+       we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
+       job, ndigit, taufac, sstol, partol, maxit, iprint, lunerr, lunrpt, &
+       stpb, stpd, ldstpd, sclb, scld, ldscld, &
+       work, lwork, iwork, liwork, &
+       info, &
+       lower, upper)
+   !! Driver routine for finding the weighted explicit or implicit orthogonal distance
+   !! regression (ODR) or ordinary linear or nonlinear least squares (OLS) solution.
+   ! Routines Called  DODDRV
+   ! Date Written   860529   (YYMMDD)
+   ! Revision Date  920304   (YYMMDD)
+   
+      use odrpack_kinds, only: zero, one, three
+   
+      procedure(fcn_t) :: fcn
+         !! User-supplied subroutine for evaluating the model.
+      integer, intent(in) :: n
+         !! The number of observations.
+      integer, intent(in) :: m
+         !! The number of columns of data in the independent variable.
+      integer, intent(in) :: np
+         !! The number of function parameters.
+      integer, intent(in) :: nq
+         !! The number of responses per observation.
+      real(kind=wp), intent(inout) :: beta(np)
+         !! The function parameters.
+      real(kind=wp), intent(in) :: y(ldy, nq)
+         !! The dependent variable. Unused when the model is implicit.
+      integer, intent(in) :: ldy
+         !! The leading dimension of array `y`.
+      real(kind=wp), intent(in) :: x(ldx, m)
+         !! The independent variable.
+      integer, intent(in) :: ldx
+         !! The leading dimension of array `x`.
+      real(kind=wp), intent(in) :: we(ldwe, ld2we, nq)
+         !! The `epsilon` weights.
+      integer, intent(in) :: ldwe
+         !! The leading dimension of array `we`.
+      integer, intent(in) :: ld2we
+         !! The second dimension of array `we`.
+      real(kind=wp), intent(in) :: wd(ldwd, ld2wd, m)
+         !! The `delta` weights.
+      integer, intent(in) :: ldwd
+         !! The leading dimension of array `wd`.
+      integer, intent(in) :: ld2wd
+         !! The second dimension of array `wd`.
+      integer, intent(in) :: ifixb(np)
+         !! The values designating whether the elements of `beta` are fixed at their input
+         !! values or not.
+      integer, intent(in) :: ifixx(ldifx, m)
+         !! The values designating whether the elements of `x` are fixed at their input values
+         !! or not.
+      integer, intent(in) :: ldifx
+         !! The leading dimension of array `ifixx`.
+      integer, intent(in) :: job
+         !! The variable controlling problem initialization and computational method.
+      integer, intent(in) :: ndigit
+         !! The number of accurate digits in the function results, as supplied by the user.
+      real(kind=wp), intent(in) :: taufac
+         !! The factor used to compute the initial trust region diameter.
+      real(kind=wp), intent(in) :: sstol
+         !! The sum-of-squares convergence stopping tolerance.
+      real(kind=wp), intent(in) :: partol
+         !! The user-supplied parameter convergence stopping tolerance.
+      integer, intent(in) :: maxit
+         !! The maximum number of iterations allowed.
+      integer, intent(in) :: iprint
+         !! The print control variables.
+      integer, intent(in) :: lunerr
+         !! The logical unit number used for error messages.
+      integer, intent(in) :: lunrpt
+         !! The logical unit number used for computation reports.
+      real(kind=wp), intent(in) :: stpb(np)
+         !! The relative step for computing finite difference derivatives with respect to `beta`.
+      real(kind=wp), intent(in) :: stpd(ldstpd, m)
+         !! The relative step for computing finite difference derivatives with respect to `delta`.
+      integer, intent(in) :: ldstpd
+         !! The leading dimension of array `stpd`.
+      real(kind=wp), intent(in) :: sclb(np)
+         !! The scaling values for `beta`.
+      real(kind=wp), intent(in) :: scld(ldscld, m)
+         !! The scaling value for `delta`.
+      integer, intent(in) :: ldscld
+         !! The leading dimension of array `scld`.
+      real(kind=wp), intent(inout) :: work(lwork)
+         !! The real work space.
+      integer, intent(in) :: lwork
+         !! The length of vector `work`.
+      integer, intent(inout) :: iwork(liwork)
+         !! The integer work space.
+      integer, intent(in) :: liwork
+         !! The length of vector `iwork`.
+      integer, intent(out) :: info
+         !! The variable designating why the computations were stopped.
+      real(kind=wp), intent(in) :: lower(np)
+         !! The lower bound on `beta`.
+      real(kind=wp), intent(in) :: upper(np)
+         !! The upper bound on `beta`.
+   
+      ! Local scalars
+      real(kind=wp), parameter :: pcheck = 1.0E3_wp, pstart = 1.0E1_wp, pfac = 1.0E1_wp
+      real(kind=wp) :: cnvtol, tstimp
+      integer :: iprnti, ipr1, ipr2, ipr2f, ipr3, jobi, job1, job2, job3, job4, job5, &
+                 maxiti, maxit1
+      logical :: done, fstitr, head, implct, prtpen
+   
+      ! Local arrays
+      real(kind=wp) :: pnlty(1, 1, 1)
+   
+      ! External subroutines
+      external :: doddrv
+   
+      ! Variable Definitions (alphabetically)
+      !  BETA:    The function parameters.
+      !  CNVTOL:  The convergence tolerance for implicit models.
+      !  DONE:    The variable designating whether the inplicit solution has been found (DONE=TRUE)
+      !           or not (DONE=FALSE).
+      !  FCN:     The user-supplied subroutine for evaluating the model.
+      !  FSTITR:  The variable designating whether this is the first iteration (FSTITR=TRUE)
+      !           or not (FSTITR=FALSE).
+      !  HEAD:    The variable designating whether the heading is to be printed (HEAD=TRUE)
+      !           or not (HEAD=FALSE).
+      !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
+      !           values or not.
+      !  IFIXX:   The values designating whether the elements of X are fixed at their input
+      !           values or not.
+      !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
+      !           or explicit ODR (IMPLCT=FALSE).
+      !  INFO:    The variable designating why the computations were stopped.
+      !  IPRINT:  The print control variables.
+      !  IPRNTI:  The print control variables.
+      !  IPR1:    The 1st digit of the print control variable.
+      !  IPR2:    The 2nd digit of the print control variable.
+      !  IPR3:    The 3rd digit of the print control variable.
+      !  IPR4:    The 4th digit of the print control variable.
+      !  IWORK:   The integer work space.
+      !  JOB:     The variable controling problem initialization and computational method.
+      !  JOBI:    The variable controling problem initialization and computational method.
+      !  JOB1:    The 1st digit of the variable JOB.
+      !  JOB2:    The 2nd digit of the variable JOB.
+      !  JOB3:    The 3rd digit of the variable JOB.
+      !  JOB4:    The 4th digit of the variable JOB.
+      !  JOB5:    The 5th digit of the variable JOB.
+      !  LDIFX:   The leading dimension of array IFIXX.
+      !  LDSCLD:  The leading dimension of array SCLD.
+      !  LDSTPD:  The leading dimension of array STPD.
+      !  LDWD:    The leading dimension of array WD.
+      !  LDWE:    The leading dimension of array WE.
+      !  LDX:     The leading dimension of array X.
+      !  LDY:     The leading dimension of array Y.
+      !  LD2WD:   The second dimension of array WD.
+      !  LD2WE:   The second dimension of array WE.
+      !  LIWORK:  The length of vector IWORK.
+      !  LOWER:   The lower bound for BETA.
+      !  LUNERR:  The logical unit number used for error messages.
+      !  LUNRPT:  The logical unit number used for computation reports.
+      !  LWORK:   The length of vector work.
+      !  M:       The number of columns of data in the independent variable.
+      !  MAXIT:   The maximum number of iterations allowed.
+      !  MAXITI:  For implicit models, the number of iterations allowed for the current penalty
+      !           parameter value.
+      !  MAXIT1:  For implicit models, the number of iterations allowed for the next penalty
+      !           parameter value.
+      !  N:       The number of observations.
+      !  NDIGIT:  The number of accurate digits in the function results, as supplied by the user.
+      !  NP:      The number of function parameters.
+      !  NQ:      The number of responses per observation.
+      !  PARTOL:  The user supplied parameter convergence stopping tolerance.
+      !  PCHECK:  The value designating the minimum penalty parameter allowed before the implicit
+      !           problem can be considered solved.
+      !  PFAC:    The factor for increasing the penalty parameter.
+      !  PNLTY:   The penalty parameter for an implicit model.
+      !  PRTPEN:  The value designating whether the penalty parameter is to be printed in the
+      !           iteration report (PRTPEN=TRUE) or not (PRTPEN=FALSE).
+      !  PSTART:  The factor for increasing the penalty parameter.
+      !  SCLB:    The scaling values for BETA.
+      !  SCLD:    The scaling values for DELTA.
+      !  STPB:    The relative step for computing finite difference derivatives with respect to BETA.
+      !  STPD:    The relative step for computing finite difference derivatives with respect to DELTA.
+      !  SSTOL:   The sum-of-squares convergence stopping tolerance.
+      !  TAUFAC:  The factor used to compute the initial trust region diameter.
+      !  TSTIMP:  The relative change in the parameters between the initial values and the solution.
+      !  UPPER:   The upper bound for BETA.
+      !  WD:      The DELTA weights.
+      !  WE:      The EPSILON weights.
+      !  WORK:    The real work space.
+      !  X:       The independent variable.
+      !  Y:       The dependent variable. Unused when the model is implicit.
+   
+      implct = mod(job, 10) .eq. 1
+      fstitr = .true.
+      head = .true.
+      prtpen = .false.
+   
+      if (implct) then
+         !  Set up for implicit problem
+         if (iprint .ge. 0) then
+            ipr1 = mod(iprint, 10000)/1000
+            ipr2 = mod(iprint, 1000)/100
+            ipr2f = mod(iprint, 100)/10
+            ipr3 = mod(iprint, 10)
+         else
+            ipr1 = 2
+            ipr2 = 0
+            ipr2f = 0
+            ipr3 = 1
+         end if
+         iprnti = ipr1*1000 + ipr2*100 + ipr2f*10
+   
+         job5 = mod(job, 100000)/10000
+         job4 = mod(job, 10000)/1000
+         job3 = mod(job, 1000)/100
+         job2 = mod(job, 100)/10
+         job1 = mod(job, 10)
+         jobi = job5*10000 + job4*1000 + job3*100 + job2*10 + job1
+   
+         if (we(1, 1, 1) .le. zero) then
+            pnlty(1, 1, 1) = -pstart
+         else
+            pnlty(1, 1, 1) = -we(1, 1, 1)
+         end if
+   
+         if (partol .lt. zero) then
+            cnvtol = epsilon(zero)**(one/three)
+         else
+            cnvtol = min(partol, one)
+         end if
+   
+         if (maxit .ge. 1) then
+            maxiti = maxit
+         else
+            maxiti = 100
+         end if
+   
+         done = maxiti .eq. 0
+         prtpen = .true.
+   
+         do while (.true.)
+            call doddrv &
+               (head, fstitr, prtpen, &
+                fcn, n, m, np, nq, beta, y, ldy, x, ldx, &
+                pnlty, 1, 1, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
+                jobi, ndigit, taufac, sstol, cnvtol, maxiti, &
+                iprnti, lunerr, lunrpt, &
+                stpb, stpd, ldstpd, sclb, scld, ldscld, &
+                work, lwork, iwork, liwork, &
+                maxit1, tstimp, info, lower, upper)
+   
+            if (done) then
+               return
+            else
+               done = maxit1 .le. 0 .or. (abs(pnlty(1, 1, 1)) .ge. pcheck .and. tstimp .le. cnvtol)
+            end if
+   
+            if (done) then
+               if (tstimp .le. cnvtol) then
+                  info = (info/10)*10 + 2
+               else
+                  info = (info/10)*10 + 4
+               end if
+               jobi = 10000 + 1000 + job3*100 + job2*10 + job1
+               maxiti = 0
+               iprnti = ipr3
+            else
+               prtpen = .true.
+               pnlty(1, 1, 1) = pfac*pnlty(1, 1, 1)
+               jobi = 10000 + 1000 + 000 + job2*10 + job1
+               maxiti = maxit1
+               iprnti = 0000 + ipr2*100 + ipr2f*10
+            end if
+         end do
+      else
+         ! Explicit problem
+         call doddrv &
+            (head, fstitr, prtpen, &
+             fcn, n, m, np, nq, beta, y, ldy, x, ldx, &
+             we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
+             job, ndigit, taufac, sstol, partol, maxit, &
+             iprint, lunerr, lunrpt, &
+             stpb, stpd, ldstpd, sclb, scld, ldscld, &
+             work, lwork, iwork, liwork, &
+             maxit1, tstimp, info, lower, upper)
+      end if
+   
+   end subroutine dodcnt
+
 end module odrpack
-
-subroutine doddrv                                                             &
-         ( head, fstitr, prtpen,                                              &
-         fcn, n, m, np, nq, beta, y, ldy, x, ldx,                             &
-         we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx,               &
-         job, ndigit, taufac, sstol, partol, maxit,                           &
-         iprint, lunerr, lunrpt,                                              &
-         stpb, stpd, ldstpd, sclb, scld, ldscld,                              &
-         work, lwork, iwork, liwork,                                          &
-         maxit1, tstimp, info, lower, upper)
-!***Begin Prologue  DODDRV
-!***Refer to  ODR
-!***Routines Called  FCN,DCOPY,DDOT,DETAF,DFCTRW,DFLAGS,
-!       DINIWK,DIWINF,DJCK,DNRM2,DODCHK,DODMN,
-!       DODPER,DPACK,DSETN,DUNPAC,DWGHT,DWINF
-!       DERSTEP
-!***Date Written   860529   (YYMMDD)
-!***Revision Date  920619   (YYMMDD)
-!***Purpose  Perform error checking and initialization, and begin
-!       procedure for performing orthogonal distance regression
-!       (ODR) or ordinary linear or nonlinear least squares (OLS)
-!***End Prologue  DODDRV
-!
-!...Used modules
-        use odrpack_kinds, only: wp, zero, one
-        use odrpack,only: tempret
-!
-!...Scalar arguments
-        real(kind = wp)                                                       &
-         partol, sstol, taufac, tstimp
-        integer                                                               &
-         info, iprint, job, ldifx, ldscld, ldstpd, ldwd, ldwe, ldx, ldy,      &
-         ld2wd, ld2we, liwork, lunerr, lunrpt, lwork, m, maxit, maxit1,       &
-         n, ndigit, np, nq
-        logical                                                               &
-         fstitr, head, prtpen
-!
-!...Array arguments
-        real(kind = wp)                                                       &
-         beta( np), lower( np), sclb( np), scld( ldscld, m), stpb( np),       &
-         stpd( ldstpd, m), upper( np), we( ldwe, ld2we, nq),                  &
-         wd( ldwd, ld2wd, m), work( lwork), x( ldx, m), y( ldy, nq)
-        integer                                                               &
-         ifixb( np), ifixx( ldifx, m), iwork( liwork)
-!
-!...Subroutine arguments
-        external                                                              &
-         fcn
-
-!...Local scalars
-        real(kind = wp) :: epsmac, eta, p5, ten
-        integer :: actrsi, alphai, betaci, betani, betasi, beta0i, boundi, deltai,  &
-                   deltni, deltsi, diffi, epsmai, etai, fi, fjacbi, fjacdi, fni, fsi, i, &
-                   idfi, int2i, iprini, iranki, istop, istopi, jobi, jpvti, k, ldtt,  &
-                   ldtti, liwkmn, loweri, luneri, lunrpi, lwkmn, lwrk, maxiti, msgb,    &
-                   msgd, neta, netai, nfev, nfevi, niteri, njev, njevi, nnzw, nnzwi,    &
-                   npp, nppi, nrow, nrowi, ntol, ntoli, olmavi, omegai, partli, pnormi, &
-                   prersi, qrauxi, rcondi, rnorsi, rvari, sdi, si, ssfi, ssi, sstoli,   &
-                   taufci, taui, ti, tti, ui, upperi, vcvi, we1i, wrk1i, wrk2i, wrk3i,  &
-                   wrk4i, wrk5i, wrk6i, wrk7i, wrk, wssi, wssdei, wssepi, xplusi
-        logical :: anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
-
-!...Local arrays
-        real(kind = wp) :: betaj( np)
-        integer :: interval( np)
-
-!...External functions
-        real(kind = wp), external :: ddot, dnrm2, derstep
-
-!...External subroutines
-        external :: dcopy, detaf, dfctrw, dflags, diniwk, diwinf, djck, dodchk, &
-                    dodmn, dodper, dpack, dsetn, dunpac, dwinf
-!
-!...Data statements
-        data                                                                  &
-         p5, ten                                                              &
-         /0.5E0_wp,10.0E0_wp/
-!
-!...Interface blocks
-         interface
-         subroutine dwght(n, m, wt, ldwt, ld2wt, t, wtt)
-            use odrpack_kinds, only: wp
-            integer, intent(in) :: n, m, ldwt, ld2wt
-            real(kind=wp), intent(in) :: t(:, :), wt(:, :, :)
-            real(kind=wp), intent(out) :: wtt(:, :)
-         end subroutine
-      end interface
-
-!...Routine names used as subprogram arguments
-!       FCN:     THE USER SUPPLIED SUBROUTINE FOR EVALUATING THE MODEL.
-!
-!...Variable Definitions (alphabetically)
-!       ACTRSI:  The location in array work of variable ACTRS.
-!       ALPHAI:  The location in array work of variable ALPHA.
-!       ANAJAC:  The variable designating whether the Jacobians are
-!       computed by finite differences (ANAJAC=FALSE) or not
-!       (ANAJAC=TRUE).
-!       BETA:    The function parameters.
-!       BETACI:  The starting location in array WORK of array BETAC.
-!       BETAJ:   The parameters to use in the derivative checking algorithm.
-!       BETANI:  The starting location in array WORK of array BETAN.
-!       BETASI:  The starting location in array WORK of array BETAS.
-!       BETA0I:  The starting location in array WORK of array BETA0.
-!       CDJAC:   The variable designating whether the Jacobians are
-!       Computed by central differences (CDJAC=TRUE) or forward
-!       differences (CDJAC=FALSE).
-!       CHKJAC:  The variable designating whether the user supplied
-!       Jacobians are to be checked (CHKJAC=TRUE) or not
-!       (CHKJAC=FALSE).
-!       DELTAI:  The starting location in array WORK of array DELTA.
-!       DELTNI:  The starting location in array WORK of array DELTAN.
-!       DELTSI:  The starting location in array WORK of array DELTAS.
-!       DIFFI:   The starting location in array WORK of array DIFF.
-!       DOVCV:   The variable designating whether the covariance matrix is
-!       to be computed (DOVCV=TRUE) or not (DOVCV=FALSE).
-!       EPSMAI:  The location in array WORK of variable EPSMAC.
-!       ETA:     The relative noise in the function results.
-!       ETAI:    The location in array WORK of variable ETA.
-!       FI:      The starting location in array WORK of array F.
-!       FJACBI:  The starting location in array WORK of array FJACB.
-!       FJACDI:  The starting location in array WORK of array FJACD.
-!       FNI:     The starting location in array WORK of array FN.
-!       FSI:     The starting location in array WORK of array FS.
-!       FSTITR:  The variable designating whether this is the first
-!       iteration (FSTITR=TRUE) or not (FSTITR=FALSE).
-!       HEAD:    The variable designating whether the heading is to be
-!       printed (HEAD=TRUE) or not (HEAD=FALSE).
-!       I:       An index variable.
-!       IDFI:    The location in array iwork of variable IDF.
-!       IFIXB:   The values designating whether the elements of BETA are
-!       fixed at their input values or not.
-!       IFIXX:   The values designating whether the elements of X are
-!       fixed at their input values or not.
-!       IMPLCT:  The variable designating whether the solution is by
-!       implicit ODR (IMPLCT=TRUE) or explicit ODR (IMPLCT=FALSE).
-!       INFO:    The variable designating why the computations were stopped.
-!       INITD:   The variable designating whether DELTA is to be initialized
-!       to zero (INITD=TRUE) or to the values in the first N by M
-!       elements of array WORK (INITD=FALSE).
-!       INT2I:   The location in array IWORK of variable INT2.
-!       INTERVAL: Specifies which checks can be performed when checking derivatives
-!       based on the interval of the bound constraints.
-!       IPRINI:  The location in array iwork of variable IPRINT.
-!       IPRINT:  The print control variable.
-!       IRANKI:  The location in array IWORK of variable IRANK.
-!       ISODR:   The variable designating whether the solution is by ODR
-!       (ISODR=TRUE) or by OLS (ISODR=FALSE).
-!       ISTOP:   The variable designating whether there are problems
-!       computing the function at the current BETA and DELTA.
-!       ISTOPI:  The location in array IWORK of variable ISTOP.
-!       IWORK:   The integer work space.
-!       JOB:     The variable controling problem initialization and
-!       computational method.
-!       JOBI:    The location in array IWORK of variable JOB.
-!       JPVTI:   The starting location in array IWORK of array JPVT.
-!       K:       An index variable.
-!       LDIFX:   The leading dimension of array IFIXX.
-!       LDSCLD:  The leading dimension of array SCLD.
-!       LDSTPD:  The leading dimension of array STPD.
-!       LDTT:    The leading dimension of array TT.
-!       LDTTI:   The location in array IWORK of variable LDTT.
-!       LDWD:    The leading dimension of array WD.
-!       LDWE:    The leading dimension of array WE.
-!       LDX:     The leading dimension of array X.
-!       LDY:     The leading dimension of array Y.
-!       LD2WD:   The second dimension of array WD.
-!       LD2WE:   The second dimension of array WE.
-!       LIWKMN:  The minimum acceptable length of array IWORK.
-!       LIWORK:  The length of vector IWORK.
-!       LOWER:   The lower bound for BETA.
-!       LUNERI:  The location in array IWORK of variable LUNERR.
-!       LUNERR:  The logical unit number used for error messages.
-!       LUNRPI:  The location in array IWORK of variable LUNRPT.
-!       LUNRPT:  The logical unit number used for computation reports.
-!       LWKMN:   The minimum acceptable length of array WORK.
-!       LWORK:   The length of vector WORK.
-!       LWRK:    The length of vector WRK.
-!       M:       The number of columns of data in the explanatory variable.
-!       MAXIT:   The maximum number of iterations allowed.
-!       MAXIT1:  For implicit models, the iterations allowed for the next
-!       penalty parameter value.
-!       MAXITI:  The location in array IWORK of variable MAXIT.
-!       MSGB:    The starting location in array IWORK of array MSGB.
-!       MSGD:    The starting location in ARRAY IWORK of array MSGD.
-!       N:       The number of observations.
-!       NDIGIT:  The number of accurate digits in the function results, as
-!       supplied by the user.
-!       NETA:    The number of accurate digits in the function results.
-!       NETAI:   The location in array IWORK of variable NETA.
-!       NFEV:    The number of function evaluations.
-!       NFEVI:   The location in array IWORK of variable NFEV.
-!       NITERI:  The location in array IWORK of variable NITER.
-!       NJEV:    The number of Jacobian evaluations.
-!       NJEVI:   The location in array IWORK of variable NJEV.
-!       NNZW:    The number of nonzero observational error weights.
-!       NNZWI:   The location in array IWORK of variable NNZW.
-!       NP:      The number of function parameters.
-!       NPP:     The number of function parameters being estimated.
-!       NPPI:    The location in array IWORK of variable NPP.
-!       NQ:      The number of responses per observation.
-!       NROW:    The row number at which the derivative is to be checked.
-!       NROWI:   The location in array IWORK of variable NROW.
-!       NTOL:    The number of digits of agreement required between the
-!       numerical derivatives and the user supplied derivatives,
-!       set by DJCK.
-!       NTOLI:   The location in array IWORK of variable NTOL.
-!       OLMAVI:  The location in array WORK of variable OLMAVG.
-!       OMEGAI:  The starting location in array WORK of array OMEGA.
-!       ONE:     The value 1.0E0_wp.
-!       PARTLI:  The location in array WORK of variable PARTOL.
-!       PARTOL:  The parameter convergence stopping tolerance.
-!       PNORM:   The norm of the scaled estimated parameters.
-!       PNORMI:  The location in array WORK of variable PNORM.
-!       PRERSI:  The location in array WORK of variable PRERS.
-!       PRTPEN:  The variable designating whether the penalty parameter is
-!       to be printed in the iteration report (PRTPEN=TRUE) or not
-!       (PRTPEN=FALSE).
-!       P5:      The value 0.5E0_wp.
-!       QRAUXI:  The starting location in array WORK of array QRAUX.
-!       RCONDI:  The location in array WORK of variable RCOND.
-!       REDOJ:   The variable designating whether the Jacobian matrix is to
-!       be recomputed for the computation of the covariance matrix
-!       (REDOJ=TRUE) or not (REDOJ=FALSE).
-!       RESTRT:  The variable designating whether the call is a restart
-!       (RESTRT=TRUE) or not (RESTRT=FALSE).
-!       RNORSI:  The location in array WORK of variable RNORMS.
-!       RVARI:   The location in array WORK of variable RVAR.
-!       SCLB:    The scaling values for BETA.
-!       SCLD:    The scaling values for DELTA.
-!       SDI:     The starting location in array WORK of array SD.
-!       SI:      The starting location in array WORK of array S.
-!       SSFI:    The starting location in array WORK of array SSF.
-!       SSI:     The starting location in array WORK of array SS.
-!       SSTOL:   The sum-of-squares convergence stopping tolerance.
-!       SSTOLI:  The location in array WORK of variable SSTOL.
-!       STPB:    The step size for finite difference derivatives wrt BETA.
-!       STPD:    The step size for finite difference derivatives wrt DELTA.
-!       TAUFAC:  The factor used to compute the initial trust region
-!       diameter.
-!       TAUFCI:  The location in array WORK of variable TAUFAC.
-!       TAUI:    The location in array WORK of variable TAU.
-!       TEN:     The value 10.0E0_wp.
-!       TI:      The starting location in array WORK of array T.
-!       TSTIMP:  The relative change in the parameters between the initial
-!       values and the solution.
-!       TTI:     The starting location in array WORK of array TT.
-!       UI:      The starting location in array WORK of array U.
-!       UPPER:   The upper bound for BETA.
-!       VCVI:    The starting location in array WORK of array VCV.
-!       WD:      The DELTA weights.
-!       WE:      The EPSILON weights.
-!       WE1I:    The starting location in array WORK of array WE1.
-!       WORK:    The REAL (KIND=wp) work space.
-!       WRK:     The starting location in array WORK of array WRK,
-!       equivalenced to WRK1 and WRK2.
-!       WRK1I:   The starting location in array WORK of array WRK1.
-!       WRK2I:   The starting location in array WORK of array WRK2.
-!       WRK3I:   The starting location in array WORK of array WRK3.
-!       WRK4I:   The starting location in array WORK of array WRK4.
-!       WRK5I:   The starting location in array WORK of array WRK5.
-!       WRK6I:   The starting location in array WORK of array WRK6.
-!       WRK7I:   The starting location in array WORK of array WRK7.
-!       WSSI:    The location in array WORK of variable wss.
-!       WSSDEI:  The location in array WORK of variable WSSDEL.
-!       WSSEPI:  The location in array WORK of variable WSSEPS.
-!       X:       The explanatory variable.
-!       XPLUSI:  The starting location in array WORK of array XPLUSD.
-!       Y:       The dependent variable.  Unused when the model is implicit.
-!       ZERO:    The value 0.0E0_wp.
-!
-!
-!***First executable statement  DODDRV
-!
-!
-!  Initialize necessary variables
-!
-        call dflags( job, restrt, initd, dovcv, redoj,                        &
-         anajac, cdjac, chkjac, isodr, implct)
-!
-!  Set starting locations within integer workspace
-!  (invalid values of M, NP and/or NQ are handled reasonably by DIWINF)
-!
-        call diwinf( m, np, nq,                                               &
-         msgb, msgd, jpvti, istopi,                                           &
-         nnzwi, nppi, idfi,                                                   &
-         jobi, iprini, luneri, lunrpi,                                        &
-         nrowi, ntoli, netai,                                                 &
-         maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti,                  &
-         boundi,                                                              &
-         liwkmn)
-!
-!  Set starting locations within REAL (KIND=wp) work space
-!  (invalid values of N, M, NP, NQ, LDWE and/or LD2WE
-!  are handled reasonably by DWINF)
-!
-        call dwinf( n, m, np, nq, ldwe, ld2we, isodr,                         &
-         deltai, fi, xplusi, fni, sdi, vcvi,                                  &
-         rvari, wssi, wssdei, wssepi, rcondi, etai,                           &
-         olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi,                &
-         partli, sstoli, taufci, epsmai,                                      &
-         beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui,           &
-         fsi, fjacbi, we1i, diffi,                                            &
-         deltsi, deltni, ti, tti, omegai, fjacdi,                             &
-         wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i,                     &
-         loweri, upperi,                                                      &
-         lwkmn)
-        if ( isodr) then
-           wrk = wrk1i
-           lwrk = n* m* nq+ n* nq
-        else
-           wrk = wrk2i
-           lwrk = n* nq
-        endif
-!
-!  Update the penalty parameters
-!  (WE(1,1,1) is not a user supplied array in this case)
-        if ( restrt .and. implct) then
-           we(1,1,1) = max( work( we1i)**2,abs( we(1,1,1)))
-           work( we1i) = -sqrt(abs( we(1,1,1)))
-        endif
-!
-        if ( restrt) then
-!
-!  Reset maximum number of iterations
-!
-           if ( maxit .ge. 0) then
-              iwork( maxiti) = iwork( niteri)+ maxit
-           else
-              iwork( maxiti) = iwork( niteri)+10
-           endif
-!
-           if ( iwork( niteri) .lt. iwork( maxiti)) then
-              info = 0
-           endif
-!
-           if ( job .ge. 0) iwork( jobi) = job
-           if ( iprint .ge. 0) iwork( iprini) = iprint
-           if ( partol .ge. zero .and. partol .lt. one) work( partli) =       &
-            partol
-           if ( sstol .ge. zero .and. sstol .lt. one) work( sstoli) = sstol
-!
-           work( olmavi) = work( olmavi)* iwork( niteri)
-!
-           if ( implct) then
-              call dcopy( n* nq, work( fni),1, work( fi),1)
-           else
-              !call dxmy( n, nq, work( fni), n, y, ldy, work( fi), n)
-              work(fi:fi+(n*nq-1)) = work(fni:fni+(n*nq-1)) - reshape(y(1:n,:), shape=[n*nq]) 
-           endif
-           call dwght( n, nq,                                                 &
-            reshape( work( we1i: we1i+ ldwe* ld2we* nq-1),(/ ldwe, ld2we, nq  &
-            /)), ldwe, ld2we,reshape( work( fi: fi+ n* nq-1),(/ n, nq/)),     &
-            tempret(1: n,1: nq))
-           work( fi: fi+ n* nq-1) = reshape( tempret(1: n,1: nq),(/ n* nq/))
-           work( wssepi) = ddot( n* nq, work( fi),1, work( fi),1)
-           work( wssi) = work( wssepi)+ work( wssdei)
-!
-        else
-!
-!  Perform error checking
-!
-           info = 0
-!
-           call dodchk( n, m, np, nq,                                         &
-            isodr, anajac, implct,                                            &
-            beta, ifixb,                                                      &
-            ldx, ldifx, ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd,             &
-            ldy,                                                              &
-            lwork, lwkmn, liwork, liwkmn,                                     &
-            sclb, scld, stpb, stpd,                                           &
-            info,                                                             &
-            lower, upper)
-           if ( info .gt. 0) then
-              goto 50
-           endif
-!
-!  Initialize work vectors as necessary
-!
-           do 10 i = n* m+ n* nq+1, lwork
-              work( i) = zero
-10         continue
-           do 20 i = 1, liwork
-              iwork( i) = 0
-20         continue
-!
-           call diniwk( n, m, np,                                             &
-            work, lwork, iwork, liwork,                                       &
-            x, ldx, ifixx, ldifx, scld, ldscld,                               &
-            beta, sclb,                                                       &
-            sstol, partol, maxit, taufac,                                     &
-            job, iprint, lunerr, lunrpt,                                      &
-            lower, upper,                                                     &
-            epsmai, sstoli, partli, maxiti, taufci,                           &
-            jobi, iprini, luneri, lunrpi,                                     &
-            ssfi, tti, ldtti, deltai,                                         &
-            loweri, upperi, boundi)
-!
-           iwork( msgb) = -1
-           iwork( msgd) = -1
-           work( taui) = - work( taufci)
-!
-!  Set up for parameter estimation -
-!  Pull BETA's to be estimated and corresponding scale values
-!  and store in WORK(BETACI) and WORK(SSI), respectively
-!
-           call dpack( np, iwork( nppi), work( betaci), beta, ifixb)
-           call dpack( np, iwork( nppi), work( ssi), work( ssfi), ifixb)
-           npp = iwork( nppi)
-!
-!  Check that WD is positive definite and WE is positive semidefinite,
-!  saving factorization of WE, and counting number of nonzero weights
-!
-           call dfctrw( n, m, nq, npp,                                        &
-            isodr,                                                            &
-            we, ldwe, ld2we, wd, ldwd, ld2wd,                                 &
-            work( wrk2i), work( wrk4i),                                       &
-            work( we1i), nnzw, info)
-           iwork( nnzwi) = nnzw
-!
-           if ( info .ne. 0) then
-              goto 50
-           endif
-!
-!  Evaluate the predicted values and
-!          weighted EPSILONS at the starting point
-!
-           call dunpac( np, work( betaci), beta, ifixb)
-           work(xplusi:xplusi+(n*m-1)) = work(deltai:deltai+(n*m-1)) + reshape(x(1:n,:), shape=[n*m])
-           istop = 0
-           call fcn( n, m, np, nq,                                            &
-            n, m, np,                                                         &
-            beta, work(xplusi),                                               &
-            ifixb, ifixx, ldifx,                                              &
-            002, work( fni), work( wrk6i), work( wrk1i),                      &
-            istop)
-           iwork( istopi) = istop
-           if ( istop .eq. 0) then
-              iwork( nfevi) = iwork( nfevi)+1
-              if ( implct) then
-                 call dcopy( n* nq, work( fni),1, work( fi),1)
-              else
-                 !call dxmy( n, nq, work( fni), n, y, ldy, work( fi), n)
-                 work(fi:fi+(n*nq-1)) = work(fni:fni+(n*nq-1)) - reshape(y(1:n,:), shape=[n*nq]) 
-              endif
-              call dwght( n, nq,                                              &
-               reshape( work( we1i: we1i+ ldwe* ld2we* nq-1),                 &
-               (/ ldwe, ld2we, nq/)), ldwe, ld2we,                            &
-               reshape( work( fi: fi+ n* nq-1),(/ n, nq/)),                   &
-               tempret(1: n,1: nq))
-              work( fi: fi+ n* nq-1) = reshape( tempret(1: n,1: nq),(/ n* nq  &
-               /))
-           else
-              info = 52000
-              goto 50
-           endif
-!
-!  Compute norm of the initial estimates
-!
-           call dwght( npp,1,reshape( work( ssi: ssi+ npp-1),(/ npp,1,1/)),   &
-            npp,1,reshape( work( betaci: betaci+ npp-1),(/ npp,1/)),          &
-            tempret(1: npp,1:1))
-           work( wrk: wrk+ npp-1) = tempret(1: npp,1)
-           if ( isodr) then
-              call dwght( n, m,reshape( work( tti: tti+ iwork( ldtti)*1* m-1) &
-               ,(/ iwork( ldtti),1, m/)), iwork( ldtti),1,reshape( work(      &
-               deltai: deltai+ n* m-1),(/ n, m/)), tempret(1: n,1: m))
-              work( wrk+ npp: wrk+ npp+ n* m-1) =                             &
-               reshape( tempret(1: n,1: m),(/ n* m/))
-              work( pnormi) = dnrm2( npp+ n* m, work( wrk),1)
-           else
-              work( pnormi) = dnrm2( npp, work( wrk),1)
-           endif
-!
-!  Compute sum of squares of the weighted EPSILONS and weighted DELTAS
-!
-           work( wssepi) = ddot( n* nq, work( fi),1, work( fi),1)
-           if ( isodr) then
-              call dwght( n, m, wd, ldwd, ld2wd,                              &
-               reshape( work( deltai: deltai+ n* m),(/ n, m/)),               &
-               tempret(1: n,1: m))
-              work( wrk: wrk+ n* m-1) = reshape( tempret(1: n,1: m),(/ n* m/) &
-               )
-              work( wssdei) = ddot( n* m, work( deltai),1, work( wrk),1)
-           else
-              work( wssdei) = zero
-           endif
-           work( wssi) = work( wssepi)+ work( wssdei)
-!
-!  Select first row of X + DELTA that contains no zeros
-!
-           nrow = -1
-           call dsetn( n, m, work( xplusi), n, nrow)
-           iwork( nrowi) = nrow
-!
-!  Set number of good digits in function results
-!
-           epsmac = work( epsmai)
-           if ( ndigit .lt. 2) then
-              iwork( netai) = -1
-              nfev = iwork( nfevi)
-              call detaf( fcn,                                                &
-               n, m, np, nq,                                                  &
-               work( xplusi), beta, epsmac, nrow,                             &
-               work( betani), work( fni),                                     &
-               ifixb, ifixx, ldifx,                                           &
-               istop, nfev, eta, neta,                                        &
-               work( wrk1i), work( wrk2i), work( wrk6i), work( wrk7i),        &
-               info,                                                          &
-               lower, upper)
-              iwork( istopi) = istop
-              iwork( nfevi) = nfev
-              if ( istop .ne. 0 .or. info .ne. 0) then
-                 if ( info .eq. 0) then
-                    info = 53000
-                 endif
-                 iwork( netai) = 0
-                 work( etai) = zero
-                 goto 50
-              else
-                 iwork( netai) = - neta
-                 work( etai) = eta
-              endif
-           else
-              iwork( netai) = min( ndigit,int( p5-log10( epsmac)))
-              work( etai) = max( epsmac, ten**(- ndigit))
-           endif
-!
-!  Check bounds are large enough for derivative calculations.
-!
-           if (.not. anajac .or. chkjac) then
-              if ( cdjac) then
-                 do k = 1, np
-                    if ( upper( k)-abs(2* derstep(1, k, upper( k), work( ssfi &
-                     ), stpb, neta)) .lt. lower( k)) then
-                       info = 90020
-                       goto 50
-                    endif
-                 enddo
-              else
-                 do k = 1, np
-                    if ( upper( k)-abs(2* derstep(0, k, upper( k), work( ssfi &
-                     ), stpb, neta)) .lt. lower( k)) then
-                       info = 90020
-                       goto 50
-                    endif
-                 enddo
-              endif
-           endif
-!
-!  CHECK DERIVATIVES IF NECESSARY
-!
-           if ( chkjac .and. anajac) then
-              ntol = -1
-              nfev = iwork( nfevi)
-              njev = iwork( njevi)
-              neta = iwork( netai)
-              ldtt = iwork( ldtti)
-              eta = work( etai)
-              epsmac = work( epsmai)
-!  ENSURE BETA IS NOT TOO CLOSE TO BOUNDS FOR THE DERIVATIVE CHECK.
-              betaj(:) = beta(:)
-              call mbfb( np, betaj, lower, upper, work( ssfi), stpb, neta,    &
-               eta, interval)
-!  CHECK THE DERIVATIVES.
-              call djck( fcn,                                                 &
-               n, m, np, nq,                                                  &
-               beta, betaj, work( xplusi),                                    &
-               ifixb, ifixx, ldifx, stpb, stpd, ldstpd,                       &
-               work( ssfi), work( tti), ldtt,                                 &
-               eta, neta, ntol, nrow, isodr, epsmac,                          &
-               work( fni), work( fjacbi), work( fjacdi),                      &
-               iwork( msgb), iwork( msgd), work( diffi),                      &
-               istop, nfev, njev,                                             &
-               work( wrk1i), work( wrk2i), work( wrk6i),                      &
-               interval)
-              iwork( istopi) = istop
-              iwork( nfevi) = nfev
-              iwork( njevi) = njev
-              iwork( ntoli) = ntol
-              if ( istop .ne. 0) then
-                 info = 54000
-              elseif ( iwork( msgb) .ne. 0 .or. iwork( msgd) .ne. 0) then
-                 info = 40000
-              endif
-           else
-!
-!  Indicate user supplied derivatives were not checked
-              iwork( msgb) = -1
-              iwork( msgd) = -1
-           endif
-!
-!  Print appropriate error messages
-!
-50         if (( info .ne. 0) .or.                                            &
-               ( iwork( msgb) .ne. -1)) then
-              if ( lunerr .ne. 0 .and. iprint .ne. 0) then
-                 call dodper                                                  &
-                  ( info, lunerr,                                             &
-                  n, m, np, nq,                                               &
-                  ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd,                   &
-                  lwkmn, liwkmn,                                              &
-                  work( fjacbi), work( fjacdi),                               &
-                  work( diffi), iwork( msgb), isodr, iwork( msgd),            &
-                  work( xplusi), iwork( nrowi), iwork( netai), iwork( ntoli))
-              endif
-!
-!  Set INFO to reflect errors in the user supplied Jacobians
-!
-              if ( info .eq. 40000) then
-                 if ( iwork( msgb) .eq. 2 .or. iwork( msgd) .eq. 2) then
-                    if ( iwork( msgb) .eq. 2) then
-                       info = info+1000
-                    endif
-                    if ( iwork( msgd) .eq. 2) then
-                       info = info+100
-                    endif
-                 else
-                    info = 0
-                 endif
-              endif
-              if ( info .ne. 0) then
-                 return
-              endif
-           endif
-        endif
-!
-!  Save the initial values of BETA
-        call dcopy( np, beta,1, work( beta0i),1)
-!
-!  Find least squares solution
-!
-        call dcopy( n* nq, work( fni),1, work( fsi),1)
-        ldtt = iwork( ldtti)
-        call dodmn( head, fstitr, prtpen,                                     &
-         fcn, n, m, np, nq, job, beta, y, ldy, x, ldx,                        &
-         we, work( we1i), ldwe, ld2we, wd, ldwd, ld2wd,                       &
-         ifixb, ifixx, ldifx,                                                 &
-         work( betaci), work( betani), work( betasi), work( si),              &
-         work( deltai), work( deltni), work( deltsi),                         &
-         work( loweri), work( upperi),                                        &
-         work( ti), work( fi), work( fni), work( fsi),                        &
-         work( fjacbi), iwork( msgb), work( fjacdi), iwork( msgd),            &
-         work( ssfi), work( ssi), work( tti), ldtt,                           &
-         stpb, stpd, ldstpd,                                                  &
-         work( xplusi), work( wrk), lwrk,                                     &
-         work, lwork, iwork, liwork, info,                                    &
-         iwork( boundi))
-        maxit1 = iwork( maxiti)- iwork( niteri)
-        tstimp = zero
-        do 100 k = 1, np
-           if ( beta( k) .eq. zero) then
-!-----------------------------^------------------------------------------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
-              tstimp = max( tstimp,                                           &
-               abs( beta( k)- work( beta0i-1+ k))/ work( ssfi-1+ k))
-           else
-              tstimp = max( tstimp,                                           &
-               abs( beta( k)- work( beta0i-1+ k))/abs( beta( k)))
-           endif
-100     continue
-!
-        return
-!
-end subroutine
-
