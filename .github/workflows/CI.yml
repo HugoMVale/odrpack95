@@ -3,7 +3,7 @@ name: Build and test pkg
 on: [push, pull_request]
 
 jobs:
-  gcc-build:
+  linux-gcc-build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -61,7 +61,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
 
-  msys2-build:
+  msys2-gcc-build:
     runs-on: windows-latest
     defaults:
       run:
@@ -85,3 +85,4 @@ jobs:
         run: |
           gfortran --version
           fpm test --profile debug --verbose
+          fpm test --profile release --verbose
