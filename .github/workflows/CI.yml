@@ -9,7 +9,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        gcc_v: [10] # Version of GFortran we want to use.
+        gcc_v: [10, 13] # Version of GFortran we want to use.
         include:
           - os: ubuntu-latest
             os-arch: linux-x86_64
@@ -35,7 +35,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           fpm-version: "v0.10.0"
 
-      - name: Build with coverage info
+      - name: Build and test
         run: |
           gfortran --version
           rm -rf ./build/gfortran*
@@ -48,6 +48,7 @@ jobs:
           fpm run --example "example5" --profile release
 
       - name: Upload coverage to Codecov
+        if: ${{ matrix.gcc_v == '10' }}
         uses: codecov/codecov-action@v4.0.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
