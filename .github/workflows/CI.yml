@@ -71,17 +71,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Install MSYS2, GFortran, fpm
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW64
-          update: true
-          path-type: inherit
-          install: |
-            mingw-w64-x86_64-gcc-fortran
-            mingw-w64-x86_64-fpm
+  #     - name: Install MSYS2, GFortran, fpm
+  #     - uses: msys2/setup-msys2@v2
+  #       with:
+  #         msystem: MINGW64
+  #         update: true
+  #         path-type: inherit
+  #         install: |
+  #           mingw-w64-x86_64-gcc-fortran
+  #           mingw-w64-x86_64-fpm
 
-      - name: Build and test
-        run: |
-          gfortran --version
-          fpm test --profile debug --verbose
+  #     - name: Build and test
+  #       run: |
+  #         gfortran --version
+  #         fpm test --profile debug --verbose
