@@ -3,13 +3,13 @@ name: Build and test pkg
 on: [push, pull_request]
 
 jobs:
-  build:
+  linux-gcc-build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        gcc_v: [10] # Version of GFortran we want to use.
+        gcc_v: [10, 12]
         include:
           - os: ubuntu-latest
             os-arch: linux-x86_64
@@ -22,7 +22,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install GFortran Linux
+      - name: Install GFortran
         if: contains(matrix.os, 'ubuntu')
         run: |
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_V} 100 \
@@ -35,20 +35,54 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           fpm-version: "v0.10.0"
 
-      - name: Build with coverage info
+      - name: Build and test
+        run: |
+          gfortran --version
+          fpm test --profile debug --verbose
+          fpm test --profile release --verbose
+      
+      - name: Generate coverage report
+        if: ${{ matrix.gcc_v == '10' }}
         run: |
           gfortran --version
           rm -rf ./build/gfortran*
-          fpm test --profile debug --flag "--coverage" --verbose
+          fpm test --profile debug --flag "--coverage"
           gcov ./build/gfortran*/odrpack95/src*.gcda -r ./src/ -b -w
-
+          
       - name: Run examples
         run: |
           gfortran --version
           fpm run --example "example5" --profile release
 
       - name: Upload coverage to Codecov
+        if: ${{ matrix.gcc_v == '10' }}
         uses: codecov/codecov-action@v4.0.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
+
+  msys2-gcc-build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install MSYS2, GFortran, fpm
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          path-type: inherit
+          install: |
+            mingw-w64-x86_64-gcc-fortran
+            mingw-w64-x86_64-fpm
+
+      - name: Build and test
+        run: |
+          gfortran --version
+          fpm test --profile debug --verbose
+          fpm test --profile release --verbose
