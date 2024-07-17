@@ -4574,7 +4574,7 @@ contains
          !! A work array of `(lwrk)` elements, _equivalenced_ to `wrk1` and `wrk2`.
       integer, intent(in) :: lwrk
          !! The length of vector `wrk`.
-      integer, intent(out) :: istopc
+      integer, intent(inout) :: istopc
          !! The variable designating whether the computations were stopped due to a numerical
          !! error within subroutine `dodstp`.
    
