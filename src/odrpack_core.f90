@@ -4972,7 +4972,7 @@ contains
          !! The rank deficiency of the Jacobian wrt `beta`.
       real(kind=wp), intent(out) :: rcond
          !! The approximate reciprocal condition of `fjacb`.
-      real(kind=wp), intent(out) :: rss
+      real(kind=wp), intent(inout) :: rss
          !! The residual sum of squares.
       integer, intent(out) :: idf
          !! The degrees of freedom of the fit, equal to the number of observations with nonzero
