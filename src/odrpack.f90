@@ -130,7 +130,7 @@ contains
          !! Scaling values for `delta`. `Shape: (1<=ldscld<=n, m)`. See p. 32.
       real(kind=wp), intent(inout), pointer, optional :: work(:)
          !! Real work space.
-      integer, intent(out), pointer, optional :: iwork(:)
+      integer, intent(inout), pointer, optional :: iwork(:)
          !! Integer work space.
       integer, intent(out), optional :: info
          !! Variable designating why the computations were stopped.
@@ -1063,7 +1063,7 @@ contains
          !! For implicit models, the iterations allowed for the next penalty parameter value.
       real(kind=wp), intent(out) :: tstimp
          !! The relative change in the parameters between the initial values and the solution.
-      integer, intent(out) :: info
+      integer, intent(inout) :: info
          !! The variable designating why the computations were stopped.
       real(kind=wp), intent(in) :: lower(np)
          !! The lower bound for `beta`.
@@ -1749,7 +1749,7 @@ contains
          !! The leading dimension of array `stpd`.
       real(kind=wp), intent(out) :: xplusd(n, m)
          !! The values of `x + delta`.
-      real(kind=wp), intent(out) :: wrk(lwrk)
+      real(kind=wp), intent(inout) :: wrk(lwrk)
          !! A work array, _equivalenced_ to `wrk1` and `wrk2`.
       integer, intent(in) :: lwrk
          !! The length of vector `wrk`.
