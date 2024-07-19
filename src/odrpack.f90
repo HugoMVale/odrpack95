@@ -50,7 +50,7 @@ contains
    !     Applied and Computational Mathematics Division
    !     National Institute of Standards and Technology
    !     Boulder, CO 80303-3328
-   ! Purpose:  REAL (KIND=wp) driver routine for finding the weighted explicit or implicit
+   ! Purpose:  REAL(wp) driver routine for finding the weighted explicit or implicit
    !   orthogonal distance regression (ODR) or ordinary linear or nonlinear least squares (OLS)
    !   solution (long call statement)
    ! Description:
@@ -82,17 +82,17 @@ contains
          !! Number of function parameters.
       integer, intent(in) :: nq
          !! Number of responses per observation.
-      real(kind=wp), intent(inout) :: beta(:)
+      real(wp), intent(inout) :: beta(:)
          !! Function parameters. `Shape: (np)`.
-      real(kind=wp), intent(in) :: y(:, :)
+      real(wp), intent(in) :: y(:, :)
          !! Dependent variable. `Shape: (n, nq)`. Unused when the model is implicit.
-      real(kind=wp), intent(in) :: x(:, :)
+      real(wp), intent(in) :: x(:, :)
          !! Explanatory variable. `Shape: (n, m)`.
-      real(kind=wp), intent(inout), optional :: delta(:, :)
+      real(wp), intent(inout), optional :: delta(:, :)
          !! Initial error in the `x` data. `Shape: (n, m)`.
-      real(kind=wp), intent(in), optional :: we(:, :, :)
+      real(wp), intent(in), optional :: we(:, :, :)
          !! `epsilon` weights. `Shape: (1<=ldwe<=n, 1<=ld2we<=nq, nq)`. See p. 25.
-      real(kind=wp), intent(in), optional :: wd(:, :, :)
+      real(wp), intent(in), optional :: wd(:, :, :)
          !! `delta` weights. `Shape: (1<=ldwd<=n, 1<=ld2wd<=m, m)`. See p. 26.
       integer, intent(in), optional :: ifixb(:)
          !! Values designating whether the elements of `beta` are fixed at their input values
@@ -104,11 +104,11 @@ contains
          !! Variable controlling problem initialization and computational method.
       integer, intent(in), optional :: ndigit
          !! Number of accurate digits in the function results, as supplied by the user.
-      real(kind=wp), intent(in), optional :: taufac
+      real(wp), intent(in), optional :: taufac
          !! Factor used to compute the initial trust region diameter.
-      real(kind=wp), intent(in), optional :: sstol
+      real(wp), intent(in), optional :: sstol
          !! Sum-of-squares convergence stopping tolerance.
-      real(kind=wp), intent(in), optional :: partol
+      real(wp), intent(in), optional :: partol
       !! Parameter convergence stopping tolerance.
       integer, intent(in), optional :: maxit
          !! Maximum number of iterations allowed.
@@ -118,25 +118,25 @@ contains
          !! Logical unit number for error messages.
       integer, intent(in), optional :: lunrpt
          !! Logical unit number for computation reports.
-      real(kind=wp), intent(in), optional :: stpb(:)
+      real(wp), intent(in), optional :: stpb(:)
          !! Relative step for computing finite difference derivatives with respect to `beta`.
          !! `Shape: (np)`.
-      real(kind=wp), intent(in), optional :: stpd(:, :)
+      real(wp), intent(in), optional :: stpd(:, :)
          !! Relative step for computing finite difference derivatives with respect to `delta`.
          !! `Shape: (1<=ldstpd<=n, m)`. See p. 31.
-      real(kind=wp), intent(in), optional :: sclb(:)
+      real(wp), intent(in), optional :: sclb(:)
       !! Scaling values for `beta`. `Shape: (np)`.
-      real(kind=wp), intent(in), optional :: scld(:, :)
+      real(wp), intent(in), optional :: scld(:, :)
          !! Scaling values for `delta`. `Shape: (1<=ldscld<=n, m)`. See p. 32.
-      real(kind=wp), intent(inout), pointer, optional :: work(:)
+      real(wp), intent(inout), pointer, optional :: work(:)
          !! Real work space.
       integer, intent(inout), pointer, optional :: iwork(:)
          !! Integer work space.
       integer, intent(out), optional :: info
          !! Variable designating why the computations were stopped.
-      real(kind=wp), intent(in), optional :: lower(:)
+      real(wp), intent(in), optional :: lower(:)
          !! Lower bound on `beta`. `Shape: (np)`.
-      real(kind=wp), intent(in), optional :: upper(:)
+      real(wp), intent(in), optional :: upper(:)
          !! Upper bound on `beta`. `Shape: (np)`.
 
       ! Local variables
@@ -145,11 +145,11 @@ contains
                  liprint, llunerr, llunrpt, linfo, lenwork, leniwork, linfo1, linfo2, linfo3, &
                  linfo4, linfo5
       integer :: lifixb(np), lifixx(n, m)
-      real(kind=wp) :: ltaufac, lsstol, lpartol
-      real(kind=wp) :: llower(np), lwe(n, nq, nq), lwd(n, m, m), lstpb(np), lstpd(n, m), &
+      real(wp) :: ltaufac, lsstol, lpartol
+      real(wp) :: llower(np), lwe(n, nq, nq), lwd(n, m, m), lstpb(np), lstpd(n, m), &
                        lsclb(np), lscld(n, m), lupper(np), wd1(1, 1, 1)
 
-      real(kind=wp), pointer, save :: lwork(:)
+      real(wp), pointer, save :: lwork(:)
       integer, pointer, save :: liwork(:)  
       logical :: head
 
@@ -691,23 +691,23 @@ contains
          !! The number of function parameters.
       integer, intent(in) :: nq
          !! The number of responses per observation.
-      real(kind=wp), intent(inout) :: beta(np)
+      real(wp), intent(inout) :: beta(np)
          !! The function parameters.
-      real(kind=wp), intent(in) :: y(ldy, nq)
+      real(wp), intent(in) :: y(ldy, nq)
          !! The dependent variable. Unused when the model is implicit.
       integer, intent(in) :: ldy
          !! The leading dimension of array `y`.
-      real(kind=wp), intent(in) :: x(ldx, m)
+      real(wp), intent(in) :: x(ldx, m)
          !! The independent variable.
       integer, intent(in) :: ldx
          !! The leading dimension of array `x`.
-      real(kind=wp), intent(inout) :: we(ldwe, ld2we, nq)
+      real(wp), intent(inout) :: we(ldwe, ld2we, nq)
          !! The `epsilon` weights.
       integer, intent(in) :: ldwe
          !! The leading dimension of array `we`.
       integer, intent(in) :: ld2we
          !! The second dimension of array `we`.
-      real(kind=wp), intent(in) :: wd(ldwd, ld2wd, m)
+      real(wp), intent(in) :: wd(ldwd, ld2wd, m)
          !! The `delta` weights.
       integer, intent(in) :: ldwd
          !! The leading dimension of array `wd`.
@@ -725,11 +725,11 @@ contains
          !! The variable controlling problem initialization and computational method.
       integer, intent(in) :: ndigit
          !! The number of accurate digits in the function results, as supplied by the user.
-      real(kind=wp), intent(in) :: taufac
+      real(wp), intent(in) :: taufac
          !! The factor used to compute the initial trust region diameter.
-      real(kind=wp), intent(in) :: sstol
+      real(wp), intent(in) :: sstol
          !! The sum-of-squares convergence stopping tolerance.
-      real(kind=wp), intent(in) :: partol
+      real(wp), intent(in) :: partol
          !! The user-supplied parameter convergence stopping tolerance.
       integer, intent(in) :: maxit
          !! The maximum number of iterations allowed.
@@ -739,19 +739,19 @@ contains
          !! The logical unit number used for error messages.
       integer, intent(in) :: lunrpt
          !! The logical unit number used for computation reports.
-      real(kind=wp), intent(in) :: stpb(np)
+      real(wp), intent(in) :: stpb(np)
          !! The relative step for computing finite difference derivatives with respect to `beta`.
-      real(kind=wp), intent(in) :: stpd(ldstpd, m)
+      real(wp), intent(in) :: stpd(ldstpd, m)
          !! The relative step for computing finite difference derivatives with respect to `delta`.
       integer, intent(in) :: ldstpd
          !! The leading dimension of array `stpd`.
-      real(kind=wp), intent(in) :: sclb(np)
+      real(wp), intent(in) :: sclb(np)
          !! The scaling values for `beta`.
-      real(kind=wp), intent(in) :: scld(ldscld, m)
+      real(wp), intent(in) :: scld(ldscld, m)
          !! The scaling value for `delta`.
       integer, intent(in) :: ldscld
          !! The leading dimension of array `scld`.
-      real(kind=wp), intent(inout) :: work(lwork)
+      real(wp), intent(inout) :: work(lwork)
          !! The real work space.
       integer, intent(in) :: lwork
          !! The length of vector `work`.
@@ -761,20 +761,20 @@ contains
          !! The length of vector `iwork`.
       integer, intent(out) :: info
          !! The variable designating why the computations were stopped.
-      real(kind=wp), intent(in) :: lower(np)
+      real(wp), intent(in) :: lower(np)
          !! The lower bound on `beta`.
-      real(kind=wp), intent(in) :: upper(np)
+      real(wp), intent(in) :: upper(np)
          !! The upper bound on `beta`.
    
       ! Local scalars
-      real(kind=wp), parameter :: pcheck = 1.0E3_wp, pstart = 1.0E1_wp, pfac = 1.0E1_wp
-      real(kind=wp) :: cnvtol, tstimp
+      real(wp), parameter :: pcheck = 1.0E3_wp, pstart = 1.0E1_wp, pfac = 1.0E1_wp
+      real(wp) :: cnvtol, tstimp
       integer :: iprnti, ipr1, ipr2, ipr2f, ipr3, jobi, job1, job2, job3, job4, job5, &
                  maxiti, maxit1
       logical :: done, fstitr, head, implct, prtpen
    
       ! Local arrays
-      real(kind=wp) :: pnlty(1, 1, 1)
+      real(wp) :: pnlty(1, 1, 1)
      
       ! Variable Definitions (alphabetically)
       !  BETA:    The function parameters.
@@ -991,23 +991,23 @@ contains
          !! The number of function parameters.
       integer, intent(in) :: nq
          !! The number of responses per observation.
-      real(kind=wp), intent(inout) :: beta(np)
+      real(wp), intent(inout) :: beta(np)
          !! The function parameters.
-      real(kind=wp), intent(in) :: y(ldy, nq)
+      real(wp), intent(in) :: y(ldy, nq)
          !! The dependent variable. Unused when the model is implicit.
       integer, intent(in) :: ldy
          !! The leading dimension of array `y`.
-      real(kind=wp), intent(in) :: x(ldx, m)
+      real(wp), intent(in) :: x(ldx, m)
          !! The explanatory variable.
       integer, intent(in) :: ldx
          !! The leading dimension of array `x`.
-      real(kind=wp), intent(inout) :: we(ldwe, ld2we, nq)
+      real(wp), intent(inout) :: we(ldwe, ld2we, nq)
          !! The `epsilon` weights.
       integer, intent(in) :: ldwe
          !! The leading dimension of array `we`.
       integer, intent(in) :: ld2we
          !! The second dimension of array `we`.
-      real(kind=wp), intent(in) :: wd(ldwd, ld2wd, m)
+      real(wp), intent(in) :: wd(ldwd, ld2wd, m)
          !! The `delta`        weights.
       integer, intent(in) :: ldwd
          !! The leading dimension of array `wd`.
@@ -1025,11 +1025,11 @@ contains
          !! The variable controlling problem initialization and computational method.
       integer, intent(in) :: ndigit
          !! The number of accurate digits in the function results, as supplied by the user.
-      real(kind=wp), intent(in) :: taufac
+      real(wp), intent(in) :: taufac
          !! The factor used to compute the initial trust region diameter.
-      real(kind=wp), intent(in) :: sstol
+      real(wp), intent(in) :: sstol
          !! The sum-of-squares convergence stopping tolerance.
-      real(kind=wp), intent(in) :: partol
+      real(wp), intent(in) :: partol
          !! The parameter convergence stopping tolerance.
       integer, intent(in) :: maxit
          !! The maximum number of iterations allowed.
@@ -1039,19 +1039,19 @@ contains
          !! The logical unit number used for error messages.
       integer, intent(in) :: lunrpt
          !! The logical unit number used for computation reports.
-      real(kind=wp), intent(in) :: stpb(np)
+      real(wp), intent(in) :: stpb(np)
          !! The step size for finite difference derivatives with respect to `beta`.
-      real(kind=wp), intent(in) :: stpd(ldstpd, m)
+      real(wp), intent(in) :: stpd(ldstpd, m)
          !! The step size for finite difference derivatives with respect to `delta`.
       integer, intent(in) :: ldstpd
          !! The leading dimension of array `stpd`.
-      real(kind=wp), intent(in) :: sclb(np)
+      real(wp), intent(in) :: sclb(np)
          !! The scaling values for `beta`.
-      real(kind=wp), intent(in) :: scld(ldscld, m)
+      real(wp), intent(in) :: scld(ldscld, m)
          !! The scaling values for `delta`.
       integer, intent(in) :: ldscld
          !! The leading dimension of array `scld`.
-      real(kind=wp), intent(inout) :: work(lwork)
+      real(wp), intent(inout) :: work(lwork)
          !! The real work space.
       integer, intent(in) :: lwork
          !! The length of vector `work`.
@@ -1061,17 +1061,17 @@ contains
          !! The length of vector `iwork`.
       integer, intent(out) :: maxit1
          !! For implicit models, the iterations allowed for the next penalty parameter value.
-      real(kind=wp), intent(out) :: tstimp
+      real(wp), intent(out) :: tstimp
          !! The relative change in the parameters between the initial values and the solution.
       integer, intent(inout) :: info
          !! The variable designating why the computations were stopped.
-      real(kind=wp), intent(in) :: lower(np)
+      real(wp), intent(in) :: lower(np)
          !! The lower bound for `beta`.
-      real(kind=wp), intent(in) :: upper(np)
+      real(wp), intent(in) :: upper(np)
          !! The upper bound for `beta`.
 
       ! Local scalars
-      real(kind=wp) :: epsmac, eta
+      real(wp) :: epsmac, eta
       integer :: actrsi, alphai, betaci, betani, betasi, beta0i, boundi, deltai, &
                  deltni, deltsi, diffi, epsmai, etai, fi, fjacbi, fjacdi, fni, fsi, i, &
                  idfi, int2i, iprini, iranki, istop, istopi, jobi, jpvti, k, ldtt, &
@@ -1084,11 +1084,11 @@ contains
       logical :: anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
 
       ! Local arrays
-      real(kind=wp) :: betaj(np)
+      real(wp) :: betaj(np)
       integer :: interval(np)
 
       ! External BLAS/LAPACK procedures
-      real(kind=wp), external :: ddot, dnrm2
+      real(wp), external :: ddot, dnrm2
       external :: dcopy
       
       ! External ODRPACK procedures
@@ -1243,7 +1243,7 @@ contains
       !  WD:       The DELTA weights.
       !  WE:       The EPSILON weights.
       !  WE1I:     The starting location in array WORK of array WE1.
-      !  WORK:     The REAL (KIND=wp) work space.
+      !  WORK:     The REAL (wp) work space.
       !  WRK:      The starting location in array WORK of array WRK, equivalenced to WRK1 and WRK2.
       !  WRK1I:    The starting location in array WORK of array WRK1.
       !  WRK2I:    The starting location in array WORK of array WRK2.
@@ -1273,7 +1273,7 @@ contains
                   boundi, &
                   liwkmn)
 
-      ! Set starting locations within REAL (KIND=wp) work space
+      ! Set starting locations within REAL (wp) work space
       ! (invalid values of N, M, NP, NQ, LDWE and/or LD2WE
       ! are handled reasonably by DWINF)
       call dwinf(n, m, np, nq, ldwe, ld2we, isodr, &
@@ -1665,25 +1665,25 @@ contains
          !! The number of responses per observation.
       integer, intent(inout) :: job
          !! The variable controlling problem initialization and computational method.
-      real(kind=wp), intent(inout) :: beta(np)
+      real(wp), intent(inout) :: beta(np)
          !! The function parameters.
-      real(kind=wp), intent(in) :: y(ldy, nq)
+      real(wp), intent(in) :: y(ldy, nq)
          !! The dependent variable. Unused when the model is implicit.
       integer, intent(in) :: ldy
          !! The leading dimension of array `y`.
-      real(kind=wp), intent(in) :: x(ldx, m)
+      real(wp), intent(in) :: x(ldx, m)
          !! The explanatory variable.
       integer, intent(in) :: ldx
          !! The leading dimension of array `x`.
-      real(kind=wp), intent(in) :: we(ldwe, ld2we, nq)
+      real(wp), intent(in) :: we(ldwe, ld2we, nq)
          !! The `epsilon` weights.
-      real(kind=wp), intent(in) :: we1(ldwe, ld2we, nq)
+      real(wp), intent(in) :: we1(ldwe, ld2we, nq)
          !! The square root of the `epsilon` weights.
       integer, intent(in) :: ldwe
          !! The leading dimension of arrays `we` and `we1`.
       integer, intent(in) :: ld2we
          !! The second dimension of arrays `we` and `we1`.
-      real(kind=wp), intent(in) :: wd(ldwd, ld2wd, m)
+      real(wp), intent(in) :: wd(ldwd, ld2wd, m)
          !! The `delta` weights.
       integer, intent(in) :: ldwd
          !! The leading dimension of array `wd`.
@@ -1697,64 +1697,64 @@ contains
          !! values or not.
       integer, intent(in) :: ldifx
          !! The leading dimension of array `ifixx`.
-      real(kind=wp), intent(inout) :: betac(np)
+      real(wp), intent(inout) :: betac(np)
          !! The current estimated values of the unfixed `beta`s.
-      real(kind=wp), intent(out) :: betan(np)
+      real(wp), intent(out) :: betan(np)
          !! The new estimated values of the unfixed `beta`s.
-      real(kind=wp), intent(in) :: betas(np)
+      real(wp), intent(in) :: betas(np)
          !! The saved estimated values of the unfixed `beta`s.
-      real(kind=wp), intent(out) :: s(np)
+      real(wp), intent(out) :: s(np)
          !! The step for `beta`.
-      real(kind=wp), intent(in) :: delta(n, m)
+      real(wp), intent(in) :: delta(n, m)
          !! The estimated errors in the explanatory variables.
-      real(kind=wp), intent(out) :: deltan(n, m)
+      real(wp), intent(out) :: deltan(n, m)
          !! The new estimated errors in the explanatory variables.
-      real(kind=wp), intent(inout) :: deltas(n, m)
+      real(wp), intent(inout) :: deltas(n, m)
          !! The saved estimated errors in the explanatory variables.
-      real(kind=wp), intent(in) :: lower(np)
+      real(wp), intent(in) :: lower(np)
          !! The lower bound for unfixed `beta`s.
-      real(kind=wp), intent(in) :: upper(np)
+      real(wp), intent(in) :: upper(np)
          !! The upper bound for unfixed `beta`s.
-      real(kind=wp), intent(out) :: t(n, m)
+      real(wp), intent(out) :: t(n, m)
          !! The step for `delta`.
-      real(kind=wp), intent(inout) :: f(n, nq)
+      real(wp), intent(inout) :: f(n, nq)
          !! The (weighted) estimated values of `epsilon`.
-      real(kind=wp), intent(out) :: fn(n, nq)
+      real(wp), intent(out) :: fn(n, nq)
          !! The new predicted values from the function.
-      real(kind=wp), intent(out) :: fs(n, nq)
+      real(wp), intent(out) :: fs(n, nq)
          !! The saved predicted values from the function.
-      real(kind=wp), intent(out) :: fjacb(n, np, nq)
+      real(wp), intent(out) :: fjacb(n, np, nq)
          !! The Jacobian with respect to `beta`.
       integer, intent(in) :: msgb(nq*np + 1)
          !! The error checking results for the Jacobian with respect to `beta`.
-      real(kind=wp), intent(out) :: fjacd(n, m, nq)
+      real(wp), intent(out) :: fjacd(n, m, nq)
          !! The Jacobian with respect to `delta`.
       integer, intent(in) :: msgd(nq*m + 1)
          !! The error checking results for the Jacobian with respect to `delta`.
-      real(kind=wp), intent(in) :: ssf(np)
+      real(wp), intent(in) :: ssf(np)
          !! The scaling values used for `beta`.
-      real(kind=wp), intent(in) :: ss(np)
+      real(wp), intent(in) :: ss(np)
          !! The scaling values used for the unfixed `beta`s.
-      real(kind=wp), intent(in) :: tt(ldtt, m)
+      real(wp), intent(in) :: tt(ldtt, m)
          !! The scaling values used for `delta`.
       integer, intent(in) :: ldtt
          !! The leading dimension of array `tt`.
-      real(kind=wp), intent(in) :: stpb(np)
+      real(wp), intent(in) :: stpb(np)
          !! The relative step used for computing finite difference derivatives with respect
          !! to each `beta`.
-      real(kind=wp), intent(in) :: stpd(ldstpd, m)
+      real(wp), intent(in) :: stpd(ldstpd, m)
          !! The relative step used for computing finite difference derivatives with respect
          !! to `delta`.
       integer, intent(in) :: ldstpd
          !! The leading dimension of array `stpd`.
-      real(kind=wp), intent(out) :: xplusd(n, m)
+      real(wp), intent(out) :: xplusd(n, m)
          !! The values of `x + delta`.
-      real(kind=wp), intent(inout) :: wrk(lwrk)
+      real(wp), intent(inout) :: wrk(lwrk)
          !! A work array, _equivalenced_ to `wrk1` and `wrk2`.
       integer, intent(in) :: lwrk
          !! The length of vector `wrk`.
-      real(kind=wp), intent(inout) :: work(lwork)
-         !! The real (kind=wp) workspace.
+      real(wp), intent(inout) :: work(lwork)
+         !! The real (wp) workspace.
       integer, intent(in) :: lwork
          !! The length of vector `work`.
       integer, intent(inout) :: iwork(liwork)
@@ -1767,12 +1767,12 @@ contains
          !! The values of the bounds for `beta`.
 
       ! Local scalars
-      real(kind=wp), parameter :: p0001 = 0.00010_wp, &
+      real(wp), parameter :: p0001 = 0.00010_wp, &
                                   p1 = 0.1_wp, &
                                   p25 = 0.25_wp, &
                                   p5 = 0.5_wp, &
                                   p75 = 0.75_wp
-      real(kind=wp) :: actred, actrs, alpha, dirder, eta, olmavg, partol, pnorm, prered, &
+      real(wp) :: actred, actrs, alpha, dirder, eta, olmavg, partol, pnorm, prered, &
                        prers, ratio, rcond, rnorm, rnormn, rnorms, rss, rvar, sstol, tau, &
                        taufac, temp, temp1, temp2, tsnorm
 
@@ -1785,10 +1785,10 @@ contains
                  intdbl, isodr, lstep, redoj, restrt
 
       ! Local arrays
-      real(kind=wp) :: loweru(np), upperu(np), wss(3)
+      real(wp) :: loweru(np), upperu(np), wss(3)
 
       ! External BLAS/LAPACK procedures
-      real(kind=wp), external :: ddot, dnrm2
+      real(wp), external :: ddot, dnrm2
       external :: dcopy
 
       ! External ODRPACK procedures
@@ -1951,7 +1951,7 @@ contains
       !  WE:      The EPSILON weights.
       !  WE1:     The square root of the EPSILON weights.
       !  WD:      The DELTA weights.
-      !  WORK:    The REAL (KIND=wp) work space.
+      !  WORK:    The REAL (wp) work space.
       !  WSS:     The sum-of-squares of the weighted EPSILONS and DELTAS, the sum-of-squares
       !           of the weighted DELTAS, and the sum-of-squares of the weighted EPSILONS.
       !  WRK:     A work array, equivalenced to WRK1 and WRK2

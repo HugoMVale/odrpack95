@@ -19,7 +19,7 @@ impure subroutine dodpc1                                                 &
    use odrpack_core, only: dhstep
 !
 !...Scalar arguments
-   real(kind = wp)                                                       &
+   real(wp)                                                       &
     partol, pnlty, sstol, taufac, wss, wssdel, wsseps
    integer                                                               &
     ipr, job, ldifx, ldstpd, ldtt, ldwd, ldwe, ldx, ldy, ld2wd, ld2we,   &
@@ -28,7 +28,7 @@ impure subroutine dodpc1                                                 &
     anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
 !
 !...Array arguments
-   real(kind = wp)                                                       &
+   real(wp)                                                       &
     beta( np), delta( n, m), lower( np), ssf( np), stpb( np), stpd(      &
     ldstpd, m), tt( ldtt, m), upper( np), wd( ldwd, ld2wd, m), we( ldwe, &
     ld2we, nq), x( ldx, m), y( ldy, nq)
@@ -36,7 +36,7 @@ impure subroutine dodpc1                                                 &
     ifixb( np), ifixx( ldifx, m), msgb( nq, np), msgd( nq, m)
 !
 !...Local scalars
-   real(kind = wp)                                                       &
+   real(wp)                                                       &
     temp1, temp2, temp3, zero
    integer                                                               &
     i, itemp, j, job1, job2, job3, job4, job5, l
@@ -128,9 +128,9 @@ impure subroutine dodpc1                                                 &
 !       TEMPC0:  A temporary CHARACTER*2 value.
 !       TEMPC1:  A temporary CHARACTER*5 value.
 !       TEMPC2:  A temporary CHARACTER*13 value.
-!       TEMP1:   A temporary REAL (KIND=wp) value.
-!       TEMP2:   A temporary REAL (KIND=wp) value.
-!       TEMP3:   A temporary REAL (KIND=wp) value.
+!       TEMP1:   A temporary REAL (wp) value.
+!       TEMP2:   A temporary REAL (wp) value.
+!       TEMP3:   A temporary REAL (wp) value.
 !       TT:      The scaling values for DELTA.
 !       WD:      The DELTA weights.
 !       WE:      The EPSILON weights.
@@ -657,7 +657,7 @@ impure subroutine dodpc2                                                 &
    use odrpack_kinds,only: wp
 !
 !...Scalar arguments
-   real(kind = wp)                                                       &
+   real(wp)                                                       &
     actred, alpha, pnlty, pnorm, prered, tau, wss
    integer                                                               &
     ipr, lunrpt, nfev, niter, np
@@ -665,11 +665,11 @@ impure subroutine dodpc2                                                 &
     fstitr, implct, prtpen
 !
 !...Array arguments
-   real(kind = wp)                                                       &
+   real(wp)                                                       &
     beta( np)
 !
 !...Local scalars
-   real(kind = wp)                                                       &
+   real(wp)                                                       &
     ratio, zero
    integer                                                               &
     j, k, l
@@ -846,7 +846,7 @@ impure subroutine dodpc3                                                 &
    use odrpack_core, only: dppt
 !
 !...Scalar arguments
-   real(kind = wp)                                                       &
+   real(wp)                                                       &
     pnlty, rcond, rvar, wss, wssdel, wsseps
    integer                                                               &
     idf, info, ipr, irank, istop, lunrpt, m,                             &
@@ -855,14 +855,14 @@ impure subroutine dodpc3                                                 &
     anajac, didvcv, dovcv, implct, isodr, redoj
 !
 !...Array arguments
-   real(kind = wp)                                                       &
+   real(wp)                                                       &
     beta( np), delta( n, m), f( n, nq), lower( np), upper( np), sdbeta(  &
     np)
    integer                                                               &
     ifixb2( np)
 !
 !...Local scalars
-   real(kind = wp)                                                       &
+   real(wp)                                                       &
     tval
    integer                                                               &
     d1, d2, d3, d4, d5, i, j, k, l, nplm1
@@ -1405,7 +1405,7 @@ impure subroutine dodpcr                                                 &
    use odrpack_core, only: dflags
 !
 !...Scalar arguments
-   real(kind = wp)                                                       &
+   real(wp)                                                       &
     actred, alpha, partol, pnorm, prered, rcond, rvar,                   &
     sstol, tau, taufac
    integer                                                               &
@@ -1416,7 +1416,7 @@ impure subroutine dodpcr                                                 &
     didvcv, fstitr, head, prtpen
 !
 !...Array arguments
-   real(kind = wp)                                                       &
+   real(wp)                                                       &
     beta( np), delta( n, m), f( n, nq), lower( np), sdbeta( np), ssf( np &
     ), stpb( np), stpd( ldstpd, m), tt( ldtt, m), upper( np), wd( ldwd,  &
     ld2wd, m), we( ldwe, ld2we, nq), wss(3), x( ldx, m), y( ldy, nq)
@@ -1424,7 +1424,7 @@ impure subroutine dodpcr                                                 &
     ifixb( np), ifixx( ldifx, m), msgb( nq* np+1), msgd( nq* m+1)
 !
 !...Local scalars
-   real(kind = wp)                                                       &
+   real(wp)                                                       &
     pnlty
    logical                                                               &
     anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
@@ -2146,7 +2146,7 @@ impure subroutine dodpe2                                                 &
     isodr
 !
 !...Array arguments
-   real(kind = wp)                                                       &
+   real(wp)                                                       &
     diff( nq, np+ m), fjacb( n, np, nq), fjacd( n, m, nq), xplusd( n, m)
    integer                                                               &
     msgb( nq, np), msgd( nq, m)
@@ -2522,7 +2522,7 @@ impure subroutine dodper                                                 &
     isodr
 !
 !...Array arguments
-   real(kind = wp)                                                       &
+   real(wp)                                                       &
     diff( nq, np+ m), fjacb( n, np, nq), fjacd( n, m, nq), xplusd( n, m)
    integer                                                               &
     msgb( nq* np+1), msgd( nq* m+1)
@@ -2714,7 +2714,7 @@ impure subroutine dodphd                                                 &
 !
 1000    format (                                                              &
     ' ********************************************************* '/       &
-    ' * ODRPACK95 version 1.00 of 12-27-2005 (REAL (KIND=wp)) * '/       &
+    ' * ODRPACK95 version 1.00 of 12-27-2005 (REAL (wp)) * '/       &
     ' ********************************************************* '/ &
     )
 end subroutine dodphd

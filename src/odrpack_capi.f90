@@ -146,7 +146,7 @@ contains
          !! Explanatory variable.
       real(c_double), intent(in), optional :: lower(np)
          !! Lower bound on `beta`.
-      real(kind=wp), intent(in), optional :: upper(np)
+      real(wp), intent(in), optional :: upper(np)
          !! Upper bound on `beta`.
       integer(c_int), intent(in), optional :: job
          !! Variable controlling initialization and computational method.
@@ -198,7 +198,7 @@ contains
          !! Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
       real(c_double), intent(in), optional :: lower(np)
          !! Lower bound on `beta`.
-      real(kind=wp), intent(in), optional :: upper(np)
+      real(wp), intent(in), optional :: upper(np)
          !! Upper bound on `beta`.
       integer(c_int), intent(in), optional :: job
          !! Variable controlling initialization and computational method.
@@ -285,7 +285,7 @@ contains
          !! Leading dimension of array `scld`, `ldscld ∈ {1, n}`.
       real(c_double), intent(in), optional :: lower(np)
          !! Lower bound on `beta`.
-      real(kind=wp), intent(in), optional :: upper(np)
+      real(wp), intent(in), optional :: upper(np)
          !! Upper bound on `beta`.
       real(c_double), intent(inout), optional :: delta(n, m)
          !! Initial error in the `x` data.
