@@ -408,9 +408,9 @@ contains
          !! The number of function parameters actually estimated.
       integer, intent(out) :: job
          !! The variable controlling problem initialization and computational method.
-      real(kind=wp), intent(out) :: partol
+      real(kind=wp), intent(inout) :: partol
          !! The parameter convergence stopping tolerance.
-      real(kind=wp), intent(out) :: sstol
+      real(kind=wp), intent(inout) :: sstol
          !! The sum-of-squares convergence stopping tolerance.
       integer, intent(out) :: maxit
          !! The maximum number of iterations allowed.
@@ -434,41 +434,41 @@ contains
       integer, intent(out) :: ipr3
          !! The value of the first digit (from the right) of `iprint`, which controls the final
          !! summary report.
-      real(kind=wp), intent(out) :: wss(3)
+      real(kind=wp), intent(inout) :: wss(3)
          !! The sum of the squares of the weighted `epsilons` and `deltas`, the sum of the squares
          !! of the weighted `deltas`, and the sum of the squares of the weighted `epsilons`.
-      real(kind=wp), intent(out) :: rvar
+      real(kind=wp), intent(inout) :: rvar
          !! The residual variance, i.e. the standard deviation squared.
-      integer, intent(out) :: idf
+      integer, intent(inout) :: idf
          !! The degrees of freedom of the fit, equal to the number of observations with nonzero
          !! weighted derivatives minus the number of parameters being estimated.
-      real(kind=wp), intent(out) :: tau
+      real(kind=wp), intent(inout) :: tau
          !! The trust region diameter.
-      real(kind=wp), intent(out) :: alpha
+      real(kind=wp), intent(inout) :: alpha
          !! The Levenberg-Marquardt parameter.
-      integer, intent(out) :: niter
+      integer, intent(inout) :: niter
          !! The number of iterations taken.
-      integer, intent(out) :: nfev
+      integer, intent(inout) :: nfev
          !! The number of function evaluations.
-      integer, intent(out) :: njev
+      integer, intent(inout) :: njev
          !! The number of Jacobian evaluations.
-      integer, intent(out) :: int2
+      integer, intent(inout) :: int2
          !! The number of internal doubling steps.
-      real(kind=wp), intent(out) :: olmavg
+      real(kind=wp), intent(inout) :: olmavg
          !! The average number of Levenberg-Marquardt steps per iteration.
-      real(kind=wp), intent(out) :: rcond
+      real(kind=wp), intent(inout) :: rcond
          !! The approximate reciprocal condition of `fjacb`.
-      integer, intent(out) :: irank
+      integer, intent(inout) :: irank
          !! The rank deficiency of the Jacobian wrt `beta`.
-      real(kind=wp), intent(out) :: actrs
+      real(kind=wp), intent(inout) :: actrs
          !! The saved actual relative reduction in the sum-of-squares.
-      real(kind=wp), intent(out) :: pnorm
+      real(kind=wp), intent(inout) :: pnorm
          !! The norm of the scaled estimated parameters.
-      real(kind=wp), intent(out) :: prers
+      real(kind=wp), intent(inout) :: prers
          !! The saved predicted relative reduction in the sum-of-squares.
-      real(kind=wp), intent(out) :: rnorms
+      real(kind=wp), intent(inout) :: rnorms
          !! The norm of the saved weighted `epsilons` and `deltas`.
-      integer, intent(out) :: istop
+      integer, intent(inout) :: istop
          !! The variable designating whether there are problems computing the function at the
          !! current `beta` and `delta`.
    
@@ -964,7 +964,7 @@ contains
       integer, intent(out) :: istop
          !! The variable designating whether there are problems computing the function at the
          !! current `beta` and `delta`.
-      integer, intent(out) :: nfev
+      integer, intent(inout) :: nfev
          !! The number of function evaluations.
       real(kind=wp), intent(out) :: eta
          !! The noise in the model results.
@@ -1198,7 +1198,7 @@ contains
          !! The leading dimension of array `tt`.
       integer, intent(in) :: neta
          !! The number of accurate digits in the function results.
-      real(kind=wp), intent(out) :: fn(n, nq)
+      real(kind=wp), intent(in) :: fn(n, nq)
          !! The predicted values of the function at the current point.
       real(kind=wp), intent(out) :: stp(n)
          !! The step used for computing finite difference derivatives with respect to `delta`.
@@ -3414,7 +3414,7 @@ contains
          !! for all but the `j`-th parameter value, which is `beta(j) + stp0`.
       real(kind=wp), intent(in) :: stp0
          !! The initial step size for the finite difference derivative.
-      real(kind=wp), intent(out) :: pv
+      real(kind=wp), intent(in) :: pv
          !! The predicted value of the model for row `nrow`.
       real(kind=wp), intent(in) :: d
          !! The derivative with respect to the `j`-th unknown parameter.
@@ -3662,7 +3662,7 @@ contains
          !! The step size for the finite difference derivative.
       real(kind=wp), intent(inout) :: curve
          !! A measure of the curvature in the model.
-      real(kind=wp), intent(out) :: pv
+      real(kind=wp), intent(in) :: pv
          !! The predicted value for row `nrow`.
       real(kind=wp), intent(in) :: d
          !! The derivative with respect to the `j`-th unknown parameter.
@@ -3842,7 +3842,7 @@ contains
       logical, intent(in) :: iswrtb
          !! The variable designating whether the derivatives wrt `beta` (`iswrtb = .true.`)
          !! or `delta` (`iswrtb = .false.`) are being checked.
-      real(kind=wp), intent(out) :: pv
+      real(kind=wp), intent(in) :: pv
          !! The predicted value for row `nrow`.
       real(kind=wp), intent(in) :: d
          !! The derivative with respect to the `j`-th unknown parameter.
@@ -4096,16 +4096,16 @@ contains
          !! The agreement tolerance.
       real(kind=wp), intent(in) :: d
          !! The derivative with respect to the `j`-th unknown parameter.
-      real(kind=wp), intent(out) :: fd
+      real(kind=wp), intent(in) :: fd
          !! The forward difference derivative wrt the `j`-th parameter.
       real(kind=wp), intent(in) :: typj
          !! The typical size of the `j`-th unknown `beta` or `delta`.
-      real(kind=wp), intent(out) :: pvpstp
+      real(kind=wp), intent(in) :: pvpstp
          !! The predicted value for row `nrow` of the model using the current parameter estimates
          !! for all but the `j`-th parameter value, which is `beta(j) + stp0`.
       real(kind=wp), intent(in) :: stp0
          !! The initial step size for the finite difference derivative.
-      real(kind=wp), intent(out) :: pv
+      real(kind=wp), intent(in) :: pv
          !! The predicted value from the model for row `nrow`.
       real(kind=wp), intent(out) :: diffj
          !! The relative differences between the user supplied and finite difference derivatives
@@ -5671,7 +5671,7 @@ contains
       integer, intent(out) :: istop
          !! The variable designating whether there are problems computing the function at the
          !! current `beta` and `delta`.
-      integer, intent(out) :: nfev
+      integer, intent(inout) :: nfev
          !! The number of function evaluations.
       real(kind=wp), intent(out) :: pvd
          !! The function value for the selected observation & response.
