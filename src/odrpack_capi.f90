@@ -150,11 +150,10 @@ contains
          !! Upper bound on `beta`.
       integer(c_int), intent(in), optional :: job
          !! Variable controlling initialization and computational method.
-      
+
       call odr(fcn, n, m, np, nq, beta, y, x, lower=lower, upper=upper, job=job)
 
    end subroutine odr_basic_c
-
 
    subroutine odr_short_c( &
       fcn, &
@@ -166,8 +165,8 @@ contains
       job, &
       iprint, lunerr, lunrpt, &
       info) bind(C)
-   !! "Short" wrapper for the `odr` routine including mandatory arguments and most commonly used 
-   !! optional arguments. Similar to the short-call statement of the original ODRPACK `DODR`. 
+   !! "Short" wrapper for the `odr` routine including mandatory arguments and most commonly used
+   !! optional arguments. Similar to the short-call statement of the original ODRPACK `DODR`.
       procedure(fcn_tc) :: fcn
          !! User-supplied subroutine for evaluating the model.
       integer(c_int), intent(in) :: n
@@ -210,10 +209,10 @@ contains
          !! Logical unit number for computation reports.
       integer(c_int), intent(out), optional :: info
          !! Logical unit number for computation reports.
-      
+
       call odr(fcn, n, m, np, nq, beta, y, x, &
                we=we, wd=wd, &
-               lower=lower, upper=upper, &            
+               lower=lower, upper=upper, &
                job=job, &
                iprint=iprint, lunerr=lunerr, lunrpt=lunrpt, &
                info=info)
@@ -252,7 +251,7 @@ contains
       real(c_double), intent(in) :: y(n, nq)
          !! Dependent variable. Unused when the model is implicit.
       real(c_double), intent(in) :: x(n, m)
-         !! Explanatory variable.     
+         !! Explanatory variable.
       real(c_double), intent(in) :: we(ldwe, ld2we, nq)
          !! `epsilon` weights.
       integer(c_int), intent(in) :: ldwe
@@ -275,13 +274,13 @@ contains
          !! Relative step for computing finite difference derivatives with respect to `beta`.
       real(c_double), intent(in) :: stpd(ldstpd, m)
          !! Relative step for computing finite difference derivatives with respect to `delta`.
-      integer(c_int), intent(in) :: ldstpd  
+      integer(c_int), intent(in) :: ldstpd
          !! Leading dimension of array `stpd`, `ldstpd ∈ {1, n}`.
       real(c_double), intent(in) :: sclb(np)
          !! Scaling values for `beta`.
       real(c_double), intent(in) :: scld(ldscld, m)
          !! Scaling values for `delta`.
-      integer(c_int), intent(in) :: ldscld  
+      integer(c_int), intent(in) :: ldscld
          !! Leading dimension of array `scld`, `ldscld ∈ {1, n}`.
       real(c_double), intent(in), optional :: lower(np)
          !! Lower bound on `beta`.
@@ -306,7 +305,7 @@ contains
       integer(c_int), intent(in), optional :: lunerr
          !! Logical unit number for error messages.
       integer(c_int), intent(in), optional :: lunrpt
-         !! Logical unit number for computation reports.     
+         !! Logical unit number for computation reports.
       integer(c_int), intent(out), optional :: info
          !! Variable designating why the computations were stopped.
 
@@ -342,10 +341,10 @@ contains
       integer :: length, i
 
       length = strlen(filename_cptr)
-      allocate(filename_fptr(length))
+      allocate (filename_fptr(length))
       call c_f_pointer(cptr=filename_cptr, fptr=filename_fptr, shape=[length])
 
-      allocate(character(len=length) :: filename)
+      allocate (character(len=length) :: filename)
       do i = 1, length
          filename(i:i) = filename_fptr(i)
       end do
@@ -364,9 +363,9 @@ contains
          !! Logical unit number.
       integer(c_int), intent(out) :: ierr
          !! Error code returned by `iostat`.
-      
+
       close (unit=lun, iostat=ierr)
-   
+
    end subroutine close_file
 
    subroutine dwinf_c(n, m, np, nq, ldwe, ld2we, isodr, workidx) bind(C)
@@ -384,7 +383,7 @@ contains
       integer(c_int), intent(in) :: ld2we
          !! Second dimension of array `we`.
       logical(c_bool), intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr = .true.`) or 
+         !! Variable designating whether the solution is by ODR (`isodr = .true.`) or
          !! by OLS (`isodr = .false.`).
       type(workidx_t), intent(out) :: workidx
          !! 0-based indexes of real work array.
@@ -408,57 +407,57 @@ contains
                  loweri, upperi, &
                  lwkmn)
 
-      workidx%eps    = epsi - 1
-      workidx%xplus  = xplusi - 1
-      workidx%fn     = fni - 1
-      workidx%sd     = sdi - 1
-      workidx%vcv    = vcvi - 1
-      workidx%rvar   = rvari - 1
-      workidx%wss    = wssi - 1
-      workidx%wssde  = wssdei - 1
-      workidx%wssep  = wssepi - 1
-      workidx%rcond  = rcondi - 1
-      workidx%eta    = etai - 1
-      workidx%olmav  = olmavi - 1
-      workidx%tau    = taui - 1
-      workidx%alpha  = alphai - 1
-      workidx%actrs  = actrsi - 1
-      workidx%pnorm  = pnormi - 1
-      workidx%rnors  = rnorsi - 1
-      workidx%prers  = prersi - 1
-      workidx%partl  = partli - 1
-      workidx%sstol  = sstoli - 1
-      workidx%taufc  = taufci - 1
-      workidx%epsma  = epsmai - 1
-      workidx%beta0  = beta0i - 1
-      workidx%betac  = betaci - 1
-      workidx%betas  = betasi - 1
-      workidx%betan  = betani - 1
-      workidx%s      = si - 1
-      workidx%ss     = ssi - 1
-      workidx%ssf    = ssfi - 1
-      workidx%qraux  = qrauxi - 1
-      workidx%u      = ui - 1
-      workidx%fs     = fsi - 1
-      workidx%fjacb  = fjacbi - 1
-      workidx%we1    = we1i - 1
-      workidx%diff   = diffi - 1
-      workidx%delts  = deltsi - 1
-      workidx%deltn  = deltni - 1
-      workidx%t      = ti - 1
-      workidx%tt     = tti - 1
-      workidx%omega  = omegai - 1
-      workidx%fjacd  = fjacdi - 1
-      workidx%wrk1   = wrk1i - 1
-      workidx%wrk2   = wrk2i - 1
-      workidx%wrk3   = wrk3i - 1
-      workidx%wrk4   = wrk4i - 1
-      workidx%wrk5   = wrk5i - 1
-      workidx%wrk6   = wrk6i - 1
-      workidx%wrk7   = wrk7i - 1
-      workidx%lower  = loweri - 1
-      workidx%upper  = upperi - 1
-      workidx%lwkmn  = lwkmn
+      workidx%eps = epsi - 1
+      workidx%xplus = xplusi - 1
+      workidx%fn = fni - 1
+      workidx%sd = sdi - 1
+      workidx%vcv = vcvi - 1
+      workidx%rvar = rvari - 1
+      workidx%wss = wssi - 1
+      workidx%wssde = wssdei - 1
+      workidx%wssep = wssepi - 1
+      workidx%rcond = rcondi - 1
+      workidx%eta = etai - 1
+      workidx%olmav = olmavi - 1
+      workidx%tau = taui - 1
+      workidx%alpha = alphai - 1
+      workidx%actrs = actrsi - 1
+      workidx%pnorm = pnormi - 1
+      workidx%rnors = rnorsi - 1
+      workidx%prers = prersi - 1
+      workidx%partl = partli - 1
+      workidx%sstol = sstoli - 1
+      workidx%taufc = taufci - 1
+      workidx%epsma = epsmai - 1
+      workidx%beta0 = beta0i - 1
+      workidx%betac = betaci - 1
+      workidx%betas = betasi - 1
+      workidx%betan = betani - 1
+      workidx%s = si - 1
+      workidx%ss = ssi - 1
+      workidx%ssf = ssfi - 1
+      workidx%qraux = qrauxi - 1
+      workidx%u = ui - 1
+      workidx%fs = fsi - 1
+      workidx%fjacb = fjacbi - 1
+      workidx%we1 = we1i - 1
+      workidx%diff = diffi - 1
+      workidx%delts = deltsi - 1
+      workidx%deltn = deltni - 1
+      workidx%t = ti - 1
+      workidx%tt = tti - 1
+      workidx%omega = omegai - 1
+      workidx%fjacd = fjacdi - 1
+      workidx%wrk1 = wrk1i - 1
+      workidx%wrk2 = wrk2i - 1
+      workidx%wrk3 = wrk3i - 1
+      workidx%wrk4 = wrk4i - 1
+      workidx%wrk5 = wrk5i - 1
+      workidx%wrk6 = wrk6i - 1
+      workidx%wrk7 = wrk7i - 1
+      workidx%lower = loweri - 1
+      workidx%upper = upperi - 1
+      workidx%lwkmn = lwkmn
 
    end subroutine dwinf_c
 
