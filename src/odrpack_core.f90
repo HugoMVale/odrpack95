@@ -1056,7 +1056,7 @@ contains
 
       ! Adjust the points used in calculating FCN to uphold the boundary constraints
       do k = 1, np
-         sbk = sign(one, parpts(2, k) - parpts(-2, k))
+         sbk = int(sign(one, parpts(2, k) - parpts(-2, k)))
          if (parpts(sbk*2, k) > upper(k)) then
             shift = upper(k) - parpts(sbk*2, k)
             parpts(sbk*2, k) = upper(k)
@@ -1126,7 +1126,7 @@ contains
             eta = max(wrk7(j, l), eta)
          end do
       end do
-      neta = max(two, p5 - log10(eta))
+      neta = int(max(two, p5 - log10(eta)))
 
    end subroutine detaf
 
@@ -3192,7 +3192,7 @@ contains
 
       ! Set tolerance for checking derivatives
       tol = eta**(0.25E0_wp)
-      ntol = max(one, p5 - log10(tol))
+      ntol = int(max(one, p5 - log10(tol)))
 
       ! Compute, if necessary, PV0
       pv0 = pv0i
