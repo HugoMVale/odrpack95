@@ -70,7 +70,7 @@ contains
       !    SIAM J. Sci. Stat. Comput., 8(6):1052-1078.
 
       use odrpack_kinds, only: negone, zero
-      use odrpack_core, only: fcn_t, tempret !@todo
+      use odrpack_core, only: fcn_t
 
       procedure(fcn_t) :: fcn
          !! User-supplied subroutine for evaluating the model.
@@ -148,6 +148,7 @@ contains
       real(wp) :: ltaufac, lsstol, lpartol
       real(wp) :: llower(np), lwe(n, nq, nq), lwd(n, m, m), lstpb(np), lstpd(n, m), &
                   lsclb(np), lscld(n, m), lupper(np), wd1(1, 1, 1)
+      real(wp), allocatable :: tempret(:, :)
 
       real(wp), pointer, save :: lwork(:)
       integer, pointer, save :: liwork(:)
@@ -605,7 +606,7 @@ contains
              liprint, llunerr, llunrpt, &
              lstpb, lstpd(1:ldstpd, 1:m), ldstpd, &
              lsclb, lscld(1:ldscld, 1:m), ldscld, &
-             lwork, lenwork, liwork, leniwork, &
+             lwork, lenwork, tempret, liwork, leniwork, &
              linfo, &
              llower, lupper)
       else
@@ -623,7 +624,7 @@ contains
              liprint, llunerr, llunrpt, &
              lstpb, lstpd(1:ldstpd, 1:m), ldstpd, &
              lsclb, lscld(1:ldscld, 1:m), ldscld, &
-             lwork, lenwork, liwork, leniwork, &
+             lwork, lenwork, tempret, liwork, leniwork, &
              linfo, &
              llower, lupper)
       end if
@@ -669,7 +670,7 @@ contains
        we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
        job, ndigit, taufac, sstol, partol, maxit, iprint, lunerr, lunrpt, &
        stpb, stpd, ldstpd, sclb, scld, ldscld, &
-       work, lwork, iwork, liwork, &
+       work, lwork, tempret, iwork, liwork, &
        info, &
        lower, upper)
    !! Driver routine for finding the weighted explicit or implicit orthogonal distance
@@ -755,6 +756,8 @@ contains
          !! The real work space.
       integer, intent(in) :: lwork
          !! The length of vector `work`.
+      real(wp), intent(inout) :: tempret(:, :)
+         !! Temporary work array for holding return values before copying to a lower rank array.
       integer, intent(inout) :: iwork(liwork)
          !! The integer work space.
       integer, intent(in) :: liwork
@@ -909,7 +912,7 @@ contains
                 jobi, ndigit, taufac, sstol, cnvtol, maxiti, &
                 iprnti, lunerr, lunrpt, &
                 stpb, stpd, ldstpd, sclb, scld, ldscld, &
-                work, lwork, iwork, liwork, &
+                work, lwork, tempret, iwork, liwork, &
                 maxit1, tstimp, info, lower, upper)
 
             if (done) then
@@ -944,7 +947,7 @@ contains
              job, ndigit, taufac, sstol, partol, maxit, &
              iprint, lunerr, lunrpt, &
              stpb, stpd, ldstpd, sclb, scld, ldscld, &
-             work, lwork, iwork, liwork, &
+             work, lwork, tempret, iwork, liwork, &
              maxit1, tstimp, info, lower, upper)
       end if
 
@@ -957,7 +960,7 @@ contains
        job, ndigit, taufac, sstol, partol, maxit, &
        iprint, lunerr, lunrpt, &
        stpb, stpd, ldstpd, sclb, scld, ldscld, &
-       work, lwork, iwork, liwork, &
+       work, lwork, tempret, iwork, liwork, &
        maxit1, tstimp, info, lower, upper)
    !! Performs error checking and initialization, and begins procedure for performing orthogonal
    !! distance regression (ODR) or ordinary linear or nonlinear least squares (OLS).
@@ -970,7 +973,6 @@ contains
       use odrpack_kinds, only: zero, one, ten, p5 => half
       use odrpack_core, only: fcn_t, detaf, dfctrw, dflags, diniwk, diwinf, djck, dodchk, &
                               dpack, dsetn, dunpac, dwght, dwinf, derstep, mbfb
-      use odrpack_core, only: tempret ! @todo: remove
 
       logical, intent(in) :: head
          !! The variable designating whether the heading is to be printed (`head = .true.`)
@@ -1055,6 +1057,8 @@ contains
          !! The real work space.
       integer, intent(in) :: lwork
          !! The length of vector `work`.
+      real(wp), intent(inout) :: tempret(:, :)
+         !! Temporary work array for holding return values before copying to a lower rank array.
       integer, intent(inout) :: iwork(liwork)
          !! The integer work space.
       integer, intent(in) :: liwork
@@ -1610,7 +1614,7 @@ contains
                  work(ssfi), work(ssi), work(tti), ldtt, &
                  stpb, stpd, ldstpd, &
                  work(xplusi), work(wrk), lwrk, &
-                 work, lwork, iwork, liwork, info, &
+                 work, lwork, tempret, iwork, liwork, info, &
                  iwork(boundi))
       maxit1 = iwork(maxiti) - iwork(niteri)
       tstimp = zero
@@ -1633,7 +1637,7 @@ contains
        lower, upper, &
        t, f, fn, fs, fjacb, msgb, fjacd, msgd, &
        ssf, ss, tt, ldtt, stpb, stpd, ldstpd, &
-       xplusd, wrk, lwrk, work, lwork, iwork, liwork, info, &
+       xplusd, wrk, lwrk, work, lwork, tempret, iwork, liwork, info, &
        bound)
    !! Iteratively compute least squares solution.
       ! Date Written   860529   (YYMMDD)
@@ -1642,7 +1646,6 @@ contains
       use odrpack_kinds, only: zero, one
       use odrpack_core, only: fcn_t, dacces, devjac, dflags, dunpac, dwght, dpack, dodvcv, &
                               dodlm
-      use odrpack_core, only: tempret ! @todo: remove
 
       logical, intent(in) :: head
          !! The variable designating whether the heading is to be printed (`head = .true.`)
@@ -1757,6 +1760,8 @@ contains
          !! The real (wp) workspace.
       integer, intent(in) :: lwork
          !! The length of vector `work`.
+      real(wp), intent(inout) :: tempret(:, :)
+         !! Temporary work array for holding return values before copying to a lower rank array.
       integer, intent(inout) :: iwork(liwork)
          !! The integer workspace.
       integer, intent(in) :: liwork
@@ -2062,7 +2067,7 @@ contains
                      ifixb, ifixx, ldifx, &
                      x, ldx, delta, xplusd, stpd, ldstpd, &
                      ssf, tt, ldtt, neta, fs, &
-                     t, work(wrk1), work(wrk2), work(wrk3), work(wrk6), &
+                     t, work(wrk1), work(wrk2), work(wrk3), work(wrk6), tempret, &
                      fjacb, isodr, fjacd, we1, ldwe, ld2we, &
                      njev, nfev, istop, info, &
                      lower, upper)
@@ -2091,7 +2096,7 @@ contains
                     work(u), work(qraux), iwork(jpvt), &
                     s, t, nlms, rcond, irank, &
                     work(wrk1), work(wrk2), work(wrk3), work(wrk4), &
-                    work(wrk5), wrk, lwrk, istopc)
+                    work(wrk5), wrk, lwrk, tempret, istopc)
       end if
       if (istopc /= 0) then
          info = istopc
@@ -2191,8 +2196,7 @@ contains
          wrk(1:n*nq) = reshape(tempret(1:n, 1:nq), [n*nq])
          if (isodr) then
             call dwght(n, m, wd, ldwd, ld2wd, deltan, tempret(1:n, 1:m))
-            wrk(n*nq + 1:n*nq + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [ &
-                                                       n*m])
+            wrk(n*nq + 1:n*nq + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
             rnormn = sqrt(ddot(n*nq, wrk, 1, wrk, 1) + &
                           ddot(n*m, deltan, 1, wrk(n*nq + 1), 1))
          else
@@ -2286,8 +2290,7 @@ contains
                     reshape(betac, [npp, 1]), tempret(1:npp, 1:1))
          wrk(1:npp) = tempret(1:npp, 1)
          if (isodr) then
-            call dwght(n, m, reshape(tt, [ldtt, 1, m]), ldtt, 1, &
-                       delta, tempret(1:n, 1:m))
+            call dwght(n, m, reshape(tt, [ldtt, 1, m]), ldtt, 1, delta, tempret(1:n, 1:m))
             wrk(npp + 1:npp + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
             pnorm = dnrm2(npp + n*m, wrk, 1)
          else
@@ -2400,7 +2403,7 @@ contains
                         ifixb, ifixx, ldifx, &
                         x, ldx, delta, xplusd, stpd, ldstpd, &
                         ssf, tt, ldtt, neta, fs, &
-                        t, work(wrk1), work(wrk2), work(wrk3), work(wrk6), &
+                        t, work(wrk1), work(wrk2), work(wrk3), work(wrk6), tempret, &
                         fjacb, isodr, fjacd, we1, ldwe, ld2we, &
                         njev, nfev, istop, info, &
                         lower, upper)
@@ -2430,7 +2433,7 @@ contains
                         work(u), work(qraux), iwork(jpvt), &
                         s, t, irank, rcond, rss, idf, rvar, ifixb, &
                         work(wrk1), work(wrk2), work(wrk3), work(wrk4), &
-                        work(wrk5), wrk, lwrk, istopc)
+                        work(wrk5), wrk, lwrk, tempret, istopc)
             if (istopc /= 0) then
                info = istopc
                goto 200

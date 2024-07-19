@@ -4,9 +4,6 @@ module odrpack_core
    use odrpack_kinds, only: wp
    implicit none
 
-   ! A temporary work array for holding return values before copying to a lower rank array.
-   real(wp), allocatable :: tempret(:, :)
-
    abstract interface
       subroutine fcn_t(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, ldifx, &
                        ideval, f, fjacb, fjacd, istop)
@@ -62,7 +59,7 @@ contains
        alpha2, tau, epsfcn, isodr, &
        tfjacb, omega, u, qraux, jpvt, &
        s, t, nlms, rcond, irank, &
-       wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
+       wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, tempret, istopc)
    !! Compute Levenberg-Marquardt parameter and steps `s` and `t` using analog of the
    !! trust-region Levenberg-Marquardt algorithm.
       ! Routines Called  DDOT, DNRM2, DODSTP, DSCALE, DWGHT
@@ -144,6 +141,8 @@ contains
          !! A work array of `(lwrk)` elements, _equivalenced_ to `wrk1` and `wrk2`.
       integer, intent(in) :: lwrk
          !! The length of vector `wrk`.
+      real(wp), intent(inout) :: tempret(:, :)
+         !! Temporary work array for holding return values before copying to a lower rank array.
       integer, intent(out) :: istopc
          !! The variable designating whether the computations were stopped due to some other
          !! numerical error detected within subroutine `dodstp`.
@@ -228,7 +227,7 @@ contains
                   alpha1, epsfcn, isodr, &
                   tfjacb, omega, u, qraux, jpvt, &
                   s, t, phi1, irank, rcond, forvcv, &
-                  wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
+                  wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, tempret, istopc)
       if (istopc /= 0) then
          return
       end if
@@ -288,7 +287,7 @@ contains
                      alpha2, epsfcn, isodr, &
                      tfjacb, omega, u, qraux, jpvt, &
                      s, t, phi2, irank, rcond, forvcv, &
-                     wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
+                     wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, tempret, istopc)
          if (istopc /= 0) then
             return
          end if
@@ -1139,7 +1138,7 @@ contains
        ifixb, ifixx, ldifx, &
        x, ldx, delta, xplusd, stpd, ldstpd, &
        ssf, tt, ldtt, neta, fn, &
-       stp, wrk1, wrk2, wrk3, wrk6, &
+       stp, wrk1, wrk2, wrk3, wrk6, tempret, &
        fjacb, isodr, fjacd, we1, ldwe, ld2we, &
        njev, nfev, istop, info, &
        lower, upper)
@@ -1210,6 +1209,8 @@ contains
          !! A work array of `(np)` elements.
       real(wp), intent(out) :: wrk6(n, np, nq)
          !! A work array of `(n, np, nq)` elements.
+      real(wp), intent(inout) :: tempret(:, :)
+         !! Temporary work array for holding return values before copying to a lower rank array.
       real(wp), intent(out) :: fjacb(n, np, nq)
          !! The Jacobian with respect to `beta`.
       logical, intent(in) :: isodr
@@ -4487,7 +4488,7 @@ contains
        alpha, epsfcn, isodr, &
        tfjacb, omega, u, qraux, kpvt, &
        s, t, phi, irank, rcond, forvcv, &
-       wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
+       wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, tempret, istopc)
    !! Compute locally constrained steps `s` and `t`, and `phi(alpha)`.
       ! Routines Called  IDAMAX, DCHEX, DESUBI, DFCTR, DNRM2, DQRDC, DQRSL, DROT,
       !                  DROTG, DSOLVE, DTRCO, DTRSL, DVEVTR, DWGHT
@@ -4574,6 +4575,8 @@ contains
          !! A work array of `(lwrk)` elements, _equivalenced_ to `wrk1` and `wrk2`.
       integer, intent(in) :: lwrk
          !! The length of vector `wrk`.
+      real(wp), intent(inout) :: tempret(:, :)
+         !! Temporary work array for holding return values before copying to a lower rank array.
       integer, intent(inout) :: istopc
          !! The variable designating whether the computations were stopped due to a numerical
          !! error within subroutine `dodstp`.
@@ -4904,7 +4907,7 @@ contains
        vcv, sd, &
        wrk6, omega, u, qraux, jpvt, &
        s, t, irank, rcond, rss, idf, rvar, ifixb, &
-       wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
+       wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, tempret, istopc)
    !! Compute covariance matrix of estimated parameters.
       ! Routines Called  DPODI, DODSTP
       ! Date Written   901207   (YYMMDD)
@@ -4995,6 +4998,8 @@ contains
          !! A work array of `(lwrk)` elements, _equivalenced_ to `wrk1` and `wrk2`.
       integer, intent(in) :: lwrk
          !! The length of vector `lwrk`.
+      real(wp), intent(inout) :: tempret(:, :)
+         !! Temporary work array for holding return values before copying to a lower rank array.
       integer, intent(out) :: istopc
          !! The variable designating whether the computations were stoped due to a numerical
          !! error within subroutine `dodstp`.
@@ -5076,7 +5081,7 @@ contains
                   zero, epsfcn, isodr, &
                   wrk6, omega, u, qraux, jpvt, &
                   s, t, temp, irank, rcond, forvcv, &
-                  wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
+                  wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, tempret, istopc)
       if (istopc /= 0) then
          return
       end if
