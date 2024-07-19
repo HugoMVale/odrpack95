@@ -18,7 +18,7 @@ program tester
 !  STAT
 
 !...LOCAL ARRAYS
-   real(kind=wp) :: beta(:), y(:, :), x(:, :), upper(2), lower(2)
+   real(wp) :: beta(:), y(:, :), x(:, :), upper(2), lower(2)
 
 !...ALLOCATABLE ARRAYS
    allocatable :: beta, y, x
@@ -184,12 +184,12 @@ subroutine fcn &
    integer :: ideval, istop, ldifx, ldm, ldn, ldnp, m, n, np, nq
 
 !...ARRAY ARGUMENTS
-   real(kind=wp) :: beta(np), f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq), &
+   real(wp) :: beta(np), f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq), &
                     xplusd(ldn, m)
    integer :: ifixb(np), ifixx(ldifx, m)
 
 !...ARRAYS IN COMMON
-   real(kind=wp) :: lower(2), upper(2)
+   real(wp) :: lower(2), upper(2)
 
 !...LOCAL SCALARS
    integer :: i

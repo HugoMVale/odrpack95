@@ -15,7 +15,7 @@ program dtest
    integer :: ntest
 
 !...Local scalars
-   real(kind=wp) :: tstfac
+   real(wp) :: tstfac
    integer :: lunerr, lunrpt, lunsum
    logical :: passed
 
@@ -39,7 +39,7 @@ program dtest
 !       disagreed (PASSED=FALSE).
 !       TSTFAC:  The user-supplied factor for scaling the test tolerances
 !       used to check for agreement between computed results and
-!       results obtained using REAL (KIND=wp) version on cray
+!       results obtained using REAL (wp) version on cray
 !       YMP.  Values of TSTFAC greater than one increase the
 !       test tolerances, making the tests easier to pass and
 !       allowing small discrepancies between the computed and
@@ -64,7 +64,7 @@ program dtest
    open (unit=lunerr, file='./test/test_solution_report.txt')
    open (unit=lunsum, file='./test/test_solution_summary.txt')
 
-!  Exercise REAL (KIND=wp) version of ODRPACK95
+!  Exercise REAL (wp) version of ODRPACK95
 !  (test reports generated on file 'RESULTS' and
 !       summarized in file 'SUMMARY')
 
@@ -91,7 +91,7 @@ subroutine dodrx(tstfac, passed, lunsum)
    implicit none
 
 !...Parameters
-   real(kind=wp), parameter :: base = radix(1.0E0_wp)
+   real(wp), parameter :: base = radix(1.0E0_wp)
    integer, parameter :: maxn = 50, maxm = 3, maxnp = 10, maxnq = 2, ntests = 23, &
                          ldwe = maxn, ld2we = maxnq, ldwd = maxn, ld2wd = maxm, &
                          lwork = 18 + 11*maxnp + maxnp**2 + maxm + maxm**2 + &
@@ -101,7 +101,7 @@ subroutine dodrx(tstfac, passed, lunsum)
                          liwork = 20 + maxnp + maxnq*(maxnp + maxm)
 
 !...Scalar arguments
-   real(kind=wp) :: tstfac
+   real(wp) :: tstfac
    integer :: lunsum
    logical :: passed
 
@@ -112,28 +112,28 @@ subroutine dodrx(tstfac, passed, lunsum)
    integer :: i, info, iprint, itest, job, l, ldifx, ldscld, ldstpd, ldwd1, ldwe1, &
               ldx, ldy, ld2wd1, ld2we1, liwmin, lun, lunerr, lunrpt, lwmin, &
               m, maxit, msg, n, ndigit, np, nq
-   real(kind=wp) :: bnrm, epsmac, ewrt, ewrt2, hundrd, one, p01, p2, partol, sstol, &
-                    taufac, three, tsttol, two, wss, wssdel, wsseps, zero
+   real(wp) :: bnrm, epsmac, ewrt, ewrt2, hundrd, one, p01, p2, partol, sstol, &
+               taufac, three, tsttol, two, wss, wssdel, wsseps, zero
    logical :: failed, fails, isodr, short
    character(len=80) :: title
 
 !...Arrays in common
-   real(kind=wp) :: lower(maxnp), upper(maxnp)
+   real(wp) :: lower(maxnp), upper(maxnp)
 
 !...Local arrays
-   real(kind=wp) :: beta(maxnp), dpymp(2, ntests), &
-                    sclb(maxnp), scld(maxn, maxm), &
-                    stpb(maxnp), stpd(maxn, maxm), &
-                    we(maxn, maxnq, maxnq), wd(maxn, maxm, maxm), &
-                    wrk(maxn*maxm + maxn*maxnq), x(maxn, maxm), y(maxn, maxnq), &
-                    tempretl(maxn, maxm)
-   real(kind=wp), pointer :: work(:)
-   real(kind=wp), allocatable :: delta(:, :)
+   real(wp) :: beta(maxnp), dpymp(2, ntests), &
+               sclb(maxnp), scld(maxn, maxm), &
+               stpb(maxnp), stpd(maxn, maxm), &
+               we(maxn, maxnq, maxnq), wd(maxn, maxm, maxm), &
+               wrk(maxn*maxm + maxn*maxnq), x(maxn, maxm), y(maxn, maxnq), &
+               tempretl(maxn, maxm)
+   real(wp), pointer :: work(:)
+   real(wp), allocatable :: delta(:, :)
    integer :: idpymp(ntests), ifixb(maxnp), ifixx(maxn, maxm)
    integer, pointer :: iwork(:)
 
 !...External functions
-   real(kind=wp), external :: ddot, dnrm2
+   real(wp), external :: ddot, dnrm2
 
 !...External subroutines
    external :: dodrxd, dodrxf, dodrxw
@@ -254,7 +254,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 !       BNRM:    The norm of BETA.
 !       DELTA:   The error in the X data.
 !       DPYMP:   The floating point results from a cray YMP using
-!       REAL (KIND=wp).
+!       REAL (wp).
 !       EPSMAC:  The value of machine precision.
 !       EWRT:    A temporary variable for the denominator of the relative error
 !       calculations (error with respect to).
@@ -262,16 +262,16 @@ subroutine dodrx(tstfac, passed, lunsum)
 !       calculations (error with respect to).
 !       FAILED:  The variable designating whether the results of all of the
 !       demonstration runs agreed with those from the cray YMP
-!       using REAL (KIND=wp) (FAILED=FALSE) or whether some of
+!       using REAL (wp) (FAILED=FALSE) or whether some of
 !       the tests disagreed (FAILED=TRUE).
 !       FAILS:   The variable designating whether the results of an
 !       individual demonstration run agreed with those from the
-!       cray YMP using REAL (KIND=wp) (FAILS=FALSE) or
+!       cray YMP using REAL (wp) (FAILS=FALSE) or
 !       disagree (FAILS=TRUE).
 !       HUNDRD:  The value 100.0E0_wp.
 !       I:       An index variable.
 !       IDPYMP:  The integer results from a cray YMP using
-!       REAL (KIND=wp).
+!       REAL (wp).
 !       IFIXB:   The values designating whether the elements of BETA are
 !       fixed at their input values or not.
 !       IFIXX:   The values designating whether the elements of DELTA are
@@ -321,7 +321,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 !       ONE:     The value 1.0E0_wp.
 !       PASSED:  The variable designating whether the results of all of the
 !       demonstration runs agreed with those from the cray YMP
-!       using REAL (KIND=wp) (PASSED=TRUE), or whether some of
+!       using REAL (wp) (PASSED=TRUE), or whether some of
 !       the results disagreed (PASSED=FALSE).
 !       P01:     The value 0.01E0_wp.
 !       P2:      The value 0.2E0_wp.
@@ -338,15 +338,15 @@ subroutine dodrx(tstfac, passed, lunsum)
 !       TITLE:   The reference for the data set being analyzed.
 !       TSTFAC:  The user-supplied factor for scaling the test tolerances
 !       used to check for agreement between computed results and
-!       results obtained using REAL (KIND=wp) version on cray
+!       results obtained using REAL (wp) version on cray
 !       YMP.
 !       TSTTOL:  The test tolerance used in checking computed values for
 !       purposes of determining proper installation.
 !       TWO:     The value 2.0E0_wp.
 !       WD:      The DELTA weights.
 !       WE:      The EPSILON weights.
-!       WORK:    The REAL (KIND=wp) work space.
-!       WRK:     The REAL (KIND=wp) work space for computing test results.
+!       WORK:    The REAL (wp) work space.
+!       WRK:     The REAL (wp) work space for computing test results.
 !       WSS:     The sum of the squared weighted errors.
 !       WSSDEL:  The sum of the squared weighted errors in X.
 !       WSSEPS:  The sum of the squared weighted errors in Y.
@@ -1081,7 +1081,7 @@ subroutine dodrx(tstfac, passed, lunsum)
       end if
 
 !  Compare results with those obtained on the cray ymp or the intel xeon running
-!  Linux using REAL (KIND=wp) version of ODRPACK95
+!  Linux using REAL (wp) version of ODRPACK95
 
       bnrm = dnrm2(np, beta, 1)
       call dwght(n, m, wd, ldwd1, ld2wd1, reshape(work(1:n*m), (/n, m/)), &
@@ -1268,7 +1268,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 2200 format(' Data Set Reference: ', A80)
 3100 format &
       (/' Comparison of new results with', &
-        ' REAL (KIND=wp) Cray YMP or Intel X86 (Linux) '/ &
+        ' REAL (wp) Cray YMP or Intel X86 (Linux) '/ &
         ' Result:'// &
         '                         Norm of BETA', &
         '        Sum of Squared WTD OBS Errors  INFO')
@@ -1325,7 +1325,7 @@ subroutine dodrxd &
    character(len=80) :: title
 
 !...Array arguments
-   real(kind=wp) :: beta(*), x(ldx, *), y(ldy, *)
+   real(wp) :: beta(*), x(ldx, *), y(ldy, *)
 
 !...Scalars in common
    integer :: setno
@@ -1334,8 +1334,7 @@ subroutine dodrxd &
    integer :: i, j, k, l
 
 !...Local arrays
-   real(kind=wp) :: bdata(maxnp, maxset), xdata(maxn, maxm, maxset), &
-                    ydata(maxn, maxnq, maxset)
+   real(wp) :: bdata(maxnp, maxset), xdata(maxn, maxm, maxset), ydata(maxn, maxnq, maxset)
    integer :: mdata(maxset), ndata(maxset), npdata(maxset), nqdata(maxset)
    character(len=80) :: tdata(maxset)
 
@@ -2231,8 +2230,7 @@ subroutine dodrxf &
    integer :: ideval, istop, ldifx, ldm, ldn, ldnp, m, n, np, nq
 
 !...Array arguments
-   real(kind=wp) :: beta(np), f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq), &
-                    xplusd(ldn, m)
+   real(wp) :: beta(np), f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq), xplusd(ldn, m)
    integer :: ifixb(np), ifixx(ldifx, m)
 
 !...Scalar parameters
@@ -2242,10 +2240,10 @@ subroutine dodrxf &
    integer :: setno
 
 !...Arrays in common
-   real(kind=wp) :: lower(maxnp), upper(maxnp)
+   real(wp) :: lower(maxnp), upper(maxnp)
 
 !...Local scalars
-   real(kind=wp) :: ctheta, fac1, fac2, fac3, fac4, freq, omega, phi, pi, r, stheta, theta
+   real(wp) :: ctheta, fac1, fac2, fac3, fac4, freq, omega, phi, pi, r, stheta, theta
    integer :: i, j, k
 
 !...Common blocks
@@ -2622,7 +2620,6 @@ subroutine dodrxw(maxn, maxm, maxnp, maxnq, ldwe, ld2we, isodr, liwmin, lwmin)
 !***End Prologue  DODRXW
 !
 !...Used modules
-   use odrpack_kinds, only: wp
    implicit none
 
 !...Scalar arguments
