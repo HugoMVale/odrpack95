@@ -185,7 +185,7 @@ impure subroutine dodpc1                                                 &
    if ( anajac) then
       write ( lunrpt,1140) job4
       if ( chkjac) then
-         if ( msgb1 .ge. 1 .or. msgd1 .ge. 1) then
+         if ( msgb1 >= 1 .or. msgd1 >= 1) then
             write ( lunrpt,1141)
          else
             write ( lunrpt,1142)
@@ -207,7 +207,7 @@ impure subroutine dodpc1                                                 &
    else
       write ( lunrpt,1152) job5
    endif
-   if ( neta .lt. 0) then
+   if ( neta < 0) then
       write ( lunrpt,1200)- neta
    else
       write ( lunrpt,1210) neta
@@ -235,15 +235,15 @@ impure subroutine dodpc1                                                 &
    endif
 !
 !
-   if ( ipr .ge. 2) then
+   if ( ipr >= 2) then
 !
 !
 !  Print function parameter data
 !
       write ( lunrpt,4000)
       if ( chkjac .and.                                                  &
-          (( msgb1 .ge. 1) .or.                                          &
-           ( msgd1 .ge. 1))) then
+          (( msgb1 >= 1) .or.                                          &
+           ( msgd1 >= 1))) then
          write ( lunrpt,4110)
       elseif ( anajac) then
          write ( lunrpt,4120)
@@ -251,10 +251,10 @@ impure subroutine dodpc1                                                 &
          write ( lunrpt,4200)
       endif
       do 130 j = 1, np
-         if ( ifixb(1) .lt. 0) then
+         if ( ifixb(1) < 0) then
             tempc1 = '   NO'
          else
-            if ( ifixb( j) .ne. 0) then
+            if ( ifixb( j) /= 0) then
                tempc1 = '   NO'
             else
                tempc1 = '  YES'
@@ -262,17 +262,17 @@ impure subroutine dodpc1                                                 &
          endif
          if ( anajac) then
             if ( chkjac .and.                                            &
-                (( msgb1 .ge. 1) .or.                                    &
-                 ( msgd1 .ge. 1))) then
+                (( msgb1 >= 1) .or.                                    &
+                 ( msgd1 >= 1))) then
                itemp = -1
                do 110 l = 1, nq
                   itemp = max( itemp, msgb( l, j))
 110                 continue
-               if ( itemp .le. -1) then
+               if ( itemp <= -1) then
                   tempc2 = '    UNCHECKED'
-               elseif ( itemp .eq. 0) then
+               elseif ( itemp == 0) then
                   tempc2 = '     VERIFIED'
-               elseif ( itemp .ge. 1) then
+               elseif ( itemp >= 1) then
                   tempc2 = ' QUESTIONABLE'
                endif
             else
@@ -281,7 +281,7 @@ impure subroutine dodpc1                                                 &
          else
             tempc2 = '             '
          endif
-         if ( ssf(1) .lt. zero) then
+         if ( ssf(1) < zero) then
             temp1 = abs( ssf(1))
          else
             temp1 = ssf( j)
@@ -305,8 +305,8 @@ impure subroutine dodpc1                                                 &
       if ( isodr) then
          write ( lunrpt,2010)
          if ( chkjac .and.                                               &
-             (( msgb1 .ge. 1) .or.                                       &
-              ( msgd1 .ge. 1))) then
+             (( msgb1 >= 1) .or.                                       &
+              ( msgd1 >= 1))) then
             write ( lunrpt,2110)
          elseif ( anajac) then
             write ( lunrpt,2120)
@@ -322,17 +322,17 @@ impure subroutine dodpc1                                                 &
             tempc0 = '1,'
             do 230 i = 1, n, n-1
 !
-               if ( ifixx(1,1) .lt. 0) then
+               if ( ifixx(1,1) < 0) then
                   tempc1 = '   NO'
                else
-                  if ( ldifx .eq. 1) then
-                     if ( ifixx(1, j) .eq. 0) then
+                  if ( ldifx == 1) then
+                     if ( ifixx(1, j) == 0) then
                         tempc1 = '  YES'
                      else
                         tempc1 = '   NO'
                      endif
                   else
-                     if ( ifixx( i, j) .eq. 0) then
+                     if ( ifixx( i, j) == 0) then
                         tempc1 = '  YES'
                      else
                         tempc1 = '   NO'
@@ -340,27 +340,27 @@ impure subroutine dodpc1                                                 &
                   endif
                endif
 !
-               if ( tt(1,1) .lt. zero) then
+               if ( tt(1,1) < zero) then
                   temp1 = abs( tt(1,1))
                else
-                  if ( ldtt .eq. 1) then
+                  if ( ldtt == 1) then
                      temp1 = tt(1, j)
                   else
                      temp1 = tt( i, j)
                   endif
                endif
 !
-               if ( wd(1,1,1) .lt. zero) then
+               if ( wd(1,1,1) < zero) then
                   temp2 = abs( wd(1,1,1))
                else
-                  if ( ldwd .eq. 1) then
-                     if ( ld2wd .eq. 1) then
+                  if ( ldwd == 1) then
+                     if ( ld2wd == 1) then
                         temp2 = wd(1,1, j)
                      else
                         temp2 = wd(1, j, j)
                      endif
                   else
-                     if ( ld2wd .eq. 1) then
+                     if ( ld2wd == 1) then
                         temp2 = wd( i,1, j)
                      else
                         temp2 = wd( i, j, j)
@@ -370,24 +370,24 @@ impure subroutine dodpc1                                                 &
 !
                if ( anajac) then
                   if ( chkjac .and.                                      &
-                      ((( msgb1 .ge. 1) .or.                             &
-                        ( msgd1 .ge. 1)) .and.                           &
-                       ( i .eq. 1))) then
+                      ((( msgb1 >= 1) .or.                             &
+                        ( msgd1 >= 1)) .and.                           &
+                       ( i == 1))) then
                      itemp = -1
                      do 210 l = 1, nq
                         itemp = max( itemp, msgd( l, j))
 210                       continue
-                     if ( itemp .le. -1) then
+                     if ( itemp <= -1) then
                         tempc2 = '    UNCHECKED'
-                     elseif ( itemp .eq. 0) then
+                     elseif ( itemp == 0) then
                         tempc2 = '     VERIFIED'
-                     elseif ( itemp .ge. 1) then
+                     elseif ( itemp >= 1) then
                         tempc2 = ' QUESTIONABLE'
                      endif
                   else
                      tempc2 = '             '
                   endif
-                  if ( m .le. 9) then
+                  if ( m <= 9) then
                      write ( lunrpt,5110)                                &
                       tempc0, j, x( i, j),                               &
                       delta( i, j), tempc1, temp1, temp2, tempc2
@@ -403,7 +403,7 @@ impure subroutine dodpc1                                                 &
                   else
                      temp3 = dhstep(0, neta, i, j, stpd, ldstpd)
                   endif
-                  if ( m .le. 9) then
+                  if ( m <= 9) then
                      write ( lunrpt,5210)                                &
                       tempc0, j, x( i, j),                               &
                       delta( i, j), tempc1, temp1, temp2, temp3
@@ -417,14 +417,14 @@ impure subroutine dodpc1                                                 &
                tempc0 = 'N,'
 !
 230              continue
-            if ( j .lt. m)write ( lunrpt,6000)
+            if ( j < m)write ( lunrpt,6000)
 240           continue
       else
 !
          do 260 j = 1, m
             tempc0 = '1,'
             do 250 i = 1, n, n-1
-               if ( m .le. 9) then
+               if ( m <= 9) then
                   write ( lunrpt,5110)                                   &
                    tempc0, j, x( i, j)
                else
@@ -433,7 +433,7 @@ impure subroutine dodpc1                                                 &
                endif
                tempc0 = 'N,'
 250              continue
-            if ( j .lt. m)write ( lunrpt,6000)
+            if ( j < m)write ( lunrpt,6000)
 260           continue
       endif
 !
@@ -445,22 +445,22 @@ impure subroutine dodpc1                                                 &
          do 310 l = 1, nq
             tempc0 = '1,'
             do 300 i = 1, n, n-1
-               if ( we(1,1,1) .lt. zero) then
+               if ( we(1,1,1) < zero) then
                   temp1 = abs( we(1,1,1))
-               elseif ( ldwe .eq. 1) then
-                  if ( ld2we .eq. 1) then
+               elseif ( ldwe == 1) then
+                  if ( ld2we == 1) then
                      temp1 = we(1,1, l)
                   else
                      temp1 = we(1, l, l)
                   endif
                else
-                  if ( ld2we .eq. 1) then
+                  if ( ld2we == 1) then
                      temp1 = we( i,1, l)
                   else
                      temp1 = we( i, l, l)
                   endif
                endif
-               if ( nq .le. 9) then
+               if ( nq <= 9) then
                   write ( lunrpt,5110)                                   &
                    tempc0, l, y( i, l), temp1
                else
@@ -469,7 +469,7 @@ impure subroutine dodpc1                                                 &
                endif
                tempc0 = 'N,'
 300              continue
-            if ( l .lt. nq)write ( lunrpt,6000)
+            if ( l < nq)write ( lunrpt,6000)
 310           continue
       endif
    endif
@@ -714,7 +714,7 @@ impure subroutine dodpc2                                                 &
 !
 !
    if ( fstitr) then
-      if ( ipr .eq. 1) then
+      if ( ipr == 1) then
          if ( implct) then
             write ( lunrpt,1121)
          else
@@ -732,7 +732,7 @@ impure subroutine dodpc2                                                 &
       write ( lunrpt,1133) pnlty
    endif
 !
-   if ( alpha .eq. zero) then
+   if ( alpha == zero) then
 !-----------------------^------------------------------------------------------
 !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
 !------------------------------------------------------------------------------
@@ -740,7 +740,7 @@ impure subroutine dodpc2                                                 &
    else
       gn = ' NO'
    endif
-   if ( pnorm .ne. zero) then
+   if ( pnorm /= zero) then
 !-----------------------^------------------------------------------------------
 !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
 !------------------------------------------------------------------------------
@@ -748,23 +748,23 @@ impure subroutine dodpc2                                                 &
    else
       ratio = zero
    endif
-   if ( ipr .eq. 1) then
+   if ( ipr == 1) then
       write ( lunrpt,1141) niter, nfev, wss, actred, prered,             &
        ratio, gn
    else
       j = 1
       k = min(3, np)
-      if ( j .eq. k) then
+      if ( j == k) then
          write ( lunrpt,1141) niter, nfev, wss, actred, prered,          &
           ratio, gn, j, beta( j)
       else
          write ( lunrpt,1142) niter, nfev, wss, actred, prered,          &
           ratio, gn, j, k,( beta( l), l = j, k)
       endif
-      if ( np .gt. 3) then
+      if ( np > 3) then
          do 10 j = 4, np,3
             k = min( j+2, np)
-            if ( j .eq. k) then
+            if ( j == k) then
                write ( lunrpt,1151) j, beta( j)
             else
                write ( lunrpt,1152) j, k,( beta( l), l = j, k)
@@ -944,36 +944,36 @@ impure subroutine dodpc3                                                 &
 !  Print stopping conditions
 !
    write ( lunrpt,1000)
-   if ( info .le. 9) then
-      if ( info .eq. 1) then
+   if ( info <= 9) then
+      if ( info == 1) then
          write ( lunrpt,1011) info
-      elseif ( info .eq. 2) then
+      elseif ( info == 2) then
          write ( lunrpt,1012) info
-      elseif ( info .eq. 3) then
+      elseif ( info == 3) then
          write ( lunrpt,1013) info
-      elseif ( info .eq. 4) then
+      elseif ( info == 4) then
          write ( lunrpt,1014) info
-      elseif ( info .le. 9) then
+      elseif ( info <= 9) then
          write ( lunrpt,1015) info
       endif
-   elseif ( info .le. 9999) then
+   elseif ( info <= 9999) then
 !
 !  Print warning diagnostics
 !
       write ( lunrpt,1020) info
-      if ( d2 .eq. 1)write ( lunrpt,1021)
-      if ( d3 .eq. 1)write ( lunrpt,1022)
-      if ( d4 .eq. 1)write ( lunrpt,1023)
-      if ( d4 .eq. 2)write ( lunrpt,1024)
-      if ( d5 .eq. 1) then
+      if ( d2 == 1)write ( lunrpt,1021)
+      if ( d3 == 1)write ( lunrpt,1022)
+      if ( d4 == 1)write ( lunrpt,1023)
+      if ( d4 == 2)write ( lunrpt,1024)
+      if ( d5 == 1) then
          write ( lunrpt,1031)
-      elseif ( d5 .eq. 2) then
+      elseif ( d5 == 2) then
          write ( lunrpt,1032)
-      elseif ( d5 .eq. 3) then
+      elseif ( d5 == 3) then
          write ( lunrpt,1033)
-      elseif ( d5 .eq. 4) then
+      elseif ( d5 == 4) then
          write ( lunrpt,1034)
-      elseif ( d5 .le. 9) then
+      elseif ( d5 <= 9) then
          write ( lunrpt,1035) d5
       endif
    else
@@ -981,15 +981,15 @@ impure subroutine dodpc3                                                 &
 !  Print error messages
 !
       write ( lunrpt,1040) info
-      if ( d1 .eq. 5) then
+      if ( d1 == 5) then
          write ( lunrpt,1042)
-         if ( d2 .ne. 0)write ( lunrpt,1043) d2
-         if ( d3 .eq. 3) then
+         if ( d2 /= 0)write ( lunrpt,1043) d2
+         if ( d3 == 3) then
             write ( lunrpt,1044) d3
-         elseif ( d3 .ne. 0) then
+         elseif ( d3 /= 0) then
             write ( lunrpt,1045) d3
          endif
-      elseif ( d1 .eq. 6) then
+      elseif ( d1 == 6) then
          write ( lunrpt,1050)
       else
          write ( lunrpt,1060) d1
@@ -1032,13 +1032,13 @@ impure subroutine dodpc3                                                 &
       write ( lunrpt,7300)
       tval = dppt(0.975E0_wp, idf)
       do 10 j = 1, np
-         if ( ifixb2( j) .ge. 1) then
+         if ( ifixb2( j) >= 1) then
             write ( lunrpt,8400) j, beta( j),                            &
              lower( j), upper( j),                                       &
              sdbeta( j),                                                 &
              beta( j)- tval* sdbeta( j),                                 &
              beta( j)+ tval* sdbeta( j)
-         elseif ( ifixb2( j) .eq. 0) then
+         elseif ( ifixb2( j) == 0) then
             write ( lunrpt,8600) j, beta( j), lower( j), upper( j)
          else
             write ( lunrpt,8700) j, beta( j), lower( j), upper( j)
@@ -1047,28 +1047,28 @@ impure subroutine dodpc3                                                 &
       if (.not. redoj)write ( lunrpt,7310)
    else
       if ( dovcv) then
-         if ( d1 .le. 5) then
+         if ( d1 <= 5) then
             write ( lunrpt,7410)
          else
             write ( lunrpt,7420)
          endif
       endif
 !
-      if (( irank .eq. 0 .and. npp .eq. np) .or. niter .eq. 0) then
-         if ( np .eq. 1) then
+      if (( irank == 0 .and. npp == np) .or. niter == 0) then
+         if ( np == 1) then
             write ( lunrpt,7100)
          else
             write ( lunrpt,7200)
          endif
          do 20 j = 1, np, nplm1+1
             k = min( j+ nplm1, np)
-            if ( k .eq. j) then
+            if ( k == j) then
                write ( lunrpt,8100) j, beta( j)
             else
                write ( lunrpt,8200) j, k,( beta( l), l = j, k)
             endif
 20            continue
-         if ( niter .ge. 1) then
+         if ( niter >= 1) then
             write ( lunrpt,8800)
          else
             write ( lunrpt,8900)
@@ -1076,9 +1076,9 @@ impure subroutine dodpc3                                                 &
       else
          write ( lunrpt,7500)
          do 30 j = 1, np
-            if ( ifixb2( j) .ge. 1) then
+            if ( ifixb2( j) >= 1) then
                write ( lunrpt,8500) j, beta( j), lower( j), upper( j)
-            elseif ( ifixb2( j) .eq. 0) then
+            elseif ( ifixb2( j) == 0) then
                write ( lunrpt,8600) j, beta( j), lower( j), upper( j)
             else
                write ( lunrpt,8700) j, beta( j), lower( j), upper( j)
@@ -1087,14 +1087,14 @@ impure subroutine dodpc3                                                 &
       endif
    endif
 !
-   if ( ipr .eq. 1) return
+   if ( ipr == 1) return
 !
 !
 !  Print EPSILON's and DELTA's together in a column if the number of
 !  columns of data in EPSILON and DELTA is less than or equal to three.
 !
    if ( implct .and.                                                     &
-       ( m .le. 4)) then
+       ( m <= 4)) then
       write ( lunrpt,4100)
       write ( fmt1,9110) m
       write ( lunrpt, fmt1)( j, j = 1, m)
@@ -1103,7 +1103,7 @@ impure subroutine dodpc3                                                 &
 40         continue
 !
    elseif ( isodr .and.                                                  &
-           ( nq+ m .le. 4)) then
+           ( nq+ m <= 4)) then
       write ( lunrpt,4110)
       write ( fmt1,9120) nq, m
       write ( lunrpt, fmt1)( l, l = 1, nq),( j, j = 1, m)
@@ -1113,8 +1113,8 @@ impure subroutine dodpc3                                                 &
 50         continue
 !
    elseif (.not. isodr .and.                                             &
-           (( nq .ge. 2) .and.                                           &
-            ( nq .le. 4))) then
+           (( nq >= 2) .and.                                           &
+            ( nq <= 4))) then
       write ( lunrpt,4120)
       write ( fmt1,9130) nq
       write ( lunrpt, fmt1)( l, l = 1, nq)
@@ -1131,14 +1131,14 @@ impure subroutine dodpc3                                                 &
 !
          do 80 j = 1, nq
             write ( lunrpt,4200) j
-            if ( n .eq. 1) then
+            if ( n == 1) then
                write ( lunrpt,7100)
             else
                write ( lunrpt,7200)
             endif
             do 70 i = 1, n, nplm1+1
                k = min( i+ nplm1, n)
-               if ( i .eq. k) then
+               if ( i == k) then
                   write ( lunrpt,8100) i, f( i, j)
                else
                   write ( lunrpt,8200) i, k,( f( l, j), l = i, k)
@@ -1152,14 +1152,14 @@ impure subroutine dodpc3                                                 &
       if ( isodr) then
          do 100 j = 1, m
             write ( lunrpt,4300) j
-            if ( n .eq. 1) then
+            if ( n == 1) then
                write ( lunrpt,7100)
             else
                write ( lunrpt,7200)
             endif
             do 90 i = 1, n, nplm1+1
                k = min( i+ nplm1, n)
-               if ( i .eq. k) then
+               if ( i == k) then
                   write ( lunrpt,8100) i, delta( i, j)
                else
                   write ( lunrpt,8200) i, k,( delta( l, j), l = i, k)
@@ -1555,7 +1555,7 @@ impure subroutine dodpcr                                                 &
 !
 !  Print initial summary
 !
-   if ( iflag .eq. 1) then
+   if ( iflag == 1) then
       write ( lunrpt,1200) typ
       call dodpc1                                                        &
        ( ipr, lunrpt,                                                    &
@@ -1568,7 +1568,7 @@ impure subroutine dodpcr                                                 &
 !
 !  Print iteration reports
 !
-   elseif ( iflag .eq. 2) then
+   elseif ( iflag == 2) then
 !
       if ( fstitr) then
          write ( lunrpt,1300) typ
@@ -1580,7 +1580,7 @@ impure subroutine dodpcr                                                 &
 !
 !  Print final summary
 !
-   elseif ( iflag .eq. 3) then
+   elseif ( iflag == 3) then
 !
       write ( lunrpt,1400) typ
       call dodpc3                                                        &
@@ -1653,133 +1653,133 @@ impure subroutine dodpe1                                                 &
 !  Print appropriate messages for errors in problem specification
 !  parameters
 !
-   if ( d1 .eq. 1) then
-      if ( d2 .ne. 0) then
+   if ( d1 == 1) then
+      if ( d2 /= 0) then
          write ( unit,1100)
       endif
-      if ( d3 .ne. 0) then
+      if ( d3 /= 0) then
          write ( unit,1200)
       endif
-      if ( d4 .ne. 0) then
+      if ( d4 /= 0) then
          write ( unit,1300)
       endif
-      if ( d5 .ne. 0) then
+      if ( d5 /= 0) then
          write ( unit,1400)
       endif
 !
 !  Print appropriate messages for errors in dimension specification
 !  parameters
 !
-   elseif ( d1 .eq. 2) then
+   elseif ( d1 == 2) then
 !
-      if ( d2 .ne. 0) then
-         if ( d2 .eq. 1 .or. d2 .eq. 3) then
+      if ( d2 /= 0) then
+         if ( d2 == 1 .or. d2 == 3) then
             write ( unit,2110)
          endif
-         if ( d2 .eq. 2 .or. d2 .eq. 3) then
+         if ( d2 == 2 .or. d2 == 3) then
             write ( unit,2120)
          endif
       endif
 !
-      if ( d3 .ne. 0) then
-         if ( d3 .eq. 1 .or. d3 .eq. 3 .or. d3 .eq. 5 .or. d3 .eq. 7)    &
+      if ( d3 /= 0) then
+         if ( d3 == 1 .or. d3 == 3 .or. d3 == 5 .or. d3 == 7)    &
           then
             write ( unit,2210)
          endif
-         if ( d3 .eq. 2 .or. d3 .eq. 3 .or. d3 .eq. 6 .or. d3 .eq. 7)    &
+         if ( d3 == 2 .or. d3 == 3 .or. d3 == 6 .or. d3 == 7)    &
           then
             write ( unit,2220)
          endif
-         if ( d3 .eq. 4 .or. d3 .eq. 5 .or. d3 .eq. 6 .or. d3 .eq. 7)    &
+         if ( d3 == 4 .or. d3 == 5 .or. d3 == 6 .or. d3 == 7)    &
           then
             write ( unit,2230)
          endif
       endif
 !
-      if ( d4 .ne. 0) then
-         if ( d4 .eq. 1 .or. d4 .eq. 3) then
+      if ( d4 /= 0) then
+         if ( d4 == 1 .or. d4 == 3) then
             write ( unit,2310)
          endif
-         if ( d4 .eq. 2 .or. d4 .eq. 3) then
+         if ( d4 == 2 .or. d4 == 3) then
             write ( unit,2320)
          endif
       endif
 !
-      if ( d5 .ne. 0) then
-         if ( d5 .eq. 1 .or. d5 .eq. 3) then
+      if ( d5 /= 0) then
+         if ( d5 == 1 .or. d5 == 3) then
             write ( unit,2410) lwkmn
          endif
-         if ( d5 .eq. 2 .or. d5 .eq. 3) then
+         if ( d5 == 2 .or. d5 == 3) then
             write ( unit,2420) liwkmn
          endif
       endif
 !
-   elseif ( d1 .eq. 3) then
+   elseif ( d1 == 3) then
 !
 !  Print appropriate messages for errors in scale values
 !
-      if ( d3 .ne. 0) then
-         if ( d3 .eq. 2 .or. d3 .eq. 3) then
-            if ( ldscld .ge. n) then
+      if ( d3 /= 0) then
+         if ( d3 == 2 .or. d3 == 3) then
+            if ( ldscld >= n) then
                write ( unit,3110)
             else
                write ( unit,3120)
             endif
          endif
-         if ( d3 .eq. 1 .or. d3 .eq. 3) then
+         if ( d3 == 1 .or. d3 == 3) then
             write ( unit,3130)
          endif
       endif
 !
 !  Print appropriate messages for errors in derivative step values
 !
-      if ( d2 .ne. 0) then
-         if ( d2 .eq. 2 .or. d2 .eq. 3) then
-            if ( ldstpd .ge. n) then
+      if ( d2 /= 0) then
+         if ( d2 == 2 .or. d2 == 3) then
+            if ( ldstpd >= n) then
                write ( unit,3210)
             else
                write ( unit,3220)
             endif
          endif
-         if ( d2 .eq. 1 .or. d2 .eq. 3) then
+         if ( d2 == 1 .or. d2 == 3) then
             write ( unit,3230)
          endif
       endif
 !
 !  Print appropriate messages for errors in observational error weights
 !
-      if ( d4 .ne. 0) then
-         if ( d4 .eq. 1) then
-            if ( ldwe .ge. n) then
-               if ( ld2we .ge. nq) then
+      if ( d4 /= 0) then
+         if ( d4 == 1) then
+            if ( ldwe >= n) then
+               if ( ld2we >= nq) then
                   write ( unit,3310)
                else
                   write ( unit,3320)
                endif
             else
-               if ( ld2we .ge. nq) then
+               if ( ld2we >= nq) then
                   write ( unit,3410)
                else
                   write ( unit,3420)
                endif
             endif
          endif
-         if ( d4 .eq. 2) then
+         if ( d4 == 2) then
             write ( unit,3500)
          endif
       endif
 !
 !  Print appropriate messages for errors in DELTA weights
 !
-      if ( d5 .ne. 0) then
-         if ( ldwd .ge. n) then
-            if ( ld2wd .ge. m) then
+      if ( d5 /= 0) then
+         if ( ldwd >= n) then
+            if ( ld2wd >= m) then
                write ( unit,4310)
             else
                write ( unit,4320)
             endif
          else
-            if ( ld2wd .ge. m) then
+            if ( ld2wd >= m) then
                write ( unit,4410)
             else
                write ( unit,4420)
@@ -1787,55 +1787,55 @@ impure subroutine dodpe1                                                 &
          endif
       endif
 !
-   elseif ( d1 .eq. 7) then
+   elseif ( d1 == 7) then
 !
 !  Print the appropriate messages for errors in JOB
 !
-      if ( d2 .ne. 0) then
+      if ( d2 /= 0) then
          write ( unit,5000)
       endif
 !
-      if ( d3 .ne. 0) then
+      if ( d3 /= 0) then
          write ( unit,5100)
       endif
 !
-      if ( d4 .ne. 0) then
+      if ( d4 /= 0) then
          write ( unit,5200)
       endif
 !
-   elseif ( d1 .eq. 8) then
+   elseif ( d1 == 8) then
 !
 !  Print the appropriate messages for errors in array allocation
 !
-      if ( d2 .ne. 0) then
+      if ( d2 /= 0) then
          write ( unit,7200)
       endif
 !
-      if ( d3 .ne. 0) then
+      if ( d3 /= 0) then
          write ( unit,7300)
       endif
 !
-      if ( d4 .ne. 0) then
+      if ( d4 /= 0) then
          write ( unit,7400)
       endif
 !
-   elseif ( d1 .eq. 9) then
+   elseif ( d1 == 9) then
 !
 !  Print the appropriate messages for errors in bounds
 !
-      if ( d2 .ne. 0) then
+      if ( d2 /= 0) then
          write ( unit,6000)
       endif
 !
-      if ( d3 .ne. 0) then
+      if ( d3 /= 0) then
          write ( unit,6100)
       endif
 !
-      if ( d4 .eq. 1) then
+      if ( d4 == 1) then
          write ( unit,6210)
       endif
 !
-      if ( d4 .eq. 2) then
+      if ( d4 == 2) then
          write ( unit,6220)
       endif
 !
@@ -1843,69 +1843,69 @@ impure subroutine dodpe1                                                 &
 !
 !  Print error messages for array sizes incorrect
 !
-   if ( info/100000 .eq. 1) then
+   if ( info/100000 == 1) then
       info = info-100000
-      if ( info .ge. 32768) then
+      if ( info >= 32768) then
          info = info-32768
          write ( unit,8015)
       endif
-      if ( info .ge. 16384) then
+      if ( info >= 16384) then
          info = info-16384
          write ( unit,8014)
       endif
-      if ( info .ge. 8192) then
+      if ( info >= 8192) then
          info = info-8192
          write ( unit,8013)
       endif
-      if ( info .ge. 4096) then
+      if ( info >= 4096) then
          info = info-4096
          write ( unit,8012)
       endif
-      if ( info .ge. 2048) then
+      if ( info >= 2048) then
          info = info-2048
          write ( unit,8011)
       endif
-      if ( info .ge. 1024) then
+      if ( info >= 1024) then
          info = info-1024
          write ( unit,8010)
       endif
-      if ( info .ge. 512) then
+      if ( info >= 512) then
          info = info-512
          write ( unit,8009)
       endif
-      if ( info .ge. 256) then
+      if ( info >= 256) then
          info = info-256
          write ( unit,8008)
       endif
-      if ( info .ge. 128) then
+      if ( info >= 128) then
          info = info-128
          write ( unit,8007)
       endif
-      if ( info .ge. 64) then
+      if ( info >= 64) then
          info = info-64
          write ( unit,8006)
       endif
-      if ( info .ge. 32) then
+      if ( info >= 32) then
          info = info-32
          write ( unit,8005)
       endif
-      if ( info .ge. 16) then
+      if ( info >= 16) then
          info = info-16
          write ( unit,8004)
       endif
-      if ( info .ge. 8) then
+      if ( info >= 8) then
          info = info-8
          write ( unit,8003)
       endif
-      if ( info .ge. 4) then
+      if ( info >= 4) then
          info = info-4
          write ( unit,8002)
       endif
-      if ( info .ge. 2) then
+      if ( info >= 2) then
          info = info-2
          write ( unit,8001)
       endif
-      if ( info .ge. 1) then
+      if ( info >= 1) then
          info = info-1
          write ( unit,8000)
       endif
@@ -2058,24 +2058,24 @@ impure subroutine dodpe1                                                 &
     (/' ERROR :  JOB requires the optional argument IWORK and'/          &
     '          IWORK is not present or not associated.')
 6000    format                                                                &
-    (/' ERROR :  LOWER(K).GT.UPPER(K) for some K.  Adjust the'/          &
-    '          the bounds so that LOWER(K).LE.UPPER(K) holds'/           &
+    (/' ERROR :  LOWER(K)>UPPER(K) for some K.  Adjust the'/          &
+    '          the bounds so that LOWER(K)<=UPPER(K) holds'/           &
     '          for all K.')
 6100    format                                                                &
-    (/' ERROR :  BETA(K).GT.UPPER(K) or BETA(K).LT.LOWER(K) '/           &
+    (/' ERROR :  BETA(K)>UPPER(K) or BETA(K)<LOWER(K) '/           &
     '          for some K.  Adjust the bounds or BETA so '/              &
-    '          that LOWER(K).LE.BETA(K).LE.UPPER(K) holds'/              &
+    '          that LOWER(K)<=BETA(K)<=UPPER(K) holds'/              &
     '          for all K.')
 6210    format                                                                &
-    (/' ERROR :  UPPER(K)-LOWER(K) .LT. 400*BETA(K)*EPSMAC  '/           &
+    (/' ERROR :  UPPER(K)-LOWER(K) < 400*BETA(K)*EPSMAC  '/           &
     '          for some K and EPSMAC having the largest '/               &
-    '          value such that 1+EPSMAC.NE.1.  This '/                   &
+    '          value such that 1+EPSMAC/=1.  This '/                   &
     '          constraint on UPPER and LOWER is necessary'/              &
     '          for the calculation of NDIGIT.  Increase the'/            &
     '          range of the bounds or specify NDIGIT '/                  &
     '          explicitly.')
 6220    format                                                                &
-    (/' ERROR :  UPPER(K)-LOWER(K) .LT. ABS(STEP) for some'/             &
+    (/' ERROR :  UPPER(K)-LOWER(K) < ABS(STEP) for some'/             &
     '          K where step is the step size for numeric'/               &
     '          derivatives.  Increase the bounds or supply'/             &
     '          an analytic jacobian.')
@@ -2201,18 +2201,18 @@ impure subroutine dodpe2                                                 &
 10      continue
 !
    do 40 l = 1, nq
-      if ( msgb1 .ge. 1) then
+      if ( msgb1 >= 1) then
          do 20 i = 1, np
-            if ( msgb( l, i) .ge. 1) then
+            if ( msgb( l, i) >= 1) then
                ftnote(0) = .true.
                ftnote( msgb( l, i)) = .true.
             endif
 20            continue
       endif
 !
-      if ( msgd1 .ge. 1) then
+      if ( msgd1 >= 1) then
          do 30 i = 1, m
-            if ( msgd( l, i) .ge. 1) then
+            if ( msgd( l, i) >= 1) then
                ftnote(0) = .true.
                ftnote( msgd( l, i)) = .true.
             endif
@@ -2236,20 +2236,20 @@ impure subroutine dodpe2                                                 &
 !
       do 50 i = 1, np
          k = msgb( l, i)
-         if ( k .eq. 7) then
+         if ( k == 7) then
             flag = '*'
          else
             flag = ' '
          endif
-         if ( k .le. -1) then
+         if ( k <= -1) then
             write ( unit,3100) i
-         elseif ( k .eq. 0) then
+         elseif ( k == 0) then
             write ( unit,3200) i, fjacb( nrow, i, l), diff( l, i), flag
-         elseif ( k .eq. 8) then
+         elseif ( k == 8) then
             write ( unit,3400) i, fjacb( nrow, i, l), flag, k
-         elseif ( k .eq. 9) then
+         elseif ( k == 9) then
             write ( unit,3500) i, flag, k
-         elseif ( k .ge. 1) then
+         elseif ( k >= 1) then
             write ( unit,3300) i, fjacb( nrow, i, l), diff( l, i), flag, &
              k
          endif
@@ -2257,17 +2257,17 @@ impure subroutine dodpe2                                                 &
       if ( isodr) then
          do 60 i = 1, m
             k = msgd( l, i)
-            if ( k .eq. 7) then
+            if ( k == 7) then
                flag = '*'
             else
                flag = ' '
             endif
-            if ( k .le. -1) then
+            if ( k <= -1) then
                write ( unit,4100) nrow, i
-            elseif ( k .eq. 0) then
+            elseif ( k == 0) then
                write ( unit,4200) nrow, i,                               &
                 fjacd( nrow, i, l), diff( l, np+ i), flag
-            elseif ( k .ge. 1) then
+            elseif ( k >= 1) then
                write ( unit,4300) nrow, i,                               &
                 fjacd( nrow, i, l), diff( l, np+ i), flag, k
             endif
@@ -2291,7 +2291,7 @@ impure subroutine dodpe2                                                 &
       if ( ftnote(9))write ( unit,5900)
    endif
 !
-   if ( neta .lt. 0) then
+   if ( neta < 0) then
       write ( unit,6000)- neta
    else
       write ( unit,6100) neta
@@ -2438,14 +2438,14 @@ impure subroutine dodpe3                                                  &
 !  Print appropriate messages to indicate where computations were
 !  stopped
 !
-   if ( d2 .eq. 2) then
+   if ( d2 == 2) then
       write ( unit,1100)
-   elseif ( d2 .eq. 3) then
+   elseif ( d2 == 3) then
       write ( unit,1200)
-   elseif ( d2 .eq. 4) then
+   elseif ( d2 == 4) then
       write ( unit,1300)
    endif
-   if ( d3 .eq. 2) then
+   if ( d3 == 2) then
       write ( unit,1400)
    endif
 !
@@ -2584,9 +2584,9 @@ impure subroutine dodper                                                 &
 !
 !  Set logical unit number for error report
 !
-   if ( lunerr .eq. 0) then
+   if ( lunerr == 0) then
       return
-   elseif ( lunerr .lt. 0) then
+   elseif ( lunerr < 0) then
       unit = 6
    else
       unit = lunerr
@@ -2607,8 +2607,8 @@ impure subroutine dodper                                                 &
 !
 !  Print appropriate error messages for ODRPACK95 invoked stop
 !
-   if (( d1 .ge. 1 .and. d1 .le. 3) .or.                                 &
-       ( d1 .eq. 7 .or. d1 .eq. 9)) then
+   if (( d1 >= 1 .and. d1 <= 3) .or.                                 &
+       ( d1 == 7 .or. d1 == 9)) then
 !
 !  Print appropriate messages for errors in
 !          problem specification parameters
@@ -2621,8 +2621,8 @@ impure subroutine dodper                                                 &
        ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd,                         &
        lwkmn, liwkmn)
 !
-   elseif (( d1 .eq. 4) .or.                                             &
-           ( msgb(1) .ge. 0)) then
+   elseif (( d1 == 4) .or.                                             &
+           ( msgb(1) >= 0)) then
 !
 !  Print appropriate messages for derivative checking
 !
@@ -2632,7 +2632,7 @@ impure subroutine dodper                                                 &
        diff, msgb(1), msgb(2), isodr, msgd(1), msgd(2),                  &
        xplusd, nrow, neta, ntol)
 !
-   elseif ( d1 .eq. 5) then
+   elseif ( d1 == 5) then
 !
 !  Print appropriate error message for user invoked stop from FCN
 !
@@ -2642,10 +2642,10 @@ impure subroutine dodper                                                 &
 !
 !  Print correct form of call statement
 !
-   if (( d1 .ge. 1 .and. d1 .le. 3) .or.                                 &
-       ( d1 .eq. 4 .and.                                                 &
-        ( d2 .eq. 2 .or. d3 .eq. 2)) .or.                                &
-       ( d1 .eq. 5)) then
+   if (( d1 >= 1 .and. d1 <= 3) .or.                                 &
+       ( d1 == 4 .and.                                                 &
+        ( d2 == 2 .or. d3 == 2)) .or.                                &
+       ( d1 == 5)) then
       write ( unit,1100)
    endif
 !

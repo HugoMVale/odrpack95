@@ -2,7 +2,7 @@ module odrpack
 
    use odrpack_kinds, only: wp
    implicit none
-   
+
 contains
 
    impure subroutine odr &
@@ -24,50 +24,50 @@ contains
    !! Driver routine for finding the weighted explicit or implicit orthogonal distance
    !! regression (ODR) or ordinary linear or nonlinear least squares (OLS) solution (long call
    !! statement).
-   ! Date Written:   860529   (YYMMDD)
-   ! Revision Date:  20040301 (YYYYMMDD)
-   ! Category No.:  G2E,I1B1
-   ! Keywords:  Orthogonal distance regression,
-   !   Nonlinear least squares,
-   !   Measurement error models,
-   !   Errors in variables
-   ! Authors:
-   !   Boggs, Paul T.
-   !     Applied and Computational Mathematics Division
-   !     National Institute of Standards and Technology
-   !     Gaithersburg, MD 20899
-   !   Byrd, Richard H.
-   !     Department of Computer Science
-   !     University of Colorado, Boulder, CO 80309
-   !   Rogers, Janet E.
-   !     Applied and Computational Mathematics Division
-   !     National Institute of Standards and Technology
-   !     Boulder, CO 80303-3328
-   !   Schnabel, Robert B.
-   !     Department of Computer Science
-   !     University of Colorado, Boulder, CO 80309
-   !     and
-   !     Applied and Computational Mathematics Division
-   !     National Institute of Standards and Technology
-   !     Boulder, CO 80303-3328
-   ! Purpose:  REAL(wp) driver routine for finding the weighted explicit or implicit
-   !   orthogonal distance regression (ODR) or ordinary linear or nonlinear least squares (OLS)
-   !   solution (long call statement)
-   ! Description:
-   !   For details, see ODRPACK95 User's Reference Guide.
-   ! References:
-   !   Boggs, P. T., R. H. Byrd, J. R. Donaldson, and R. B. Schnabel (1989),
-   !     "Algorithm 676 --- ODRPACK: Software for Weighted Orthogonal Distance Regression,"
-   !     ACM Trans. Math. Software., 15(4):348-364.
-   !       Boggs, P. T., R. H. Byrd, J. E. Rogers, and
-   !   R. B. Schnabel (1992),
-   !     "User's Reference Guide for ODRPACK Version 2.01,
-   !     Software for Weighted Orthogonal Distance Regression,"
-   !     National Institute of Standards and Technology
-   !     Internal Report Number 92-4834.
-   !  Boggs, P. T., R. H. Byrd, and R. B. Schnabel (1987),
-   !    "A Stable and Efficient Algorithm for Nonlinear Orthogonal Distance Regression,"
-   !    SIAM J. Sci. Stat. Comput., 8(6):1052-1078.
+      ! Date Written:   860529   (YYMMDD)
+      ! Revision Date:  20040301 (YYYYMMDD)
+      ! Category No.:  G2E,I1B1
+      ! Keywords:  Orthogonal distance regression,
+      !   Nonlinear least squares,
+      !   Measurement error models,
+      !   Errors in variables
+      ! Authors:
+      !   Boggs, Paul T.
+      !     Applied and Computational Mathematics Division
+      !     National Institute of Standards and Technology
+      !     Gaithersburg, MD 20899
+      !   Byrd, Richard H.
+      !     Department of Computer Science
+      !     University of Colorado, Boulder, CO 80309
+      !   Rogers, Janet E.
+      !     Applied and Computational Mathematics Division
+      !     National Institute of Standards and Technology
+      !     Boulder, CO 80303-3328
+      !   Schnabel, Robert B.
+      !     Department of Computer Science
+      !     University of Colorado, Boulder, CO 80309
+      !     and
+      !     Applied and Computational Mathematics Division
+      !     National Institute of Standards and Technology
+      !     Boulder, CO 80303-3328
+      ! Purpose:  REAL(wp) driver routine for finding the weighted explicit or implicit
+      !   orthogonal distance regression (ODR) or ordinary linear or nonlinear least squares (OLS)
+      !   solution (long call statement)
+      ! Description:
+      !   For details, see ODRPACK95 User's Reference Guide.
+      ! References:
+      !   Boggs, P. T., R. H. Byrd, J. R. Donaldson, and R. B. Schnabel (1989),
+      !     "Algorithm 676 --- ODRPACK: Software for Weighted Orthogonal Distance Regression,"
+      !     ACM Trans. Math. Software., 15(4):348-364.
+      !       Boggs, P. T., R. H. Byrd, J. E. Rogers, and
+      !   R. B. Schnabel (1992),
+      !     "User's Reference Guide for ODRPACK Version 2.01,
+      !     Software for Weighted Orthogonal Distance Regression,"
+      !     National Institute of Standards and Technology
+      !     Internal Report Number 92-4834.
+      !  Boggs, P. T., R. H. Byrd, and R. B. Schnabel (1987),
+      !    "A Stable and Efficient Algorithm for Nonlinear Orthogonal Distance Regression,"
+      !    SIAM J. Sci. Stat. Comput., 8(6):1052-1078.
 
       use odrpack_kinds, only: negone, zero
       use odrpack_core, only: fcn_t, tempret !@todo
@@ -147,10 +147,10 @@ contains
       integer :: lifixb(np), lifixx(n, m)
       real(wp) :: ltaufac, lsstol, lpartol
       real(wp) :: llower(np), lwe(n, nq, nq), lwd(n, m, m), lstpb(np), lstpd(n, m), &
-                       lsclb(np), lscld(n, m), lupper(np), wd1(1, 1, 1)
+                  lsclb(np), lscld(n, m), lupper(np), wd1(1, 1, 1)
 
       real(wp), pointer, save :: lwork(:)
-      integer, pointer, save :: liwork(:)  
+      integer, pointer, save :: liwork(:)
       logical :: head
 
       ! External ODRPACK procedures
@@ -192,41 +192,41 @@ contains
       if (present(lunrpt)) then
          llunrpt = lunrpt
       end if
-      if (llunrpt .lt. 0) then
+      if (llunrpt < 0) then
          llunrpt = 6
       end if
 
       if (present(lunerr)) then
          llunerr = lunerr
       end if
-      if (llunerr .lt. 0) then
+      if (llunerr < 0) then
          llunerr = 6
       end if
 
       ! Ensure the problem size is valid
-      if (n .le. 0) then
+      if (n <= 0) then
          linfo5 = 1
          linfo4 = 1
       end if
 
-      if (m .le. 0) then
+      if (m <= 0) then
          linfo5 = 1
          linfo3 = 1
       end if
 
-      if (np .le. 0) then
+      if (np <= 0) then
          linfo5 = 1
          linfo2 = 1
       end if
 
-      if (nq .le. 0) then
+      if (nq <= 0) then
          linfo5 = 1
          linfo1 = 1
       end if
 
-      if (linfo5 .ne. 0) then
+      if (linfo5 /= 0) then
          linfo = 10000*linfo5 + 1000*linfo4 + 100*linfo3 + 10*linfo2 + linfo1
-         if (llunerr .gt. 0 .and. liprint .ne. 0) then
+         if (llunerr > 0 .and. liprint /= 0) then
             call dodphd(head, llunrpt)
             call dodpe1( &
                llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1, &
@@ -244,16 +244,16 @@ contains
       ! Define LJOB and check that necessary arguments are passed for JOB
       if (present(job)) then
          ljob = job
-         if (mod(job, 10000)/1000 .ge. 1) then
+         if (mod(job, 10000)/1000 >= 1) then
             if (.not. present(delta)) then
                linfo5 = 7
                linfo4 = 1
-            ! elseif (.not. allocated(delta)) then
-            !    linfo5 = 7
-            !    linfo4 = 1
+               ! elseif (.not. allocated(delta)) then
+               !    linfo5 = 7
+               !    linfo4 = 1
             end if
          end if
-         if (job .ge. 10000) then
+         if (job >= 10000) then
             if (.not. present(iwork)) then
                linfo5 = 7
                linfo2 = 1
@@ -262,7 +262,7 @@ contains
                linfo2 = 1
             end if
          end if
-         if (job .ge. 10000) then
+         if (job >= 10000) then
             if (.not. present(work)) then
                linfo5 = 7
                linfo3 = 1
@@ -275,9 +275,9 @@ contains
          ljob = -1
       end if
 
-      if (linfo5 .ne. 0) then
+      if (linfo5 /= 0) then
          linfo = 10000*linfo5 + 1000*linfo4 + 100*linfo3 + 10*linfo2 + linfo1
-         if (llunerr .gt. 0 .and. liprint .ne. 0) then
+         if (llunerr > 0 .and. liprint /= 0) then
             call dodphd(head, llunrpt)
             call dodpe1( &
                llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1, &
@@ -293,7 +293,7 @@ contains
       end if
 
       ! Determine the size of WORK
-      if (ljob .lt. 0 .or. mod(ljob, 10) .le. 1) then
+      if (ljob < 0 .or. mod(ljob, 10) <= 1) then
          lenwork = 18 + 13*np + np**2 + m + m**2 + 4*n*nq + 6*n*m + 2*n*nq*np + &
                    2*n*nq*m + nq**2 + 5*nq + nq*(np + m) + n*nq*nq
       else
@@ -314,14 +314,14 @@ contains
       !       allocate (delta(n, m), stat=linfo4)
       !    end if
       ! end if
-      if (linfo4 .ne. 0 .or. linfo3 .ne. 0 .or. linfo2 .ne. 0) then
+      if (linfo4 /= 0 .or. linfo3 /= 0 .or. linfo2 /= 0) then
          linfo5 = 8
       end if
 
-      if (linfo5 .ne. 0) then
+      if (linfo5 /= 0) then
          linfo = 10000*mod(linfo5, 10) + 1000*mod(linfo4, 10) + &
                  100*mod(linfo3, 10) + 10*mod(linfo2, 10) + mod(linfo1, 10)
-         if (llunerr .gt. 0 .and. liprint .ne. 0) then
+         if (llunerr > 0 .and. liprint /= 0) then
             call dodphd(head, llunrpt)
             call dodpe1( &
                llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1, &
@@ -349,25 +349,25 @@ contains
       lwd(1, 1, 1) = negone
 
       ! Check the size of required arguments and return errors if they are too small
-      if (size(beta) .lt. np) then
+      if (size(beta) < np) then
          linfo1 = linfo1 + 1
       end if
 
-      if (any(size(y) .lt. (/n, nq/))) then
+      if (any(size(y) < (/n, nq/))) then
          linfo1 = linfo1 + 2
       end if
 
-      if (any(size(x) .lt. (/n, m/))) then
+      if (any(size(x) < (/n, m/))) then
          linfo1 = linfo1 + 4
       end if
 
       ! Check the presence of optional arguments and copy their values internally or
       ! report errors as necessary
       if (present(ifixb)) then
-         if (size(ifixb) .lt. np) then
+         if (size(ifixb) < np) then
             linfo1 = linfo1 + 64
          end if
-         if (ifixb(1) .lt. 0) then
+         if (ifixb(1) < 0) then
             lifixb(1) = ifixb(1)
          else
             lifixb(1:np) = ifixb(1:np)
@@ -376,17 +376,17 @@ contains
 
       if (present(ifixx)) then
          ldifx = size(ifixx, 1)
-         if (any(size(ifixx) .le. (/0, 0/))) then
+         if (any(size(ifixx) <= (/0, 0/))) then
             linfo1 = linfo1 + 128
          end if
-         if (.not. (ifixx(1, 1) .lt. 0 .or. ldifx .eq. 1 .or. ldifx .ge. n) &
-             .or. size(ifixx, 2) .lt. m) then
+         if (.not. (ifixx(1, 1) < 0 .or. ldifx == 1 .or. ldifx >= n) &
+             .or. size(ifixx, 2) < m) then
             linfo1 = linfo1 + 128
          end if
-         if (ldifx .gt. n) then
+         if (ldifx > n) then
             ldifx = n
          end if
-         if (ifixx(1, 1) .lt. 0) then
+         if (ifixx(1, 1) < 0) then
             lifixx(1, 1) = ifixx(1, 1)
          else
             lifixx(1:ldifx, 1:m) = ifixx(1:ldifx, 1:m)
@@ -395,11 +395,11 @@ contains
 
       if (present(iwork)) then
          if (associated(iwork)) then
-            if (size(iwork) .lt. leniwork) then
+            if (size(iwork) < leniwork) then
                linfo1 = linfo1 + 8192
             end if
             !  This is a restart, copy IWORK.
-            if (mod(ljob/10000, 10) .ge. 1) then
+            if (mod(ljob/10000, 10) >= 1) then
                liwork(1:leniwork) = iwork(1:leniwork)
             end if
          end if
@@ -418,10 +418,10 @@ contains
       end if
 
       if (present(sclb)) then
-         if (size(sclb) .lt. np) then
+         if (size(sclb) < np) then
             linfo1 = linfo1 + 1024
          end if
-         if (sclb(1) .le. zero) then
+         if (sclb(1) <= zero) then
             lsclb(1) = sclb(1)
          else
             lsclb(1:np) = sclb(1:np)
@@ -430,17 +430,17 @@ contains
 
       if (present(scld)) then
          ldscld = size(scld, 1)
-         if (any(size(scld) .le. (/0, 0/))) then
+         if (any(size(scld) <= (/0, 0/))) then
             linfo1 = linfo1 + 2048
          end if
-         if (.not. (scld(1, 1) .le. zero .or. ldscld .eq. 1 .or. ldscld .ge. n) &
-             .or. size(scld, 2) .lt. m) then
+         if (.not. (scld(1, 1) <= zero .or. ldscld == 1 .or. ldscld >= n) &
+             .or. size(scld, 2) < m) then
             linfo1 = linfo1 + 2048
          end if
-         if (ldscld .gt. n) then
+         if (ldscld > n) then
             ldscld = n
          end if
-         if (scld(1, 1) .le. zero) then
+         if (scld(1, 1) <= zero) then
             lscld(1, 1) = scld(1, 1)
          else
             lscld(1:ldscld, 1:m) = scld(1:ldscld, 1:m)
@@ -452,10 +452,10 @@ contains
       end if
 
       if (present(stpb)) then
-         if (size(stpb) .lt. np) then
+         if (size(stpb) < np) then
             linfo1 = linfo1 + 256
          end if
-         if (stpb(1) .le. zero) then
+         if (stpb(1) <= zero) then
             lstpb(1) = stpb(1)
          else
             lstpb(1:np) = stpb(1:np)
@@ -464,17 +464,17 @@ contains
 
       if (present(stpd)) then
          ldstpd = size(stpd, 1)
-         if (any(size(stpd) .le. (/0, 0/))) then
+         if (any(size(stpd) <= (/0, 0/))) then
             linfo1 = linfo1 + 512
          end if
-         if (.not. (stpd(1, 1) .le. zero .or. ldstpd .eq. 1 .or. ldstpd .ge. n) &
-             .or. size(stpd, 2) .lt. m) then
+         if (.not. (stpd(1, 1) <= zero .or. ldstpd == 1 .or. ldstpd >= n) &
+             .or. size(stpd, 2) < m) then
             linfo1 = linfo1 + 512
          end if
-         if (ldstpd .gt. n) then
+         if (ldstpd > n) then
             ldstpd = n
          end if
-         if (stpd(1, 1) .le. zero) then
+         if (stpd(1, 1) <= zero) then
             lstpd(1, 1) = stpd(1, 1)
          else
             lstpd(1:ldstpd, 1:m) = stpd(1:ldstpd, 1:m)
@@ -488,21 +488,21 @@ contains
       if (present(we)) then
          ldwe = size(we, 1)
          ld2we = size(we, 2)
-         if (any(size(we) .le. (/0, 0, 0/))) then
+         if (any(size(we) <= (/0, 0, 0/))) then
             linfo1 = linfo1 + 16
          end if
-         if (.not. (we(1, 1, 1) .lt. zero .or. &
-                    ((ldwe .eq. 1 .or. ldwe .ge. n) .and. &
-                     (ld2we .eq. 1 .or. ld2we .ge. nq))) .or. size(we, 3) .lt. nq) then
+         if (.not. (we(1, 1, 1) < zero .or. &
+                    ((ldwe == 1 .or. ldwe >= n) .and. &
+                     (ld2we == 1 .or. ld2we >= nq))) .or. size(we, 3) < nq) then
             linfo1 = linfo1 + 16
          end if
-         if (ldwe .gt. n) then
+         if (ldwe > n) then
             ldwe = n
          end if
-         if (ld2we .gt. nq) then
+         if (ld2we > nq) then
             ld2we = nq
          end if
-         if (we(1, 1, 1) .lt. zero) then
+         if (we(1, 1, 1) < zero) then
             lwe(1, 1, 1) = we(1, 1, 1)
          else
             lwe(1:ldwe, 1:ld2we, 1:nq) = we(1:ldwe, 1:ld2we, 1:nq)
@@ -512,21 +512,21 @@ contains
       if (present(wd)) then
          ldwd = size(wd, 1)
          ld2wd = size(wd, 2)
-         if (any(size(wd) .le. (/0, 0, 0/))) then
+         if (any(size(wd) <= (/0, 0, 0/))) then
             linfo1 = linfo1 + 32
          end if
-         if (.not. (wd(1, 1, 1) .lt. zero .or. &
-                    ((ldwd .eq. 1 .or. ldwd .ge. n) .and. &
-                     (ld2wd .eq. 1 .or. ld2wd .ge. m))) .or. size(wd, 3) .lt. m) then
+         if (.not. (wd(1, 1, 1) < zero .or. &
+                    ((ldwd == 1 .or. ldwd >= n) .and. &
+                     (ld2wd == 1 .or. ld2wd >= m))) .or. size(wd, 3) < m) then
             linfo1 = linfo1 + 32
          end if
-         if (ldwd .gt. n) then
+         if (ldwd > n) then
             ldwd = n
          end if
-         if (ld2wd .gt. m) then
+         if (ld2wd > m) then
             ld2wd = m
          end if
-         if (wd(1, 1, 1) .le. 0.0_wp) then
+         if (wd(1, 1, 1) <= 0.0_wp) then
             lwd(1, 1, 1) = wd(1, 1, 1)
          else
             lwd(1:ldwd, 1:ld2wd, 1:m) = wd(1:ldwd, 1:ld2wd, 1:m)
@@ -535,15 +535,15 @@ contains
 
       if (present(work)) then
          if (associated(work)) then
-            if (size(work) .lt. lenwork) then
+            if (size(work) < lenwork) then
                linfo1 = linfo1 + 4096
             end if
             !  Deltas are in WORK, copy them.
-            if (mod(ljob/1000, 10) .ge. 1 .and. .not. present(delta)) then
+            if (mod(ljob/1000, 10) >= 1 .and. .not. present(delta)) then
                lwork(1:n*m) = work(1:n*m)
             end if
             !  This is a restart, copy WORK.
-            if (mod(ljob/10000, 10) .ge. 1) then
+            if (mod(ljob/10000, 10) >= 1) then
                lwork(1:lenwork) = work(1:lenwork)
             end if
          end if
@@ -551,32 +551,32 @@ contains
 
       if (present(delta)) then
          !if (allocated(delta)) then
-            if (any(shape(delta) .lt. (/n, m/))) then
-               linfo1 = linfo1 + 8
-            end if
-            lwork(1:n*m) = reshape(delta(1:n, 1:m), (/n*m/))
+         if (any(shape(delta) < (/n, m/))) then
+            linfo1 = linfo1 + 8
+         end if
+         lwork(1:n*m) = reshape(delta(1:n, 1:m), (/n*m/))
          !end if
       end if
 
       if (present(lower)) then
-         if (size(lower) .lt. np) then
+         if (size(lower) < np) then
             linfo1 = linfo1 + 32768
          end if
          llower(1:np) = lower(1:np)
       end if
 
       if (present(upper)) then
-         if (size(upper) .lt. np) then
+         if (size(upper) < np) then
             linfo1 = linfo1 + 16384
          end if
          lupper(1:np) = upper(1:np)
       end if
 
       ! Report an error if any of the array sizes didn't match.
-      if (linfo1 .ne. 0) then
+      if (linfo1 /= 0) then
          linfo = 100000 + linfo1
          linfo1 = 0
-         if (llunerr .gt. 0 .and. liprint .ne. 0) then
+         if (llunerr > 0 .and. liprint /= 0) then
             call dodphd(head, llunrpt)
             call dodpe1( &
                llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1, &
@@ -591,7 +591,7 @@ contains
          return
       end if
 
-      if (lwd(1, 1, 1) .ne. 0) then
+      if (lwd(1, 1, 1) /= 0) then
          call dodcnt &
             (fcn, &
              n, m, np, nq, &
@@ -630,7 +630,7 @@ contains
 
       if (present(delta)) then
          !if (allocated(delta)) then
-            delta(1:n, 1:m) = reshape(lwork(1:n*m), (/n, m/))
+         delta(1:n, 1:m) = reshape(lwork(1:n*m), (/n, m/))
          !end if
       end if
 
@@ -674,13 +674,13 @@ contains
        lower, upper)
    !! Driver routine for finding the weighted explicit or implicit orthogonal distance
    !! regression (ODR) or ordinary linear or nonlinear least squares (OLS) solution.
-   ! Routines Called  DODDRV
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
-   
+      ! Routines Called  DODDRV
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
+
       use odrpack_kinds, only: zero, one, three
       use odrpack_core, only: fcn_t
-   
+
       procedure(fcn_t) :: fcn
          !! User-supplied subroutine for evaluating the model.
       integer, intent(in) :: n
@@ -765,17 +765,17 @@ contains
          !! The lower bound on `beta`.
       real(wp), intent(in) :: upper(np)
          !! The upper bound on `beta`.
-   
+
       ! Local scalars
       real(wp), parameter :: pcheck = 1.0E3_wp, pstart = 1.0E1_wp, pfac = 1.0E1_wp
       real(wp) :: cnvtol, tstimp
       integer :: iprnti, ipr1, ipr2, ipr2f, ipr3, jobi, job1, job2, job3, job4, job5, &
                  maxiti, maxit1
       logical :: done, fstitr, head, implct, prtpen
-   
+
       ! Local arrays
       real(wp) :: pnlty(1, 1, 1)
-     
+
       ! Variable Definitions (alphabetically)
       !  BETA:    The function parameters.
       !  CNVTOL:  The convergence tolerance for implicit models.
@@ -852,15 +852,15 @@ contains
       !  WORK:    The real work space.
       !  X:       The independent variable.
       !  Y:       The dependent variable. Unused when the model is implicit.
-   
-      implct = mod(job, 10) .eq. 1
+
+      implct = mod(job, 10) == 1
       fstitr = .true.
       head = .true.
       prtpen = .false.
-   
+
       if (implct) then
          !  Set up for implicit problem
-         if (iprint .ge. 0) then
+         if (iprint >= 0) then
             ipr1 = mod(iprint, 10000)/1000
             ipr2 = mod(iprint, 1000)/100
             ipr2f = mod(iprint, 100)/10
@@ -872,35 +872,35 @@ contains
             ipr3 = 1
          end if
          iprnti = ipr1*1000 + ipr2*100 + ipr2f*10
-   
+
          job5 = mod(job, 100000)/10000
          job4 = mod(job, 10000)/1000
          job3 = mod(job, 1000)/100
          job2 = mod(job, 100)/10
          job1 = mod(job, 10)
          jobi = job5*10000 + job4*1000 + job3*100 + job2*10 + job1
-   
-         if (we(1, 1, 1) .le. zero) then
+
+         if (we(1, 1, 1) <= zero) then
             pnlty(1, 1, 1) = -pstart
          else
             pnlty(1, 1, 1) = -we(1, 1, 1)
          end if
-   
-         if (partol .lt. zero) then
+
+         if (partol < zero) then
             cnvtol = epsilon(zero)**(one/three)
          else
             cnvtol = min(partol, one)
          end if
-   
-         if (maxit .ge. 1) then
+
+         if (maxit >= 1) then
             maxiti = maxit
          else
             maxiti = 100
          end if
-   
-         done = maxiti .eq. 0
+
+         done = maxiti == 0
          prtpen = .true.
-   
+
          do while (.true.)
             call doddrv &
                (head, fstitr, prtpen, &
@@ -911,15 +911,15 @@ contains
                 stpb, stpd, ldstpd, sclb, scld, ldscld, &
                 work, lwork, iwork, liwork, &
                 maxit1, tstimp, info, lower, upper)
-   
+
             if (done) then
                return
             else
-               done = maxit1 .le. 0 .or. (abs(pnlty(1, 1, 1)) .ge. pcheck .and. tstimp .le. cnvtol)
+               done = maxit1 <= 0 .or. (abs(pnlty(1, 1, 1)) >= pcheck .and. tstimp <= cnvtol)
             end if
-   
+
             if (done) then
-               if (tstimp .le. cnvtol) then
+               if (tstimp <= cnvtol) then
                   info = (info/10)*10 + 2
                else
                   info = (info/10)*10 + 4
@@ -947,7 +947,7 @@ contains
              work, lwork, iwork, liwork, &
              maxit1, tstimp, info, lower, upper)
       end if
-   
+
    end subroutine dodcnt
 
    impure subroutine doddrv &
@@ -1090,7 +1090,7 @@ contains
       ! External BLAS/LAPACK procedures
       real(wp), external :: ddot, dnrm2
       external :: dcopy
-      
+
       ! External ODRPACK procedures
       ! @todo: place in module
       external :: dodper
@@ -1306,20 +1306,20 @@ contains
       if (restrt) then
 
          ! Reset maximum number of iterations
-         if (maxit .ge. 0) then
+         if (maxit >= 0) then
             iwork(maxiti) = iwork(niteri) + maxit
          else
             iwork(maxiti) = iwork(niteri) + 10
          end if
 
-         if (iwork(niteri) .lt. iwork(maxiti)) then
+         if (iwork(niteri) < iwork(maxiti)) then
             info = 0
          end if
 
-         if (job .ge. 0) iwork(jobi) = job
-         if (iprint .ge. 0) iwork(iprini) = iprint
-         if (partol .ge. zero .and. partol .lt. one) work(partli) = partol
-         if (sstol .ge. zero .and. sstol .lt. one) work(sstoli) = sstol
+         if (job >= 0) iwork(jobi) = job
+         if (iprint >= 0) iwork(iprini) = iprint
+         if (partol >= zero .and. partol < one) work(partli) = partol
+         if (sstol >= zero .and. sstol < one) work(sstoli) = sstol
 
          work(olmavi) = work(olmavi)*iwork(niteri)
 
@@ -1351,7 +1351,7 @@ contains
                      sclb, scld, stpb, stpd, &
                      info, &
                      lower, upper)
-         if (info .gt. 0) then
+         if (info > 0) then
             goto 50
          end if
 
@@ -1395,7 +1395,7 @@ contains
                      work(we1i), nnzw, info)
          iwork(nnzwi) = nnzw
 
-         if (info .ne. 0) then
+         if (info /= 0) then
             goto 50
          end if
 
@@ -1411,7 +1411,7 @@ contains
                   002, work(fni), work(wrk6i), work(wrk1i), &
                   istop)
          iwork(istopi) = istop
-         if (istop .eq. 0) then
+         if (istop == 0) then
             iwork(nfevi) = iwork(nfevi) + 1
             if (implct) then
                call dcopy(n*nq, work(fni), 1, work(fi), 1)
@@ -1467,7 +1467,7 @@ contains
 
          ! Set number of good digits in function results
          epsmac = work(epsmai)
-         if (ndigit .lt. 2) then
+         if (ndigit < 2) then
             iwork(netai) = -1
             nfev = iwork(nfevi)
             call detaf(fcn, &
@@ -1481,8 +1481,8 @@ contains
                        lower, upper)
             iwork(istopi) = istop
             iwork(nfevi) = nfev
-            if (istop .ne. 0 .or. info .ne. 0) then
-               if (info .eq. 0) then
+            if (istop /= 0 .or. info /= 0) then
+               if (info == 0) then
                   info = 53000
                end if
                iwork(netai) = 0
@@ -1502,7 +1502,7 @@ contains
             if (cdjac) then
                do k = 1, np
                   if (upper(k) - abs(2*derstep(1, k, upper(k), work(ssfi), stpb, neta)) &
-                      .lt. lower(k)) then
+                      < lower(k)) then
                      info = 90020
                      goto 50
                   end if
@@ -1510,7 +1510,7 @@ contains
             else
                do k = 1, np
                   if (upper(k) - abs(2*derstep(0, k, upper(k), work(ssfi), stpb, neta)) &
-                      .lt. lower(k)) then
+                      < lower(k)) then
                      info = 90020
                      goto 50
                   end if
@@ -1548,9 +1548,9 @@ contains
             iwork(nfevi) = nfev
             iwork(njevi) = njev
             iwork(ntoli) = ntol
-            if (istop .ne. 0) then
+            if (istop /= 0) then
                info = 54000
-            elseif (iwork(msgb) .ne. 0 .or. iwork(msgd) .ne. 0) then
+            elseif (iwork(msgb) /= 0 .or. iwork(msgd) /= 0) then
                info = 40000
             end if
          else
@@ -1560,9 +1560,9 @@ contains
          end if
 
          ! Print appropriate error messages
-50       if ((info .ne. 0) .or. &
-             (iwork(msgb) .ne. -1)) then
-            if (lunerr .ne. 0 .and. iprint .ne. 0) then
+50       if ((info /= 0) .or. &
+             (iwork(msgb) /= -1)) then
+            if (lunerr /= 0 .and. iprint /= 0) then
                call dodper &
                   (info, lunerr, &
                    n, m, np, nq, &
@@ -1574,19 +1574,19 @@ contains
             end if
 
             ! Set INFO to reflect errors in the user supplied Jacobians
-            if (info .eq. 40000) then
-               if (iwork(msgb) .eq. 2 .or. iwork(msgd) .eq. 2) then
-                  if (iwork(msgb) .eq. 2) then
+            if (info == 40000) then
+               if (iwork(msgb) == 2 .or. iwork(msgd) == 2) then
+                  if (iwork(msgb) == 2) then
                      info = info + 1000
                   end if
-                  if (iwork(msgd) .eq. 2) then
+                  if (iwork(msgd) == 2) then
                      info = info + 100
                   end if
                else
                   info = 0
                end if
             end if
-            if (info .ne. 0) then
+            if (info /= 0) then
                return
             end if
          end if
@@ -1615,7 +1615,7 @@ contains
       maxit1 = iwork(maxiti) - iwork(niteri)
       tstimp = zero
       do k = 1, np
-         if (beta(k) .eq. zero) then
+         if (beta(k) == zero) then
             tstimp = max(tstimp, abs(beta(k) - work(beta0i - 1 + k))/work(ssfi - 1 + k))
          else
             tstimp = max(tstimp, abs(beta(k) - work(beta0i - 1 + k))/abs(beta(k)))
@@ -1768,13 +1768,13 @@ contains
 
       ! Local scalars
       real(wp), parameter :: p0001 = 0.00010_wp, &
-                                  p1 = 0.1_wp, &
-                                  p25 = 0.25_wp, &
-                                  p5 = 0.5_wp, &
-                                  p75 = 0.75_wp
+                             p1 = 0.1_wp, &
+                             p25 = 0.25_wp, &
+                             p5 = 0.5_wp, &
+                             p75 = 0.75_wp
       real(wp) :: actred, actrs, alpha, dirder, eta, olmavg, partol, pnorm, prered, &
-                       prers, ratio, rcond, rnorm, rnormn, rnorms, rss, rvar, sstol, tau, &
-                       taufac, temp, temp1, temp2, tsnorm
+                  prers, ratio, rcond, rnorm, rnormn, rnorms, rss, rvar, sstol, tau, &
+                  taufac, temp, temp1, temp2, tsnorm
 
       integer, parameter :: ludflt = 6
       integer :: i, idf, iflag, int2, ipr, ipr1, ipr2, ipr2f, ipr3, irank, istop, istopc, &
@@ -1989,14 +1989,14 @@ contains
       lstep = .true.
 
       ! Print initial summary if desired
-      if (ipr1 .ne. 0 .and. lunrpt .ne. 0) then
+      if (ipr1 /= 0 .and. lunrpt /= 0) then
          iflag = 1
-         if (ipr1 .ge. 3 .and. lunrpt .ne. ludflt) then
+         if (ipr1 >= 3 .and. lunrpt /= ludflt) then
             npr = 2
          else
             npr = 1
          end if
-         if (ipr1 .ge. 6) then
+         if (ipr1 >= 6) then
             ipr = 2
          else
             ipr = 2 - mod(ipr1, 2)
@@ -2015,7 +2015,7 @@ contains
                         wss, rvar, idf, work(sd), &
                         niter, nfev, njev, actred, prered, &
                         tau, pnorm, alpha, f, rcond, irank, info, istop)
-            if (ipr1 .ge. 5) then
+            if (ipr1 >= 5) then
                ipr = 2
             else
                ipr = 1
@@ -2025,7 +2025,7 @@ contains
       end if
 
       ! Stop if initial estimates are exact solution
-      if (rnorm .eq. zero) then
+      if (rnorm == zero) then
          info = 1
          olmavg = zero
          istop = 0
@@ -2034,10 +2034,10 @@ contains
 
       ! Stop if number of iterations already equals maximum permitted
       if (restrt .and. &
-          (niter .ge. maxit)) then
+          (niter >= maxit)) then
          istop = 0
          goto 150
-      elseif (niter .ge. maxit) then
+      elseif (niter >= maxit) then
          info = 4
          istop = 0
          goto 150
@@ -2051,7 +2051,7 @@ contains
       looped = 0
 
       ! Evaluate jacobian using best estimate of function (FS)
-      if ((niter .eq. 1) .and. &
+      if ((niter == 1) .and. &
           (anajac .and. chkjac)) then
          istop = 0
       else
@@ -2067,10 +2067,10 @@ contains
                      njev, nfev, istop, info, &
                      lower, upper)
       end if
-      if (istop .ne. 0) then
+      if (istop /= 0) then
          info = 51000
          goto 200
-      elseif (info .eq. 50300) then
+      elseif (info == 50300) then
          goto 200
       end if
 
@@ -2078,7 +2078,7 @@ contains
 110   continue
 
       ! Compute steps S and T
-      if (looped .gt. 100) then
+      if (looped > 100) then
          info = 60000
          goto 200
       else
@@ -2093,7 +2093,7 @@ contains
                     work(wrk1), work(wrk2), work(wrk3), work(wrk4), &
                     work(wrk5), wrk, lwrk, istopc)
       end if
-      if (istopc .ne. 0) then
+      if (istopc /= 0) then
          info = istopc
          goto 200
       end if
@@ -2106,15 +2106,15 @@ contains
 
       ! Project the step wrt the bounds
       do i = 1, npu
-         if (loweru(i) .eq. upperu(i)) then
+         if (loweru(i) == upperu(i)) then
             betan(i) = upperu(i)
             s(i) = upperu(i) - betac(i)
             bound(i) = 3
-         elseif (betan(i) .le. loweru(i)) then
+         elseif (betan(i) <= loweru(i)) then
             betan(i) = loweru(i)
             s(i) = loweru(i) - betac(i)
             bound(i) = 2
-         elseif (betan(i) .ge. upperu(i)) then
+         elseif (betan(i) >= upperu(i)) then
             betan(i) = upperu(i)
             s(i) = upperu(i) - betac(i)
             bound(i) = 1
@@ -2167,15 +2167,15 @@ contains
                ifixb, ifixx, ldifx, &
                002, fn, work(wrk6), work(wrk1), &
                istop)
-      if (istop .eq. 0) then
+      if (istop == 0) then
          nfev = nfev + 1
       end if
 
-      if (istop .lt. 0) then
+      if (istop < 0) then
          ! Set INFO to indicate user has stopped the computations in FCN
          info = 51000
          goto 200
-      elseif (istop .gt. 0) then
+      elseif (istop > 0) then
          ! Set norm to indicate step should be rejected
          rnormn = rnorm/(p1*p75)
       else
@@ -2201,21 +2201,21 @@ contains
       end if
 
       ! Compute scaled actual reduction
-      if (p1*rnormn .lt. rnorm) then
+      if (p1*rnormn < rnorm) then
          actred = one - (rnormn/rnorm)**2
       else
          actred = -one
       end if
 
       ! Compute ratio of actual reduction to predicted reduction
-      if (prered .eq. zero) then
+      if (prered == zero) then
          ratio = zero
       else
          ratio = actred/prered
       end if
 
       ! Check on lack of reduction in internal doubling case
-      if (intdbl .and. (ratio .lt. p0001 .or. rnormn .gt. rnorms)) then
+      if (intdbl .and. (ratio < p0001 .or. rnormn > rnorms)) then
          istop = 0
          tau = tau*p5
          alpha = alpha/p5
@@ -2230,21 +2230,21 @@ contains
 
       ! Update step bound
       intdbl = .false.
-      if (ratio .lt. p25) then
-         if (actred .ge. zero) then
+      if (ratio < p25) then
+         if (actred >= zero) then
             temp = p5
          else
             temp = p5*dirder/(dirder + p5*actred)
          end if
-         if (p1*rnormn .ge. rnorm .or. temp .lt. p1) then
+         if (p1*rnormn >= rnorm .or. temp < p1) then
             temp = p1
          end if
          tau = temp*min(tau, tsnorm/p1)
          alpha = alpha/temp
-      elseif (alpha .eq. zero) then
+      elseif (alpha == zero) then
          tau = tsnorm/p5
 
-      elseif (ratio .ge. p75 .and. nlms .le. 11) then
+      elseif (ratio >= p75 .and. nlms <= 11) then
          ! Step qualifies for internal doubling
          !  - Update TAU and ALPHA
          !  - Save information for current point
@@ -2263,13 +2263,13 @@ contains
       end if
 
       ! If internal doubling, skip convergence checks
-      if (intdbl .and. tau .gt. zero) then
+      if (intdbl .and. tau > zero) then
          int2 = int2 + 1
          goto 110
       end if
 
       ! Check acceptance
-      if (ratio .ge. p0001) then
+      if (ratio >= p0001) then
          call dcopy(n*nq, fn, 1, fs, 1)
          if (implct) then
             call dcopy(n*nq, fs, 1, f, 1)
@@ -2300,29 +2300,29 @@ contains
 
       ! Test convergence
       info = 0
-      cnvss = rnorm .eq. zero &
+      cnvss = rnorm == zero &
               .or. &
-              (abs(actred) .le. sstol .and. &
-               prered .le. sstol .and. &
-               p5*ratio .le. one)
-      cnvpar = (tau .le. partol*pnorm) .and. (.not. implct)
+              (abs(actred) <= sstol .and. &
+               prered <= sstol .and. &
+               p5*ratio <= one)
+      cnvpar = (tau <= partol*pnorm) .and. (.not. implct)
       if (cnvss) info = 1
       if (cnvpar) info = 2
       if (cnvss .and. cnvpar) info = 3
 
       ! Print iteration report
-      if (info .ne. 0 .or. lstep) then
-         if (ipr2 .ne. 0 .and. ipr2f .ne. 0 .and. lunrpt .ne. 0) then
-            if (ipr2f .eq. 1 .or. mod(niter, ipr2f) .eq. 1) then
+      if (info /= 0 .or. lstep) then
+         if (ipr2 /= 0 .and. ipr2f /= 0 .and. lunrpt /= 0) then
+            if (ipr2f == 1 .or. mod(niter, ipr2f) == 1) then
                iflag = 2
                call dunpac(np, betac, beta, ifixb)
                wss(1) = rnorm*rnorm
-               if (ipr2 .ge. 3 .and. lunrpt .ne. ludflt) then
+               if (ipr2 >= 3 .and. lunrpt /= ludflt) then
                   npr = 2
                else
                   npr = 1
                end if
-               if (ipr2 .ge. 6) then
+               if (ipr2 >= 6) then
                   ipr = 2
                else
                   ipr = 2 - mod(ipr2, 2)
@@ -2341,7 +2341,7 @@ contains
                               wss, rvar, idf, work(sd), &
                               niter, nfev, njev, actred, prered, &
                               tau, pnorm, alpha, f, rcond, irank, info, istop)
-                  if (ipr2 .ge. 5) then
+                  if (ipr2 >= 5) then
                      ipr = 2
                   else
                      ipr = 1
@@ -2355,11 +2355,11 @@ contains
       end if
 
       ! Check if finished
-      if (info .eq. 0) then
+      if (info == 0) then
 
          if (lstep) then
             ! Begin next interation unless a stopping criteria has been met
-            if (niter .ge. maxit) then
+            if (niter >= maxit) then
                info = 4
             else
                goto 100
@@ -2373,7 +2373,7 @@ contains
 
 150   continue
 
-      if (istop .gt. 0) info = info + 100
+      if (istop > 0) info = info + 100
 
       ! Store unweighted EPSILONS and X+DELTA to return to user
       if (implct) then
@@ -2387,7 +2387,7 @@ contains
 
       ! Compute covariance matrix of estimated parameters in upper NP by NP portion
       ! of WORK(VCV) if requested
-      if (dovcv .and. istop .eq. 0) then
+      if (dovcv .and. istop == 0) then
 
          ! Re-evaluate Jacobian at final solution, if requested
          ! Otherwise, Jacobian from beginning of last iteration will be used
@@ -2405,10 +2405,10 @@ contains
                         njev, nfev, istop, info, &
                         lower, upper)
 
-            if (istop .ne. 0) then
+            if (istop /= 0) then
                info = 51000
                goto 200
-            elseif (info .eq. 50300) then
+            elseif (info == 50300) then
                goto 200
             end if
          end if
@@ -2420,7 +2420,7 @@ contains
          else
             rss = rnorm*rnorm
          end if
-         if (redoj .or. niter .ge. 1) then
+         if (redoj .or. niter >= 1) then
             call dodvcv(n, m, np, nq, npp, &
                         f, fjacb, fjacd, &
                         wd, ldwd, ld2wd, ssf, ss, tt, ldtt, delta, &
@@ -2431,7 +2431,7 @@ contains
                         s, t, irank, rcond, rss, idf, rvar, ifixb, &
                         work(wrk1), work(wrk2), work(wrk3), work(wrk4), &
                         work(wrk5), wrk, lwrk, istopc)
-            if (istopc .ne. 0) then
+            if (istopc /= 0) then
                info = istopc
                goto 200
             end if
@@ -2445,19 +2445,19 @@ contains
          work(wrk3 + i) = iwork(jpvt + i)
          iwork(jpvt + i) = -2
       end do
-      if (redoj .or. niter .ge. 1) then
+      if (redoj .or. niter >= 1) then
          do i = 0, npp - 1
             j = int(work(wrk3 + i)) - 1
-            if (i .le. npp - irank - 1) then
+            if (i <= npp - irank - 1) then
                iwork(jpvt + j) = 1
             else
                iwork(jpvt + j) = -1
             end if
          end do
-         if (npp .lt. np) then
+         if (npp < np) then
             j = npp - 1
             do i = np - 1, 0, -1
-               if (ifixb(i + 1) .eq. 0) then
+               if (ifixb(i + 1) == 0) then
                   iwork(jpvt + i) = 0
                else
                   iwork(jpvt + i) = iwork(jpvt + j)
@@ -2468,7 +2468,7 @@ contains
       end if
 
       ! Store various scalars in work arrays for return to user
-      if (niter .ge. 1) then
+      if (niter >= 1) then
          olmavg = olmavg/niter
       else
          olmavg = zero
@@ -2501,15 +2501,15 @@ contains
                   rcond, irank, actrs, pnorm, prers, rnorms, istop)
 
       ! Encode existance of questionable results into info
-      if (info .le. 9 .or. info .ge. 60000) then
-         if (msgb(1) .eq. 1 .or. msgd(1) .eq. 1) then
+      if (info <= 9 .or. info >= 60000) then
+         if (msgb(1) == 1 .or. msgd(1) == 1) then
             info = info + 1000
          end if
-         if (istop .ne. 0) then
+         if (istop /= 0) then
             info = info + 100
          end if
-         if (irank .ge. 1) then
-            if (npp .gt. irank) then
+         if (irank >= 1) then
+            if (npp > irank) then
                info = info + 10
             else
                info = info + 20
@@ -2518,15 +2518,15 @@ contains
       end if
 
       ! Print final summary
-      if (ipr3 .ne. 0 .and. lunrpt .ne. 0) then
+      if (ipr3 /= 0 .and. lunrpt /= 0) then
          iflag = 3
 
-         if (ipr3 .ge. 3 .and. lunrpt .ne. ludflt) then
+         if (ipr3 >= 3 .and. lunrpt /= ludflt) then
             npr = 2
          else
             npr = 1
          end if
-         if (ipr3 .ge. 6) then
+         if (ipr3 >= 6) then
             ipr = 2
          else
             ipr = 2 - mod(ipr3, 2)
@@ -2545,7 +2545,7 @@ contains
                         wss, rvar, idf, work(sd), &
                         niter, nfev, njev, actred, prered, &
                         tau, pnorm, alpha, f, rcond, irank, info, istop)
-            if (ipr3 .ge. 5) then
+            if (ipr3 >= 5) then
                ipr = 2
             else
                ipr = 1

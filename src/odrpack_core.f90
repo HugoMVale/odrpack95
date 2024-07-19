@@ -54,7 +54,7 @@ module odrpack_core
    end interface
 
 contains
-   
+
    subroutine dodlm &
       (n, m, np, nq, npp, &
        f, fjacb, fjacd, &
@@ -65,12 +65,12 @@ contains
        wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
    !! Compute Levenberg-Marquardt parameter and steps `s` and `t` using analog of the
    !! trust-region Levenberg-Marquardt algorithm.
-   ! Routines Called  DDOT, DNRM2, DODSTP, DSCALE, DWGHT
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
-   
+      ! Routines Called  DDOT, DNRM2, DODSTP, DSCALE, DWGHT
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
+
       use odrpack_kinds, only: zero
-   
+
       integer, intent(in) :: n
          !! The number of observations.
       integer, intent(in) :: m
@@ -147,16 +147,16 @@ contains
       integer, intent(out) :: istopc
          !! The variable designating whether the computations were stopped due to some other
          !! numerical error detected within subroutine `dodstp`.
-   
+
       ! Local scalars
       real(wp), parameter :: p001 = 0.001_wp, p1 = 0.1_wp
       real(wp) :: alpha1, alphan, bot, phi1, phi2, sa, top
       integer :: i, iwrk, j, k
       logical :: forvcv
-   
+
       ! External BLAS/LAPACK procedures
       real(wp), external :: ddot, dnrm2
-    
+
       ! Variable Definitions (alphabetically)
       !  ALPHAN:  The new Levenberg-Marquardt parameter.
       !  ALPHA1:  The previous Levenberg-Marquardt parameter.
@@ -216,10 +216,10 @@ contains
       !  WRK3:    A work array of (NP) elements.
       !  WRK4:    A work array of (M by M) elements.
       !  WRK5:    A work array of (M) elements.
-   
+
       forvcv = .false.
       istopc = 0
-   
+
       ! Compute full Gauss-Newton step (ALPHA=0)
       alpha1 = zero
       call dodstp(n, m, np, nq, npp, &
@@ -229,34 +229,34 @@ contains
                   tfjacb, omega, u, qraux, jpvt, &
                   s, t, phi1, irank, rcond, forvcv, &
                   wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
-      if (istopc .ne. 0) then
+      if (istopc /= 0) then
          return
       end if
-   
+
       ! Initialize TAU if necessary
-      if (tau .lt. zero) then
+      if (tau < zero) then
          tau = abs(tau)*phi1
       end if
-   
+
       ! Check if full Gauss-Newton step is optimal
-      if ((phi1 - tau) .le. p1*tau) then
+      if ((phi1 - tau) <= p1*tau) then
          nlms = 1
          alpha2 = zero
          return
       end if
-   
+
       ! Full Gauss-Newton step is outside trust region - find locally constrained optimal step
       phi1 = phi1 - tau
-   
+
       ! Initialize upper and lower bounds for ALPHA
       bot = zero
-   
+
       do k = 1, npp
          tfjacb(1:n, 1:nq, k) = fjacb(1:n, k, 1:nq)
          wrk(k) = ddot(n*nq, tfjacb(1, 1, k), 1, f(1, 1), 1)
       end do
       call dscale(npp, 1, ss, npp, wrk, npp, wrk, npp)
-   
+
       if (isodr) then
          call dwght(n, m, wd, ldwd, ld2wd, delta, tempret(1:n, 1:m))
          wrk(npp + 1:npp + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), (/n*m/))
@@ -272,15 +272,15 @@ contains
       else
          top = dnrm2(npp, wrk, 1)/tau
       end if
-   
-      if (alpha2 .gt. top .or. alpha2 .eq. zero) then
+
+      if (alpha2 > top .or. alpha2 == zero) then
          alpha2 = p001*top
       end if
-   
+
       ! Main loop
-   
+
       do i = 1, 10
-   
+
          ! Compute locally constrained steps S and T and PHI(ALPHA) for current value of ALPHA
          call dodstp(n, m, np, nq, npp, &
                      f, fjacb, fjacd, &
@@ -289,51 +289,51 @@ contains
                      tfjacb, omega, u, qraux, jpvt, &
                      s, t, phi2, irank, rcond, forvcv, &
                      wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
-         if (istopc .ne. 0) then
+         if (istopc /= 0) then
             return
          end if
          phi2 = phi2 - tau
-   
+
          ! Check whether current step is optimal
-         if (abs(phi2) .le. p1*tau .or. (alpha2 .eq. bot .and. phi2 .lt. zero)) then
+         if (abs(phi2) <= p1*tau .or. (alpha2 == bot .and. phi2 < zero)) then
             nlms = i + 1
             return
          end if
-   
+
          ! Current step is not optimaL
-   
+
          ! Update bounds for ALPHA and compute new ALPHA
-         if (phi1 - phi2 .eq. zero) then
+         if (phi1 - phi2 == zero) then
             nlms = 12
             return
          end if
          sa = phi2*(alpha1 - alpha2)/(phi1 - phi2)
-         if (phi2 .lt. zero) then
+         if (phi2 < zero) then
             top = min(top, alpha2)
          else
             bot = max(bot, alpha2)
          end if
-         if (phi1*phi2 .gt. zero) then
+         if (phi1*phi2 > zero) then
             bot = max(bot, alpha2 - sa)
          else
             top = min(top, alpha2 - sa)
          end if
-   
+
          alphan = alpha2 - sa*(phi1 + tau)/tau
-         if (alphan .ge. top .or. alphan .le. bot) then
+         if (alphan >= top .or. alphan <= bot) then
             alphan = max(p001*top, sqrt(top*bot))
          end if
-   
+
          ! Get ready for next iteration
          alpha1 = alpha2
          alpha2 = alphan
          phi1 = phi2
-   
+
       end do
-   
+
       ! Set NLMS to indicate an optimal step could not be found in 10 trys
       nlms = 12
-   
+
    end subroutine dodlm
 
    pure subroutine dacces &
@@ -348,10 +348,10 @@ contains
        tau, alpha, niter, nfev, njev, int2, olmavg, &
        rcond, irank, actrs, pnorm, prers, rnorms, istop)
    !! Access or store values in the work arrays.
-   ! Routines Called  DIWINF, DWINF
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
-     
+      ! Routines Called  DIWINF, DWINF
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
+
       integer, intent(in) :: n
          !! The number of observations.
       integer, intent(in) :: m
@@ -471,7 +471,7 @@ contains
       integer, intent(inout) :: istop
          !! The variable designating whether there are problems computing the function at the
          !! current `beta` and `delta`.
-   
+
       ! Local scalars
       integer :: actrsi, alphai, betaci, betani, betasi, beta0i, boundi, deltai, deltni, deltsi, &
                  diffi, epsi, epsmai, etai, fjacbi, fjacdi, fni, fsi, idfi, int2i, iprini, &
@@ -480,7 +480,7 @@ contains
                  ntoli, olmavi, omegai, partli, pnormi, prersi, qrauxi, rcondi, rnorsi, rvari, &
                  sdi, si, ssfi, ssi, sstoli, taufci, taui, ti, tti, ui, upperi, vcvi, we1i, &
                  wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, wssi, wssdei, wssepi, xplusi
-     
+
       ! Variable Definitions (alphabetically)
       !  ACCESS:  The variable designating whether information is to be accessed from the work
       !           arrays (ACCESS=TRUE) or stored in them (ACCESS=FALSE).
@@ -515,7 +515,7 @@ contains
       !           iteration reports.
       !  IPR2F:   The value of the second digit (from the right) of IPRINT, which controls the
       !           frequency of the iteration reports.
-      !  IPR3:    The value of the first digit (from the right) of IPRINT, which controls the 
+      !  IPR3:    The value of the first digit (from the right) of IPRINT, which controls the
       !           final summary report.
       !  IPRINI:  The location in array IWORK of variable IPRINT.
       !  IPRINT:  The print control variable.
@@ -622,7 +622,7 @@ contains
       !  WSSDEI:  The starting location in array WORK of variable WSS(2).
       !  WSSEPI:  The starting location in array WORK of variable WSS(3).
       !  XPLUSI:  The starting location in array WORK of array XPLUSD.
-   
+
       ! Find starting locations within integer workspace
       call diwinf(m, np, nq, &
                   msgb, msgd, jpvti, istopi, &
@@ -632,7 +632,7 @@ contains
                   maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
                   boundi, &
                   liwkmn)
-   
+
       ! Find starting locations within REAL work space
       call dwinf(n, m, np, nq, ldwe, ld2we, isodr, &
                  deltai, epsi, xplusi, fni, sdi, vcvi, &
@@ -645,7 +645,7 @@ contains
                  wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
                  loweri, upperi, &
                  lwkmn)
-   
+
       if (access) then
          ! Set starting locations for work vectors
          jpvt = jpvti
@@ -677,7 +677,7 @@ contains
          sstol = work(sstoli)
          tau = work(taui)
          taufac = work(taufci)
-   
+
          neta = iwork(netai)
          irank = iwork(iranki)
          job = iwork(jobi)
@@ -690,14 +690,14 @@ contains
          npp = iwork(nppi)
          idf = iwork(idfi)
          int2 = iwork(int2i)
-   
+
          ! Set up print control variables
          iprint = iwork(iprini)
          ipr1 = mod(iprint, 10000)/1000
          ipr2 = mod(iprint, 1000)/100
          ipr2f = mod(iprint, 100)/10
          ipr3 = mod(iprint, 10)
-   
+
       else
          ! Store values into the work vectors
          work(actrsi) = actrs
@@ -714,7 +714,7 @@ contains
          work(rnorsi) = rnorms
          work(sstoli) = sstol
          work(taui) = tau
-   
+
          iwork(iranki) = irank
          iwork(istopi) = istop
          iwork(nfevi) = nfev
@@ -723,19 +723,19 @@ contains
          iwork(idfi) = idf
          iwork(int2i) = int2
       end if
-   
+
    end subroutine dacces
-   
+
    real(wp) pure function derstep(itype, k, betak, ssf, stpb, neta) result(derstepr)
    !! Compute step size for center and forward difference calculations.
-   ! Routines Called  DHSTEP
-   ! Date Written   20040616   (YYYYMMDD)
-   ! Revision Date  20040616   (YYYYMMDD)
-   
+      ! Routines Called  DHSTEP
+      ! Date Written   20040616   (YYYYMMDD)
+      ! Revision Date  20040616   (YYYYMMDD)
+
       use odrpack_kinds, only: zero, one
-   
+
       integer, intent(in) :: itype
-         !! The finite difference method being used, where: `itype = 0` indicates forward 
+         !! The finite difference method being used, where: `itype = 0` indicates forward
          !! finite differences, and `itype = 1` indicates central finite differences.
       integer, intent(in) :: k
          !! Index into `beta` where `betak` resides.
@@ -748,10 +748,10 @@ contains
          !! to `beta`.
       integer, intent(in) :: neta
          !! Number of good digits in the function results.
-   
+
       ! Local scalars
       real(wp) :: typj
-     
+
       ! Variable definitions (alphabetically)
       !  BETAK:   The K-th function parameter.
       !  ITYPE:   0 - calc foward difference step, 1 - calc center difference step.
@@ -761,9 +761,9 @@ contains
       !  STPB:    The relative step used for computing finite difference derivatives with
       !           respect to BETA.
       !  TYPJ:    The typical size of the J-th unkonwn BETA.
-   
-      if (betak .eq. zero) then
-         if (ssf(1) .lt. zero) then
+
+      if (betak == zero) then
+         if (ssf(1) < zero) then
             typj = one/abs(ssf(1))
          else
             typj = one/ssf(k)
@@ -772,17 +772,17 @@ contains
          typj = abs(betak)
       end if
       derstepr = sign(one, betak)*typj*dhstep(itype, neta, 1, k, stpb, 1)
-   
+
    end function derstep
-   
+
    pure subroutine desubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, e)
    !! Compute `e = wd + alpha*tt**2`.
-   ! Routines Called (NONE)
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
-   
+      ! Routines Called (NONE)
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
+
       use odrpack_kinds, only: zero
-   
+
       integer, intent(in) :: n
          !! The number of observations.
       integer, intent(in) :: m
@@ -803,10 +803,10 @@ contains
          !! An indexing variable.
       real(wp), intent(out) :: e(m, m)
          !! The value of the array `e = wd + alpha*tt**2`.
-   
+
       ! Local scalars
       integer :: j, j1, j2
-   
+
       ! Variable Definitions (alphabetically)
       !  ALPHA:  The Levenberg-Marquardt parameter.
       !  E:      The value of the array E = WD + ALPHA*TT**2
@@ -821,16 +821,16 @@ contains
       !  NP:     The number of responses per observation.
       !  TT:     The scaling values used for DELTA.
       !  WD:     The squared DELTA weights, D**2.
-   
-      ! N.B. the locations of WD and TT accessed depend on the value of the first element of 
+
+      ! N.B. the locations of WD and TT accessed depend on the value of the first element of
       ! each array and the leading dimensions of the multiply subscripted arrays.
-   
-      if (n .eq. 0 .or. m .eq. 0) return
-   
-      if (wd(1, 1, 1) .ge. zero) then
-         if (ldwd .ge. n) then
+
+      if (n == 0 .or. m == 0) return
+
+      if (wd(1, 1, 1) >= zero) then
+         if (ldwd >= n) then
             ! The elements of WD have been individually specified
-            if (ld2wd .eq. 1) then
+            if (ld2wd == 1) then
                ! The arrays stored in WD are diagonal
                e = zero
                do j = 1, m
@@ -845,8 +845,8 @@ contains
                end do
             end if
             !
-            if (tt(1, 1) .gt. zero) then
-               if (ldtt .ge. n) then
+            if (tt(1, 1) > zero) then
+               if (ldtt >= n) then
                   do j = 1, m
                      e(j, j) = e(j, j) + alpha*tt(i, j)**2
                   end do
@@ -862,7 +862,7 @@ contains
             end if
          else
             ! WD is an M by M matrix
-            if (ld2wd .eq. 1) then
+            if (ld2wd == 1) then
                ! The array stored in WD is diagonal
                e = zero
                do j = 1, m
@@ -876,9 +876,9 @@ contains
                   end do
                end do
             end if
-   
-            if (tt(1, 1) .gt. zero) then
-               if (ldtt .ge. n) then
+
+            if (tt(1, 1) > zero) then
+               if (ldtt >= n) then
                   do j = 1, m
                      e(j, j) = e(j, j) + alpha*tt(i, j)**2
                   end do
@@ -896,8 +896,8 @@ contains
       else
          ! WD is a diagonal matrix with elements ABS(WD(1,1,1))
          e = zero
-         if (tt(1, 1) .gt. zero) then
-            if (ldtt .ge. n) then
+         if (tt(1, 1) > zero) then
+            if (ldtt >= n) then
                do j = 1, m
                   e(j, j) = abs(wd(1, 1, 1)) + alpha*tt(i, j)**2
                end do
@@ -912,9 +912,9 @@ contains
             end do
          end if
       end if
-   
+
    end subroutine desubi
-   
+
    subroutine detaf &
       (fcn, &
        n, m, np, nq, &
@@ -927,12 +927,12 @@ contains
        lower, upper)
    !! Compute noise and number of good digits in function results.
    !! (Adapted from STARPAC subroutine ETAFUN.)
-   ! Routines Called  FCN
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
-   
+      ! Routines Called  FCN
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
+
       use odrpack_kinds, only: zero, one, two, hundred
-   
+
       procedure(fcn_t) :: fcn
          !! The user-supplied subroutine for evaluating the model.
       integer, intent(in) :: n
@@ -984,15 +984,15 @@ contains
          !! The lower bound of `beta`.
       real(wp), intent(in) :: upper(np)
          !! The upper bound of `beta`.
-   
+
       ! Local scalars
       real(wp), parameter :: p1 = 0.1_wp, p2 = 0.2_wp, p5 = 0.5_wp
       real(wp) :: a, b, fac, shift, stp
       integer :: j, k, l, sbk
-   
+
       ! Local arrays
       real(wp) :: parpts(-2:2, np)
-   
+
       ! Variable Definitions (ALPHABETICALLY)
       !  A:       Parameters of the local fit.
       !  B:       Parameters of the local fit.
@@ -1034,19 +1034,19 @@ contains
       !  WRK6:    A work array of (N BY NP BY NQ) elements.
       !  WRK7:    A work array of (5 BY NQ) elements.
       !  XPLUSD:  The values of X + DELTA.
-   
+
       stp = hundred*epsmac
       eta = epsmac
-   
+
       ! Create points to use in calculating FCN for ETA and NETA
       do j = -2, 2
-         if (j .eq. 0) then
+         if (j == 0) then
             parpts(0, :) = beta(:)
          else
             do k = 1, np
-               if (ifixb(1) .lt. 0) then
+               if (ifixb(1) < 0) then
                   parpts(j, k) = beta(k) + j*stp*beta(k)
-               elseif (ifixb(k) .ne. 0) then
+               elseif (ifixb(k) /= 0) then
                   parpts(j, k) = beta(k) + j*stp*beta(k)
                else
                   parpts(j, k) = beta(k)
@@ -1054,37 +1054,37 @@ contains
             end do
          end if
       end do
-   
+
       ! Adjust the points used in calculating FCN to uphold the boundary constraints
       do k = 1, np
          sbk = sign(one, parpts(2, k) - parpts(-2, k))
-         if (parpts(sbk*2, k) .gt. upper(k)) then
+         if (parpts(sbk*2, k) > upper(k)) then
             shift = upper(k) - parpts(sbk*2, k)
             parpts(sbk*2, k) = upper(k)
             do j = -sbk*2, sbk*1, sbk
                parpts(j, k) = parpts(j, k) + shift
             end do
-            if (parpts(-sbk*2, k) .lt. lower(k)) then
+            if (parpts(-sbk*2, k) < lower(k)) then
                info = 90010
                return
             end if
          end if
-         if (parpts(-sbk*2, k) .lt. lower(k)) then
+         if (parpts(-sbk*2, k) < lower(k)) then
             shift = lower(k) - parpts(-sbk*2, k)
             parpts(-sbk*2, k) = lower(k)
             do j = -sbk*1, sbk*2, sbk
                parpts(j, k) = parpts(j, k) + shift
             end do
-            if (parpts(sbk*2, k) .gt. upper(k)) then
+            if (parpts(sbk*2, k) > upper(k)) then
                info = 90010
                return
             end if
          end if
       end do
-   
+
       ! Evaluate FCN for all points in PARPTS
       do j = -2, 2
-         if (all(parpts(j, :) .eq. beta(:))) then
+         if (all(parpts(j, :) == beta(:))) then
             do l = 1, nq
                wrk7(j, l) = pv0(nrow, l)
             end do
@@ -1096,7 +1096,7 @@ contains
                      partmp(:), xplusd, &
                      ifixb, ifixx, ldifx, &
                      003, wrk2, wrk6, wrk1, istop)
-            if (istop .ne. 0) then
+            if (istop /= 0) then
                return
             else
                nfev = nfev + 1
@@ -1106,7 +1106,7 @@ contains
             end do
          end if
       end do
-   
+
       ! Calculate ETA and NETA
       do l = 1, nq
          a = zero
@@ -1117,7 +1117,7 @@ contains
          end do
          a = p2*a
          b = p1*b
-         if ((wrk7(0, l) .ne. zero) .and. (abs(wrk7(1, l) + wrk7(-1, l)) .gt. hundred*epsmac)) then
+         if ((wrk7(0, l) /= zero) .and. (abs(wrk7(1, l) + wrk7(-1, l)) > hundred*epsmac)) then
             fac = one/abs(wrk7(0, l))
          else
             fac = one
@@ -1128,9 +1128,9 @@ contains
          end do
       end do
       neta = max(two, p5 - log10(eta))
-   
+
    end subroutine detaf
-   
+
    subroutine devjac &
       (fcn, &
        anajac, cdjac, &
@@ -1144,12 +1144,12 @@ contains
        njev, nfev, istop, info, &
        lower, upper)
    !! Compute the weighted Jacobians wrt `beta` and `delta`.
-   ! Routines Called  FCN, DDOT, DIFIX, DJACCD, DJACFD, DWGHT, DUNPAC
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
-   
+      ! Routines Called  FCN, DDOT, DIFIX, DJACCD, DJACFD, DWGHT, DUNPAC
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
+
       use odrpack_kinds, only: zero
-   
+
       procedure(fcn_t) :: fcn
          !! The user-supplied subroutine for evaluating the model.
       logical, intent(in) :: anajac
@@ -1235,14 +1235,14 @@ contains
          !! The lower bound of `beta`.
       real(wp), intent(in) :: upper(np)
          !! The upper bound of `beta`.
-   
+
       ! Local scalars
       integer :: ideval, j, k, k1, l
       logical :: ferror
-   
+
       ! External BLAS/LAPACK procedures
       real(wp), external :: ddot
-      
+
       ! Variable Definitions (alphabetically)
       !  ANAJAC:  The variable designating whether the Jacobians are computed by finite differences
       !          (ANAJAC=FALSE) or not (ANAJAC=TRUE).
@@ -1294,13 +1294,13 @@ contains
       !  WRK6:    A work array of (N BY NP BY NQ) elements.
       !  X:       The independent variable.
       !  XPLUSD:  The values of X + DELTA.
-   
+
       ! Insert current unfixed BETA estimates into BETA
       call dunpac(np, betac, beta, ifixb)
-   
+
       ! Compute XPLUSD = X + DELTA
       xplusd = x(1:n, :) + delta
-   
+
       ! Compute the Jacobian wrt the estimated BETAS (FJACB) and the Jacobian wrt DELTA (FJACD)
       istop = 0
       if (isodr) then
@@ -1315,7 +1315,7 @@ contains
                   ifixb, ifixx, ldifx, &
                   ideval, wrk2, fjacb, fjacd, &
                   istop)
-         if (istop .ne. 0) then
+         if (istop /= 0) then
             return
          else
             njev = njev + 1
@@ -1343,19 +1343,19 @@ contains
                      fjacb, isodr, fjacd, nfev, istop, info, &
                      lower, upper)
       end if
-      if (istop .lt. 0 .or. info .ge. 10000) then
+      if (istop < 0 .or. info >= 10000) then
          return
       elseif (.not. isodr) then
          ! Try to detect whether the user has computed JFACD within FCN in the OLS case
-         ferror = ddot(n*m, delta, 1, delta, 1) .ne. zero
+         ferror = ddot(n*m, delta, 1, delta, 1) /= zero
          if (ferror) then
             info = 50300
             return
          end if
       end if
-   
+
       ! Weight the Jacobian wrt the estimated BETAS
-      if (ifixb(1) .lt. 0) then
+      if (ifixb(1) < 0) then
          do k = 1, np
             call dwght(n, nq, we1, ldwe, ld2we, fjacb(1:n, k, 1:nq), tempret(1:n, 1:nq))
             fjacb(1:n, k, 1:nq) = tempret(1:n, 1:nq)
@@ -1363,14 +1363,14 @@ contains
       else
          k1 = 0
          do k = 1, np
-            if (ifixb(k) .ge. 1) then
+            if (ifixb(k) >= 1) then
                k1 = k1 + 1
                call dwght(n, nq, we1, ldwe, ld2we, fjacb(1:n, k, 1:nq), tempret(1:n, 1:nq))
                fjacb(1:n, k1, 1:nq) = tempret(1:n, 1:nq)
             end if
          end do
       end if
-   
+
       ! Weight the Jacobian's wrt DELTA as appropriate
       if (isodr) then
          do j = 1, m
@@ -1378,19 +1378,19 @@ contains
             fjacd(1:n, j, 1:nq) = tempret(1:n, 1:nq)
          end do
       end if
-   
+
    end subroutine devjac
-   
+
    subroutine dfctr(oksemi, a, lda, n, info)
    !! Factor the positive (semi)definite matrix `a` using a modified Cholesky factorization.
    !! (Adapted from LINPACK subroutine DPOFA.)
-   ! Routines Called  DDOT
-   ! Date Written   910706   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
-   ! References  Dongarra J.J., Bunch J.R., Moler C.B., Stewart G.W., *LINPACK Users Guide*, SIAM, 1979.
-   
+      ! Routines Called  DDOT
+      ! Date Written   910706   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
+      ! References  Dongarra J.J., Bunch J.R., Moler C.B., Stewart G.W., *LINPACK Users Guide*, SIAM, 1979.
+
       use odrpack_kinds, only: zero, ten
-   
+
       logical, intent(in) :: oksemi
          !! The indicating whether the factored array can be positive semidefinite
          !! (`oksemi = .true.`) or whether it must be found to be positive definite
@@ -1398,7 +1398,7 @@ contains
       real(wp), intent(inout) :: a(lda, n)
          !! The array to be factored. Upon return, `a` contains the upper triangular matrix
          !! `r` so that `a = trans(r)*r` where the strict lower triangle is set to zero.
-         !! If `info .ne. 0`, the factorization is not complete.
+         !! If `info /= 0`, the factorization is not complete.
       integer, intent(in) :: lda
          !! The leading dimension of array `a`.
       integer, intent(in) :: n
@@ -1408,18 +1408,18 @@ contains
          !!   `info = 0` then factorization was completed.
          !!   `info = k` signals an error condition. The leading minor of order `k` is not
          !!   positive (semi)definite.
-   
+
       ! Local scalars
       real(wp) :: xi, s, t
       integer j, k
-   
+
       ! External BLAS/LAPACK procedures
       real(wp), external :: ddot
-   
+
       ! Variable Definitions (alphabetically)
       !  A:       The array to be factored.  Upon return, A contains the upper triangular matrix
       !           R so that A = trans(R)*R where the strict lower triangle is set to zero.
-      !           If INFO .NE. 0, the factorization is not complete.
+      !           If INFO /= 0, the factorization is not complete.
       !  I:       An indexing variable.
       !  INFO:    An idicator variable, where if
       !           INFO = 0  then factorization was completed
@@ -1431,16 +1431,16 @@ contains
       !  OKSEMI:  The indicating whether the factored array can be positive semidefinite
       !           (OKSEMI=TRUE) or whether it must be found to be positive definite (OKSEMI=FALSE).
       !  XI:      A value used to test for non positive semidefiniteness.
-   
+
       ! Set relative tolerance for detecting non positive semidefiniteness.
       xi = -ten*epsilon(zero)
-   
+
       ! Compute factorization, storing in upper triangular portion of A
       do j = 1, n
          info = j
          s = zero
          do k = 1, j - 1
-            if (a(k, k) .eq. zero) then
+            if (a(k, k) == zero) then
                t = zero
             else
                t = a(k, j) - ddot(k - 1, a(1, k), 1, a(1, j), 1)
@@ -1450,29 +1450,29 @@ contains
             s = s + t*t
          end do
          s = a(j, j) - s
-   
+
          ! ...Exit
-         if (a(j, j) .lt. zero .or. s .lt. xi*abs(a(j, j))) then
+         if (a(j, j) < zero .or. s < xi*abs(a(j, j))) then
             return
-         elseif (.not. oksemi .and. s .le. zero) then
+         elseif (.not. oksemi .and. s <= zero) then
             return
-         elseif (s .le. zero) then
+         elseif (s <= zero) then
             a(j, j) = zero
          else
             a(j, j) = sqrt(s)
          end if
       end do
       info = 0
-   
+
       ! Zero out lower portion of A
       do j = 2, n
          do k = 1, j - 1
             a(j, k) = zero
          end do
       end do
-   
+
    end subroutine dfctr
-   
+
    subroutine dfctrw &
       (n, m, nq, npp, &
        isodr, &
@@ -1481,12 +1481,12 @@ contains
        we1, nnzw, info)
    !! Check input parameters, indicating errors found using nonzero values of argument `info` as
    !! described in the ODRPACK95 reference guide.
-   ! Routines Called  DFCTR
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
-   
+      ! Routines Called  DFCTR
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
+
       use odrpack_kinds, only: zero
-   
+
       integer, intent(in) :: n
          !! The number of observations.
       integer, intent(in) :: m
@@ -1520,11 +1520,11 @@ contains
          !! The number of nonzero weighted observations.
       integer, intent(out) :: info
          !! The variable designating why the computations were stopped.
-   
+
       ! Local scalars
       integer :: i, inf, j, j1, j2, l, l1, l2
       logical :: notzro, exited
-   
+
       ! Variable Definitions (alphabetically)
       !  I:       An indexing variable.
       !  INFO:    The variable designating why the computations were stopped.
@@ -1553,25 +1553,25 @@ contains
       !  WD:      The (squared) DELTA weights.
       !  WRK0:    A work array of (NQ BY NQ) elements.
       !  WRK4:    A work array of (M BY M) elements.
-   
+
       ! Check EPSILON weights, and store factorization in WE1
-   
+
       exited = .false.
-   
-      if (we(1, 1, 1) .lt. zero) then
+
+      if (we(1, 1, 1) < zero) then
          ! WE contains a scalar
          we1(1, 1, 1) = -sqrt(abs(we(1, 1, 1)))
          nnzw = n
       else
          nnzw = 0
-         if (ldwe .eq. 1) then
-            if (ld2we .eq. 1) then
+         if (ldwe == 1) then
+            if (ld2we == 1) then
                ! WE contains a diagonal matrix
                do l = 1, nq
-                  if (we(1, 1, l) .gt. zero) then
+                  if (we(1, 1, l) > zero) then
                      nnzw = n
                      we1(1, 1, l) = sqrt(we(1, 1, l))
-                  elseif (we(1, 1, l) .lt. zero) then
+                  elseif (we(1, 1, l) < zero) then
                      info = 30010
                      exited = .true.
                      exit
@@ -1585,7 +1585,7 @@ contains
                   end do
                end do
                call dfctr(.true., wrk0, nq, nq, inf)
-               if (inf .ne. 0) then
+               if (inf /= 0) then
                   info = 30010
                   exited = .true.
                else
@@ -1593,22 +1593,22 @@ contains
                      do l2 = 1, nq
                         we1(1, l1, l2) = wrk0(l1, l2)
                      end do
-                     if (we1(1, l1, l1) .ne. zero) then
+                     if (we1(1, l1, l1) /= zero) then
                         nnzw = n
                      end if
                   end do
                end if
             end if
          else
-            if (ld2we .eq. 1) then
+            if (ld2we == 1) then
                ! WE contains an array of  diagonal matrix
                do i = 1, n
                   notzro = .false.
                   do l = 1, nq
-                     if (we(i, 1, l) .gt. zero) then
+                     if (we(i, 1, l) > zero) then
                         notzro = .true.
                         we1(i, 1, l) = sqrt(we(i, 1, l))
-                     elseif (we(i, 1, l) .lt. zero) then
+                     elseif (we(i, 1, l) < zero) then
                         info = 30010
                         exited = .true.
                         exit
@@ -1628,7 +1628,7 @@ contains
                      end do
                   end do
                   call dfctr(.true., wrk0, nq, nq, inf)
-                  if (inf .ne. 0) then
+                  if (inf /= 0) then
                      info = 30010
                      exited = .true.
                      exit
@@ -1638,7 +1638,7 @@ contains
                         do l2 = 1, nq
                            we1(i, l1, l2) = wrk0(l1, l2)
                         end do
-                        if (we1(i, l1, l1) .ne. zero) then
+                        if (we1(i, l1, l1) /= zero) then
                            notzro = .true.
                         end if
                      end do
@@ -1650,22 +1650,22 @@ contains
             end if
          end if
       end if
-   
+
       ! Check for a sufficient number of nonzero EPSILON weights
       if (.not. exited) then
-         if (nnzw .lt. npp) info = 30020
+         if (nnzw < npp) info = 30020
       end if
-   
+
       ! Check DELTA weights
-      if (.not. isodr .or. wd(1, 1, 1) .lt. zero) then
+      if (.not. isodr .or. wd(1, 1, 1) < zero) then
          ! Problem is not ODR, or WD contains a scalar
          return
       else
-         if (ldwd .eq. 1) then
-            if (ld2wd .eq. 1) then
+         if (ldwd == 1) then
+            if (ld2wd == 1) then
                ! WD contains a diagonal matrix
                do j = 1, m
-                  if (wd(1, 1, j) .le. zero) then
+                  if (wd(1, 1, j) <= zero) then
                      info = max(30001, info + 1)
                      return
                   end if
@@ -1678,17 +1678,17 @@ contains
                   end do
                end do
                call dfctr(.false., wrk4, m, m, inf)
-               if (inf .ne. 0) then
+               if (inf /= 0) then
                   info = max(30001, info + 1)
                   return
                end if
             end if
          else
-            if (ld2wd .eq. 1) then
+            if (ld2wd == 1) then
                ! WD contains an array of diagonal matrices
                do i = 1, n
                   do j = 1, m
-                     if (wd(i, 1, j) .le. zero) then
+                     if (wd(i, 1, j) <= zero) then
                         info = max(30001, info + 1)
                         return
                      end if
@@ -1703,7 +1703,7 @@ contains
                      end do
                   end do
                   call dfctr(.false., wrk4, m, m, inf)
-                  if (inf .ne. 0) then
+                  if (inf /= 0) then
                      info = max(30001, info + 1)
                      return
                   end if
@@ -1711,15 +1711,15 @@ contains
             end if
          end if
       end if
-   
+
    end subroutine dfctrw
-   
+
    pure subroutine dflags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
    !! Set flags indicating conditions specified by `job`.
-   ! Routines Called  (NONE)
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
-   
+      ! Routines Called  (NONE)
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
+
       integer, intent(in) :: job
          !! The variable controlling problem initialization and computational method.
       logical, intent(out) :: restrt
@@ -1749,10 +1749,10 @@ contains
       logical, intent(out) :: implct
          !! The variable designating whether the solution is by implicit ODR (`implct = .true.`)
          !! or explicit ODR (`implct = .false.`).
-   
+
       ! Local scalars
       integer :: j
-   
+
       ! Variable Definitions (alphabetically)
       !  ANAJAC:  The variable designating whether the Jacobians are computed by finite differences
       !           (ANAJAC=FALSE) or not (ANAJAC=TRUE).
@@ -1774,34 +1774,34 @@ contains
       !           computation of the covariance matrix (REDOJ=TRUE) or not (REDOJ=FALSE).
       !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or
       !           not (RESTRT=FALSE).
-   
-      if (job .ge. 0) then
-   
-         restrt = job .ge. 10000
-         initd = mod(job, 10000)/1000 .eq. 0
+
+      if (job >= 0) then
+
+         restrt = job >= 10000
+         initd = mod(job, 10000)/1000 == 0
          j = mod(job, 1000)/100
-   
-         if (j .eq. 0) then
+
+         if (j == 0) then
             dovcv = .true.
             redoj = .true.
-         elseif (j .eq. 1) then
+         elseif (j == 1) then
             dovcv = .true.
             redoj = .false.
          else
             dovcv = .false.
             redoj = .false.
          end if
-   
+
          j = mod(job, 100)/10
-         if (j .eq. 0) then
+         if (j == 0) then
             anajac = .false.
             cdjac = .false.
             chkjac = .false.
-         elseif (j .eq. 1) then
+         elseif (j == 1) then
             anajac = .false.
             cdjac = .true.
             chkjac = .false.
-         elseif (j .eq. 2) then
+         elseif (j == 2) then
             anajac = .true.
             cdjac = .false.
             chkjac = .true.
@@ -1810,21 +1810,21 @@ contains
             cdjac = .false.
             chkjac = .false.
          end if
-   
+
          j = mod(job, 10)
-         if (j .eq. 0) then
+         if (j == 0) then
             isodr = .true.
             implct = .false.
-         elseif (j .eq. 1) then
+         elseif (j == 1) then
             isodr = .true.
             implct = .true.
          else
             isodr = .false.
             implct = .false.
          end if
-   
+
       else
-   
+
          restrt = .false.
          initd = .true.
          dovcv = .true.
@@ -1834,21 +1834,21 @@ contains
          chkjac = .false.
          isodr = .true.
          implct = .false.
-   
+
       end if
-   
+
    end subroutine dflags
-   
+
    real(wp) pure function dhstep(itype, neta, i, j, stp, ldstp) result(dhstepr)
    !! Set relative step size for finite difference derivatives.
-   ! Routines Called  (NONE)
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
-   
+      ! Routines Called  (NONE)
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
+
       use odrpack_kinds, only: zero, two, three, ten
-   
+
       integer, intent(in) :: itype
-         !! The finite difference method being used, where: `itype = 0` indicates forward 
+         !! The finite difference method being used, where: `itype = 0` indicates forward
          !! finite differences, and `itype = 1` indicates central finite differences.
       integer, intent(in) :: neta
          !! The number of good digits in the function results.
@@ -1860,7 +1860,7 @@ contains
          !! The step size for the finite difference derivative.
       integer, intent(in) :: ldstp
          !! The leading dimension of array `stp`.
-   
+
       ! Variable Definitions (alphabetically)
       !  I:       An identifier for selecting user supplied step sizes.
       !  ITYPE:   The finite difference method being used, where
@@ -1870,32 +1870,32 @@ contains
       !  LDSTP:   The leading dimension of array STP.
       !  NETA:    The number of good digits in the function results.
       !  STP:     The step size for the finite difference derivative.
-   
-      if (stp(1, 1) .le. zero) then
-         if (itype .eq. 0) then
+
+      if (stp(1, 1) <= zero) then
+         if (itype == 0) then
             ! Use default forward finite difference step size
             dhstepr = ten**(-abs(neta)/two - two)
          else
             ! Use default central finite difference step size
             dhstepr = ten**(-abs(neta)/three)
          end if
-   
-      elseif (ldstp .eq. 1) then
+
+      elseif (ldstp == 1) then
          dhstepr = stp(1, j)
       else
          dhstepr = stp(i, j)
       end if
-   
+
    end function dhstep
-   
+
    pure subroutine difix(n, m, ifix, ldifix, t, ldt, tfix, ldtfix)
    !! Set elements of `t` to zero according to `ifix`.
-   ! Routines Called  (NONE)
-   ! Date Written   910612   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
-   
+      ! Routines Called  (NONE)
+      ! Date Written   910612   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
+
       use odrpack_kinds, only: zero
-   
+
       integer, intent(in) :: n
          !! The number of rows of data in the array.
       integer, intent(in) :: m
@@ -1912,10 +1912,10 @@ contains
          !! The resulting array.
       integer, intent(in) :: ldtfix
          !! The leading dimension of array `tfix`.
-   
+
       ! Local scalars
       integer :: i, j
-   
+
       ! Variable Definitions (alphabetically)
       !  I:       An indexing variable.
       !  IFIX:    The array designating whether an element of T is to be set to zero.
@@ -1927,14 +1927,14 @@ contains
       !  N:       The number of rows of data in the array.
       !  T:       The array being set to zero according to the elements of IFIX.
       !  TFIX:    The resulting array.
-   
-      if (n .eq. 0 .or. m .eq. 0) return
-   
-      if (ifix(1, 1) .ge. zero) then
-         if (ldifix .ge. n) then
+
+      if (n == 0 .or. m == 0) return
+
+      if (ifix(1, 1) >= zero) then
+         if (ldifix >= n) then
             do j = 1, m
                do i = 1, n
-                  if (ifix(i, j) .eq. 0) then
+                  if (ifix(i, j) == 0) then
                      tfix(i, j) = zero
                   else
                      tfix(i, j) = t(i, j)
@@ -1943,7 +1943,7 @@ contains
             end do
          else
             do j = 1, m
-               if (ifix(1, j) .eq. 0) then
+               if (ifix(1, j) == 0) then
                   do i = 1, n
                      tfix(i, j) = zero
                   end do
@@ -1955,9 +1955,9 @@ contains
             end do
          end if
       end if
-   
+
    end subroutine difix
-   
+
    pure subroutine diwinf &
       (m, np, nq, &
        msgbi, msgdi, ifix2i, istopi, &
@@ -1968,10 +1968,10 @@ contains
        boundi, &
        liwkmn)
    !! Set storage locations within integer work space.
-   ! Routines Called  (NONE)
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
-   
+      ! Routines Called  (NONE)
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
+
       integer, intent(in) :: m
          !! The number of columns of data in the independent variable.
       integer, intent(in) :: np
@@ -2024,7 +2024,7 @@ contains
          !! The location in array `iwork` of variable `bound`.
       integer, intent(out) :: liwkmn
          !! The minimum acceptable length of array `iwork`.
-   
+
       ! Variable Definitions (alphabetically)
       !  IDFI:    The location in array IWORK of variable IDF.
       !  IFIX2I:  The starting location in array IWORK of array IFIX2.
@@ -2051,8 +2051,8 @@ contains
       !  NQ:      The number of responses per observation.
       !  NROWI:   The location in array IWORK of variable NROW.
       !  NTOLI:   The location in array IWORK of variable NTOL.
-   
-      if (np .ge. 1 .and. m .ge. 1) then
+
+      if (np >= 1 .and. m >= 1) then
          msgbi = 1
          msgdi = msgbi + nq*np + 1
          ifix2i = msgdi + nq*m + 1
@@ -2101,9 +2101,9 @@ contains
          boundi = 1
          liwkmn = 1
       end if
-   
+
    end subroutine diwinf
-   
+
    subroutine diniwk &
       (n, m, np, work, lwork, iwork, liwork, &
        x, ldx, ifixx, ldifx, scld, ldscld, &
@@ -2116,12 +2116,12 @@ contains
        ssfi, tti, ldtti, deltai, &
        loweri, upperi, boundi)
    !! Initialize work vectors as necessary.
-   ! Routines Called  DFLAGS, DSCLB, DSCLD, DCOPY
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
-   
+      ! Routines Called  DFLAGS, DSCLB, DSCLD, DCOPY
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
+
       use odrpack_kinds, only: zero, one, two, three
-   
+
       integer, intent(in) :: n
          !! The number of observations.
       integer, intent(in) :: m
@@ -2204,14 +2204,14 @@ contains
          !! The starting location in array `iwork` of array `upper`.
       integer, intent(in) :: boundi
          !! The location in array `iwork` of variable `bound`.
-   
+
       ! Local scalars
       integer :: i, j, istart
       logical :: anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
-   
+
       ! External BLAS/LAPACK procedures
       external :: dcopy
-   
+
       ! Variable Definitions (alphabetically)
       !  ANAJAC:  The variable designating whether the Jacobians are computed by finite differences
       !           (ANAJAC=FALSE) or not (ANAJAC=TRUE).
@@ -2269,82 +2269,82 @@ contains
       !  TTI:     The starting location in array WORK of the ARRAY TT.
       !  WORK:    The REAL (wp) work space.
       !  X:       The independent variable.
-   
+
       call dflags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
-   
+
       ! Store value of machine precision in work vector
       work(epsmai) = epsilon(zero)
-   
+
       ! Set tolerance for stopping criteria based on the change in the parameters (see also
       ! subprogram DODCNT)
-      if (partol .lt. zero) then
+      if (partol < zero) then
          work(partli) = work(epsmai)**(two/three)
       else
          work(partli) = min(partol, one)
       end if
-   
+
       ! Set tolerance for stopping criteria based on the change in the sum of squares of the
       ! weighted observational errors
-      if (sstol .lt. zero) then
+      if (sstol < zero) then
          work(sstoli) = sqrt(work(epsmai))
       else
          work(sstoli) = min(sstol, one)
       end if
-   
+
       ! Set factor for computing trust region diameter at first iteration
-      if (taufac .le. zero) then
+      if (taufac <= zero) then
          work(taufci) = one
       else
          work(taufci) = min(taufac, one)
       end if
-   
+
       ! Set maximum number of iterations
-      if (maxit .lt. 0) then
+      if (maxit < 0) then
          iwork(maxiti) = 50
       else
          iwork(maxiti) = maxit
       end if
-   
+
       ! Store problem initialization and computational method control variable
-      if (job .le. 0) then
+      if (job <= 0) then
          iwork(jobi) = 0
       else
          iwork(jobi) = job
       end if
-   
+
       ! Set print control
-      if (iprint .lt. 0) then
+      if (iprint < 0) then
          iwork(iprini) = 2001
       else
          iwork(iprini) = iprint
       end if
-   
+
       ! Set logical unit number for error messages
-      if (lunerr .lt. 0) then
+      if (lunerr < 0) then
          iwork(luneri) = 6
       else
          iwork(luneri) = lunerr
       end if
-   
+
       ! Set logical unit number for computation reports
-      if (lunrpt .lt. 0) then
+      if (lunrpt < 0) then
          iwork(lunrpi) = 6
       else
          iwork(lunrpi) = lunrpt
       end if
-   
+
       ! Compute scaling for BETA's and DELTA's
-      if (sclb(1) .le. zero) then
+      if (sclb(1) <= zero) then
          call dsclb(np, beta, work(ssfi))
       else
          call dcopy(np, sclb, 1, work(ssfi), 1)
       end if
       if (isodr) then
-         if (scld(1, 1) .le. zero) then
+         if (scld(1, 1) <= zero) then
             iwork(ldtti) = n
             call dscld(n, m, x, ldx, work(tti), iwork(ldtti))
          else
-            if (ldscld .eq. 1) then
+            if (ldscld == 1) then
                iwork(ldtti) = 1
                call dcopy(m, scld(1, 1), 1, work(tti), 1)
             else
@@ -2356,17 +2356,17 @@ contains
             end if
          end if
       end if
-   
+
       ! Initialize DELTA's as necessary
       if (isodr) then
          if (initd) then
             !call dzero( n, m, work( deltai), n)
             work(deltai:deltai + (n*m - 1)) = zero
          else
-            if (ifixx(1, 1) .ge. 0) then
-               if (ldifx .eq. 1) then
+            if (ifixx(1, 1) >= 0) then
+               if (ldifx == 1) then
                   do j = 1, m
-                     if (ifixx(1, j) .eq. 0) then
+                     if (ifixx(1, j) == 0) then
                         istart = deltai + (j - 1)*n
                         work(istart:istart + (n - 1)) = zero
                         !call dzero( n,1, work( deltai+( j-1)* n), n)
@@ -2375,7 +2375,7 @@ contains
                else
                   do j = 1, m
                      do i = 1, n
-                        if (ifixx(i, j) .eq. 0) then
+                        if (ifixx(i, j) == 0) then
                            work(deltai - 1 + i + (j - 1)*n) = zero
                         end if
                      end do
@@ -2387,16 +2387,16 @@ contains
          !call dzero( n, m, work( deltai), n)
          work(deltai:deltai + (n*m - 1)) = zero
       end if
-   
+
       ! Copy bounds into WORK
       work(loweri:loweri + np - 1) = lower(1:np)
       work(upperi:upperi + np - 1) = upper(1:np)
-   
+
       ! Initialize parameters on bounds in IWORK
       iwork(boundi:boundi + np - 1) = 0
-   
+
    end subroutine diniwk
-   
+
    subroutine djaccd &
       (fcn, &
        n, m, np, nq, &
@@ -2407,12 +2407,12 @@ contains
        lower, upper)
    !! Compute central difference approximations to the Jacobian wrt the estimated `beta`s and
    !! wrt the `delta`s.
-   ! Routines Called  FCN, DHSTEP
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
-   
+      ! Routines Called  FCN, DHSTEP
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
+
       use odrpack_kinds, only: zero, one
-   
+
       procedure(fcn_t) :: fcn
          !! The user supplied subroutine for evaluating the model.
       integer, intent(in) :: n
@@ -2483,12 +2483,12 @@ contains
          !! The lower bound on `beta`.
       real(wp), intent(in) :: upper(np)
          !! The upper bound on `beta`.
-   
+
       ! Local scalars
       real(wp) :: betak, typj
       integer :: i, j, k, l
       logical :: doit, setzro
-     
+
       ! Variable Definitions (alphabetically)
       !  BETA:    The function parameters.
       !  BETAK:   The K-th function parameter.
@@ -2539,11 +2539,11 @@ contains
       !  WRK2:    A work array of (N BY NQ) elements.
       !  WRK3:    A work array of (NP) elements.
       !  WRK6:    A WORK ARRAY OF (N BY NP BY NQ) elements.
-   
+
       ! Compute the Jacobian wrt the estimated BETAS
       do k = 1, np
-         if (ifixb(1) .ge. 0) then
-            if (ifixb(k) .eq. 0) then
+         if (ifixb(1) >= 0) then
+            if (ifixb(k) == 0) then
                doit = .false.
             else
                doit = .true.
@@ -2557,24 +2557,24 @@ contains
             betak = beta(k)
             wrk3(k) = betak + derstep(1, k, betak, ssf, stpb, neta)
             wrk3(k) = wrk3(k) - betak
-   
+
             beta(k) = betak + wrk3(k)
-            if (beta(k) .gt. upper(k)) then
+            if (beta(k) > upper(k)) then
                beta(k) = upper(k)
-            elseif (beta(k) .lt. lower(k)) then
+            elseif (beta(k) < lower(k)) then
                beta(k) = lower(k)
             end if
-            if (beta(k) - 2*wrk3(k) .lt. lower(k)) then
+            if (beta(k) - 2*wrk3(k) < lower(k)) then
                beta(k) = lower(k) + 2*wrk3(k)
-            elseif (beta(k) - 2*wrk3(k) .gt. upper(k)) then
+            elseif (beta(k) - 2*wrk3(k) > upper(k)) then
                beta(k) = upper(k) + 2*wrk3(k)
             end if
-            if (beta(k) .gt. upper(k) .or. beta(k) .lt. lower(k)) then
+            if (beta(k) > upper(k) .or. beta(k) < lower(k)) then
                info = 60001
                return
             end if
             istop = 0
-            if (beta(k) .eq. betak) then
+            if (beta(k) == betak) then
                wrk2(1:n, 1:nq) = fn(1:n, 1:nq)
             else
                call fcn(n, m, np, nq, &
@@ -2583,25 +2583,25 @@ contains
                         ifixb, ifixx, ldifx, &
                         001, wrk2, wrk6, wrk1, &
                         istop)
-               if (istop .ne. 0) then
+               if (istop /= 0) then
                   return
                else
                   nfev = nfev + 1
                end if
             end if
             fjacb(1:n, k, 1:nq) = wrk2(1:n, 1:nq)
-   
+
             beta(k) = beta(k) - 2*wrk3(k)
-            if (beta(k) .gt. upper(k)) then
+            if (beta(k) > upper(k)) then
                info = 60001
                return
             end if
-            if (beta(k) .lt. lower(k)) then
+            if (beta(k) < lower(k)) then
                info = 60001
                return
             end if
             istop = 0
-            if (beta(k) .eq. betak) then
+            if (beta(k) == betak) then
                wrk2(1:n, 1:nq) = fn(1:n, 1:nq)
             else
                call fcn(n, m, np, nq, &
@@ -2610,13 +2610,13 @@ contains
                         ifixb, ifixx, ldifx, &
                         001, wrk2, wrk6, wrk1, &
                         istop)
-               if (istop .ne. 0) then
+               if (istop /= 0) then
                   return
                else
                   nfev = nfev + 1
                end if
             end if
-   
+
             do l = 1, nq
                do i = 1, n
                   fjacb(i, k, l) = (fjacb(i, k, l) - wrk2(i, l))/(2*wrk3(k))
@@ -2625,15 +2625,15 @@ contains
             beta(k) = betak
          end if
       end do
-   
+
       ! Compute the Jacobian wrt the X's
       if (isodr) then
          do j = 1, m
-            if (ifixx(1, 1) .lt. 0) then
+            if (ifixx(1, 1) < 0) then
                doit = .true.
                setzro = .false.
-            elseif (ldifx .eq. 1) then
-               if (ifixx(1, j) .eq. 0) then
+            elseif (ldifx == 1) then
+               if (ifixx(1, j) == 0) then
                   doit = .false.
                else
                   doit = .true.
@@ -2643,7 +2643,7 @@ contains
                doit = .false.
                setzro = .false.
                do i = 1, n
-                  if (ifixx(i, j) .ne. 0) then
+                  if (ifixx(i, j) /= 0) then
                      doit = .true.
                   else
                      setzro = .true.
@@ -2656,10 +2656,10 @@ contains
                end do
             else
                do i = 1, n
-                  if (xplusd(i, j) .eq. zero) then
-                     if (tt(1, 1) .lt. zero) then
+                  if (xplusd(i, j) == zero) then
+                     if (tt(1, 1) < zero) then
                         typj = one/abs(tt(1, 1))
-                     elseif (ldtt .eq. 1) then
+                     elseif (ldtt == 1) then
                         typj = one/tt(1, j)
                      else
                         typj = one/tt(i, j)
@@ -2678,7 +2678,7 @@ contains
                         ifixb, ifixx, ldifx, &
                         001, wrk2, wrk6, wrk1, &
                         istop)
-               if (istop .ne. 0) then
+               if (istop /= 0) then
                   return
                else
                   nfev = nfev + 1
@@ -2688,7 +2688,7 @@ contains
                      end do
                   end do
                end if
-   
+
                do i = 1, n
                   xplusd(i, j) = x(i, j) + delta(i, j) - stp(i)
                end do
@@ -2699,15 +2699,15 @@ contains
                         ifixb, ifixx, ldifx, &
                         001, wrk2, wrk6, wrk1, &
                         istop)
-               if (istop .ne. 0) then
+               if (istop /= 0) then
                   return
                else
                   nfev = nfev + 1
                end if
-   
+
                if (setzro) then
                   do i = 1, n
-                     if (ifixx(i, j) .eq. 0) then
+                     if (ifixx(i, j) == 0) then
                         fjacd(i, j, 1:nq) = zero
                      else
                         fjacd(i, j, 1:nq) = (fjacd(i, j, 1:nq) - wrk2(i, 1:nq))/(2*stp(i))
@@ -2722,9 +2722,9 @@ contains
             end if
          end do
       end if
-   
+
    end subroutine djaccd
-   
+
    subroutine djacfd &
       (fcn, &
        n, m, np, nq, &
@@ -2735,12 +2735,12 @@ contains
        lower, upper)
    !! Compute forward difference approximations to the Jacobian wrt the estimated `beta`s and
    !! wrt the `delta`s.
-   ! Routines Called  FCN, DHSTEP, DERSTEP
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
-   
+      ! Routines Called  FCN, DHSTEP, DERSTEP
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
+
       use odrpack_kinds, only: zero, one
-   
+
       procedure(fcn_t) :: fcn
          !! The user supplied subroutine for evaluating the model.
       integer, intent(in) :: n
@@ -2811,12 +2811,12 @@ contains
          !! The lower bound on `beta`.
       real(wp), intent(in) :: upper(np)
          !! The upper bound on `beta`.
-   
+
       ! Local scalars
       real(wp) :: betak, step, typj
       integer :: i, j, k, l
       logical :: doit, setzro
-      
+
       ! Variable Definitions (alphabetically)
       !  BETA:    The function parameters.
       !  BETAK:   The K-th function parameter.
@@ -2864,11 +2864,11 @@ contains
       !  WRK2:    A work array of (N BY NQ) elements.
       !  WRK3:    A work array of (NP) elements.
       !  WRK6:    A work array of (N BY NP BY NQ) elements.
-   
+
       ! Compute the Jacobian wrt the estimated BETAS
       do k = 1, np
-         if (ifixb(1) .ge. 0) then
-            if (ifixb(k) .eq. 0) then
+         if (ifixb(1) >= 0) then
+            if (ifixb(k) == 0) then
                doit = .false.
             else
                doit = .true.
@@ -2886,18 +2886,18 @@ contains
             wrk3(k) = betak + step
             wrk3(k) = wrk3(k) - betak
             beta(k) = betak + wrk3(k)
-            if (beta(k) .gt. upper(k)) then
+            if (beta(k) > upper(k)) then
                step = -step
                wrk3(k) = betak + step
                wrk3(k) = wrk3(k) - betak
                beta(k) = betak + wrk3(k)
             end if
-            if (beta(k) .lt. lower(k)) then
+            if (beta(k) < lower(k)) then
                step = -step
                wrk3(k) = betak + step
                wrk3(k) = wrk3(k) - betak
                beta(k) = betak + wrk3(k)
-               if (beta(k) .gt. upper(k)) then
+               if (beta(k) > upper(k)) then
                   info = 60001
                   return
                end if
@@ -2909,7 +2909,7 @@ contains
                      ifixb, ifixx, ldifx, &
                      001, wrk2, wrk6, wrk1, &
                      istop)
-            if (istop .ne. 0) then
+            if (istop /= 0) then
                return
             else
                nfev = nfev + 1
@@ -2922,15 +2922,15 @@ contains
             beta(k) = betak
          end if
       end do
-   
+
       ! Compute the Jacobian wrt the X'S
       if (isodr) then
          do j = 1, m
-            if (ifixx(1, 1) .lt. 0) then
+            if (ifixx(1, 1) < 0) then
                doit = .true.
                setzro = .false.
-            elseif (ldifx .eq. 1) then
-               if (ifixx(1, j) .eq. 0) then
+            elseif (ldifx == 1) then
+               if (ifixx(1, j) == 0) then
                   doit = .false.
                else
                   doit = .true.
@@ -2940,7 +2940,7 @@ contains
                doit = .false.
                setzro = .false.
                do i = 1, n
-                  if (ifixx(i, j) .ne. 0) then
+                  if (ifixx(i, j) /= 0) then
                      doit = .true.
                   else
                      setzro = .true.
@@ -2953,10 +2953,10 @@ contains
                end do
             else
                do i = 1, n
-                  if (xplusd(i, j) .eq. zero) then
-                     if (tt(1, 1) .lt. zero) then
+                  if (xplusd(i, j) == zero) then
+                     if (tt(1, 1) < zero) then
                         typj = one/abs(tt(1, 1))
-                     elseif (ldtt .eq. 1) then
+                     elseif (ldtt == 1) then
                         typj = one/tt(1, j)
                      else
                         typj = one/tt(i, j)
@@ -2964,14 +2964,14 @@ contains
                   else
                      typj = abs(xplusd(i, j))
                   end if
-   
+
                   stp(i) = xplusd(i, j) &
                            + sign(one, xplusd(i, j)) &
                            *typj*dhstep(0, neta, i, j, stpd, ldstpd)
                   stp(i) = stp(i) - xplusd(i, j)
                   xplusd(i, j) = xplusd(i, j) + stp(i)
                end do
-   
+
                istop = 0
                call fcn(n, m, np, nq, &
                         n, m, np, &
@@ -2979,7 +2979,7 @@ contains
                         ifixb, ifixx, ldifx, &
                         001, wrk2, wrk6, wrk1, &
                         istop)
-               if (istop .ne. 0) then
+               if (istop /= 0) then
                   return
                else
                   nfev = nfev + 1
@@ -2988,12 +2988,12 @@ contains
                         fjacd(i, j, l) = wrk2(i, l)
                      end do
                   end do
-   
+
                end if
-   
+
                if (setzro) then
                   do i = 1, n
-                     if (ifixx(i, j) .eq. 0) then
+                     if (ifixx(i, j) == 0) then
                         do l = 1, nq
                            fjacd(i, j, l) = zero
                         end do
@@ -3017,9 +3017,9 @@ contains
             end if
          end do
       end if
-   
+
    end subroutine djacfd
-   
+
    subroutine djck &
       (fcn, &
        n, m, np, nq, &
@@ -3033,12 +3033,12 @@ contains
        interval)
    !! Driver routine for the derivative checking process.
    !! (Adapted from STARPAC subroutine DCKCNT.)
-   ! Routines Called  FCN, DHSTEP, DJCKM
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
-   
+      ! Routines Called  FCN, DHSTEP, DJCKM
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
+
       use odrpack_kinds, only: zero, one, p5 => half
-   
+
       procedure(fcn_t) :: fcn
          !! The user supplied subroutine for evaluating the model.
       integer, intent(in) :: n
@@ -3116,12 +3116,12 @@ contains
       integer, intent(in) :: interval(np)
          !! Specifies which checks can be performed when checking derivatives based on the
          !! interval of the bound constraints.
-   
+
       ! Local scalars
       real(wp) :: diffj, h0, hc0, pv, tol, typj
       integer :: ideval, j, lq, msgb1, msgd1
       logical :: isfixd, iswrtb
-   
+
       ! Local arrays
       real(wp) :: pv0(n, nq)
 
@@ -3188,14 +3188,14 @@ contains
       !  WRK2:     A work array of (N BY NQ) elements.
       !  WRK6:     A work array of (N BY NP BY NQ) elements.
       !  XPLUSD:   The values of X + DELTA.
-   
+
       ! Set tolerance for checking derivatives
       tol = eta**(0.25E0_wp)
       ntol = max(one, p5 - log10(tol))
-   
+
       ! Compute, if necessary, PV0
       pv0 = pv0i
-      if (any(beta(:) .ne. betaj(:))) then
+      if (any(beta(:) /= betaj(:))) then
          istop = 0
          ideval = 001
          call fcn(n, m, np, nq, &
@@ -3204,13 +3204,13 @@ contains
                   ifixb, ifixx, ldifx, &
                   ideval, pv0, fjacb, fjacd, &
                   istop)
-         if (istop .ne. 0) then
+         if (istop /= 0) then
             return
          else
             njev = njev + 1
          end if
       end if
-   
+
       ! Compute user-supplied derivative values
       istop = 0
       if (isodr) then
@@ -3224,37 +3224,37 @@ contains
                ifixb, ifixx, ldifx, &
                ideval, wrk2, fjacb, fjacd, &
                istop)
-      if (istop .ne. 0) then
+      if (istop /= 0) then
          return
       else
          njev = njev + 1
       end if
-   
+
       ! Check derivatives wrt BETA for each response of observation NROW
       msgb1 = 0
       msgd1 = 0
-   
+
       do lq = 1, nq
-   
+
          ! Set predicted value of model at current parameter estimates
          pv = pv0(nrow, lq)
-   
+
          iswrtb = .true.
          do j = 1, np
-   
-            if (ifixb(1) .lt. 0) then
+
+            if (ifixb(1) < 0) then
                isfixd = .false.
-            elseif (ifixb(j) .eq. 0) then
+            elseif (ifixb(j) == 0) then
                isfixd = .true.
             else
                isfixd = .false.
             end if
-   
+
             if (isfixd) then
                msgb(1 + lq + (j - 1)*nq) = -1
             else
-               if (beta(j) .eq. zero) then
-                  if (ssf(1) .lt. zero) then
+               if (beta(j) == zero) then
+                  if (ssf(1) < zero) then
                      typj = one/abs(ssf(1))
                   else
                      typj = one/ssf(j)
@@ -3262,12 +3262,12 @@ contains
                else
                   typj = abs(beta(j))
                end if
-   
+
                h0 = dhstep(0, neta, 1, j, stpb, 1)
                hc0 = h0
-   
+
                ! Check derivative wrt the J-th parameter at the NROW-th row
-               if (interval(j) .ge. 1) then
+               if (interval(j) >= 1) then
                   call djckm(fcn, &
                              n, m, np, nq, &
                              betaj, xplusd, &
@@ -3276,7 +3276,7 @@ contains
                              iswrtb, pv, fjacb(nrow, j, lq), &
                              diffj, msgb1, msgb(2), istop, nfev, &
                              wrk1, wrk2, wrk6, interval)
-                  if (istop .ne. 0) then
+                  if (istop /= 0) then
                      msgb(1) = -1
                      return
                   else
@@ -3286,18 +3286,18 @@ contains
                   msgb(1 + j) = 9
                end if
             end if
-   
+
          end do
-   
+
          ! Check derivatives wrt X for each response of observation NROW
          if (isodr) then
             iswrtb = .false.
             do j = 1, m
-   
-               if (ifixx(1, 1) .lt. 0) then
+
+               if (ifixx(1, 1) < 0) then
                   isfixd = .false.
-               elseif (ldifx .eq. 1) then
-                  if (ifixx(1, j) .eq. 0) then
+               elseif (ldifx == 1) then
+                  if (ifixx(1, j) == 0) then
                      isfixd = .true.
                   else
                      isfixd = .false.
@@ -3305,14 +3305,14 @@ contains
                else
                   isfixd = .false.
                end if
-   
+
                if (isfixd) then
                   msgd(1 + lq + (j - 1)*nq) = -1
                else
-                  if (xplusd(nrow, j) .eq. zero) then
-                     if (tt(1, 1) .lt. zero) then
+                  if (xplusd(nrow, j) == zero) then
+                     if (tt(1, 1) < zero) then
                         typj = one/abs(tt(1, 1))
-                     elseif (ldtt .eq. 1) then
+                     elseif (ldtt == 1) then
                         typj = one/tt(1, j)
                      else
                         typj = one/tt(nrow, j)
@@ -3320,10 +3320,10 @@ contains
                   else
                      typj = abs(xplusd(nrow, j))
                   end if
-   
+
                   h0 = dhstep(0, neta, nrow, j, stpd, ldstpd)
                   hc0 = dhstep(1, neta, nrow, j, stpd, ldstpd)
-   
+
                   ! Check derivative wrt the J-th column of DELTA at row NROW
                   call djckm(fcn, &
                              n, m, np, nq, &
@@ -3333,23 +3333,23 @@ contains
                              iswrtb, pv, fjacd(nrow, j, lq), &
                              diffj, msgd1, msgd(2), istop, nfev, &
                              wrk1, wrk2, wrk6, interval)
-                  if (istop .ne. 0) then
+                  if (istop /= 0) then
                      msgd(1) = -1
                      return
                   else
                      diff(lq, np + j) = diffj
                   end if
                end if
-   
+
             end do
          end if
       end do
-   
+
       msgb(1) = msgb1
       msgd(1) = msgd1
-   
+
    end subroutine djck
-   
+
    subroutine djckc &
       (fcn, &
        n, m, np, nq, &
@@ -3362,12 +3362,12 @@ contains
    !! Check whether high curvature could be the cause of the disagreement between the numerical
    !! and analytic derviatives.
    !! (Adapted from STARPAC subroutine DCKCRV.)
-   ! Routines Called  DJCKF, DPVB, DPVD
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
-   
+      ! Routines Called  DJCKF, DPVB, DPVD
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
+
       use odrpack_kinds, only: one, two, ten
-   
+
       procedure(fcn_t) :: fcn
          !! The user supplied subroutine for evaluating the model.
       integer, intent(in) :: n
@@ -3434,11 +3434,11 @@ contains
          !! A work array of `(n, nq)` elements.
       real(wp), intent(out) :: wrk6(n, np, nq)
          !! A work array of `(n, np, nq)` elements.
-   
+
       ! Local scalars
       real(wp), parameter :: p01 = 0.01_wp
       real(wp) :: curve, pvmcrv, pvpcrv, stp, stpcrv
-      
+
       ! Variable Definitions (alphabetically)
       !  BETA:    The function parameters.
       !  CURVE:   A measure of the curvature in the model.
@@ -3486,9 +3486,9 @@ contains
       !  WRK2:    A work array of (N BY NQ) elements.
       !  WRK6:    A work array of (N BY NP BY NQ) elements.
       !  XPLUSD:  The values of X + DELTA.
-   
+
       if (iswrtb) then
-   
+
          ! Perform central difference computations for derivatives wrt BETA
          stpcrv = (hc*typj*sign(one, beta(j)) + beta(j)) - beta(j)
          call dpvb(fcn, &
@@ -3497,7 +3497,7 @@ contains
                    nrow, j, lq, stpcrv, &
                    istop, nfev, pvpcrv, &
                    wrk1, wrk2, wrk6)
-         if (istop .ne. 0) then
+         if (istop /= 0) then
             return
          end if
          call dpvb(fcn, &
@@ -3506,11 +3506,11 @@ contains
                    nrow, j, lq, -stpcrv, &
                    istop, nfev, pvmcrv, &
                    wrk1, wrk2, wrk6)
-         if (istop .ne. 0) then
+         if (istop /= 0) then
             return
          end if
       else
-   
+
          ! Perform central difference computations for derivatives wrt DELTA
          stpcrv = (hc*typj*sign(one, xplusd(nrow, j)) + xplusd(nrow, j)) - xplusd(nrow, j)
          call dpvd(fcn, &
@@ -3519,7 +3519,7 @@ contains
                    nrow, j, lq, stpcrv, &
                    istop, nfev, pvpcrv, &
                    wrk1, wrk2, wrk6)
-         if (istop .ne. 0) then
+         if (istop /= 0) then
             return
          end if
          call dpvd(fcn, &
@@ -3528,15 +3528,15 @@ contains
                    nrow, j, lq, -stpcrv, &
                    istop, nfev, pvmcrv, &
                    wrk1, wrk2, wrk6)
-         if (istop .ne. 0) then
+         if (istop /= 0) then
             return
          end if
       end if
-   
+
       ! Estimate curvature by second derivative of model
       curve = abs((pvpcrv - pv) + (pvmcrv - pv))/(stpcrv*stpcrv)
       curve = curve + eta*(abs(pvpcrv) + abs(pvmcrv) + two*abs(pv))/(stpcrv**2)
-   
+
       ! Check if finite precision arithmetic could be the culprit.
       call djckf(fcn, &
                  n, m, np, nq, &
@@ -3545,19 +3545,19 @@ contains
                  fd, typj, pvpstp, stp0, curve, pv, d, &
                  diffj, msg, istop, nfev, &
                  wrk1, wrk2, wrk6)
-      if (istop .ne. 0) then
+      if (istop /= 0) then
          return
       end if
-      if (msg(lq, j) .eq. 0) then
+      if (msg(lq, j) == 0) then
          return
       end if
-   
+
       ! Check if high curvature could be the problem.
       stp = two*max(tol*abs(d)/curve, epsmac)
-      if (stp .lt. abs(ten*stp0)) then
+      if (stp < abs(ten*stp0)) then
          stp = min(stp, p01*abs(stp0))
       end if
-   
+
       if (iswrtb) then
          ! Perform computations for derivatives wrt BETA
          stp = (stp*sign(one, beta(j)) + beta(j)) - beta(j)
@@ -3567,11 +3567,11 @@ contains
                    nrow, j, lq, stp, &
                    istop, nfev, pvpstp, &
                    wrk1, wrk2, wrk6)
-         if (istop .ne. 0) then
+         if (istop /= 0) then
             return
          end if
       else
-   
+
          ! Perform computations for derivatives wrt DELTA
          stp = (stp*sign(one, xplusd(nrow, j)) + xplusd(nrow, j)) - xplusd(nrow, j)
          call dpvd(fcn, &
@@ -3580,27 +3580,27 @@ contains
                    nrow, j, lq, stp, &
                    istop, nfev, pvpstp, &
                    wrk1, wrk2, wrk6)
-         if (istop .ne. 0) then
+         if (istop /= 0) then
             return
          end if
       end if
-   
+
       ! Compute the new numerical derivative
       fd = (pvpstp - pv)/stp
       diffj = min(diffj, abs(fd - d)/abs(d))
-   
+
       ! Check whether the new numerical derivative is ok
-      if (abs(fd - d) .le. tol*abs(d)) then
+      if (abs(fd - d) <= tol*abs(d)) then
          msg(lq, j) = 0
-   
+
          ! Check if finite precision may be the culprit (fudge factor = 2)
-      elseif (abs(stp*(fd - d)) .lt. two*eta*(abs(pv) + abs(pvpstp)) + &
+      elseif (abs(stp*(fd - d)) < two*eta*(abs(pv) + abs(pvpstp)) + &
               curve*(epsmac*typj)**2) then
          msg(lq, j) = 5
       end if
-   
+
    end subroutine djckc
-   
+
    subroutine djckf &
       (fcn, &
        n, m, np, nq, &
@@ -3612,12 +3612,12 @@ contains
    !! Check whether finite precision arithmetic could be the cause of the disagreement between
    !! the derivatives.
    !! (Adapted from STARPAC subroutine DCKFPA.)
-   ! Routines Called  DPVB, DPVD
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
-   
+      ! Routines Called  DPVB, DPVD
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
+
       use odrpack_kinds, only: one, two, hundred
-   
+
       procedure(fcn_t) :: fcn
          !! The user supplied subroutine for evaluating the model.
       integer, intent(in) :: n
@@ -3682,12 +3682,12 @@ contains
          !! A work array of `(n, nq)` elements.
       real(wp), intent(out) :: wrk6(n, np, nq)
          !! A work array of `(n, np, nq)` elements.
-   
+
       ! Local scalars
       real(wp), parameter :: p1 = 0.1_wp
       real(wp) :: stp
       logical :: large
-   
+
       ! Variable Definitions (alphabetically)
       !  BETA:    The function parameters.
       !  CURVE:   A measure of the curvature in the model.
@@ -3729,20 +3729,20 @@ contains
       !  WRK2:    A work array of (N BY NQ) elements.
       !  WRK6:    A work array of (N BY NP BY NQ) elements.
       !  XPLUSD:  The values of X + DELTA.
-   
+
       ! Finite precision arithmetic could be the problem.
       ! Try a larger step size based on estimate of condition error.
       stp = eta*(abs(pv) + abs(pvpstp))/(tol*abs(d))
-      if (stp .gt. abs(p1*stp0)) then
+      if (stp > abs(p1*stp0)) then
          stp = max(stp, hundred*abs(stp0))
       end if
-      if (stp .gt. typj) then
+      if (stp > typj) then
          stp = typj
          large = .true.
       else
          large = .false.
       end if
-   
+
       if (iswrtb) then
          ! Perform computations for derivatives wrt BETA
          stp = (stp*sign(one, beta(j)) + beta(j)) - beta(j)
@@ -3762,19 +3762,19 @@ contains
                    istop, nfev, pvpstp, &
                    wrk1, wrk2, wrk6)
       end if
-      if (istop .ne. 0) then
+      if (istop /= 0) then
          return
       end if
-   
+
       fd = (pvpstp - pv)/stp
       diffj = min(diffj, abs(fd - d)/abs(d))
-   
+
       ! Check for agreement
-      if ((abs(fd - d)) .le. tol*abs(d)) then
+      if ((abs(fd - d)) <= tol*abs(d)) then
          ! Forward difference quotient and analytic derivatives agree.
          msg(lq, j) = 0
-   
-      elseif ((abs(fd - d) .le. abs(two*curve*stp)) .or. large) then
+
+      elseif ((abs(fd - d) <= abs(two*curve*stp)) .or. large) then
          ! Curvature may be the culprit (fudge factor = 2)
          if (large) then
             msg(lq, j) = 4
@@ -3782,9 +3782,9 @@ contains
             msg(lq, j) = 5
          end if
       end if
-   
+
    end subroutine djckf
-   
+
    subroutine djckm &
       (fcn, &
        n, m, np, nq, &
@@ -3795,12 +3795,12 @@ contains
        wrk1, wrk2, wrk6, interval)
    !! Check user supplied analytic derivatives against numerical derivatives.
    !! (Adapted from STARPAC subroutine DCKMN.)
-   ! Routines Called  DJCKC, DJCKZ, DPVB, DPVD
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
-   
+      ! Routines Called  DJCKC, DJCKZ, DPVB, DPVD
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
+
       use odrpack_kinds, only: zero, one, two, three, ten, hundred
-   
+
       procedure(fcn_t) :: fcn
          !! The user supplied subroutine for evaluating the model.
       integer, intent(in) :: n
@@ -3867,13 +3867,13 @@ contains
       integer, intent(in) :: interval(np)
          !! Specifies which checks can be performed when checking derivatives based on the
          !! interval of the bound constraints.
-   
+
       ! Local scalars
       real(wp), parameter :: p01 = 0.01_wp, p1 = 0.1_wp
       real(wp), parameter :: big = 1.0E19_wp, tol2 = 5.0E-2_wp
       real(wp) :: fd, h, hc, h1, hc1, pvpstp, stp0
       integer :: i
-   
+
       ! Variable Definitions (alphabetically)
       !  BETA:     The function parameters.
       !  BIG:      A big value, used to initialize DIFFJ.
@@ -3924,32 +3924,32 @@ contains
       !  WRK2:    A work array of (N BY NQ) elements.
       !  WRK6:    A work array of (N BY NP BY NQ) elements.
       !  XPLUSD:  The values of X + DELTA.
-   
+
       ! Calculate the Jth partial derivative using forward difference quotients and decide if it
       ! agrees with user supplied values
-   
+
       h1 = sqrt(eta)
       hc1 = eta**(one/three)
-   
+
       msg(lq, j) = 7
       diffj = big
-   
+
       do i = 1, 3
-   
-         if (i .eq. 1) then
+
+         if (i == 1) then
             ! Try initial relative step size
             h = h0
             hc = hc0
-         elseif (i .eq. 2) then
+         elseif (i == 2) then
             ! Try larger relative step size
             h = max(ten*h1, min(hundred*h0, one))
             hc = max(ten*hc1, min(hundred*hc0, one))
-         elseif (i .eq. 3) then
+         elseif (i == 3) then
             ! Try smaller relative step size
             h = min(p1*h1, max(p01*h, two*epsmac))
             hc = min(p1*hc1, max(p01*hc, two*epsmac))
          end if
-   
+
          if (iswrtb) then
             ! Perform computations for derivatives wrt BETA
             stp0 = (h*typj*sign(one, beta(j)) + beta(j)) - beta(j)
@@ -3969,38 +3969,38 @@ contains
                       istop, nfev, pvpstp, &
                       wrk1, wrk2, wrk6)
          end if
-         if (istop .ne. 0) then
+         if (istop /= 0) then
             return
          end if
-   
+
          fd = (pvpstp - pv)/stp0
-   
+
          ! Check for agreement
-   
+
          ! Numerical and analytic derivatives agree
-         if (abs(fd - d) .le. tol*abs(d)) then
-   
+         if (abs(fd - d) <= tol*abs(d)) then
+
             ! Set relative difference for derivative checking report
-            if ((d .eq. zero) .or. (fd .eq. zero)) then
+            if ((d == zero) .or. (fd == zero)) then
                diffj = abs(fd - d)
             else
                diffj = abs(fd - d)/abs(d)
             end if
-   
+
             ! Set message flag
-            if (d .eq. zero) then
+            if (d == zero) then
                ! JTH analytic and numerical derivatives are both zero.
                msg(lq, j) = 1
-   
+
             else
                ! JTH analytic and numerical derivatives are both nonzero.
                msg(lq, j) = 0
             end if
-   
+
          else
             ! Numerical and analytic derivatives disagree.  Check why
-            if ((d .eq. zero) .or. (fd .eq. zero)) then
-               if (interval(j) .ge. 10 .or. .not. iswrtb) then
+            if ((d == zero) .or. (fd == zero)) then
+               if (interval(j) >= 10 .or. .not. iswrtb) then
                   call djckz(fcn, &
                              n, m, np, nq, &
                              beta, xplusd, ifixb, ifixx, ldifx, &
@@ -4012,7 +4012,7 @@ contains
                   msg(lq, j) = 8
                end if
             else
-               if (interval(j) .ge. 100 .or. .not. iswrtb) then
+               if (interval(j) >= 100 .or. .not. iswrtb) then
                   call djckc(fcn, &
                              n, m, np, nq, &
                              beta, xplusd, ifixb, ifixx, ldifx, &
@@ -4024,26 +4024,26 @@ contains
                   msg(lq, j) = 8
                end if
             end if
-   
-            if (msg(lq, j) .le. 2) then
+
+            if (msg(lq, j) <= 2) then
                exit
             end if
-   
+
          end if
       end do
-   
+
       ! Set summary flag to indicate questionable results
-      if ((msg(lq, j) .ge. 7) .and. (diffj .le. tol2)) then
+      if ((msg(lq, j) >= 7) .and. (diffj <= tol2)) then
          msg(lq, j) = 6
       end if
-      if ((msg(lq, j) .ge. 1) .and. (msg(lq, j) .le. 6)) then
+      if ((msg(lq, j) >= 1) .and. (msg(lq, j) <= 6)) then
          msg1 = max(msg1, 1)
-      elseif (msg(lq, j) .ge. 7) then
+      elseif (msg(lq, j) >= 7) then
          msg1 = 2
       end if
-   
+
    end subroutine djckm
-   
+
    subroutine djckz &
       (fcn, &
        n, m, np, nq, &
@@ -4055,12 +4055,12 @@ contains
    !! Recheck the derivatives in the case where the finite difference derivative disagrees with
    !! the analytic derivative and the analytic derivative is zero.
    !! (Adapted from STARPAC subroutine DCKZRO.)
-   ! Routines Called  DPVB, DPVD
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
-   
+      ! Routines Called  DPVB, DPVD
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
+
       use odrpack_kinds, only: zero, one, two, three
-   
+
       procedure(fcn_t) :: fcn
          !! The user supplied subroutine for evaluating the model.
       integer, intent(in) :: n
@@ -4123,10 +4123,10 @@ contains
          !! A work array of `(n, nq)` elements.
       real(wp), intent(out) :: wrk6(n, np, nq)
          !! A work array of `(n, np, nq)` elements.
-   
+
       ! Local scalars
       real(wp) :: cd, pvmstp
-   
+
       ! Variable Definitions (alphabetically)
       !  BETA:    The function parameters.
       !  CD:      The central difference derivative wrt the Jth parameter.
@@ -4167,7 +4167,7 @@ contains
       !  WRK2:    A work array of (N BY NQ) elements.
       !  WRK6:    A work array of (N BY NP BY NQ) elements.
       !  XPLUSD:  The values of X + DELTA.
-   
+
       ! Recalculate numerical derivative using central difference and step size of 2*STP0
       if (iswrtb) then
          ! Perform computations for derivatives wrt BETA
@@ -4186,32 +4186,32 @@ contains
                    istop, nfev, pvmstp, &
                    wrk1, wrk2, wrk6)
       end if
-   
-      if (istop .ne. 0) then
+
+      if (istop /= 0) then
          return
       end if
-   
+
       cd = (pvpstp - pvmstp)/(two*stp0)
       diffj = min(abs(cd - d), abs(fd - d))
-   
+
       ! Check for agreement
-      if (diffj .le. tol*abs(d)) then
+      if (diffj <= tol*abs(d)) then
          ! Finite difference and analytic derivatives now agree
-         if (d .eq. zero) then
+         if (d == zero) then
             msg(lq, j) = 1
          else
             msg(lq, j) = 0
          end if
-      elseif (diffj*typj .le. abs(pv*epsmac**(one/three))) then
+      elseif (diffj*typj <= abs(pv*epsmac**(one/three))) then
          ! Derivatives are both close to zero
          msg(lq, j) = 2
       else
          ! Derivatives are not both close to zero
          msg(lq, j) = 3
       end if
-   
+
    end subroutine djckz
-   
+
    pure subroutine dodchk &
       (n, m, np, nq, &
        isodr, anajac, implct, &
@@ -4223,12 +4223,12 @@ contains
        info, &
        lower, upper)
    !! Check input parameters, indicating errors found using nonzero values of argument `info`.
-   ! Routines Called  (None)
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
-   
+      ! Routines Called  (None)
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
+
       use odrpack_kinds, only: zero
-   
+
       integer, intent(in) :: n
          !! The number of observations.
       integer, intent(in) :: m
@@ -4290,10 +4290,10 @@ contains
          !! The lower bound on `beta`.
       real(wp), intent(in) :: upper(np)
          !! The upper bound on `beta`.
-   
+
       ! Local scalars
       integer :: last, npp
-   
+
       ! Variable Definitions (alphabetically)
       !  ANAJAC:  The variable designating whether the Jacobians are computed by finite
       !           differences (ANAJAC=FALSE) or not (ANAJAC=TRUE).
@@ -4330,156 +4330,156 @@ contains
       !  SCLD:    The scaling value for DELTA.
       !  STPB:    The step for the finite difference derivitive wrt BETA.
       !  STPD:    The step for the finite difference derivitive wrt DELTA.
-   
+
       ! Find actual number of parameters being estimated
-      if ((np .le. 0) .or. (ifixb(1) .lt. 0)) then
+      if ((np <= 0) .or. (ifixb(1) < 0)) then
          npp = np
       else
-         npp = count(ifixb(1:np) .ne. 0)
+         npp = count(ifixb(1:np) /= 0)
       end if
-   
+
       ! Check problem specification parameters
-      if ((n .le. 0) .or. (m .le. 0) .or. (npp .le. 0 .or. npp .gt. n) .or. (nq .le. 0)) then
+      if ((n <= 0) .or. (m <= 0) .or. (npp <= 0 .or. npp > n) .or. (nq <= 0)) then
          info = 10000
-         if (n .le. 0) then
+         if (n <= 0) then
             info = info + 1000
          end if
-         if (m .le. 0) then
+         if (m <= 0) then
             info = info + 100
          end if
-         if (npp .le. 0 .or. npp .gt. n) then
+         if (npp <= 0 .or. npp > n) then
             info = info + 10
          end if
-         if (nq .le. 0) then
+         if (nq <= 0) then
             info = info + 1
          end if
          return
       end if
-   
+
       ! Check dimension specification parameters
-      if ((.not. implct .and. (ldy .lt. n)) .or. &
-          (ldx .lt. n) .or. &
-          ((ldwe .ne. 1) .and. (ldwe .lt. n)) .or. &
-          ((ld2we .ne. 1) .and. (ld2we .lt. nq)) .or. &
-          (isodr .and. ((ldwd .ne. 1) .and. (ldwd .lt. n))) .or. &
-          (isodr .and. ((ld2wd .ne. 1) .and. (ld2wd .lt. m))) .or. &
-          (isodr .and. ((ldifx .ne. 1) .and. (ldifx .lt. n))) .or. &
-          (isodr .and. ((ldstpd .ne. 1) .and. (ldstpd .lt. n))) .or. &
-          (isodr .and. ((ldscld .ne. 1) .and. (ldscld .lt. n))) .or. &
-          (lwork .lt. lwkmn) .or. &
-          (liwork .lt. liwkmn)) then
-   
+      if ((.not. implct .and. (ldy < n)) .or. &
+          (ldx < n) .or. &
+          ((ldwe /= 1) .and. (ldwe < n)) .or. &
+          ((ld2we /= 1) .and. (ld2we < nq)) .or. &
+          (isodr .and. ((ldwd /= 1) .and. (ldwd < n))) .or. &
+          (isodr .and. ((ld2wd /= 1) .and. (ld2wd < m))) .or. &
+          (isodr .and. ((ldifx /= 1) .and. (ldifx < n))) .or. &
+          (isodr .and. ((ldstpd /= 1) .and. (ldstpd < n))) .or. &
+          (isodr .and. ((ldscld /= 1) .and. (ldscld < n))) .or. &
+          (lwork < lwkmn) .or. &
+          (liwork < liwkmn)) then
+
          info = 20000
-   
-         if (.not. implct .and. ldy .lt. n) then
+
+         if (.not. implct .and. ldy < n) then
             info = info + 1000
          end if
-   
-         if (ldx .lt. n) then
+
+         if (ldx < n) then
             info = info + 2000
          end if
-   
-         if ((ldwe .ne. 1 .and. ldwe .lt. n) .or. (ld2we .ne. 1 .and. ld2we .lt. nq)) then
+
+         if ((ldwe /= 1 .and. ldwe < n) .or. (ld2we /= 1 .and. ld2we < nq)) then
             info = info + 100
          end if
-   
+
          if (isodr .and. &
-             ((ldwd .ne. 1 .and. ldwd .lt. n) .or. (ld2wd .ne. 1 .and. ld2wd .lt. m))) then
+             ((ldwd /= 1 .and. ldwd < n) .or. (ld2wd /= 1 .and. ld2wd < m))) then
             info = info + 200
          end if
-   
-         if (isodr .and. (ldifx .ne. 1 .and. ldifx .lt. n)) then
+
+         if (isodr .and. (ldifx /= 1 .and. ldifx < n)) then
             info = info + 10
          end if
-   
-         if (isodr .and. (ldstpd .ne. 1 .and. ldstpd .lt. n)) then
+
+         if (isodr .and. (ldstpd /= 1 .and. ldstpd < n)) then
             info = info + 20
          end if
-   
+
          if (isodr .and. &
-             (ldscld .ne. 1 .and. ldscld .lt. n)) then
+             (ldscld /= 1 .and. ldscld < n)) then
             info = info + 40
          end if
-   
-         if (lwork .lt. lwkmn) then
+
+         if (lwork < lwkmn) then
             info = info + 1
          end if
-   
-         if (liwork .lt. liwkmn) then
+
+         if (liwork < liwkmn) then
             info = info + 2
          end if
-   
+
       end if
-   
+
       ! Check DELTA scaling
-      if (isodr .and. scld(1, 1) .gt. zero) then
-         if (ldscld .ge. n) then
+      if (isodr .and. scld(1, 1) > zero) then
+         if (ldscld >= n) then
             last = n
          else
             last = 1
          end if
-         if (any(scld(1:last, 1:m) .le. zero)) then
+         if (any(scld(1:last, 1:m) <= zero)) then
             info = 30200
          end if
       end if
-   
+
       ! Check BETA scaling
-      if (sclb(1) .gt. zero) then
-         if (any(sclb(1:np) .le. zero)) then
-            if (info .eq. 0) then
+      if (sclb(1) > zero) then
+         if (any(sclb(1:np) <= zero)) then
+            if (info == 0) then
                info = 30100
             else
                info = info + 100
             end if
          end if
       end if
-   
+
       ! Check DELTA finite difference step sizes
-      if (anajac .and. isodr .and. stpd(1, 1) .gt. zero) then
-         if (ldstpd .ge. n) then
+      if (anajac .and. isodr .and. stpd(1, 1) > zero) then
+         if (ldstpd >= n) then
             last = n
          else
             last = 1
          end if
-         if (any(stpd(1:last, 1:m) .le. zero)) then
-            if (info .eq. 0) then
+         if (any(stpd(1:last, 1:m) <= zero)) then
+            if (info == 0) then
                info = 32000
             else
                info = info + 2000
             end if
          end if
       end if
-   
+
       ! Check BETA finite difference step sizes
-      if (anajac .and. stpb(1) .gt. zero) then
-         if (any(stpb(1:np) .le. zero)) then
-            if (info .eq. 0) then
+      if (anajac .and. stpb(1) > zero) then
+         if (any(stpb(1:np) <= zero)) then
+            if (info == 0) then
                info = 31000
             else
                info = info + 1000
             end if
          end if
       end if
-   
+
       !  Check bounds
-      if (any(upper(1:np) .lt. lower(1:np))) then
-         if (info .eq. 0) then
+      if (any(upper(1:np) < lower(1:np))) then
+         if (info == 0) then
             info = 91000
          end if
       end if
-   
+
       if (any( &
-          ((upper(1:np) .lt. beta(1:np)) .or. (lower(1:np) .gt. beta(1:np))) &
-          .and. .not. (upper(1:np) .lt. lower(1:np)))) then
-         if (info .ge. 90000) then
+          ((upper(1:np) < beta(1:np)) .or. (lower(1:np) > beta(1:np))) &
+          .and. .not. (upper(1:np) < lower(1:np)))) then
+         if (info >= 90000) then
             info = info + 100
          else
             info = 90100
          end if
       end if
-   
+
    end subroutine dodchk
-   
+
    subroutine dodstp &
       (n, m, np, nq, npp, &
        f, fjacb, fjacd, &
@@ -4489,13 +4489,13 @@ contains
        s, t, phi, irank, rcond, forvcv, &
        wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
    !! Compute locally constrained steps `s` and `t`, and `phi(alpha)`.
-   ! Routines Called  IDAMAX, DCHEX, DESUBI, DFCTR, DNRM2, DQRDC, DQRSL, DROT,
-   !                  DROTG, DSOLVE, DTRCO, DTRSL, DVEVTR, DWGHT
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
-   
+      ! Routines Called  IDAMAX, DCHEX, DESUBI, DFCTR, DNRM2, DQRDC, DQRSL, DROT,
+      !                  DROTG, DSOLVE, DTRCO, DTRSL, DVEVTR, DWGHT
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
+
       use odrpack_kinds, only: zero, one
-   
+
       integer, intent(in) :: n
          !! The number of observations.
       integer, intent(in) :: m
@@ -4577,20 +4577,20 @@ contains
       integer, intent(inout) :: istopc
          !! The variable designating whether the computations were stopped due to a numerical
          !! error within subroutine `dodstp`.
-   
+
       ! Local scalars
       real(wp) :: co, si, temp
       integer :: i, imax, inf, ipvt, j, k, k1, k2, kp, l
       logical :: elim
-   
+
       ! Local arrays
       real(wp) :: dum(2)
-   
+
       ! External BLAS/LAPACK procedures
       real(wp), external :: dnrm2
       integer, external :: idamax
       external :: dchex, dqrdc, dqrsl, drot, drotg, dtrco, dtrsl
-      
+
       ! Variable definitions (alphabetically)
       !  ALPHA:   The Levenberg-Marquardt parameter.
       !  CO:      The cosine from the plane rotation.
@@ -4651,32 +4651,32 @@ contains
       !  WRK3:    A work array of (NP) elements.
       !  WRK4:    A work array of (M by M) elements.
       !  WRK5:    A work array of (M) elements.
-   
+
       ! Compute loop parameters which depend on weight structure
-   
+
       !  Set up KPVT if ALPHA = 0
-      if (alpha .eq. zero) then
+      if (alpha == zero) then
          kp = npp
          do k = 1, np
             kpvt(k) = k
          end do
       else
-         if (npp .ge. 1) then
+         if (npp >= 1) then
             kp = npp - irank
          else
             kp = npp
          end if
       end if
-   
+
       if (isodr) then
          ! T = WD * DELTA = D*G2
          call dwght(n, m, wd, ldwd, ld2wd, delta, t)
-   
+
          do i = 1, n
             !  Compute WRK4, such that TRANS(WRK4)*WRK4 = E = (D**2 + ALPHA*TT**2)
             call desubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, wrk4)
             call dfctr(.false., wrk4, m, m, inf)
-            if (inf .ne. 0) then
+            if (inf /= 0) then
                istopc = 60000
                return
             end if
@@ -4688,7 +4688,7 @@ contains
                omega(l, l) = one + omega(l, l)
             end do
             call dfctr(.false., omega, nq, nq, inf)
-            if (inf .ne. 0) then
+            if (inf /= 0) then
                istopc = 60000
                return
             end if
@@ -4701,14 +4701,14 @@ contains
                call dsolve(nq, omega, nq, wrk1(i, 1:nq, j), 4)
                call dsolve(nq, omega, nq, wrk1(i, 1:nq, j), 2)
             end do
-   
+
             ! Compute WRK5 = inv(E)*D*G2
             do j = 1, m
                wrk5(j) = t(i, j)
             end do
             call dsolve(m, wrk4, m, wrk5, 4)
             call dsolve(m, wrk4, m, wrk5, 2)
-   
+
             ! Compute TFJACB = inv(trans(OMEGA))*FJACB
             do k = 1, kp
                do l = 1, nq
@@ -4716,7 +4716,7 @@ contains
                end do
                call dsolve(nq, omega, nq, tfjacb(i, 1:nq, k), 4)
                do l = 1, nq
-                  if (ss(1) .gt. zero) then
+                  if (ss(1) > zero) then
                      tfjacb(i, l, k) = tfjacb(i, l, k)/ss(kpvt(k))
                   else
                      tfjacb(i, l, k) = tfjacb(i, l, k)/abs(ss(1))
@@ -4731,17 +4731,17 @@ contains
                end do
                wrk2(i, l) = wrk2(i, l) - f(i, l)
             end do
-   
+
             ! Compute WRK2 = inv(trans(OMEGA))*(V*inv(E)*D**2*G2 - G1)
             call dsolve(nq, omega, nq, wrk2(i, 1:nq), 4)
          end do
-   
+
       else
          do i = 1, n
             do l = 1, nq
                do k = 1, kp
                   tfjacb(i, l, k) = fjacb(i, kpvt(k), l)
-                  if (ss(1) .gt. zero) then
+                  if (ss(1) > zero) then
                      tfjacb(i, l, k) = tfjacb(i, l, k)/ss(kpvt(k))
                   else
                      tfjacb(i, l, k) = tfjacb(i, l, k)/abs(ss(1))
@@ -4751,10 +4751,10 @@ contains
             end do
          end do
       end if
-   
+
       ! Compute S
       ! Do QR factorization (with column pivoting of TFJACB if ALPHA = 0)
-      if (alpha .eq. zero) then
+      if (alpha == zero) then
          ipvt = 1
          do k = 1, np
             kpvt(k) = 0
@@ -4762,23 +4762,23 @@ contains
       else
          ipvt = 0
       end if
-   
+
       call dqrdc(tfjacb, n*nq, n*nq, kp, qraux, kpvt, wrk3, ipvt)
       call dqrsl(tfjacb, n*nq, n*nq, kp, qraux, wrk2, dum, wrk2, dum, dum, dum, 1000, inf)
-      if (inf .ne. 0) then
+      if (inf /= 0) then
          istopc = 60000
          return
       end if
-   
+
       ! Eliminate alpha part using givens rotations
-      if (alpha .ne. zero) then
+      if (alpha /= zero) then
          s(1:npp) = zero
          do k1 = 1, kp
             wrk3(1:kp) = zero
             wrk3(k1) = sqrt(alpha)
             do k2 = k1, kp
                call drotg(tfjacb(k2, 1, k2), wrk3(k2), co, si)
-               if (kp - k2 .ge. 1) then
+               if (kp - k2 >= 1) then
                   call drot(kp - k2, tfjacb(k2, 1, k2 + 1), n*nq, wrk3(k2 + 1), 1, co, si)
                end if
                temp = co*wrk2(k2, 1) + si*s(kpvt(k1))
@@ -4787,20 +4787,20 @@ contains
             end do
          end do
       end if
-   
+
       ! Compute solution - eliminate variables if necessary
-      if (npp .ge. 1) then
-         if (alpha .eq. zero) then
+      if (npp >= 1) then
+         if (alpha == zero) then
             kp = npp
             elim = .true.
-            do while (elim .and. kp .ge. 1)
+            do while (elim .and. kp >= 1)
                ! Estimate RCOND - U will contain approx null vector
                call dtrco(tfjacb, n*nq, kp, rcond, u, 1)
-               if (rcond .le. epsfcn) then
+               if (rcond <= epsfcn) then
                   elim = .true.
                   imax = idamax(kp, u, 1)
                   ! IMAX is the column to remove - use DCHEX and fix KPVT
-                  if (imax .ne. kp) then
+                  if (imax /= kp) then
                      call dchex(tfjacb, n*nq, kp, imax, kp, wrk2, n*nq, 1, qraux, wrk3, 2)
                      k = kpvt(imax)
                      do i = imax, kp - 1
@@ -4816,30 +4816,30 @@ contains
             irank = npp - kp
          end if
       end if
-   
+
       if (forvcv) return
-   
+
       ! Backsolve and unscramble
-      if (npp .ge. 1) then
+      if (npp >= 1) then
          do i = kp + 1, npp
             wrk2(i, 1) = zero
          end do
-         if (kp .ge. 1) then
+         if (kp >= 1) then
             call dtrsl(tfjacb, n*nq, kp, wrk2, 01, inf)
-            if (inf .ne. 0) then
+            if (inf /= 0) then
                istopc = 60000
                return
             end if
          end if
          do i = 1, npp
-            if (ss(1) .gt. zero) then
+            if (ss(1) > zero) then
                s(kpvt(i)) = wrk2(i, 1)/ss(kpvt(i))
             else
                s(kpvt(i)) = wrk2(i, 1)/abs(ss(1))
             end if
          end do
       end if
-   
+
       if (isodr) then
          !  NOTE: T and WRK1 have been initialized above,
          !          where T    = WD * DELTA = D*G2
@@ -4848,18 +4848,18 @@ contains
             ! Compute WRK4, such that trans(WRK4)*WRK4 = E = (D**2 + ALPHA*TT**2)
             call desubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, wrk4)
             call dfctr(.false., wrk4, m, m, inf)
-            if (inf .ne. 0) then
+            if (inf /= 0) then
                istopc = 60000
                return
             end if
-   
+
             ! Compute WRK5 = inv(E)*D*G2
             do j = 1, m
                wrk5(j) = t(i, j)
             end do
             call dsolve(m, wrk4, m, wrk5, 4)
             call dsolve(m, wrk4, m, wrk5, 2)
-   
+
             do l = 1, nq
                wrk2(i, l) = f(i, l)
                do k = 1, npp
@@ -4869,7 +4869,7 @@ contains
                   wrk2(i, l) = wrk2(i, l) - fjacd(i, j, l)*wrk5(j)
                end do
             end do
-   
+
             do j = 1, m
                wrk5(j) = zero
                do l = 1, nq
@@ -4880,9 +4880,9 @@ contains
             call dsolve(m, wrk4, m, t(i, 1:m), 4)
             call dsolve(m, wrk4, m, t(i, 1:m), 2)
          end do
-   
+
       end if
-   
+
       ! Compute PHI(ALPHA) from scaled S and T
       call dwght(npp, 1, reshape(ss, [npp, 1, 1]), npp, 1, reshape(s, [npp, 1]), tempret(1:npp, 1:1))
       wrk(1:npp) = tempret(1:npp, 1)
@@ -4893,9 +4893,9 @@ contains
       else
          phi = dnrm2(npp, wrk, 1)
       end if
-   
+
    end subroutine dodstp
-   
+
    subroutine dodvcv &
       (n, m, np, nq, npp, &
        f, fjacb, fjacd, &
@@ -4906,12 +4906,12 @@ contains
        s, t, irank, rcond, rss, idf, rvar, ifixb, &
        wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
    !! Compute covariance matrix of estimated parameters.
-   ! Routines Called  DPODI, DODSTP
-   ! Date Written   901207   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
-   
+      ! Routines Called  DPODI, DODSTP
+      ! Date Written   901207   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
+
       use odrpack_kinds, only: zero
-   
+
       integer, intent(in) :: n
          !! The number of observations.
       integer, intent(in) :: m
@@ -4998,15 +4998,15 @@ contains
       integer, intent(out) :: istopc
          !! The variable designating whether the computations were stoped due to a numerical
          !! error within subroutine `dodstp`.
-   
+
       ! Local scalars
       real(wp) :: temp
       integer :: i, iunfix, j, junfix, kp
       logical :: forvcv
-   
+
       ! External BLAS/LAPACK procedures
       external :: dpodi
-   
+
       ! Variable definitions (alphabetically)
       !  DELTA:   The estimated errors in the explanatory variables.
       !  EPSFCN:  The function's precision.
@@ -5066,10 +5066,10 @@ contains
       !  WRK4:    A work array of (M by M) elements.
       !  WRK5:    A work array of (M) elements.
       !  WRK6:    A work array of (N*NQ by P) elements.
-   
+
       forvcv = .true.
       istopc = 0
-   
+
       call dodstp(n, m, np, nq, npp, &
                   f, fjacb, fjacd, &
                   wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
@@ -5077,34 +5077,34 @@ contains
                   wrk6, omega, u, qraux, jpvt, &
                   s, t, temp, irank, rcond, forvcv, &
                   wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
-      if (istopc .ne. 0) then
+      if (istopc /= 0) then
          return
       end if
       kp = npp - irank
       call dpodi(wrk6, n*nq, kp, wrk3, 1)
-   
+
       idf = 0
       do i = 1, n
-         if (any(fjacb(i, :, :) .ne. zero)) then
+         if (any(fjacb(i, :, :) /= zero)) then
             idf = idf + 1
             cycle
          end if
          if (isodr) then
-            if (any(fjacd(i, :, :) .ne. zero)) then
+            if (any(fjacd(i, :, :) /= zero)) then
                idf = idf + 1
                cycle
             end if
          end if
       end do
-   
-      if (idf .gt. kp) then
+
+      if (idf > kp) then
          idf = idf - kp
          rvar = rss/idf
       else
          idf = 0
          rvar = rss
       end if
-   
+
       ! Store variances in SD, restoring original order
       do i = 1, np
          sd(i) = zero
@@ -5112,10 +5112,10 @@ contains
       do i = 1, kp
          sd(jpvt(i)) = wrk6(i, i)
       end do
-      if (np .gt. npp) then
+      if (np > npp) then
          junfix = npp
          do j = np, 1, -1
-            if (ifixb(j) .eq. 0) then
+            if (ifixb(j) == 0) then
                sd(j) = zero
             else
                sd(j) = sd(junfix)
@@ -5123,7 +5123,7 @@ contains
             end if
          end do
       end if
-   
+
       ! Store covariance matrix in VCV, restoring original order
       do i = 1, np
          do j = 1, i
@@ -5132,24 +5132,24 @@ contains
       end do
       do i = 1, kp
          do j = i + 1, kp
-            if (jpvt(i) .gt. jpvt(j)) then
+            if (jpvt(i) > jpvt(j)) then
                vcv(jpvt(i), jpvt(j)) = wrk6(i, j)
             else
                vcv(jpvt(j), jpvt(i)) = wrk6(i, j)
             end if
          end do
       end do
-      if (np .gt. npp) then
+      if (np > npp) then
          iunfix = npp
          do i = np, 1, -1
-            if (ifixb(i) .eq. 0) then
+            if (ifixb(i) == 0) then
                do j = i, 1, -1
                   vcv(i, j) = zero
                end do
             else
                junfix = npp
                do j = np, 1, -1
-                  if (ifixb(j) .eq. 0) then
+                  if (ifixb(j) == 0) then
                      vcv(i, j) = zero
                   else
                      vcv(i, j) = vcv(iunfix, junfix)
@@ -5160,7 +5160,7 @@ contains
             end if
          end do
       end if
-   
+
       do i = 1, np
          vcv(i, i) = sd(i)
          sd(i) = sqrt(rvar*sd(i))
@@ -5168,31 +5168,31 @@ contains
             vcv(j, i) = vcv(i, j)
          end do
       end do
-   
+
       ! Unscale standard errors and covariance matrix
       do i = 1, np
-         if (ssf(1) .gt. zero) then
+         if (ssf(1) > zero) then
             sd(i) = sd(i)/ssf(i)
          else
             sd(i) = sd(i)/abs(ssf(1))
          end if
          do j = 1, np
-            if (ssf(1) .gt. zero) then
+            if (ssf(1) > zero) then
                vcv(i, j) = vcv(i, j)/(ssf(i)*ssf(j))
             else
                vcv(i, j) = vcv(i, j)/(ssf(1)*ssf(1))
             end if
          end do
       end do
-   
+
    end subroutine dodvcv
-   
+
    subroutine dpack(n2, n1, v1, v2, ifix)
    !! Select the unfixed elements of `v2` and return them in `v1`.
-   ! Routines Called  DCOPY
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
-    
+      ! Routines Called  DCOPY
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
+
       integer, intent(in) :: n2
          !! The number of items in `v2`.
       integer, intent(out) :: n1
@@ -5203,13 +5203,13 @@ contains
          !! The vector of the fixed and unfixed items from which the unfixed elements are to be extracted.
       integer, intent(in) :: ifix(n2)
          !! The values designating whether the elements of `v2` are fixed at their input values or not.
-   
+
       ! Local scalars
       integer :: i
-   
+
       ! External subroutines
       external :: dcopy
-   
+
       ! Variable definitions (alphabetically)
       !  I:       An indexing variable.
       !  IFIX:    The values designating whether the elements of V2 are fixed at their input
@@ -5219,11 +5219,11 @@ contains
       !  V1:      The vector of the unfixed items from V2.
       !  V2:      The vector of the fixed and unfixed items from which the unfixed elements are
       !           to be extracted.
-   
+
       n1 = 0
-      if (ifix(1) .ge. 0) then
+      if (ifix(1) >= 0) then
          do i = 1, n2
-            if (ifix(i) .ne. 0) then
+            if (ifix(i) /= 0) then
                n1 = n1 + 1
                v1(n1) = v2(i)
             end if
@@ -5232,9 +5232,9 @@ contains
          n1 = n2
          call dcopy(n2, v2, 1, v1, 1)
       end if
-   
+
    end subroutine dpack
-   
+
    real(wp) pure function dppnml(p) result(dppnmlr)
    !! Compute the percent point function value for the normal (Gaussian) distribution with mean 0
    !! and standard deviation 1, and with probability density function:
@@ -5243,69 +5243,69 @@ contains
    !!
    !! (Adapted from DATAPAC subroutine TPPF, with modifications to facilitate conversion to
    !! real(wp) automatically).
-   ! Routines Called  (NONE)
-   ! Date Written   901207   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
-   !***Author  Filliben, James J.,
-   !       Statistical Engineering Division
-   !       National Bureau of Standards
-   !       Washington, D. C. 20234
-   !       (Original Version--June      1972.
-   !       (Updated         --September 1975,
-   !       November  1975, AND
-   !       October   1976.
-   !***Description
-   !       --The coding as presented below is essentially
-   !       identical to that presented by Odeh and Evans
-   !       as Algortihm 70 of Applied Statistics.
-   !       --As pointed out by Odeh and Evans in Applied
-   !       Statistics, their algorithm representes a
-   !       substantial improvement over the previously employed
-   !       Hastings approximation for the normal percent point
-   !       function, with accuracy improving from 4.5*(10**-4)
-   !       to 1.5*(10**-8).
-   !***References  Odeh and Evans, the Percentage Points of the Normal
-   !       Distribution, Algortihm 70, Applied Statistics, 1974,
-   !       Pages 96-97.
-   !       Evans, Algorithms for Minimal Degree Polynomial and
-   !       Rational Approximation, M. Sc. Thesis, 1972,
-   !       University of Victoria, B. C., Canada.
-   !       Hastings, Approximations for Digital Computers, 1955,
-   !       Pages 113, 191, 192.
-   !       National Bureau of Standards Applied Mathematics
-   !       Series 55, 1964, Page 933, Formula 26.2.23.
-   !       Filliben, Simple and Robust Linear Estimation of the
-   !       Location Parameter of a Symmetric Distribution
-   !       (Unpublished Ph.D. Dissertation, Princeton
-   !       University), 1969, Pages 21-44, 229-231.
-   !       Filliben, "The Percent Point Function",
-   !       (Unpublished Manuscript), 1970, Pages 28-31.
-   !       Johnson and Kotz, Continuous Univariate Distributions,
-   !       Volume 1, 1970, Pages 40-111.
-   !       Kelley Statistical Tables, 1948.
-   !       Owen, Handbook of Statistical Tables, 1962, Pages 3-16.
-   !       Pearson and Hartley, Biometrika Tables for
-   !       Statisticians, Volume 1, 1954, Pages 104-113.
-   
+      ! Routines Called  (NONE)
+      ! Date Written   901207   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
+      !***Author  Filliben, James J.,
+      !       Statistical Engineering Division
+      !       National Bureau of Standards
+      !       Washington, D. C. 20234
+      !       (Original Version--June      1972.
+      !       (Updated         --September 1975,
+      !       November  1975, AND
+      !       October   1976.
+      !***Description
+      !       --The coding as presented below is essentially
+      !       identical to that presented by Odeh and Evans
+      !       as Algortihm 70 of Applied Statistics.
+      !       --As pointed out by Odeh and Evans in Applied
+      !       Statistics, their algorithm representes a
+      !       substantial improvement over the previously employed
+      !       Hastings approximation for the normal percent point
+      !       function, with accuracy improving from 4.5*(10**-4)
+      !       to 1.5*(10**-8).
+      !***References  Odeh and Evans, the Percentage Points of the Normal
+      !       Distribution, Algortihm 70, Applied Statistics, 1974,
+      !       Pages 96-97.
+      !       Evans, Algorithms for Minimal Degree Polynomial and
+      !       Rational Approximation, M. Sc. Thesis, 1972,
+      !       University of Victoria, B. C., Canada.
+      !       Hastings, Approximations for Digital Computers, 1955,
+      !       Pages 113, 191, 192.
+      !       National Bureau of Standards Applied Mathematics
+      !       Series 55, 1964, Page 933, Formula 26.2.23.
+      !       Filliben, Simple and Robust Linear Estimation of the
+      !       Location Parameter of a Symmetric Distribution
+      !       (Unpublished Ph.D. Dissertation, Princeton
+      !       University), 1969, Pages 21-44, 229-231.
+      !       Filliben, "The Percent Point Function",
+      !       (Unpublished Manuscript), 1970, Pages 28-31.
+      !       Johnson and Kotz, Continuous Univariate Distributions,
+      !       Volume 1, 1970, Pages 40-111.
+      !       Kelley Statistical Tables, 1948.
+      !       Owen, Handbook of Statistical Tables, 1962, Pages 3-16.
+      !       Pearson and Hartley, Biometrika Tables for
+      !       Statisticians, Volume 1, 1954, Pages 104-113.
+
       use odrpack_kinds, only: zero, half, one, two
-   
+
       real(wp), intent(in) :: p
          !! The probability at which the percent point is to be evaluated. `p` must lie between
          !! 0.0 and 1.0, exclusive.
-   
+
       ! Local scalars
       real(wp), parameter :: p0 = -0.322232431088E0_wp, &
-                                  p1 = -1.0E0_wp, &
-                                  p2 = -0.342242088547E0_wp, &
-                                  p3 = -0.204231210245E-1_wp, &
-                                  p4 = -0.453642210148E-4_wp, &
-                                  q0 = 0.993484626060E-1_wp, &
-                                  q1 = 0.588581570495E0_wp, &
-                                  q2 = 0.531103462366E0_wp, &
-                                  q3 = 0.103537752850E0_wp, &
-                                  q4 = 0.38560700634E-2_wp
+                             p1 = -1.0E0_wp, &
+                             p2 = -0.342242088547E0_wp, &
+                             p3 = -0.204231210245E-1_wp, &
+                             p4 = -0.453642210148E-4_wp, &
+                             q0 = 0.993484626060E-1_wp, &
+                             q1 = 0.588581570495E0_wp, &
+                             q2 = 0.531103462366E0_wp, &
+                             q3 = 0.103537752850E0_wp, &
+                             q4 = 0.38560700634E-2_wp
       real(wp) :: aden, anum, r, t
-   
+
       ! Variable Definitions (alphabetically)
       !  ADEN:    A value used in the approximation.
       !  ANUM:    A value used in the approximation.
@@ -5323,82 +5323,82 @@ contains
       !  Q4:      A parameter used in the approximation.
       !  R:       The probability at which the percent point is evaluated.
       !  T:       A value used in the approximation.
-   
-      if (p .eq. half) then
+
+      if (p == half) then
          dppnmlr = zero
       else
          r = p
-         if (p .gt. half) r = one - r
+         if (p > half) r = one - r
          t = sqrt(-two*log(r))
          anum = ((((t*p4 + p3)*t + p2)*t + p1)*t + p0)
          aden = ((((t*q4 + q3)*t + q2)*t + q1)*t + q0)
          dppnmlr = t + (anum/aden)
-         if (p .lt. half) dppnmlr = -dppnmlr
+         if (p < half) dppnmlr = -dppnmlr
       end if
-   
+
    end function dppnml
-   
+
    real(wp) pure function dppt(p, idf) result(dpptr)
    !! Compute the percent point function value for the student's T distribution with `idf`
    !! degrees of freedom.
    !! (Adapted from DATAPAC subroutine TPPF, with modifications to facilitate conversion to
    !! real(wp) automatically.)
-   ! Routines Called  DPPNML
-   ! Date Written   901207   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
-   !***Author  Filliben, James J.,
-   !       Statistical Engineering Division
-   !       National Bureau of Standards
-   !       Washington, D. C. 20234
-   !       (Original Version--October   1975.)
-   !       (Updated         --November  1975.)
-   !***Description
-   !       --For IDF = 1 AND IDF = 2, the percent point function
-   !       for the T distribution exists in simple closed form
-   !       and so the computed percent points are exact.
-   !       --For IDF between 3 and 6, inclusively, the approximation
-   !       is augmented by 3 iterations of Newton's method to
-   !       improve the accuracy, especially for P near 0 or 1.
-   !***References  National Bureau of Standards Applied Mathmatics
-   !       Series 55, 1964, Page 949, Formula 26.7.5.
-   !       Johnson and Kotz, Continuous Univariate Distributions,
-   !       Volume 2, 1970, Page 102, Formula 11.
-   !       Federighi, "Extended Tables of the Percentage Points
-   !       of Student"S T Distribution, Journal of the American
-   !       Statistical Association, 1969, Pages 683-688.
-   !       Hastings and Peacock, Statistical Distributions, A
-   !       Handbook for Students and Practitioners, 1975,
-   !       Pages 120-123.
-   
+      ! Routines Called  DPPNML
+      ! Date Written   901207   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
+      !***Author  Filliben, James J.,
+      !       Statistical Engineering Division
+      !       National Bureau of Standards
+      !       Washington, D. C. 20234
+      !       (Original Version--October   1975.)
+      !       (Updated         --November  1975.)
+      !***Description
+      !       --For IDF = 1 AND IDF = 2, the percent point function
+      !       for the T distribution exists in simple closed form
+      !       and so the computed percent points are exact.
+      !       --For IDF between 3 and 6, inclusively, the approximation
+      !       is augmented by 3 iterations of Newton's method to
+      !       improve the accuracy, especially for P near 0 or 1.
+      !***References  National Bureau of Standards Applied Mathmatics
+      !       Series 55, 1964, Page 949, Formula 26.7.5.
+      !       Johnson and Kotz, Continuous Univariate Distributions,
+      !       Volume 2, 1970, Page 102, Formula 11.
+      !       Federighi, "Extended Tables of the Percentage Points
+      !       of Student"S T Distribution, Journal of the American
+      !       Statistical Association, 1969, Pages 683-688.
+      !       Hastings and Peacock, Statistical Distributions, A
+      !       Handbook for Students and Practitioners, 1975,
+      !       Pages 120-123.
+
       use odrpack_kinds, only: pi, zero, half, one, two, three, eight, fiftn
-   
+
       real(wp), intent(in) :: p
          !! The probability at which the percent point is to be evaluated. `p` must lie between
          !! 0.0 and 1.0, exclusive.
       integer, intent(in) :: idf
          !! The (positive integer) degrees of freedom.
-   
+
       ! Local scalars
       real(wp), parameter :: b21 = 4.0E0_wp, &
-                                  b31 = 96.0E0_wp, &
-                                  b32 = 5.0E0_wp, &
-                                  b33 = 16.0E0_wp, &
-                                  b34 = 3.0E0_wp, &
-                                  b41 = 384.0E0_wp, &
-                                  b42 = 3.0E0_wp, &
-                                  b43 = 19.0E0_wp, &
-                                  b44 = 17.0E0_wp, &
-                                  b45 = -15.0E0_wp, &
-                                  b51 = 9216.0E0_wp, &
-                                  b52 = 79.0E0_wp, &
-                                  b53 = 776.0E0_wp, &
-                                  b54 = 1482.0E0_wp, &
-                                  b55 = -1920.0E0_wp, &
-                                  b56 = -945.0E0_wp
+                             b31 = 96.0E0_wp, &
+                             b32 = 5.0E0_wp, &
+                             b33 = 16.0E0_wp, &
+                             b34 = 3.0E0_wp, &
+                             b41 = 384.0E0_wp, &
+                             b42 = 3.0E0_wp, &
+                             b43 = 19.0E0_wp, &
+                             b44 = 17.0E0_wp, &
+                             b45 = -15.0E0_wp, &
+                             b51 = 9216.0E0_wp, &
+                             b52 = 79.0E0_wp, &
+                             b53 = 776.0E0_wp, &
+                             b54 = 1482.0E0_wp, &
+                             b55 = -1920.0E0_wp, &
+                             b56 = -945.0E0_wp
       real(wp) :: arg, c, con, d1, d3, d5, d7, d9, df, ppfn, s, term1, term2, term3, &
-                       term4, term5, z
+                  term4, term5, z
       integer :: ipass, maxit
-   
+
       ! Variable definitions (alphabetically)
       !  ARG:    A value used in the approximation.
       !  B21:    A parameter used in the approximation.
@@ -5438,27 +5438,27 @@ contains
       !  TERM4:  A value used in the approximation.
       !  TERM5:  A value used in the approximation.
       !  Z:      A value used in the approximation.
-   
+
       df = idf
       maxit = 5
-   
-      if (idf .le. 0) then
+
+      if (idf <= 0) then
          !Treat the IDF < 1 case
          dpptr = zero
-   
-      elseif (idf .eq. 1) then
+
+      elseif (idf == 1) then
          !Treat the IDF = 1 (Cauchy) case
          arg = pi*p
          dpptr = -cos(arg)/sin(arg)
-   
-      elseif (idf .eq. 2) then
+
+      elseif (idf == 2) then
          !  Treat the IDF = 2 case
          term1 = sqrt(two)/two
          term2 = two*p - one
          term3 = sqrt(p*(one - p))
          dpptr = term1*term2/term3
-   
-      elseif (idf .ge. 3) then
+
+      elseif (idf >= 3) then
          ! Treat the IDF greater than or equal to 3 case
          ppfn = dppnml(p)
          d1 = ppfn
@@ -5472,8 +5472,8 @@ contains
          term4 = (one/b41)*(b42*d7 + b43*d5 + b44*d3 + b45*d1)/(df**3)
          term5 = (one/b51)*(b52*d9 + b53*d7 + b54*d5 + b55*d3 + b56*d1)/(df**4)
          dpptr = term1 + term2 + term3 + term4 + term5
-   
-         if (idf .eq. 3) then
+
+         if (idf == 3) then
             ! Augment the results for the IDF = 3 case
             con = pi*(p - half)
             arg = dpptr/sqrt(df)
@@ -5484,8 +5484,8 @@ contains
                z = z - (z + s*c - con)/(two*c**2)
             end do
             dpptr = sqrt(df)*s/c
-   
-         elseif (idf .eq. 4) then
+
+         elseif (idf == 4) then
             ! Augment the results for the IDF = 4 case
             con = two*(p - half)
             arg = dpptr/sqrt(df)
@@ -5496,8 +5496,8 @@ contains
                z = z - ((one + half*c**2)*s - con)/((one + half)*c**3)
             end do
             dpptr = sqrt(df)*s/c
-   
-         elseif (idf .eq. 5) then
+
+         elseif (idf == 5) then
             ! Augment the results for the IDF = 5 case
             con = pi*(p - half)
             arg = dpptr/sqrt(df)
@@ -5509,8 +5509,8 @@ contains
                    ((eight/three)*c**4)
             end do
             dpptr = sqrt(df)*s/c
-   
-         elseif (idf .eq. 6) then
+
+         elseif (idf == 6) then
             !  Augment the results for the IDF = 6 case
             con = two*(p - half)
             arg = dpptr/sqrt(df)
@@ -5524,9 +5524,9 @@ contains
             dpptr = sqrt(df)*s/c
          end if
       end if
-   
+
    end function dppt
-   
+
    subroutine dpvb &
       (fcn, &
        n, m, np, nq, &
@@ -5535,10 +5535,10 @@ contains
        istop, nfev, pvb, &
        wrk1, wrk2, wrk6)
    !! Compute the `nrow`-th function value using `beta(j) + stp`.
-   ! Routines Called  FCN
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
-   
+      ! Routines Called  FCN
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
+
       procedure(fcn_t) :: fcn
          !! The user-supplied subroutine for evaluating the model.
       integer, intent(in) :: n
@@ -5580,10 +5580,10 @@ contains
          !! Work array.
       real(wp), intent(out) :: wrk6(n, np, nq)
          !! Work array.
-   
+
       ! Local scalars
       real(wp) :: betaj
-   
+
       ! Variable Definitions (alphabetically)
       !  BETA:    The function parameters.
       !  BETAJ:   The current estimate of the jth parameter.
@@ -5607,7 +5607,7 @@ contains
       !  PVB:     The function value for the selected observation & response.
       !  STP:     The step size for the finite difference derivative.
       !  XPLUSD:  The values of X + DELTA.
-   
+
       betaj = beta(j)
       beta(j) = beta(j) + stp
       istop = 0
@@ -5617,17 +5617,17 @@ contains
                ifixb, ifixx, ldifx, &
                003, wrk2, wrk6, wrk1, &
                istop)
-      if (istop .eq. 0) then
+      if (istop == 0) then
          nfev = nfev + 1
       else
          return
       end if
       beta(j) = betaj
-   
+
       pvb = wrk2(nrow, lq)
-   
+
    end subroutine dpvb
-   
+
    subroutine dpvd &
       (fcn, &
        n, m, np, nq, &
@@ -5636,9 +5636,9 @@ contains
        istop, nfev, pvd, &
        wrk1, wrk2, wrk6)
    !! Compute `nrow`-th function value using `x(nrow, j) + delta(nrow, j) + stp`.
-   ! Routines Called FCN
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
+      ! Routines Called FCN
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
 
       procedure(fcn_t) :: fcn
          !! The user-supplied subroutine for evaluating the model.
@@ -5681,10 +5681,10 @@ contains
          !! Work array.
       real(wp), intent(out) :: wrk6(n, np, nq)
          !! Work array.
-   
+
       ! Local scalars
       real(wp) :: xpdj
-   
+
       ! Variable Definitions (alphabetically)
       !  BETA:    The function parameters.
       !  FCN:     The user-supplied subroutine for evaluating the model.
@@ -5706,7 +5706,7 @@ contains
       !  STP:     The step size for the finite difference derivative.
       !  XPDJ:    The (NROW,J)th element of XPLUSD.
       !  XPLUSD:  The values of X + DELTA.
-   
+
       xpdj = xplusd(nrow, j)
       xplusd(nrow, j) = xplusd(nrow, j) + stp
       istop = 0
@@ -5716,25 +5716,25 @@ contains
                ifixb, ifixx, ldifx, &
                003, wrk2, wrk6, wrk1, &
                istop)
-      if (istop .eq. 0) then
+      if (istop == 0) then
          nfev = nfev + 1
       else
          return
       end if
       xplusd(nrow, j) = xpdj
-   
+
       pvd = wrk2(nrow, lq)
-   
+
    end subroutine dpvd
-   
+
    pure subroutine dscale(n, m, scl, ldscl, t, ldt, sclt, ldsclt)
    !! Scale `t` by the inverse of `scl`, i.e., compute `t/scl`.
-   ! Routines Called (NONE)
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
-   
+      ! Routines Called (NONE)
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
+
       use odrpack_kinds, only: zero, one
-   
+
       integer, intent(in) :: n
          !! The number of rows of data in `t`.
       integer, intent(in) :: m
@@ -5751,11 +5751,11 @@ contains
          !! The inversely scaled matrix.
       integer, intent(in) :: ldsclt
          !! The leading dimension of array `sclt`.
-   
+
       ! Local scalars
       real(wp) :: temp
       integer :: i, j
-   
+
       ! Variable Definitions (alphabetically)
       !  I:       An indexing variable.
       !  J:       An indexing variable.
@@ -5768,11 +5768,11 @@ contains
       !  SCLT:    The inversely scaled matrix.
       !  T:       The array to be inversely scaled by SCL.
       !  TEMP:    A temporary scalar.
-   
-      if (n .eq. 0 .or. m .eq. 0) return
-   
-      if (scl(1, 1) .ge. zero) then
-         if (ldscl .ge. n) then
+
+      if (n == 0 .or. m == 0) return
+
+      if (scl(1, 1) >= zero) then
+         if (ldscl >= n) then
             do j = 1, m
                do i = 1, n
                   sclt(i, j) = t(i, j)/scl(i, j)
@@ -5794,30 +5794,30 @@ contains
             end do
          end do
       end if
-   
+
    end subroutine dscale
-   
+
    pure subroutine dsclb(np, beta, ssf)
    !! Select scaling values for `beta` according to the algorithm given in the ODRPACK95
    !! reference guide.
-   ! Routines Called (NONE)
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
-   
+      ! Routines Called (NONE)
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
+
       use odrpack_kinds, only: zero, one, ten
-   
+
       integer, intent(in) :: np
          !! The number of function parameters.
       real(wp), intent(in) :: beta(np)
          !! The function parameters.
       real(wp), intent(out) :: ssf(np)
          !! The scaling values for `beta`.
-   
+
       ! Local scalars
       real(wp) :: bmax, bmin
       integer :: k
       logical ::bigdif
-   
+
       ! Variable Definitions (alphabetically)
       !  BETA:    The function parameters.
       !  BIGDIF:  The variable designating whether there is a significant difference in the
@@ -5827,26 +5827,26 @@ contains
       !  K:       An indexing variable.
       !  NP:      The number of function parameters.
       !  SSF:     The scaling values for BETA.
-   
+
       bmax = abs(beta(1))
       do k = 2, np
          bmax = max(bmax, abs(beta(k)))
       end do
-   
-      if (bmax .eq. zero) then
+
+      if (bmax == zero) then
          !  All input values of BETA are zero
          ssf(1:np) = one
       else
          !  Some of the input values are nonzero
          bmin = bmax
          do k = 1, np
-            if (beta(k) .ne. zero) then
+            if (beta(k) /= zero) then
                bmin = min(bmin, abs(beta(k)))
             end if
          end do
-         bigdif = log10(bmax) - log10(bmin) .ge. one
+         bigdif = log10(bmax) - log10(bmin) >= one
          do k = 1, np
-            if (beta(k) .eq. zero) then
+            if (beta(k) == zero) then
                ssf(k) = ten/bmin
             else
                if (bigdif) then
@@ -5856,20 +5856,20 @@ contains
                end if
             end if
          end do
-   
+
       end if
-   
+
    end subroutine dsclb
-   
+
    pure subroutine dscld(n, m, x, ldx, tt, ldtt)
    !! Select scaling values for `delta` according to the algorithm given in the ODRPACK95
    !! reference guide.
-   ! Routines Called (NONE)
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
-   
+      ! Routines Called (NONE)
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
+
       use odrpack_kinds, only: zero, one, ten
-   
+
       integer, intent(in) :: n
          !! The number of observations.
       integer, intent(in) :: m
@@ -5882,12 +5882,12 @@ contains
          !! The scaling values for `delta`.
       integer, intent(in) :: ldtt
          !! The leading dimension of array `tt`.
-   
+
       ! Local scalars
       real(wp) :: xmax, xmin
       integer :: i, j
       logical :: bigdif
-   
+
       ! Variable Definitions (alphabetically)
       !  BIGDIF:  The variable designating whether there is a significant
       !           difference in the magnitudes of the nonzero elements of
@@ -5902,13 +5902,13 @@ contains
       !  X:       The independent variable.
       !  XMAX:    The largest nonzero magnitude.
       !  XMIN:    THE SMALLEST NONZERO MAGNITUDE.
-   
+
       do j = 1, m
          xmax = abs(x(1, j))
          do i = 2, n
             xmax = max(xmax, abs(x(i, j)))
          end do
-         if (xmax .eq. zero) then
+         if (xmax == zero) then
             !  All input values of X(I,J), I=1,...,N, are zero
             do i = 1, n
                tt(i, j) = one
@@ -5917,13 +5917,13 @@ contains
             !  Some of the input values are nonzero
             xmin = xmax
             do i = 1, n
-               if (x(i, j) .ne. zero) then
+               if (x(i, j) /= zero) then
                   xmin = min(xmin, abs(x(i, j)))
                end if
             end do
-            bigdif = log10(xmax) - log10(xmin) .ge. one
+            bigdif = log10(xmax) - log10(xmin) >= one
             do i = 1, n
-               if (x(i, j) .ne. zero) then
+               if (x(i, j) /= zero) then
                   if (bigdif) then
                      tt(i, j) = one/abs(x(i, j))
                   else
@@ -5935,17 +5935,17 @@ contains
             end do
          end if
       end do
-   
+
    end subroutine dscld
-   
+
    pure subroutine dsetn(n, m, x, ldx, nrow)
    !! Select the row at which the derivative will be checked.
-   ! Routines Called  (None)
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
-   
+      ! Routines Called  (None)
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
+
       use odrpack_kinds, only: zero
-   
+
       integer, intent(in) :: n
          !! The number of observations.
       integer, intent(in) :: m
@@ -5956,10 +5956,10 @@ contains
          !! The leading dimension of array `x`.
       integer, intent(inout) :: nrow
          !! The selected row number of the independent variable.
-   
+
       ! Local scalars
       integer :: i
-   
+
       ! Variable Definitions (alphabetically)
       !  I:       An index variable.
       !  J:       An index variable.
@@ -5968,21 +5968,21 @@ contains
       !  N:       The number of observations.
       !  NROW:    The selected row number of the independent variable.
       !  X:       The independent variable.
-   
-      if ((nrow .ge. 1) .and. (nrow .le. n)) return
-   
+
+      if ((nrow >= 1) .and. (nrow <= n)) return
+
       ! Select first row of independent variables which contains no zeros
       ! if there is one, otherwise first row is used.
       nrow = 1
       do i = 1, n
-         if (all(x(i, :) .ne. zero)) then
+         if (all(x(i, :) /= zero)) then
             nrow = i
             return
          end if
       end do
-   
+
    end subroutine dsetn
-   
+
    subroutine dsolve(n, t, ldt, b, job)
    !! Solve systems of the form:
    !!
@@ -5994,12 +5994,12 @@ contains
    !!
    !! References:
    !! * Dongarra J.J., Bunch J.R., Moler C.B., Stewart G.W., *LINPACK Users Guide*, SIAM, 1979.
-   ! Routines Called  DAXPY,DDOT
-   ! Date Written   920220   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
-   
+      ! Routines Called  DAXPY,DDOT
+      ! Date Written   920220   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
+
       use odrpack_kinds, only: zero
-   
+
       integer, intent(in) :: n
          !! The number of rows and columns of data in array `t`.
       real(wp), intent(in) :: t(ldt, n)
@@ -6014,15 +6014,15 @@ contains
          !!   2: Solve `t * x = b`, where `t` is upper triangular,
          !!   3: Solve `trans(t) * x = b`, where `t` is lower triangular,
          !!   4: Solve `trans(t) * x = b`, where `t` is upper triangular.
-   
+
       ! Local scalars
       real(wp) :: temp
       integer :: j1, j, jn
-   
+
       ! External BLAS/LAPACK procedures
       real(wp), external :: ddot
       external :: daxpy
-   
+
       ! Variable Definitions (alphabetically)
       !  B:       On input:  the right hand side;  On exit:  the solution
       !  J1:      The first nonzero entry in T.
@@ -6036,86 +6036,86 @@ contains
       !  LDT:     The leading dimension of array T.
       !  N:       The number of rows and columns of data in array T.
       !  T:       The upper or lower tridiagonal system.
-   
+
       !  Find first nonzero diagonal entry in T
       j1 = 0
       do j = 1, n
-         if (j1 .eq. 0 .and. t(j, j) .ne. zero) then
+         if (j1 == 0 .and. t(j, j) /= zero) then
             j1 = j
-         elseif (t(j, j) .eq. zero) then
+         elseif (t(j, j) == zero) then
             b(j) = zero
          end if
       end do
-      if (j1 .eq. 0) return
-   
+      if (j1 == 0) return
+
       ! Find last nonzero diagonal entry in T
       jn = 0
       do j = n, j1, -1
-         if (jn .eq. 0 .and. t(j, j) .ne. zero) then
+         if (jn == 0 .and. t(j, j) /= zero) then
             jn = j
-         elseif (t(j, j) .eq. zero) then
+         elseif (t(j, j) == zero) then
             b(j) = zero
          end if
       end do
-   
-      if (job .eq. 1) then
+
+      if (job == 1) then
          ! Solve T*X=B for T lower triangular
          b(j1) = b(j1)/t(j1, j1)
          do j = j1 + 1, jn
             temp = -b(j - 1)
             call daxpy(jn - j + 1, temp, t(j, j - 1), 1, b(j), 1)
-            if (t(j, j) .ne. zero) then
+            if (t(j, j) /= zero) then
                b(j) = b(j)/t(j, j)
             else
                b(j) = zero
             end if
          end do
-   
-      elseif (job .eq. 2) then
+
+      elseif (job == 2) then
          ! Solve T*X=B for T upper triangular.
          b(jn) = b(jn)/t(jn, jn)
          do j = jn - 1, j1, -1
             temp = -b(j + 1)
             call daxpy(j, temp, t(1, j + 1), 1, b(1), 1)
-            if (t(j, j) .ne. zero) then
+            if (t(j, j) /= zero) then
                b(j) = b(j)/t(j, j)
             else
                b(j) = zero
             end if
          end do
-   
-      elseif (job .eq. 3) then
+
+      elseif (job == 3) then
          ! Solve trans(T)*X=B for T lower triangular.
          b(jn) = b(jn)/t(jn, jn)
          do j = jn - 1, j1, -1
             b(j) = b(j) - ddot(jn - j + 1, t(j + 1, j), 1, b(j + 1), 1)
-            if (t(j, j) .ne. zero) then
+            if (t(j, j) /= zero) then
                b(j) = b(j)/t(j, j)
             else
                b(j) = zero
             end if
          end do
-   
-      elseif (job .eq. 4) then
+
+      elseif (job == 4) then
          ! Solve trans(T)*X=B for T upper triangular
          b(j1) = b(j1)/t(j1, j1)
          do j = j1 + 1, jn
             b(j) = b(j) - ddot(j - 1, t(1, j), 1, b(1), 1)
-            if (t(j, j) .ne. zero) then
+            if (t(j, j) /= zero) then
                b(j) = b(j)/t(j, j)
             else
                b(j) = zero
             end if
          end do
       end if
-   
+
    end subroutine dsolve
-   
+
    subroutine dunpac(n2, v1, v2, ifix)
    !! Copy the elements of `v1` into the locations of `v2` which are unfixed.
-   ! Routines Called  DCOPY
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
+      ! Routines Called  DCOPY
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
 
       integer, intent(in) :: n2
          !! The number of items in `v2`.
@@ -6126,13 +6126,13 @@ contains
          !! be inserted.
       integer, intent(in) :: ifix(n2)
          !! The values designating whether the elements of `v2` are fixed at their input values or not.
-   
+
       ! Local scalars
       integer :: i, n1
-   
+
       ! External BLAS/LAPACK procedures
       external :: dcopy
-   
+
       ! Variable Definitions (alphabetically)
       !  I:       An indexing variable.
       !  IFIX:    The values designating whether the elements of V2 are fixed at their input
@@ -6142,11 +6142,11 @@ contains
       !  V1:      The vector of the unfixed items.
       !  V2:      The vector of the fixed and unfixed items into which the elements of V1 are
       !           to be inserted.
-   
+
       n1 = 0
-      if (ifix(1) .ge. 0) then
+      if (ifix(1) >= 0) then
          do i = 1, n2
-            if (ifix(i) .ne. 0) then
+            if (ifix(i) /= 0) then
                n1 = n1 + 1
                v2(i) = v1(n1)
             end if
@@ -6155,20 +6155,20 @@ contains
          n1 = n2
          call dcopy(n2, v1, 1, v2, 1)
       end if
-   
+
    end subroutine dunpac
-   
+
    subroutine dvevtr &
       (m, nq, indx, &
        v, ldv, ld2v, e, lde, ve, ldve, ld2ve, vev, ldvev, &
        wrk5)
    !! Compute `v*e*trans(v)` for the (`indx`)th `m` by `nq` array in `v`.
-   ! Routines Called  DSOLVE
-   ! Date Written   910613   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)   
-   
+      ! Routines Called  DSOLVE
+      ! Date Written   910613   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
+
       use odrpack_kinds, only: zero
-   
+
       integer, intent(in) :: m
          !! The number of columns of data in the independent variable.
       integer, intent(in) :: nq
@@ -6197,10 +6197,10 @@ contains
          !! The `nq` by `nq` array `vev = v * inv(ete) * trans(v)`.
       real(wp), intent(out) :: wrk5(m)
          !! An `m` work vector.
-   
+
       ! Local scalars
       integer :: j, l1, l2
-  
+
       ! Variable Definitions (alphabetically)
       !  INDX:    The row in V in which the M by NQ array is stored.
       !  J:       An indexing variable.
@@ -6218,9 +6218,9 @@ contains
       !  VE:      The NQ by M array VE = V * inv(E)
       !  VEV:     The NQ by NQ array VEV = V * inv(ETE) * trans(V).
       !  WRK5:    An M work vector.
-   
-      if (nq .eq. 0 .or. m .eq. 0) return
-   
+
+      if (nq == 0 .or. m == 0) return
+
       do l1 = 1, nq
          do j = 1, m
             wrk5(j) = v(indx, j, l1)
@@ -6230,7 +6230,7 @@ contains
             ve(indx, l1, j) = wrk5(j)
          end do
       end do
-   
+
       do l1 = 1, nq
          do l2 = 1, l1
             vev(l1, l2) = zero
@@ -6240,17 +6240,17 @@ contains
             vev(l2, l1) = vev(l1, l2)
          end do
       end do
-   
+
    end subroutine dvevtr
-   
+
    pure subroutine dwght(n, m, wt, ldwt, ld2wt, t, wtt)
    !! Scale matrix `t` using `wt`, i.e., compute `wtt = wt*t`.
-   ! Routines Called  (NONE)
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
-   
+      ! Routines Called  (NONE)
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
+
       use odrpack_kinds, only: zero
-   
+
       integer, intent(in) :: n
          !! The number of rows of data in `t`.
       integer, intent(in) :: m
@@ -6266,11 +6266,11 @@ contains
       real(wp), intent(out) :: wtt(:, :)
          !! The results of weighting array `t` by `wt`. Array `wtt` can be the same as `t` only if
          !! the arrays in `wt` are upper triangular with zeros below the diagonal.
-   
+
       ! Local scalars
       real(wp) :: temp
       integer :: i, j, k
-   
+
       ! Variable Definitions (alphabetically)
       !  I:       An indexing variable.
       !  J:       An indexing variable.
@@ -6284,12 +6284,12 @@ contains
       !  WT:      The weights.
       !  WTT:     The results of weighting array T by WT. Array WTT can be the same as T only if
       !           the arrays in WT are upper triangular with zeros below the diagonal.
-   
-      if (n .eq. 0 .or. m .eq. 0) return
-   
-      if (wt(1, 1, 1) .ge. zero) then
-         if (ldwt .ge. n) then
-            if (ld2wt .ge. m) then
+
+      if (n == 0 .or. m == 0) return
+
+      if (wt(1, 1, 1) >= zero) then
+         if (ldwt >= n) then
+            if (ld2wt >= m) then
                ! WT is an N-array of M by M matrices
                do i = 1, n
                   do j = 1, m
@@ -6309,7 +6309,7 @@ contains
                end do
             end if
          else
-            if (ld2wt .ge. m) then
+            if (ld2wt >= m) then
                ! WT is an M by M matrix
                do i = 1, n
                   do j = 1, m
@@ -6337,9 +6337,9 @@ contains
             end do
          end do
       end if
-   
+
    end subroutine dwght
-   
+
    pure subroutine dwinf &
       (n, m, np, nq, ldwe, ld2we, isodr, &
        deltai, epsi, xplusi, fni, sdi, vcvi, &
@@ -6353,9 +6353,9 @@ contains
        loweri, upperi, &
        lwkmn)
    !! Set storage locations within REAL (wp) work space.
-   ! Routines Called  (NONE)
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
+      ! Routines Called  (NONE)
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
       integer, intent(in) :: n
          !! The number of observations.
       integer, intent(in) :: m
@@ -6474,10 +6474,10 @@ contains
          !! The starting location in array `work` of array `upper`.
       integer, intent(out) :: lwkmn
          !! The minimum acceptable length of vector `work`.
-   
+
       ! Local scalars
       integer :: next
-   
+
       ! Variable Definitions (alphabetically)
       !  ACTRSI:  The location in array WORK of variable ACTRS.
       !  ALPHAI:  The location in array WORK of variable ALPHA.
@@ -6538,10 +6538,10 @@ contains
       !  WSSDEI:  The location in array WORK of variable WSSDEL.
       !  WSSEPI:  The location in array work of variable WSSEPS.
       !  XPLUSI:  The starting location in array WORK of array XPLUSD.
-   
-      if (n .ge. 1 .and. m .ge. 1 .and. np .ge. 1 .and. nq .ge. 1 .and. &
-          ldwe .ge. 1 .and. ld2we .ge. 1) then
-   
+
+      if (n >= 1 .and. m >= 1 .and. np >= 1 .and. nq >= 1 .and. &
+          ldwe >= 1 .and. ld2we >= 1) then
+
          deltai = 1
          epsi = deltai + n*m
          xplusi = epsi + n*nq
@@ -6549,14 +6549,14 @@ contains
          sdi = fni + n*nq
          vcvi = sdi + np
          rvari = vcvi + np*np
-   
+
          wssi = rvari + 1
          wssdei = wssi + 1
          wssepi = wssdei + 1
          rcondi = wssepi + 1
          etai = rcondi + 1
          olmavi = etai + 1
-   
+
          taui = olmavi + 1
          alphai = taui + 1
          actrsi = alphai + 1
@@ -6568,7 +6568,7 @@ contains
          taufci = sstoli + 1
          epsmai = taufci + 1
          beta0i = epsmai + 1
-   
+
          betaci = beta0i + np
          betasi = betaci + np
          betani = betasi + np
@@ -6578,15 +6578,15 @@ contains
          qrauxi = ssfi + np
          ui = qrauxi + np
          fsi = ui + np
-   
+
          fjacbi = fsi + n*nq
-   
+
          we1i = fjacbi + n*np*nq
-   
+
          diffi = we1i + ldwe*ld2we*nq
-   
+
          next = diffi + nq*(np + m)
-   
+
          if (isodr) then
             deltsi = next
             deltni = deltsi + n*m
@@ -6605,7 +6605,7 @@ contains
             fjacdi = deltai
             wrk1i = deltai
          end if
-   
+
          wrk2i = next
          wrk3i = wrk2i + n*nq
          wrk4i = wrk3i + np
@@ -6615,7 +6615,7 @@ contains
          loweri = wrk7i + 5*nq
          upperi = loweri + np
          next = upperi + np
-   
+
          lwkmn = next
       else
          deltai = 1
@@ -6671,18 +6671,18 @@ contains
          upperi = 1
          lwkmn = 1
       end if
-   
+
    end subroutine dwinf
-   
+
    pure subroutine mbfb(np, beta, lower, upper, ssf, stpb, neta, eta, interval)
    !! Ensure range of bounds is large enough for derivative checking.
    !! Move beta away from bounds so that derivatives can be calculated.
-   ! ROUTINES CALLED  DHSTEP
-   ! DATE WRITTEN   20040624   (YYYYMMDD)
-   ! REVISION DATE  20040624   (YYYYMMDD)
-   
+      ! ROUTINES CALLED  DHSTEP
+      ! DATE WRITTEN   20040624   (YYYYMMDD)
+      ! REVISION DATE  20040624   (YYYYMMDD)
+
       use odrpack_kinds, only: zero, one, three, ten, hundred
-   
+
       integer, intent(in) :: np
          !! The number of parameters `np`.
       real(wp), intent(inout) :: beta(np)
@@ -6702,11 +6702,11 @@ contains
       integer, intent(out) :: interval(np)
          !! Specifies which difference methods and step sizes are supported by the current
          !! interval `upper-lower`.
-   
+
       ! Local scalars
       integer :: k
       real(wp) :: h, h0, h1, hc, hc0, hc1, stpr, stpl, typj
-    
+
       ! VARIABLE DEFINITIONS (ALPHABETICALLY)
       !  BETA:     BETA for the jacobian checker.  BETA will be moved far enough from the bounds so
       !            that the derivative checker may proceed.
@@ -6726,7 +6726,7 @@ contains
       !  STPL:     Maximum step to the left of BETA (-) the derivative checker will use.
       !  STPR:     Maximum step to the right of BETA (+) the derivative checker will use.
       !  TYPJ:     The typical size of the J-th unkonwn BETA.
-   
+
       interval(:) = 111
       do k = 1, np
          h0 = dhstep(0, neta, 1, k, stpb, 1)
@@ -6735,8 +6735,8 @@ contains
          hc1 = eta**(one/three)
          h = max(ten*h1, min(hundred*h0, one))
          hc = max(ten*hc1, min(hundred*hc0, one))
-         if (beta(k) .eq. zero) then
-            if (ssf(1) .lt. zero) then
+         if (beta(k) == zero) then
+            if (ssf(1) < zero) then
                typj = one/abs(ssf(1))
             else
                typj = one/ssf(k)
@@ -6747,35 +6747,35 @@ contains
          stpr = (h*typj*sign(one, beta(k)) + beta(k)) - beta(k)
          stpl = (hc*typj*sign(one, beta(k)) + beta(k)) - beta(k)
          ! Check outer interval
-         if (lower(k) + 2*abs(stpl) .gt. upper(k)) then
-            if (interval(k) .ge. 100) then
+         if (lower(k) + 2*abs(stpl) > upper(k)) then
+            if (interval(k) >= 100) then
                interval(k) = interval(k) - 100
             end if
-         elseif (beta(k) + stpl .gt. upper(k) .or. beta(k) - stpl .gt. upper(k)) then
+         elseif (beta(k) + stpl > upper(k) .or. beta(k) - stpl > upper(k)) then
             beta(k) = upper(k) - abs(stpl)
-         elseif (beta(k) + stpl .lt. lower(k) .or. beta(k) - stpl .lt. lower(k)) then
+         elseif (beta(k) + stpl < lower(k) .or. beta(k) - stpl < lower(k)) then
             beta(k) = lower(k) + abs(stpl)
          end if
          ! Check middle interval
-         if (lower(k) + 2*abs(stpr) .gt. upper(k)) then
-            if (mod(interval(k), 100) .ge. 10) then
+         if (lower(k) + 2*abs(stpr) > upper(k)) then
+            if (mod(interval(k), 100) >= 10) then
                interval(k) = interval(k) - 10
             end if
-         elseif (beta(k) + stpr .gt. upper(k) .or. beta(k) - stpr .gt. upper(k)) then
+         elseif (beta(k) + stpr > upper(k) .or. beta(k) - stpr > upper(k)) then
             beta(k) = upper(k) - abs(stpr)
-         elseif (beta(k) + stpr .lt. lower(k) .or. beta(k) - stpr .lt. lower(k)) then
+         elseif (beta(k) + stpr < lower(k) .or. beta(k) - stpr < lower(k)) then
             beta(k) = lower(k) + abs(stpr)
          end if
          ! Check inner interval
-         if (lower(k) + abs(stpr) .gt. upper(k)) then
+         if (lower(k) + abs(stpr) > upper(k)) then
             interval(k) = 0
-         elseif (beta(k) + stpr .gt. upper(k)) then
+         elseif (beta(k) + stpr > upper(k)) then
             beta(k) = upper(k) - stpr
-         elseif (beta(k) + stpr .lt. lower(k)) then
+         elseif (beta(k) + stpr < lower(k)) then
             beta(k) = lower(k) - stpr
          end if
       end do
-   
+
    end subroutine mbfb
-     
+
 end module odrpack_core
