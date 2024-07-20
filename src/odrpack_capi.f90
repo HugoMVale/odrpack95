@@ -22,6 +22,7 @@ module odrpack_capi
                         ideval, f, fjacb, fjacd, istop) bind(C)
       !! User-supplied subroutine for evaluating the model.
          import :: c_int, c_double
+         implicit none
          integer(c_int), intent(in) :: n
             !! Number of observations.
          integer(c_int), intent(in) :: m
@@ -146,7 +147,7 @@ contains
          !! Explanatory variable.
       real(c_double), intent(in), optional :: lower(np)
          !! Lower bound on `beta`.
-      real(wp), intent(in), optional :: upper(np)
+      real(c_double), intent(in), optional :: upper(np)
          !! Upper bound on `beta`.
       integer(c_int), intent(in), optional :: job
          !! Variable controlling initialization and computational method.
@@ -197,7 +198,7 @@ contains
          !! Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
       real(c_double), intent(in), optional :: lower(np)
          !! Lower bound on `beta`.
-      real(wp), intent(in), optional :: upper(np)
+      real(c_double), intent(in), optional :: upper(np)
          !! Upper bound on `beta`.
       integer(c_int), intent(in), optional :: job
          !! Variable controlling initialization and computational method.
@@ -284,7 +285,7 @@ contains
          !! Leading dimension of array `scld`, `ldscld ∈ {1, n}`.
       real(c_double), intent(in), optional :: lower(np)
          !! Lower bound on `beta`.
-      real(wp), intent(in), optional :: upper(np)
+      real(c_double), intent(in), optional :: upper(np)
          !! Upper bound on `beta`.
       real(c_double), intent(inout), optional :: delta(n, m)
          !! Initial error in the `x` data.
