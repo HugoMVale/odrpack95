@@ -4,7 +4,7 @@ C***Begin Prologue  DASUM
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A3A
-C***Keywords  Add,BLAS,REAL (KIND=wp),Linear Algebra,Magnitude,Sum,
+C***Keywords  Add,BLAS,REAL(wp),Linear Algebra,Magnitude,Sum,
 C             Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
@@ -16,11 +16,11 @@ C                B L A S  Subprogram
 C    Description of parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL (KIND=wp) vector with N elements
+C       DX  REAL(wp) vector with N elements
 C     INCX  Storage spacing between elements of DX
 C     --Output--
-C    DASUM  REAL (KIND=wp) result (Zero IF N .LE. 0)
-C     Returns sum of magnitudes of Real (Kind=wp) DX.
+C    DASUM  REAL(wp) result (Zero IF N .LE. 0)
+C     Returns sum of magnitudes of REAL(wp) DX.
 C     DASUM = Sum from 0 to N-1 of DABS(DX(1+I*INCX))
 C***References  Lawson C.L., Hanson R.J., Kincaid D.R., Krogh F.T.,
 C                 *Basic Linear Algebra Subprograms For FORTRAN Usage*,
@@ -37,11 +37,11 @@ C...Scalar arguments
      &   INCX,N
 
 C...Array arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   DX(*)
 
 C...Result
-      REAL (KIND=wp)
+      REAL(wp)
      &   DASUMR
 
 C...Local scalars
@@ -91,7 +91,7 @@ C***Begin Prologue  DAXPY
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A7
-C***Keywords  BLAS,REAL (KIND=wp),Linear Algebra,Triad,Vector
+C***Keywords  BLAS,REAL(wp),Linear Algebra,Triad,Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
 C           Kincaid, D. R., (U. of Texas)
@@ -102,14 +102,14 @@ C                B L A S  Subprogram
 C    Description of parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DA  REAL (KIND=wp) scalar multiplier
-C       DX  REAL (KIND=wp) vector with N elements
+C       DA  REAL(wp) scalar multiplier
+C       DX  REAL(wp) vector with N elements
 C     INCX  Storage spacing between elements of DX
-C       DY  REAL (KIND=wp) vector with N elements
+C       DY  REAL(wp) vector with N elements
 C     INCY  Storage spacing between elements of DY
 C     --Output--
-C       DY  REAL (KIND=wp) result (unchanged IF N .LE. 0)
-C     Overwrite REAL (KIND=wp) DY with REAL (KIND=wp) DA*DX + DY.
+C       DY  REAL(wp) result (unchanged IF N .LE. 0)
+C     Overwrite REAL(wp) DY with REAL(wp) DA*DX + DY.
 C     For I = 0 to N-1, replace  DY(LY+I*INCY) with DA*DX(LX+I*INCX) +
 C       DY(LY+I*INCY), where LX = 1 IF INCX .GE. 0, ELSE LX = (-INCX)*N
 C       and LY is defined in a similar way using INCY.
@@ -124,13 +124,13 @@ C...Used modules
       use odrpack_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   DA
       INTEGER
      &   INCX,INCY,N
 
 C...Array arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   DX(*),DY(*)
 
 C...Local scalars
@@ -205,7 +205,7 @@ C***Begin Prologue  DCHEX
 C***Date Written   780814   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D7B
-C***Keywords  Cholesky Decomposition,REAL (KIND=wp),Exchange,
+C***Keywords  Cholesky Decomposition,REAL(wp),Exchange,
 C             Linear Algebra,LINPACK,Matrix,Positive Definite
 C***Author  Stewart, G. W., (U. of Maryland)
 C***Purpose  Updates the Cholesky Factorization  A=TRANS(R)*R  of a
@@ -235,7 +235,7 @@ C     of plane rotations of the form
 C                           (    C(I)       S(I) )
 C                           (                    ) ,
 C                           (    -S(I)      C(I) )
-C     where C(I) is REAL (KIND=wp).  The rows these rotations operate
+C     where C(I) is REAL(wp).  The rows these rotations operate
 C     on are described below.
 C     There are two types of permutations, which are determined
 C     By the value of JOB.
@@ -250,7 +250,7 @@ C                1,...,K-1,K+1,K+2,...,L,K,L+1,...,P.
 C         U is the product of L-K rotations U(I), where U(I)
 C         Acts in the (K+I-1,K+I)-plane.
 C     On entry
-C         R      REAL (KIND=wp)(LDR,P), where LDR .GE. P.
+C         R      REAL(wp)(LDR,P), where LDR .GE. P.
 C                R contains the upper triangular factor
 C                that is to be updated.  Elements of R
 C                below the diagonal are not referenced.
@@ -263,7 +263,7 @@ C                K is the first column to be permuted.
 C         L      INTEGER.
 C                L is the last column to be permuted.
 C                L must be strictly greater than K.
-C         Z      REAL (KIND=wp)(LDZ,N)Z), where LDZ .GE. P.
+C         Z      REAL(wp)(LDZ,N)Z), where LDZ .GE. P.
 C                Z is an array of NZ P-vectors into which the
 C                transformation U is multiplied.  Z is
 C                not referenced if NZ = 0.
@@ -278,9 +278,9 @@ C                       JOB = 2  Left circular shift.
 C     On return
 C         R      Contains the updated factor.
 C         Z      Contains the updated matrix Z.
-C         C      REAL (KIND=wp)(P).
+C         C      REAL(wp)(P).
 C                C contains the cosines of the transforming rotations.
-C         S      REAL (KIND=wp)(P).
+C         S      REAL(wp)(P).
 C                S contains the sines of the transforming rotations.
 C     LINPACK.  This version dated 08/14/78 .
 C     G. W. Stewart, University of Maryland, Argonne National Lab.
@@ -297,11 +297,11 @@ C...Scalar arguments
      &   JOB,K,L,LDR,LDZ,NZ,P
 
 C...Array arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   C(*),R(LDR,*),S(*),Z(LDZ,*)
 
 C...Local scalars
-      REAL (KIND=wp)
+      REAL(wp)
      &   T,T1
       INTEGER
      &   I,II,IL,IU,J,JJ,KM1,KP1,LM1,LMK
@@ -457,7 +457,7 @@ C***Begin Prologue  DCOPY
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A5
-C***Keywords  BLAS,Copy,REAL (KIND=wp),Linear Algebra,Vector
+C***Keywords  BLAS,Copy,REAL(wp),Linear Algebra,Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
 C           Kincaid, D. R., (U. of Texas)
@@ -468,13 +468,13 @@ C                B L A S  Subprogram
 C    Description of parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL (KIND=wp) vector with N elements
+C       DX  REAL(wp) vector with N elements
 C     INCX  Storage spacing between elements of DX
-C       DY  REAL (KIND=wp) vector with N elements
+C       DY  REAL(wp) vector with N elements
 C     INCY  Storage spacing between elements of DY
 C     --Output--
 C       DY  Copy of vector DX (unchanged if N .LE. 0)
-C     Copy REAL (KIND=wp) DX to REAL (KIND=wp) DY.
+C     Copy REAL(wp) DX to REAL(wp) DY.
 C     For I = 0 to N-1, copy DX(LX+I*INCX) to DY(LY+I*INCY),
 C     where LX = 1 if INCX .GE. 0, else LX = (-INCX)*N, and LY is
 C     defined in a similar way using INCY.
@@ -493,7 +493,7 @@ C...Scalar arguments
      &   INCX,INCY,N
 
 C...Array arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   DX(*),DY(*)
 
 C...Local scalars
@@ -571,7 +571,7 @@ C***Begin Prologue  DDOT
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A4
-C***Keywords  BLAS,REAL (KIND=wp),Inner Product,Linear Algebra,Vector
+C***Keywords  BLAS,REAL(wp),Inner Product,Linear Algebra,Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
 C           Kincaid, D. R., (U. of Texas)
@@ -582,13 +582,13 @@ C                B L A S  Subprogram
 C    Description of parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL (KIND=wp) vector with N elements
+C       DX  REAL(wp) vector with N elements
 C     INCX  Storage spacing between elements of DX
-C       DY  REAL (KIND=wp) vector with N elements
+C       DY  REAL(wp) vector with N elements
 C     INCY  Storage spacing between elements of DY
 C     --Output--
-C     DDOT  REAL (KIND=wp) dot product (zero if N .LE. 0)
-C     returns the dot product of REAL (KIND=wp) DX and DY.
+C     DDOT  REAL(wp) dot product (zero if N .LE. 0)
+C     returns the dot product of REAL(wp) DX and DY.
 C     DDOT = SUM for I = 0 to N-1 of  DX(LX+I*INCX) * DY(LY+I*INCY)
 C     where LX = 1 if INCX .GE. 0, else LX = (-INCX)*N, and LY is
 C     defined in a similar way using INCY.
@@ -607,11 +607,11 @@ C...Scalar arguments
      &   INCX,INCY,N
 
 C...Array arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   DX(*),DY(*)
 
 C...Result
-      REAL (KIND=wp)
+      REAL(wp)
      &   DDOTR
 
 C...Local scalars
@@ -685,7 +685,7 @@ C***Begin Prologue  DNRM2
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A3B
-C***Keywords  BLAS,REAL (KIND=wp),Euclidean,L2,Length,Linear Algebra,
+C***Keywords  BLAS,REAL(wp),Euclidean,L2,Length,Linear Algebra,
 C             Norm,Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
@@ -697,10 +697,10 @@ C                B L A S  Subprogram
 C    Description of parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL (KIND=wp) vector with N elements
+C       DX  REAL(wp) vector with N elements
 C     INCX  Storage spacing between elements of DX
 C     --Output--
-C    DNRM2  REAL (KIND=wp) result (zero if N .LE. 0)
+C    DNRM2  REAL(wp) result (zero if N .LE. 0)
 C     Euclidean norm of the N-vector stored in DX() with storage
 C     increment INCX .
 C     If    N .LE. 0 return with result = 0.
@@ -749,15 +749,15 @@ C...Scalar arguments
      &   INCX,N
 
 C...Array arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   DX(*)
 
 C...Result
-      REAL (KIND=wp)
+      REAL(wp)
      &   DNRM2R
 
 C...Local scalars
-      REAL (KIND=wp)
+      REAL(wp)
      &   CUTHI,CUTLO,HITEST,ONE,SUM,XMAX,ZERO
       INTEGER
      &   I,J,NEXT,NN
@@ -865,7 +865,7 @@ C***Begin Prologue  DPODI
 C***Date Written   780814   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D2B1B,D3B1B
-C***Keywords  Determinant,REAL (KIND=wp),Factor,Inverse,
+C***Keywords  Determinant,REAL(wp),Factor,Inverse,
 C             Linear Algebra,LINPACK,Matrix,Positive Definite
 C***AUTHOR  Moler, C. B., (U. of New Mexico)
 C***PURPOSE  Computes the determinant and inverse of a certain double 
@@ -873,10 +873,10 @@ C            precision symmetric positive definite matrix (see abstract)
 C            using the factors computed by DPOCO, DPOFA or DQRDC.
 C***Description
 C     DPODI computes the determinant and inverse of a certain
-C     REAL (KIND=wp) symmetric positive definite matrix (see below)
+C     REAL(wp) symmetric positive definite matrix (see below)
 C     using the factors computed by DPOCO, DPOFA or DQRDC.
 C     On entry
-C        A       REAL (KIND=wp)(LDA, N)
+C        A       REAL(wp)(LDA, N)
 C                The output  A  from DPOCO or DPOFA
 C                or the output  X  from DQRDC.
 C        LDA     INTEGER
@@ -895,7 +895,7 @@ C                DPODI produces the upper half of inverse(trans(X)*X)
 C                where trans(x) is the transpose.
 C                Elements of  A  below the diagonal are unchanged.
 C                If the units digit of JOB is zero,  A  is unchanged.
-C        DET     REAL (KIND=wp)(2)
+C        DET     REAL(wp)(2)
 C                Determinant of  A  or of  trans(X)*X  if requested.
 C                Otherwise not referenced.
 C                Determinant = DET(1) * 10.0**DET(2)
@@ -920,10 +920,10 @@ C...Scalar arguments
       INTEGER JOB,LDA,N
 
 C...Array arguments
-      REAL (KIND=wp) A(LDA,*),DET(*)
+      REAL(wp) A(LDA,*),DET(*)
 
 C...Local scalars
-      REAL (KIND=wp) S,T
+      REAL(wp) S,T
       INTEGER I,J,JM1,K,KP1
 
 C...External subroutines
@@ -997,7 +997,7 @@ C***Begin Prologue  DQRDC
 C***Date Written   780814   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D5
-C***Keywords  Decomposition,REAL (KIND=wp),Linear Algebra,LINPACK,
+C***Keywords  Decomposition,REAL(wp),Linear Algebra,LINPACK,
 C             Matrix,Orthogonal Triangular
 C***Author  Stewart, G. W., (U. of Maryland)
 C***Purpose  Uses Householder Transformations to Compute the QR Factori-
@@ -1008,7 +1008,7 @@ C     factorization of an N by P matrix X.  Column pivoting
 C     based on the 2-norms of the reduced columns may be 
 C     performed at the user's option.
 C     On Entry
-C        X       REAL (KIND=wp)(LDX,P), where LDX .GE. N.
+C        X       REAL(wp)(LDX,P), where LDX .GE. N.
 C                X contains the matrix whose decomposition is to be
 C                computed.
 C        LDX     INTEGER.
@@ -1035,7 +1035,7 @@ C                reduction, if X(K) is occupied by a free column
 C                it is interchanged with the free column of largest
 C                reduced norm.  JPVT is not referenced if
 C                JOB .EQ. 0.
-C        WORK    REAL (KIND=wp)(P).
+C        WORK    REAL(wp)(P).
 C                WORK is a work array.  WORK is not referenced if
 C                JOB .EQ. 0.
 C        JOB     INTEGER.
@@ -1051,7 +1051,7 @@ C                can be recovered.  Note that if pivoting has
 C                been requested, the decomposition is not that
 C                of the original matrix X but that of X
 C                with its columns permuted as described by JPVT.
-C        QRAUX   REAL (KIND=wp)(P).
+C        QRAUX   REAL(wp)(P).
 C                QRAUX contains further information required to recover
 C                the orthogonal part of the decomposition.
 C        JPVT    JPVT(K) contains the index of the column of the
@@ -1072,13 +1072,13 @@ C...Scalar arguments
      &   JOB,LDX,N,P
 
 C...Array arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   QRAUX(*),WORK(*),X(LDX,*)
       INTEGER
      &   JPVT(*)
 
 C...Local scalars
-      REAL (KIND=wp)
+      REAL(wp)
      &   MAXNRM,NRMXL,T,TT
       INTEGER
      &   J,JJ,JP,L,LP1,LUP,MAXJ,PL,PU
@@ -1086,7 +1086,7 @@ C...Local scalars
      &   NEGJ,SWAPJ
 
 C...External functions
-      REAL (KIND=wp)
+      REAL(wp)
      &   DDOT,DNRM2
       EXTERNAL
      &   DDOT,DNRM2
@@ -1224,7 +1224,7 @@ C***Begin Prologue  DQRSL
 C***Date Written   780814   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D9,D2A1
-C***Keywords  REAL (KIND=wp),Linear Algebra,LINPACK,Matrix,
+C***Keywords  REAL(wp),Linear Algebra,LINPACK,Matrix,
 C             Orthogonal Triangular,Solve
 C***Author  Stewart, G. W., (U. Of Maryland)
 C***Purpose  Applies the output of DQRDC to compute coordinate
@@ -1244,7 +1244,7 @@ C                       (0)
 C     This information is contained in coded form in the arrays
 C     X and QRAUX.
 C     On Entry
-C        X      REAL (KIND=wp)(LDX,P).
+C        X      REAL(wp)(LDX,P).
 C               X contains the output of DQRDC.
 C        LDX    INTEGER.
 C               LDX is the leading dimension of the array X.
@@ -1255,9 +1255,9 @@ C        K      INTEGER.
 C               K is the number of columns of the matrix XK.  K
 C               must not be greater than min(N,P), where P is the
 C               same as in the calling sequence to DQRDC.
-C        QRAUX  REAL (KIND=wp)(P).
+C        QRAUX  REAL(wp)(P).
 C               QRAUX contains the auxiliary output from DQRDC.
-C        Y      REAL (KIND=wp)(N)
+C        Y      REAL(wp)(N)
 C               Y contains an N-vector that is to be manipulated
 C               by DQRSL.
 C        JOB    INTEGER.
@@ -1274,26 +1274,26 @@ C               automatically triggers the computation of QTY, for
 C               which an array must be provided in the calling
 C               sequence.
 C     On Return
-C        QY     REAL (KIND=wp)(N).
+C        QY     REAL(wp)(N).
 C               QY contains Q*Y, if its computation has been
 C               requested.
-C        QTY    REAL (KIND=wp)(N).
+C        QTY    REAL(wp)(N).
 C               QTY contains trans(Q)*Y, if its computation has
 C               been requested.  Here trans(Q) is the
 C               transpose of the matrix Q.
-C        B      REAL (KIND=wp)(K)
+C        B      REAL(wp)(K)
 C               B contains the solution of the least squares problem
 C                    Minimize NORM2(Y - XK*B),
 C               if its computation has been requested.  (Note that
 C               if pivoting was requested in DQRDC, the J-th
 C               component of B will be associated with column JPVT(J)
 C               of the original matrix X that was input into DQRDC.)
-C        RSD    REAL (KIND=wp)(N).
+C        RSD    REAL(wp)(N).
 C               RSD contains the least squares residual Y - XK*B,
 C               if its computation has been requested.  RSD is
 C               also the orthogonal projection of Y onto the
 C               orthogonal complement of the column space of XK.
-C        XB     REAL (KIND=wp)(N).
+C        XB     REAL(wp)(N).
 C               XB contains the least squares approximation XK*B,
 C               if its computation has been requested.  XB is also
 C               the orthogonal projection of Y onto the column space
@@ -1341,12 +1341,12 @@ C...Scalar arguments
      &   INFO,JOB,K,LDX,N
 
 C...Array arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   B(*),QRAUX(*),QTY(*),QY(*),RSD(*),X(LDX,*),XB(*),
      &   Y(*)
 
 C...Local scalars
-      REAL (KIND=wp)
+      REAL(wp)
      &   T,TEMP
       INTEGER
      &   I,J,JJ,JU,KP1
@@ -1354,7 +1354,7 @@ C...Local scalars
      &   CB,CQTY,CQY,CR,CXB
 
 C...External functions
-      REAL (KIND=wp)
+      REAL(wp)
      &   DDOT
       EXTERNAL
      &   DDOT
@@ -1510,9 +1510,9 @@ C                B L A S  Subprogram
 C    Description of Parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL (KIND=wp) vector with N elements
+C       DX  REAL(wp) vector with N elements
 C     INCX  Storage spacing between elements of DX
-C       DY  REAL (KIND=wp) vector with N elements
+C       DY  REAL(wp) vector with N elements
 C     INCY  Storage spacing between elements of DY
 C       DC  D.P. element of rotation matrix
 C       DS  D.P. element of rotation matrix
@@ -1535,17 +1535,17 @@ C...Used modules
       use odrpack_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   DC,DS
       INTEGER
      &   INCX,INCY,N
 
 C...Array arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   DX(*),DY(*)
 
 C...Local scalars
-      REAL (KIND=wp)
+      REAL(wp)
      &   ONE,W,Z,ZERO
       INTEGER
      &   I,KX,KY,NSTEPS
@@ -1605,13 +1605,13 @@ C***Description
 C                B L A S  Subprogram
 C    Description of Parameters
 C     --Input--
-C       DA  REAL (KIND=wp) scalar
-C       DB  REAL (KIND=wp) scalar
+C       DA  REAL(wp) scalar
+C       DB  REAL(wp) scalar
 C     --Output--
-C       DA  REAL (KIND=wp) result R
-C       DB  REAL (KIND=wp) result Z
-C       DC  REAL (KIND=wp) result
-C       DS  REAL (KIND=wp) result
+C       DA  REAL(wp) result R
+C       DB  REAL(wp) result Z
+C       DC  REAL(wp) result
+C       DS  REAL(wp) result
 C     Designed By C. L. Lawson, JPL, 1977 Sept 08
 C     Construct the Givens Transformation
 C         ( DC  DS )
@@ -1637,11 +1637,11 @@ C...Used modules
       use odrpack_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   DA,DB,DC,DS
 
 C...Local scalars
-      REAL (KIND=wp)
+      REAL(wp)
      &   R,U,V
 
 C...Intrinsic functions
@@ -1716,12 +1716,12 @@ C                B L A S  Subprogram
 C    Description of Parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DA  REAL (KIND=wp) scale factor
-C       DX  REAL (KIND=wp) vector with N elements
+C       DA  REAL(wp) scale factor
+C       DX  REAL(wp) vector with N elements
 C     INCX  Storage spacing between elements of DX
 C     --Output--
-C       DX  REAL (KIND=wp) result (unchanged if N.LE.0)
-C     Replace REAL (KIND=wp) DX by REAL (KIND=wp) DA*DX.
+C       DX  REAL(wp) result (unchanged if N.LE.0)
+C     Replace REAL(wp) DX by REAL(wp) DA*DX.
 C     For I = 0 to N-1, replace DX(1+I*INCX) with  DA * DX(1+I*INCX)
 C***References  Lawson C.L., Hanson R.J., Kincaid D.R., Krogh F.T.,
 C                 *Basic Linear Algebra Subprograms for FORTRAN Usage*,
@@ -1734,13 +1734,13 @@ C...Used modules
       use odrpack_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   DA
       INTEGER
      &   INCX,N
 
 C...Array arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   DX(*)
 
 C...Local scalars
@@ -1793,7 +1793,7 @@ C***Begin Prologue  DSWAP
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A5
-C***Keywords  BLAS,REAL (KIND=wp),Interchange,Linear Algebra,Vector
+C***Keywords  BLAS,REAL(wp),Interchange,Linear Algebra,Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
 C           Kincaid, D. R., (U. of Texas)
@@ -1804,14 +1804,14 @@ C                B L A S  Subprogram
 C    Description of Parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL (KIND=wp) vector with N elements
+C       DX  REAL(wp) vector with N elements
 C     INCX  Storage spacing between elements of DX
-C       DY  REAL (KIND=wp) vector with N elements
+C       DY  REAL(wp) vector with N elements
 C     INCY  Storage spacing between elements of DY
 C     --Output--
 C       DX  Input vector DY (unchanged if N .LE. 0)
 C       DY  Input vector DX (unchanged if N .LE. 0)
-C     Interchange REAL (KIND=wp) DX and REAL (KIND=wp) DY.
+C     Interchange REAL(wp) DX and REAL(wp) DY.
 C     For I = 0 TO N-1, interchange  DX(LX+I*INCX) and DY(LY+I*INCY),
 C     where LX = 1 if INCX .GE. 0, else LX = (-INCX)*N, and LY is
 C     defined in a similar way using INCY.
@@ -1830,11 +1830,11 @@ C...Scalar arguments
      &   INCX,INCY,N
 
 C...Array arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   DX(*),DY(*)
 
 C...Local scalars
-      REAL (KIND=wp)
+      REAL(wp)
      &   DTEMP1,DTEMP2,DTEMP3
       INTEGER
      &   I,IX,IY,M,MP1,NS
@@ -1918,16 +1918,16 @@ C***Begin Prologue  DTRCO
 C***Date Written   780814   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D2A3
-C***Keywords  Condition,REAL (KIND=wp),Factor,Linear Algebra,LINPACK,
+C***Keywords  Condition,REAL(wp),Factor,Linear Algebra,LINPACK,
 C             Matrix,Triangular
 C***Author  Moler, C. B., (U. of New Mexico)
-C***Purpose  Estimates the condition of a REAL (KIND=wp) triangular
+C***Purpose  Estimates the condition of a REAL(wp) triangular
 C            matrix.
 C***Description
-C     DTRCO estimates the condition of a REAL (KIND=wp) triangular
+C     DTRCO estimates the condition of a REAL(wp) triangular
 C     matrix.
 C     On Entry
-C        T       REAL (KIND=wp)(LDT,N)
+C        T       REAL(wp)(LDT,N)
 C                T contains the triangular matrix.  The zero
 C                elements of the matrix are not referenced, and
 C                the corresponding elements of the array can be
@@ -1940,7 +1940,7 @@ C        JOB     INTEGER
 C                = 0         T  is lower triangular.
 C                = NONZERO   T  is upper triangular.
 C     On Return
-C        RCOND   REAL (KIND=wp)
+C        RCOND   REAL(wp)
 C                An estimate of the reciprocal condition of  T .
 C                for the system  T*X = B , relative perturbations
 C                in  T  and  B  of size  EPSILON  may cause
@@ -1951,7 +1951,7 @@ C                is true, then  T  may be singular to working
 C                precision.  In particular,  RCOND  is zero  if
 C                exact singularity is detected or the estimate
 C                underflows.
-C        Z       REAL (KIND=wp)(N)
+C        Z       REAL(wp)(N)
 C                A work vector whose contents are usually unimportant.
 C                If  T  is close to a singular matrix, then  Z  is
 C                an approximate null vector in the sense that
@@ -1967,17 +1967,17 @@ C...Used modules
       use odrpack_kinds, only: wp
 
 C...Scalar arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   RCOND
       INTEGER
      &   JOB,LDT,N
 
 C...Array arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   T(LDT,*),Z(*)
 
 C...Local scalars
-      REAL (KIND=wp)
+      REAL(wp)
      &   EK,S,SM,TNORM,W,WK,WKM,YNORM
       INTEGER
      &   I1,J,J1,J2,K,KK,L
@@ -1985,7 +1985,7 @@ C...Local scalars
      &   LOWER
 
 C...External functions
-      REAL (KIND=wp)
+      REAL(wp)
      &   DASUM
       EXTERNAL
      &   DASUM
@@ -2108,7 +2108,7 @@ C***Begin Prologue  DTRSL
 C***Date Written   780814   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D2A3
-C***Keywords  REAL (KIND=wp),Linear Algebra,LINPACK,Matrix,Solve,
+C***Keywords  REAL(wp),Linear Algebra,LINPACK,Matrix,Solve,
 C             Triangular
 C***Author  Stewart, G. W., (U. of Maryland)
 C***Purpose  Solves systems of the form  T*X=B or  trans(T)*X=B  where T
@@ -2121,7 +2121,7 @@ C                   trans(T) * X = B
 C     where T is a triangular matrix of order N.  Here trans(T)
 C     denotes the transpose of the matrix T.
 C     On Entry
-C         T         REAL (KIND=wp)(LDT,N)
+C         T         REAL(wp)(LDT,N)
 C                   T contains the matrix of the system.  The zero
 C                   elements of the matrix are not referenced, and
 C                   the corresponding elements of the array can be
@@ -2130,7 +2130,7 @@ C         LDT       INTEGER
 C                   LDT is the leading dimension of the array T.
 C         N         INTEGER
 C                   N is the order of the system.
-C         B         REAL (KIND=wp)(N).
+C         B         REAL(wp)(N).
 C                   B contains the right hand side of the system.
 C         JOB       INTEGER
 C                   JOB specifies what kind of system is to be solved.
@@ -2161,17 +2161,17 @@ C...Scalar arguments
      &   INFO,JOB,LDT,N
 
 C...Array arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   B(*),T(LDT,*)
 
 C...Local scalars
-      REAL (KIND=wp)
+      REAL(wp)
      &   TEMP
       INTEGER
      &   CASE,J,JJ
 
 C...External functions
-      REAL (KIND=wp)
+      REAL(wp)
      &   DDOT
       EXTERNAL
      &   DDOT
@@ -2268,7 +2268,7 @@ C***Begin Prologue  IDAMAX
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A2
-C***Keywords  BLAS,REAL (KIND=wp),Linear Algebra,Maximum Component,
+C***Keywords  BLAS,REAL(wp),Linear Algebra,Maximum Component,
 C             Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
@@ -2280,11 +2280,11 @@ C                B L A S  Subprogram
 C    Description of parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL (KIND=wp) vector with N elements
+C       DX  REAL(wp) vector with N elements
 C     INCX  Storage spacing between elements of DX
 C     --Output--
 C   IDAMAX  Smallest index (zero if N .LE. 0)
-C     Find smallest index of maximum magnitude of REAL (KIND=wp) DX.
+C     Find smallest index of maximum magnitude of REAL(wp) DX.
 C     IDAMAX =  first I, I = 1 to N, to minimize  ABS(DX(1-INCX+I*INCX)
 C***References  Lawson C.L., Hanson R.J., Kincaid D.R., Krogh F.T.,
 C                 *Basic Linear Algebra Subprograms for FORTRAN Usage*,
@@ -2301,7 +2301,7 @@ C...Scalar arguments
      &   INCX,N
 
 C...Array arguments
-      REAL (KIND=wp)
+      REAL(wp)
      &   DX(*)
 
 C...Result
@@ -2309,7 +2309,7 @@ C...Result
      &   IDAMAXR
 
 C...Local scalars
-      REAL (KIND=wp)
+      REAL(wp)
      &   DMAX,XMAG
       INTEGER
      &   I,II,NS
