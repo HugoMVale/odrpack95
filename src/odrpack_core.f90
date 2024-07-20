@@ -9,6 +9,7 @@ module odrpack_core
                        ideval, f, fjacb, fjacd, istop)
       !! User-supplied subroutine for evaluating the model.
          import :: wp
+         implicit none
          integer, intent(in) :: n
             !! Number of observations.
          integer, intent(in) :: m
