@@ -255,7 +255,7 @@ contains
          tfjacb(1:n, 1:nq, k) = fjacb(1:n, k, 1:nq)
          wrk(k) = ddot(n*nq, tfjacb(1, 1, k), 1, f(1, 1), 1)
       end do
-      call dscale(npp, 1, ss, npp, wrk, npp, wrk, npp)
+      call dscale(npp, 1, ss, npp, wrk, npp, wrk, npp) ! work is input (as t) and output (as sclt)
 
       if (isodr) then
          call dwght(n, m, wd, ldwd, ld2wd, delta, tempret(1:n, 1:m))
