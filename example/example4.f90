@@ -109,10 +109,11 @@ program example4
    implicit none
 
    real(kind=wp) :: beta(3) = [1.1E-0_wp, 3.3E+0_wp, 8.7_wp]
+   integer :: lunrpt
    ! INTEGER :: I
    ! REAL (KIND=wp) :: C, M, TOUT
 
-   open (9, file="./example/report4.dat")
+   open (newunit=lunrpt, file="./example/report4.dat")
 
    call odr(fcn, &
             n=5, m=1, np=3, nq=1, &
@@ -122,7 +123,7 @@ program example4
             lower=[0.0_wp, 0.0_wp, 0.0_wp], &
             upper=[1000.0_wp, 1000.0_wp, 1000.0_wp], &
             iprint=2122, &
-            lunrpt=9, &
+            lunrpt=lunrpt, &
             maxit=20)
 
    close (9)

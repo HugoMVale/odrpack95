@@ -51,9 +51,8 @@ program example2
    real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :)
 
    ! Set up report files
-   lunerr = 9
-   lunrpt = 9
-   open (unit=9, file='./example/report2.dat')
+   open (newunit=lunrpt, file='./example/report2.dat')
+   lunerr = lunrpt
 
    ! Read problem dimensions
    open (unit=5, file='./example/data2.dat')
