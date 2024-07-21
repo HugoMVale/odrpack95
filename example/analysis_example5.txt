@@ -1,0 +1,463 @@
+These results refer to 1000 runs of example5 (forward FD, no reports).
+
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  us/call  us/call  name    
+ 20.31      0.13     0.13                             _mcount_private
+ 17.19      0.24     0.11   519463     0.21     0.69  __odrpack_core_MOD_dodstp
+ 14.06      0.33     0.09 24934096     0.00     0.00  __odrpack_core_MOD_dsolve
+ 10.94      0.40     0.07                             __fentry__
+  4.69      0.43     0.03  4155672     0.01     0.01  __odrpack_core_MOD_desubi
+  4.69      0.46     0.03  1698664     0.02     0.02  __odrpack_core_MOD_dwght
+  3.12      0.48     0.02  6233524     0.00     0.00  __odrpack_core_MOD_dfctr
+  3.12      0.50     0.02  2077852     0.01     0.01  __odrpack_core_MOD_dvevtr
+  3.12      0.52     0.02  1049363     0.02     0.02  dcopy_
+  3.12      0.54     0.02   519463     0.04     0.06  dqrsl_
+  3.12      0.56     0.02     1000    20.00   419.83  __odrpack_MOD_dodmn
+  1.56      0.57     0.01  2077889     0.00     0.00  dnrm2_
+  1.56      0.58     0.01  1170627     0.01     0.01  drotg_
+  1.56      0.59     0.01   519463     0.02     0.03  dqrdc_
+  1.56      0.60     0.01   519455     0.02     0.02  dtrsl_
+  1.56      0.61     0.01   256492     0.04     0.04  __odrpack_core_MOD_dscale
+  1.56      0.62     0.01   129246     0.08     2.92  __odrpack_core_MOD_dodlm
+  1.56      0.63     0.01     1000    10.00   430.00  __odrpack_MOD_doddrv
+  1.56      0.64     0.01                             exp
+  0.00      0.64     0.00  3882817     0.00     0.00  ddot_
+  0.00      0.64     0.00  2207114     0.00     0.00  daxpy_
+  0.00      0.64     0.00  1426051     0.00     0.00  dscal_
+  0.00      0.64     0.00   517016     0.00     0.00  dasum_
+  0.00      0.64     0.00   390209     0.00     0.00  drot_
+  0.00      0.64     0.00   145770     0.00     0.00  __example5_model_MOD_fcn
+  0.00      0.64     0.00   130254     0.00     0.02  __odrpack_core_MOD_dunpac
+  0.00      0.64     0.00   129254     0.00     0.00  dswap_
+  0.00      0.64     0.00   129254     0.00     0.00  dtrco_
+  0.00      0.64     0.00     4000     0.00     0.00  __odrpack_core_MOD_dpack
+  0.00      0.64     0.00     3508     0.00     0.02  __odrpack_core_MOD_devjac
+  0.00      0.64     0.00     3508     0.00     0.00  __odrpack_core_MOD_djacfd
+  0.00      0.64     0.00     2000     0.00     0.00  __odrpack_core_MOD_dacces
+  0.00      0.64     0.00     2000     0.00     0.00  __odrpack_core_MOD_derstep
+  0.00      0.64     0.00     2000     0.00     0.00  __odrpack_core_MOD_dflags
+  0.00      0.64     0.00     1000     0.00   430.00  __odrpack_MOD_dodcnt
+  0.00      0.64     0.00     1000     0.00   430.00  __odrpack_MOD_odr
+  0.00      0.64     0.00     1000     0.00     0.00  __odrpack_core_MOD_detaf
+  0.00      0.64     0.00     1000     0.00     0.00  __odrpack_core_MOD_dfctrw
+  0.00      0.64     0.00     1000     0.00     0.00  __odrpack_core_MOD_diniwk
+  0.00      0.64     0.00     1000     0.00     0.00  __odrpack_core_MOD_diwinf
+  0.00      0.64     0.00     1000     0.00     0.00  __odrpack_core_MOD_dodchk
+  0.00      0.64     0.00     1000     0.00     0.00  __odrpack_core_MOD_dsclb
+  0.00      0.64     0.00     1000     0.00     0.00  __odrpack_core_MOD_dscld
+  0.00      0.64     0.00     1000     0.00     0.00  __odrpack_core_MOD_dsetn
+  0.00      0.64     0.00     1000     0.00     0.00  __odrpack_core_MOD_dwinf
+  0.00      0.64     0.00        8     0.00     0.69  __odrpack_core_MOD_dodvcv
+  0.00      0.64     0.00        8     0.00     0.00  dpodi_
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012-2024 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 4 byte(s) for 1.56% of 0.64 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]     67.2    0.00    0.43                 MAIN__ [1]
+                0.00    0.43    1000/1000        __odrpack_MOD_odr [4]
+-----------------------------------------------
+                0.00    0.43    1000/1000        __odrpack_MOD_odr [4]
+[2]     67.2    0.00    0.43    1000         __odrpack_MOD_dodcnt [2]
+                0.01    0.42    1000/1000        __odrpack_MOD_doddrv [3]
+-----------------------------------------------
+                0.01    0.42    1000/1000        __odrpack_MOD_dodcnt [2]
+[3]     67.2    0.01    0.42    1000         __odrpack_MOD_doddrv [3]
+                0.02    0.40    1000/1000        __odrpack_MOD_dodmn [5]
+                0.00    0.00    4000/1049363     dcopy_ [15]
+                0.00    0.00    4000/1698664     __odrpack_core_MOD_dwght [12]
+                0.00    0.00    1000/130254      __odrpack_core_MOD_dunpac [23]
+                0.00    0.00    1000/2077889     dnrm2_ [18]
+                0.00    0.00    2000/4000        __odrpack_core_MOD_dpack [109]
+                0.00    0.00    2000/3882817     ddot_ [27]
+                0.00    0.00    2000/2000        __odrpack_core_MOD_derstep [112]
+                0.00    0.00    1000/2000        __odrpack_core_MOD_dflags [113]
+                0.00    0.00    1000/1000        __odrpack_core_MOD_diwinf [117]
+                0.00    0.00    1000/1000        __odrpack_core_MOD_dwinf [122]
+                0.00    0.00    1000/1000        __odrpack_core_MOD_dodchk [118]
+                0.00    0.00    1000/1000        __odrpack_core_MOD_diniwk [116]
+                0.00    0.00    1000/1000        __odrpack_core_MOD_dfctrw [115]
+                0.00    0.00    1000/145770      __example5_model_MOD_fcn [108]
+                0.00    0.00    1000/1000        __odrpack_core_MOD_dsetn [121]
+                0.00    0.00    1000/1000        __odrpack_core_MOD_detaf [114]
+-----------------------------------------------
+                0.00    0.43    1000/1000        MAIN__ [1]
+[4]     67.2    0.00    0.43    1000         __odrpack_MOD_odr [4]
+                0.00    0.43    1000/1000        __odrpack_MOD_dodcnt [2]
+-----------------------------------------------
+                0.02    0.40    1000/1000        __odrpack_MOD_doddrv [3]
+[5]     65.6    0.02    0.40    1000         __odrpack_MOD_dodmn [5]
+                0.01    0.37  129246/129246      __odrpack_core_MOD_dodlm [6]
+                0.01    0.00  655754/1698664     __odrpack_core_MOD_dwght [12]
+                0.01    0.00  392138/1049363     dcopy_ [15]
+                0.00    0.00  129254/130254      __odrpack_core_MOD_dunpac [23]
+                0.00    0.00  131754/2077889     dnrm2_ [18]
+                0.00    0.00    3508/3508        __odrpack_core_MOD_devjac [24]
+                0.00    0.00       8/8           __odrpack_core_MOD_dodvcv [25]
+                0.00    0.00 1552952/3882817     ddot_ [27]
+                0.00    0.00  129246/145770      __example5_model_MOD_fcn [108]
+                0.00    0.00    2000/4000        __odrpack_core_MOD_dpack [109]
+                0.00    0.00    2000/2000        __odrpack_core_MOD_dacces [111]
+                0.00    0.00    1000/2000        __odrpack_core_MOD_dflags [113]
+-----------------------------------------------
+                0.01    0.37  129246/129246      __odrpack_MOD_dodmn [5]
+[6]     59.0    0.01    0.37  129246         __odrpack_core_MOD_dodlm [6]
+                0.11    0.25  519455/519463      __odrpack_core_MOD_dodstp [7]
+                0.01    0.00  256492/256492      __odrpack_core_MOD_dscale [22]
+                0.00    0.00  128246/2077889     dnrm2_ [18]
+                0.00    0.00  769476/3882817     ddot_ [27]
+-----------------------------------------------
+                0.00    0.00       8/519463      __odrpack_core_MOD_dodvcv [25]
+                0.11    0.25  519455/519463      __odrpack_core_MOD_dodlm [6]
+[7]     55.8    0.11    0.25  519463         __odrpack_core_MOD_dodstp [7]
+                0.08    0.00 22856020/24934096     __odrpack_core_MOD_dsolve [9]
+                0.03    0.00 4155640/4155672     __odrpack_core_MOD_desubi [11]
+                0.02    0.01  519455/519463      dqrsl_ [13]
+                0.02    0.01 2077820/2077852     __odrpack_core_MOD_dvevtr [14]
+                0.02    0.00 6233460/6233524     __odrpack_core_MOD_dfctr [16]
+                0.02    0.00 1038910/1698664     __odrpack_core_MOD_dwght [12]
+                0.01    0.01  519455/519463      dqrdc_ [17]
+                0.01    0.00 1170627/1170627     drotg_ [19]
+                0.01    0.00  519455/519455      dtrsl_ [20]
+                0.00    0.00  519455/2077889     dnrm2_ [18]
+                0.00    0.00  390209/390209      drot_ [31]
+                0.00    0.00  129246/129254      dtrco_ [33]
+-----------------------------------------------
+                                                 <spontaneous>
+[8]     20.3    0.13    0.00                 _mcount_private [8]
+-----------------------------------------------
+                0.00    0.00     224/24934096     __odrpack_core_MOD_dodstp.constprop.0 [26]
+                0.01    0.00 2077852/24934096     __odrpack_core_MOD_dvevtr [14]
+                0.08    0.00 22856020/24934096     __odrpack_core_MOD_dodstp [7]
+[9]     14.1    0.09    0.00 24934096         __odrpack_core_MOD_dsolve [9]
+-----------------------------------------------
+                                                 <spontaneous>
+[10]    10.9    0.07    0.00                 __fentry__ [10]
+-----------------------------------------------
+                0.00    0.00      32/4155672     __odrpack_core_MOD_dodstp.constprop.0 [26]
+                0.03    0.00 4155640/4155672     __odrpack_core_MOD_dodstp [7]
+[11]     4.7    0.03    0.00 4155672         __odrpack_core_MOD_desubi [11]
+-----------------------------------------------
+                0.00    0.00    4000/1698664     __odrpack_MOD_doddrv [3]
+                0.01    0.00  655754/1698664     __odrpack_MOD_dodmn [5]
+                0.02    0.00 1038910/1698664     __odrpack_core_MOD_dodstp [7]
+[12]     4.7    0.03    0.00 1698664         __odrpack_core_MOD_dwght [12]
+-----------------------------------------------
+                0.00    0.00       8/519463      __odrpack_core_MOD_dodstp.constprop.0 [26]
+                0.02    0.01  519455/519463      __odrpack_core_MOD_dodstp [7]
+[13]     4.7    0.02    0.01  519463         dqrsl_ [13]
+                0.01    0.00  519463/1049363     dcopy_ [15]
+                0.00    0.00 1038926/3882817     ddot_ [27]
+                0.00    0.00 1038926/2207114     daxpy_ [28]
+-----------------------------------------------
+                0.00    0.00      32/2077852     __odrpack_core_MOD_dodstp.constprop.0 [26]
+                0.02    0.01 2077820/2077852     __odrpack_core_MOD_dodstp [7]
+[14]     4.3    0.02    0.01 2077852         __odrpack_core_MOD_dvevtr [14]
+                0.01    0.00 2077852/24934096     __odrpack_core_MOD_dsolve [9]
+-----------------------------------------------
+                0.00    0.00    3508/1049363     __odrpack_core_MOD_devjac [24]
+                0.00    0.00    4000/1049363     __odrpack_MOD_doddrv [3]
+                0.00    0.00  130254/1049363     __odrpack_core_MOD_dunpac [23]
+                0.01    0.00  392138/1049363     __odrpack_MOD_dodmn [5]
+                0.01    0.00  519463/1049363     dqrsl_ [13]
+[15]     3.1    0.02    0.00 1049363         dcopy_ [15]
+-----------------------------------------------
+                0.00    0.00      64/6233524     __odrpack_core_MOD_dodstp.constprop.0 [26]
+                0.02    0.00 6233460/6233524     __odrpack_core_MOD_dodstp [7]
+[16]     3.1    0.02    0.00 6233524         __odrpack_core_MOD_dfctr [16]
+-----------------------------------------------
+                0.00    0.00       8/519463      __odrpack_core_MOD_dodstp.constprop.0 [26]
+                0.01    0.01  519455/519463      __odrpack_core_MOD_dodstp [7]
+[17]     2.5    0.01    0.01  519463         dqrdc_ [17]
+                0.01    0.00 1297434/2077889     dnrm2_ [18]
+                0.00    0.00 1038926/1426051     dscal_ [29]
+                0.00    0.00  519463/3882817     ddot_ [27]
+                0.00    0.00  519463/2207114     daxpy_ [28]
+                0.00    0.00  129254/129254      dswap_ [32]
+-----------------------------------------------
+                0.00    0.00    1000/2077889     __odrpack_MOD_doddrv [3]
+                0.00    0.00  128246/2077889     __odrpack_core_MOD_dodlm [6]
+                0.00    0.00  131754/2077889     __odrpack_MOD_dodmn [5]
+                0.00    0.00  519455/2077889     __odrpack_core_MOD_dodstp [7]
+                0.01    0.00 1297434/2077889     dqrdc_ [17]
+[18]     1.6    0.01    0.00 2077889         dnrm2_ [18]
+-----------------------------------------------
+                0.01    0.00 1170627/1170627     __odrpack_core_MOD_dodstp [7]
+[19]     1.6    0.01    0.00 1170627         drotg_ [19]
+-----------------------------------------------
+                0.01    0.00  519455/519455      __odrpack_core_MOD_dodstp [7]
+[20]     1.6    0.01    0.00  519455         dtrsl_ [20]
+                0.00    0.00  519455/2207114     daxpy_ [28]
+-----------------------------------------------
+                                                 <spontaneous>
+[21]     1.6    0.01    0.00                 exp [21]
+-----------------------------------------------
+                0.01    0.00  256492/256492      __odrpack_core_MOD_dodlm [6]
+[22]     1.6    0.01    0.00  256492         __odrpack_core_MOD_dscale [22]
+-----------------------------------------------
+                0.00    0.00    1000/130254      __odrpack_MOD_doddrv [3]
+                0.00    0.00  129254/130254      __odrpack_MOD_dodmn [5]
+[23]     0.4    0.00    0.00  130254         __odrpack_core_MOD_dunpac [23]
+                0.00    0.00  130254/1049363     dcopy_ [15]
+-----------------------------------------------
+                0.00    0.00    3508/3508        __odrpack_MOD_dodmn [5]
+[24]     0.0    0.00    0.00    3508         __odrpack_core_MOD_devjac [24]
+                0.00    0.00    3508/1049363     dcopy_ [15]
+                0.00    0.00    3508/3508        __odrpack_core_MOD_djacfd [110]
+-----------------------------------------------
+                0.00    0.00       8/8           __odrpack_MOD_dodmn [5]
+[25]     0.0    0.00    0.00       8         __odrpack_core_MOD_dodvcv [25]
+                0.00    0.00       8/519463      __odrpack_core_MOD_dodstp [7]
+                0.00    0.00       8/8           dpodi_ [34]
+-----------------------------------------------
+                                                 <spontaneous>
+[26]     0.0    0.00    0.00                 __odrpack_core_MOD_dodstp.constprop.0 [26]
+                0.00    0.00     224/24934096     __odrpack_core_MOD_dsolve [9]
+                0.00    0.00       8/519463      dqrsl_ [13]
+                0.00    0.00      32/2077852     __odrpack_core_MOD_dvevtr [14]
+                0.00    0.00       8/519463      dqrdc_ [17]
+                0.00    0.00      32/4155672     __odrpack_core_MOD_desubi [11]
+                0.00    0.00      64/6233524     __odrpack_core_MOD_dfctr [16]
+                0.00    0.00       8/129254      dtrco_ [33]
+-----------------------------------------------
+                0.00    0.00    2000/3882817     __odrpack_MOD_doddrv [3]
+                0.00    0.00  519463/3882817     dqrdc_ [17]
+                0.00    0.00  769476/3882817     __odrpack_core_MOD_dodlm [6]
+                0.00    0.00 1038926/3882817     dqrsl_ [13]
+                0.00    0.00 1552952/3882817     __odrpack_MOD_dodmn [5]
+[27]     0.0    0.00    0.00 3882817         ddot_ [27]
+-----------------------------------------------
+                0.00    0.00      16/2207114     dpodi_ [34]
+                0.00    0.00  129254/2207114     dtrco_ [33]
+                0.00    0.00  519455/2207114     dtrsl_ [20]
+                0.00    0.00  519463/2207114     dqrdc_ [17]
+                0.00    0.00 1038926/2207114     dqrsl_ [13]
+[28]     0.0    0.00    0.00 2207114         daxpy_ [28]
+-----------------------------------------------
+                0.00    0.00      32/1426051     dpodi_ [34]
+                0.00    0.00  387093/1426051     dtrco_ [33]
+                0.00    0.00 1038926/1426051     dqrdc_ [17]
+[29]     0.0    0.00    0.00 1426051         dscal_ [29]
+-----------------------------------------------
+                0.00    0.00  517016/517016      dtrco_ [33]
+[30]     0.0    0.00    0.00  517016         dasum_ [30]
+-----------------------------------------------
+                0.00    0.00  390209/390209      __odrpack_core_MOD_dodstp [7]
+[31]     0.0    0.00    0.00  390209         drot_ [31]
+-----------------------------------------------
+                0.00    0.00  129254/129254      dqrdc_ [17]
+[32]     0.0    0.00    0.00  129254         dswap_ [32]
+-----------------------------------------------
+                0.00    0.00       8/129254      __odrpack_core_MOD_dodstp.constprop.0 [26]
+                0.00    0.00  129246/129254      __odrpack_core_MOD_dodstp [7]
+[33]     0.0    0.00    0.00  129254         dtrco_ [33]
+                0.00    0.00  517016/517016      dasum_ [30]
+                0.00    0.00  387093/1426051     dscal_ [29]
+                0.00    0.00  129254/2207114     daxpy_ [28]
+-----------------------------------------------
+                0.00    0.00       8/8           __odrpack_core_MOD_dodvcv [25]
+[34]     0.0    0.00    0.00       8         dpodi_ [34]
+                0.00    0.00      32/1426051     dscal_ [29]
+                0.00    0.00      16/2207114     daxpy_ [28]
+-----------------------------------------------
+                0.00    0.00       1/145770      main [80]
+                0.00    0.00    1000/145770      __odrpack_MOD_doddrv [3]
+                0.00    0.00    4999/145770      __odrpack_core_MOD_detaf [114]
+                0.00    0.00   10524/145770      __odrpack_core_MOD_djacfd [110]
+                0.00    0.00  129246/145770      __odrpack_MOD_dodmn [5]
+[108]    0.0    0.00    0.00  145770         __example5_model_MOD_fcn [108]
+-----------------------------------------------
+                0.00    0.00    2000/4000        __odrpack_MOD_dodmn [5]
+                0.00    0.00    2000/4000        __odrpack_MOD_doddrv [3]
+[109]    0.0    0.00    0.00    4000         __odrpack_core_MOD_dpack [109]
+-----------------------------------------------
+                0.00    0.00    3508/3508        __odrpack_core_MOD_devjac [24]
+[110]    0.0    0.00    0.00    3508         __odrpack_core_MOD_djacfd [110]
+                0.00    0.00   10524/145770      __example5_model_MOD_fcn [108]
+-----------------------------------------------
+                0.00    0.00    2000/2000        __odrpack_MOD_dodmn [5]
+[111]    0.0    0.00    0.00    2000         __odrpack_core_MOD_dacces [111]
+-----------------------------------------------
+                0.00    0.00    2000/2000        __odrpack_MOD_doddrv [3]
+[112]    0.0    0.00    0.00    2000         __odrpack_core_MOD_derstep [112]
+-----------------------------------------------
+                0.00    0.00    1000/2000        __odrpack_MOD_dodmn [5]
+                0.00    0.00    1000/2000        __odrpack_MOD_doddrv [3]
+[113]    0.0    0.00    0.00    2000         __odrpack_core_MOD_dflags [113]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_MOD_doddrv [3]
+[114]    0.0    0.00    0.00    1000         __odrpack_core_MOD_detaf [114]
+                0.00    0.00    4999/145770      __example5_model_MOD_fcn [108]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_MOD_doddrv [3]
+[115]    0.0    0.00    0.00    1000         __odrpack_core_MOD_dfctrw [115]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_MOD_doddrv [3]
+[116]    0.0    0.00    0.00    1000         __odrpack_core_MOD_diniwk [116]
+                0.00    0.00    1000/1000        __odrpack_core_MOD_dsclb [119]
+                0.00    0.00    1000/1000        __odrpack_core_MOD_dscld [120]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_MOD_doddrv [3]
+[117]    0.0    0.00    0.00    1000         __odrpack_core_MOD_diwinf [117]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_MOD_doddrv [3]
+[118]    0.0    0.00    0.00    1000         __odrpack_core_MOD_dodchk [118]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_core_MOD_diniwk [116]
+[119]    0.0    0.00    0.00    1000         __odrpack_core_MOD_dsclb [119]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_core_MOD_diniwk [116]
+[120]    0.0    0.00    0.00    1000         __odrpack_core_MOD_dscld [120]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_MOD_doddrv [3]
+[121]    0.0    0.00    0.00    1000         __odrpack_core_MOD_dsetn [121]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_MOD_doddrv [3]
+[122]    0.0    0.00    0.00    1000         __odrpack_core_MOD_dwinf [122]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012-2024 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+ [108] __example5_model_MOD_fcn [110] __odrpack_core_MOD_djacfd [30] dasum_
+  [10] __fentry__            [118] __odrpack_core_MOD_dodchk [28] daxpy_
+   [2] __odrpack_MOD_dodcnt    [6] __odrpack_core_MOD_dodlm [15] dcopy_
+   [3] __odrpack_MOD_doddrv    [7] __odrpack_core_MOD_dodstp [27] ddot_
+   [5] __odrpack_MOD_dodmn    [25] __odrpack_core_MOD_dodvcv [18] dnrm2_
+   [4] __odrpack_MOD_odr     [109] __odrpack_core_MOD_dpack [34] dpodi_
+ [111] __odrpack_core_MOD_dacces [22] __odrpack_core_MOD_dscale [17] dqrdc_
+ [112] __odrpack_core_MOD_derstep [119] __odrpack_core_MOD_dsclb [13] dqrsl_
+  [11] __odrpack_core_MOD_desubi [120] __odrpack_core_MOD_dscld [31] drot_
+ [114] __odrpack_core_MOD_detaf [121] __odrpack_core_MOD_dsetn [19] drotg_
+  [24] __odrpack_core_MOD_devjac [9] __odrpack_core_MOD_dsolve [29] dscal_
+  [16] __odrpack_core_MOD_dfctr [23] __odrpack_core_MOD_dunpac [32] dswap_
+ [115] __odrpack_core_MOD_dfctrw [14] __odrpack_core_MOD_dvevtr [33] dtrco_
+ [113] __odrpack_core_MOD_dflags [12] __odrpack_core_MOD_dwght [20] dtrsl_
+ [116] __odrpack_core_MOD_diniwk [122] __odrpack_core_MOD_dwinf [21] exp
+ [117] __odrpack_core_MOD_diwinf [8] _mcount_private
