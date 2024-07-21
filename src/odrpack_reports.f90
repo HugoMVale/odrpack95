@@ -2811,7 +2811,6 @@ contains
       !           to be checked.
       !  NTOL:    The number of digits of agreement required between the finite difference and
       !           the user supplied derivatives.
-      !  UNIT:    The logical unit number for error messages.
       !  XPLUSD:  The values X + DELTA.
 
       ! Print heading
