@@ -1796,7 +1796,7 @@ contains
    end subroutine dodpcr
 
    impure subroutine dodpe1 &
-      (lunit, info, d1, d2, d3, d4, d5, &
+      (lunerr, info, d1, d2, d3, d4, d5, &
       n, m, nq, &
       ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
       lwkmn, liwkmn)
@@ -1805,7 +1805,7 @@ contains
    ! Date Written   860529   (YYMMDD)
    ! Revision Date  920619   (YYMMDD)
 
-      integer, intent(in) :: lunit
+      integer, intent(in) :: lunerr
          !! The logical unit number used for error messages.
       integer, intent(inout) :: info
          !! The variable designating why the computations were stopped.
@@ -1857,7 +1857,7 @@ contains
       !  LWKMN:   The minimum acceptable length of array WORK.
       !  LD2WD:   The second dimension of array WD.
       !  LD2WE:   The second dimension of array WE.
-      !  LUNIT:   The logical unit number used for error messages.
+      !  LUNERR:  The logical unit number used for error messages.
       !  M:       The number of columns of data in the explanatory variable.
       !  N:       The number of observations.
       !  NQ:      The number of responses per observation.
@@ -1866,16 +1866,16 @@ contains
 
       if (d1 == 1) then
          if (d2 /= 0) then
-            write (lunit, 1100)
+            write (lunerr, 1100)
          end if
          if (d3 /= 0) then
-            write (lunit, 1200)
+            write (lunerr, 1200)
          end if
          if (d4 /= 0) then
-            write (lunit, 1300)
+            write (lunerr, 1300)
          end if
          if (d5 /= 0) then
-            write (lunit, 1400)
+            write (lunerr, 1400)
          end if
 
          ! Print appropriate messages for errors in dimension specification parameters
@@ -1884,43 +1884,43 @@ contains
 
          if (d2 /= 0) then
             if (d2 == 1 .or. d2 == 3) then
-               write (lunit, 2110)
+               write (lunerr, 2110)
             end if
             if (d2 == 2 .or. d2 == 3) then
-               write (lunit, 2120)
+               write (lunerr, 2120)
             end if
          end if
 
          if (d3 /= 0) then
             if (d3 == 1 .or. d3 == 3 .or. d3 == 5 .or. d3 == 7) &
                then
-               write (lunit, 2210)
+               write (lunerr, 2210)
             end if
             if (d3 == 2 .or. d3 == 3 .or. d3 == 6 .or. d3 == 7) &
                then
-               write (lunit, 2220)
+               write (lunerr, 2220)
             end if
             if (d3 == 4 .or. d3 == 5 .or. d3 == 6 .or. d3 == 7) &
                then
-               write (lunit, 2230)
+               write (lunerr, 2230)
             end if
          end if
 
          if (d4 /= 0) then
             if (d4 == 1 .or. d4 == 3) then
-               write (lunit, 2310)
+               write (lunerr, 2310)
             end if
             if (d4 == 2 .or. d4 == 3) then
-               write (lunit, 2320)
+               write (lunerr, 2320)
             end if
          end if
 
          if (d5 /= 0) then
             if (d5 == 1 .or. d5 == 3) then
-               write (lunit, 2410) lwkmn
+               write (lunerr, 2410) lwkmn
             end if
             if (d5 == 2 .or. d5 == 3) then
-               write (lunit, 2420) liwkmn
+               write (lunerr, 2420) liwkmn
             end if
          end if
 
@@ -1931,13 +1931,13 @@ contains
          if (d3 /= 0) then
             if (d3 == 2 .or. d3 == 3) then
                if (ldscld >= n) then
-                  write (lunit, 3110)
+                  write (lunerr, 3110)
                else
-                  write (lunit, 3120)
+                  write (lunerr, 3120)
                end if
             end if
             if (d3 == 1 .or. d3 == 3) then
-               write (lunit, 3130)
+               write (lunerr, 3130)
             end if
          end if
 
@@ -1946,13 +1946,13 @@ contains
          if (d2 /= 0) then
             if (d2 == 2 .or. d2 == 3) then
                if (ldstpd >= n) then
-                  write (lunit, 3210)
+                  write (lunerr, 3210)
                else
-                  write (lunit, 3220)
+                  write (lunerr, 3220)
                end if
             end if
             if (d2 == 1 .or. d2 == 3) then
-               write (lunit, 3230)
+               write (lunerr, 3230)
             end if
          end if
 
@@ -1962,20 +1962,20 @@ contains
             if (d4 == 1) then
                if (ldwe >= n) then
                   if (ld2we >= nq) then
-                     write (lunit, 3310)
+                     write (lunerr, 3310)
                   else
-                     write (lunit, 3320)
+                     write (lunerr, 3320)
                   end if
                else
                   if (ld2we >= nq) then
-                     write (lunit, 3410)
+                     write (lunerr, 3410)
                   else
-                     write (lunit, 3420)
+                     write (lunerr, 3420)
                   end if
                end if
             end if
             if (d4 == 2) then
-               write (lunit, 3500)
+               write (lunerr, 3500)
             end if
          end if
 
@@ -1984,15 +1984,15 @@ contains
          if (d5 /= 0) then
             if (ldwd >= n) then
                if (ld2wd >= m) then
-                  write (lunit, 4310)
+                  write (lunerr, 4310)
                else
-                  write (lunit, 4320)
+                  write (lunerr, 4320)
                end if
             else
                if (ld2wd >= m) then
-                  write (lunit, 4410)
+                  write (lunerr, 4410)
                else
-                  write (lunit, 4420)
+                  write (lunerr, 4420)
                end if
             end if
          end if
@@ -2002,15 +2002,15 @@ contains
          ! Print the appropriate messages for errors in JOB
 
          if (d2 /= 0) then
-            write (lunit, 5000)
+            write (lunerr, 5000)
          end if
 
          if (d3 /= 0) then
-            write (lunit, 5100)
+            write (lunerr, 5100)
          end if
 
          if (d4 /= 0) then
-            write (lunit, 5200)
+            write (lunerr, 5200)
          end if
 
       elseif (d1 == 8) then
@@ -2018,15 +2018,15 @@ contains
          ! Print the appropriate messages for errors in array allocation
 
          if (d2 /= 0) then
-            write (lunit, 7200)
+            write (lunerr, 7200)
          end if
 
          if (d3 /= 0) then
-            write (lunit, 7300)
+            write (lunerr, 7300)
          end if
 
          if (d4 /= 0) then
-            write (lunit, 7400)
+            write (lunerr, 7400)
          end if
 
       elseif (d1 == 9) then
@@ -2034,19 +2034,19 @@ contains
          ! Print the appropriate messages for errors in bounds
 
          if (d2 /= 0) then
-            write (lunit, 6000)
+            write (lunerr, 6000)
          end if
 
          if (d3 /= 0) then
-            write (lunit, 6100)
+            write (lunerr, 6100)
          end if
 
          if (d4 == 1) then
-            write (lunit, 6210)
+            write (lunerr, 6210)
          end if
 
          if (d4 == 2) then
-            write (lunit, 6220)
+            write (lunerr, 6220)
          end if
 
       end if
@@ -2057,67 +2057,67 @@ contains
          info = info - 100000
          if (info >= 32768) then
             info = info - 32768
-            write (lunit, 8015)
+            write (lunerr, 8015)
          end if
          if (info >= 16384) then
             info = info - 16384
-            write (lunit, 8014)
+            write (lunerr, 8014)
          end if
          if (info >= 8192) then
             info = info - 8192
-            write (lunit, 8013)
+            write (lunerr, 8013)
          end if
          if (info >= 4096) then
             info = info - 4096
-            write (lunit, 8012)
+            write (lunerr, 8012)
          end if
          if (info >= 2048) then
             info = info - 2048
-            write (lunit, 8011)
+            write (lunerr, 8011)
          end if
          if (info >= 1024) then
             info = info - 1024
-            write (lunit, 8010)
+            write (lunerr, 8010)
          end if
          if (info >= 512) then
             info = info - 512
-            write (lunit, 8009)
+            write (lunerr, 8009)
          end if
          if (info >= 256) then
             info = info - 256
-            write (lunit, 8008)
+            write (lunerr, 8008)
          end if
          if (info >= 128) then
             info = info - 128
-            write (lunit, 8007)
+            write (lunerr, 8007)
          end if
          if (info >= 64) then
             info = info - 64
-            write (lunit, 8006)
+            write (lunerr, 8006)
          end if
          if (info >= 32) then
             info = info - 32
-            write (lunit, 8005)
+            write (lunerr, 8005)
          end if
          if (info >= 16) then
             info = info - 16
-            write (lunit, 8004)
+            write (lunerr, 8004)
          end if
          if (info >= 8) then
             info = info - 8
-            write (lunit, 8003)
+            write (lunerr, 8003)
          end if
          if (info >= 4) then
             info = info - 4
-            write (lunit, 8002)
+            write (lunerr, 8002)
          end if
          if (info >= 2) then
             info = info - 2
-            write (lunit, 8001)
+            write (lunerr, 8001)
          end if
          if (info >= 1) then
             info = info - 1
-            write (lunit, 8000)
+            write (lunerr, 8000)
          end if
       end if
 
@@ -2331,7 +2331,7 @@ contains
    end subroutine dodpe1
 
    impure subroutine dodpe2 &
-      (lunit, &
+      (lunerr, &
       n, m, np, nq, &
       fjacb, fjacd, &
       diff, msgb1, msgb, isodr, msgd1, msgd, &
@@ -2341,7 +2341,7 @@ contains
    ! Date Written   860529   (YYMMDD)
    ! Revision Date  920619   (YYMMDD)
 
-      integer, intent(in) :: lunit
+      integer, intent(in) :: lunerr
          !! The logical unit number used for error messages.
       integer, intent(in) :: n
          !! The number of observations.
@@ -2401,7 +2401,7 @@ contains
       !  J:       An index variable.
       !  K:       An index variable.
       !  L:       An index variable.
-      !  LUNIT:   The logical unit number used for error messages.
+      !  LUNERR:  The logical unit number used for error messages.
       !  M:       The number of columns of data in the explanatory variable.
       !  MSGB:    The error checking results for the Jacobian wrt BETA.
       !  MSGB1:   The error checking results for the Jacobian wrt BETA.
@@ -2449,12 +2449,12 @@ contains
       else
          typ = 'OLS'
       end if
-      write (lunit, 1000) typ
+      write (lunerr, 1000) typ
 
       do l = 1, nq
 
-         write (lunit, 2100) l, nrow
-         write (lunit, 2200)
+         write (lunerr, 2100) l, nrow
+         write (lunerr, 2200)
 
          do i = 1, np
             k = msgb(l, i)
@@ -2464,15 +2464,15 @@ contains
                flag = ' '
             end if
             if (k <= -1) then
-               write (lunit, 3100) i
+               write (lunerr, 3100) i
             elseif (k == 0) then
-               write (lunit, 3200) i, fjacb(nrow, i, l), diff(l, i), flag
+               write (lunerr, 3200) i, fjacb(nrow, i, l), diff(l, i), flag
             elseif (k == 8) then
-               write (lunit, 3400) i, fjacb(nrow, i, l), flag, k
+               write (lunerr, 3400) i, fjacb(nrow, i, l), flag, k
             elseif (k == 9) then
-               write (lunit, 3500) i, flag, k
+               write (lunerr, 3500) i, flag, k
             elseif (k >= 1) then
-               write (lunit, 3300) i, fjacb(nrow, i, l), diff(l, i), flag, &
+               write (lunerr, 3300) i, fjacb(nrow, i, l), diff(l, i), flag, &
                   k
             end if
          end do
@@ -2485,11 +2485,11 @@ contains
                   flag = ' '
                end if
                if (k <= -1) then
-                  write (lunit, 4100) nrow, i
+                  write (lunerr, 4100) nrow, i
                elseif (k == 0) then
-                  write (lunit, 4200) nrow, i, fjacd(nrow, i, l), diff(l, np + i), flag
+                  write (lunerr, 4200) nrow, i, fjacd(nrow, i, l), diff(l, np + i), flag
                elseif (k >= 1) then
-                  write (lunit, 4300) nrow, i, fjacd(nrow, i, l), diff(l, np + i), flag, k
+                  write (lunerr, 4300) nrow, i, fjacd(nrow, i, l), diff(l, np + i), flag, k
                end if
             end do
          end if
@@ -2499,31 +2499,31 @@ contains
 
       if (ftnote(0)) then
 
-         write (lunit, 5000)
-         if (ftnote(1)) write (lunit, 5100)
-         if (ftnote(2)) write (lunit, 5200)
-         if (ftnote(3)) write (lunit, 5300)
-         if (ftnote(4)) write (lunit, 5400)
-         if (ftnote(5)) write (lunit, 5500)
-         if (ftnote(6)) write (lunit, 5600)
-         if (ftnote(7)) write (lunit, 5700)
-         if (ftnote(8)) write (lunit, 5800)
-         if (ftnote(9)) write (lunit, 5900)
+         write (lunerr, 5000)
+         if (ftnote(1)) write (lunerr, 5100)
+         if (ftnote(2)) write (lunerr, 5200)
+         if (ftnote(3)) write (lunerr, 5300)
+         if (ftnote(4)) write (lunerr, 5400)
+         if (ftnote(5)) write (lunerr, 5500)
+         if (ftnote(6)) write (lunerr, 5600)
+         if (ftnote(7)) write (lunerr, 5700)
+         if (ftnote(8)) write (lunerr, 5800)
+         if (ftnote(9)) write (lunerr, 5900)
       end if
 
       if (neta < 0) then
-         write (lunit, 6000) - neta
+         write (lunerr, 6000) - neta
       else
-         write (lunit, 6100) neta
+         write (lunerr, 6100) neta
       end if
-      write (lunit, 7000) ntol
+      write (lunerr, 7000) ntol
 
       ! Print out row of explanatory variable which was checked.
 
-      write (lunit, 8100) nrow
+      write (lunerr, 8100) nrow
 
       do j = 1, m
-         write (lunit, 8110) nrow, j, xplusd(nrow, j)
+         write (lunerr, 8110) nrow, j, xplusd(nrow, j)
       end do
 
       ! Format statements
@@ -2627,14 +2627,14 @@ contains
 
    end subroutine dodpe2
 
-   impure subroutine dodpe3(lunit, d2, d3)
+   impure subroutine dodpe3(lunerr, d2, d3)
    !! Print error reports indicating that computations were stopped in user-supplied 
    !! subroutine `fcn`.
    ! Routines Called  (NONE)
    ! Date Written   860529   (YYMMDD)
    ! Revision Date  920619   (YYMMDD)
 
-      integer :: lunit
+      integer :: lunerr
          !! The logical unit number used for error messages.
       integer :: d2
          !! The 2nd digit (from the left) of `info`.
@@ -2644,19 +2644,19 @@ contains
       ! Variable Definitions (alphabetically)
       !  D2:      The 2nd digit (from the left) of INFO.
       !  D3:      The 3rd digit (from the left) of INFO.
-      !  LUNIT:   The logical unit number used for error messages.
+      !  LUNERR:  The logical unit number used for error messages.
 
       ! Print appropriate messages to indicate where computations were stopped
 
       if (d2 == 2) then
-         write (lunit, 1100)
+         write (lunerr, 1100)
       elseif (d2 == 3) then
-         write (lunit, 1200)
+         write (lunerr, 1200)
       elseif (d2 == 4) then
-         write (lunit, 1300)
+         write (lunerr, 1300)
       end if
       if (d3 == 2) then
-         write (lunit, 1400)
+         write (lunerr, 1400)
       end if
 
       ! Format statements
@@ -2773,7 +2773,7 @@ contains
          !! user-supplied derivatives.
 
       ! Local scalars
-      integer :: d1, d2, d3, d4, d5, unit
+      integer :: d1, d2, d3, d4, d5
       logical :: head
 
       ! Variable Definitions (alphabetically)
@@ -2814,18 +2814,9 @@ contains
       !  UNIT:    The logical unit number for error messages.
       !  XPLUSD:  The values X + DELTA.
 
-      ! Set logical unit number for error report
-      if (lunerr == 0) then
-         return
-      elseif (lunerr < 0) then
-         unit = 6
-      else
-         unit = lunerr
-      end if
-
       ! Print heading
       head = .true.
-      call dodphd(head, unit)
+      call dodphd(head, lunerr)
 
       ! Extract individual digits from variable INFO
       d1 = mod(info, 100000)/10000
@@ -2842,7 +2833,7 @@ contains
          !         dimension specification parameters
          !         number of good digits in X
          !         weights
-         call dodpe1(unit, info, d1, d2, d3, d4, d5, &
+         call dodpe1(lunerr, info, d1, d2, d3, d4, d5, &
                      n, m, nq, &
                      ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
                      lwkmn, liwkmn)
@@ -2850,7 +2841,7 @@ contains
       elseif ((d1 == 4) .or. (msgb(1) >= 0)) then
 
          ! Print appropriate messages for derivative checking
-         call dodpe2(unit, &
+         call dodpe2(lunerr, &
                      n, m, np, nq, &
                      fjacb, fjacd, &
                      diff, msgb(1), msgb(2), isodr, msgd(1), msgd(2), &
@@ -2859,7 +2850,7 @@ contains
       elseif (d1 == 5) then
 
          ! Print appropriate error message for user invoked stop from FCN
-         call dodpe3(unit, d2, d3)
+         call dodpe3(lunerr, d2, d3)
 
       end if
 
@@ -2867,7 +2858,7 @@ contains
       if ((d1 >= 1 .and. d1 <= 3) .or. &
          (d1 == 4 .and. (d2 == 2 .or. d3 == 2)) .or. &
          (d1 == 5)) then
-         write (unit, 1100)
+         write (lunerr, 1100)
       end if
 
       ! Format statements
