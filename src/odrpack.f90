@@ -658,8 +658,6 @@ contains
          deallocate (lwork)
       end if
 
-      deallocate (tempret)
-
    end subroutine odr
 
    impure subroutine dodcnt &
