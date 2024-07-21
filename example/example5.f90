@@ -45,7 +45,7 @@ program example5
    use example5_model, only: fcn
    implicit none
 
-   real(kind=wp), allocatable :: beta(:), l(:), u(:), x(:, :), y(:, :)
+   real(kind=wp), allocatable :: beta(:), lower(:), upper(:), x(:, :), y(:, :)
    real(kind=wp), pointer :: work(:)
    integer, pointer :: iwork(:)
    integer :: np, n, m, nq, job
@@ -58,17 +58,18 @@ program example5
 
    nullify (iwork, work)
 
-   allocate (beta(np), l(np), u(np), x(n, m), y(n, nq))
+   allocate (beta(np), lower(np), upper(np), x(n, m), y(n, nq))
 
    beta(1:2) = [2.0_wp, 0.5_wp]
-   l(1:2) = [0.0_wp, 0.0_wp]
-   u(1:2) = [10.0_wp, 0.9_wp]
+   lower(1:2) = [0.0_wp, 0.0_wp]
+   upper(1:2) = [10.0_wp, 0.9_wp]
    x(1:4, 1) = [0.982_wp, 1.998_wp, 4.978_wp, 6.01_wp]
    y(1:4, 1) = [2.7_wp, 7.4_wp, 148.0_wp, 403.0_wp]
 
    job = 20
 
-   call odr(fcn, n, m, np, nq, beta, y, x, job=job, iwork=iwork, work=work, lower=l, upper=u)
+   call odr(fcn, n, m, np, nq, beta, y, x, job=job, iwork=iwork, work=work, &
+            lower=lower, upper=upper)
 
    ! print *
    ! print *, "iwork"
