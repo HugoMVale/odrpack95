@@ -2322,18 +2322,10 @@ contains
       end if
 
       ! Set logical unit number for error messages
-      if (lunerr < 0) then
-         iwork(luneri) = 6
-      else
-         iwork(luneri) = lunerr
-      end if
+      iwork(luneri) = lunerr
 
       ! Set logical unit number for computation reports
-      if (lunrpt < 0) then
-         iwork(lunrpi) = 6
-      else
-         iwork(lunrpi) = lunrpt
-      end if
+      iwork(lunrpi) = lunrpt
 
       ! Compute scaling for BETA's and DELTA's
       if (sclb(1) <= zero) then
