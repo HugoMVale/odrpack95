@@ -4490,7 +4490,8 @@ contains
        tfjacb, omega, u, qraux, kpvt, &
        s, t, phi, irank, rcond, forvcv, &
        wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, tempret, istopc)
-   !! Compute locally constrained steps `s` and `t`, and `phi(alpha)`.
+   !! Compute locally constrained steps `s` and `t`, and `phi(alpha)`. 
+      ! @note: This is one of the most time-consuming subroutines in ODRPACK (~25% of total).
       ! Routines Called  IDAMAX, DCHEX, DESUBI, DFCTR, DNRM2, DQRDC, DQRSL, DROT,
       !                  DROTG, DSOLVE, DTRCO, DTRSL, DVEVTR, DWGHT
       ! Date Written   860529   (YYMMDD)
@@ -4616,7 +4617,7 @@ contains
       !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by
       !           OLS (ISODR=FALSE).
       !  ISTOPC:  The variable designating whether the computations were stoped due to a numerical
-      !                error within subroutine DODSTP.
+      !           error within subroutine DODSTP.
       !  J:       An indexing variable.
       !  K:       An indexing variable.
       !  K1:      An indexing variable.
@@ -6000,6 +6001,7 @@ contains
    !!
    !! References:
    !! * Dongarra J.J., Bunch J.R., Moler C.B., Stewart G.W., *LINPACK Users Guide*, SIAM, 1979.
+      ! @note: This is one of the most time-consuming subroutines in ODRPACK (~25% of total).
       ! Routines Called  DAXPY,DDOT
       ! Date Written   920220   (YYMMDD)
       ! Revision Date  920619   (YYMMDD)
