@@ -71,6 +71,7 @@ contains
 
       use odrpack_kinds, only: negone, zero
       use odrpack_core, only: fcn_t
+      use odrpack_reports, only: dodphd, dodpe1
 
       procedure(fcn_t) :: fcn
          !! User-supplied subroutine for evaluating the model.
@@ -153,10 +154,6 @@ contains
       real(wp), pointer, save :: lwork(:)
       integer, pointer, save :: liwork(:)
       logical :: head
-
-      ! External ODRPACK procedures
-      ! @todo: place in module
-      external :: dodphd, dodpe1
 
       ! Set LINFO to zero indicating no errors have been found thus far
       linfo = 0
@@ -973,8 +970,9 @@ contains
       use odrpack_kinds, only: zero, one, ten, p5 => half
       use odrpack_core, only: fcn_t, detaf, dfctrw, dflags, diniwk, diwinf, djck, dodchk, &
                               dpack, dsetn, dunpac, dwght, dwinf, derstep, mbfb
+      use odrpack_reports, only: dodper
 
-      logical, intent(in) :: head
+      logical, intent(inout) :: head
          !! The variable designating whether the heading is to be printed (`head = .true.`)
          !! or not (`head = .false.`).
       logical, intent(inout) :: fstitr
@@ -1094,10 +1092,6 @@ contains
       ! External BLAS/LAPACK procedures
       real(wp), external :: ddot, dnrm2
       external :: dcopy
-
-      ! External ODRPACK procedures
-      ! @todo: place in module
-      external :: dodper
 
       ! Variable Definitions (alphabetically)
       !  ACTRSI:   The location in array work of variable ACTRS.
@@ -1646,8 +1640,9 @@ contains
       use odrpack_kinds, only: zero, one
       use odrpack_core, only: fcn_t, dacces, devjac, dflags, dunpac, dwght, dpack, dodvcv, &
                               dodlm
+      use odrpack_reports, only: dodpcr
 
-      logical, intent(in) :: head
+      logical, intent(inout) :: head
          !! The variable designating whether the heading is to be printed (`head = .true.`)
          !! or not (`head = .false.`).
       logical, intent(inout) :: fstitr
@@ -1795,10 +1790,6 @@ contains
       ! External BLAS/LAPACK procedures
       real(wp), external :: ddot, dnrm2
       external :: dcopy
-
-      ! External ODRPACK procedures
-      ! @todo: place in module
-      external :: dodpcr
 
       ! Variable Definitions (alphabetically)
       !  ACCESS:  The variable designating whether information is to be accessed from the work
