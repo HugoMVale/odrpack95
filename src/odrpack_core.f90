@@ -1,5 +1,5 @@
 module odrpack_core
-!! Core routines, except drivers and BLAS.
+!! Core mathematical routines, except drivers, and BLAS/LINPACK.
 
    use odrpack_kinds, only: wp
    implicit none
