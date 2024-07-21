@@ -1,6 +1,7 @@
 module odrpack
 
    use odrpack_kinds, only: wp
+   use, intrinsic :: iso_fortran_env, only: error_unit, output_unit
    implicit none
 
 contains
@@ -172,8 +173,8 @@ contains
       ldscld = 1
       ldstpd = 1
       liprint = -1
-      llunerr = -1
-      llunrpt = -1
+      llunerr = 0
+      llunrpt = 0
       lmaxit = -1
       lndigit = -1
       lpartol = negone
@@ -190,15 +191,15 @@ contains
       if (present(lunrpt)) then
          llunrpt = lunrpt
       end if
-      if (llunrpt < 0) then
-         llunrpt = 6
+      if (llunrpt == 0) then
+         llunrpt = output_unit
       end if
 
       if (present(lunerr)) then
          llunerr = lunerr
       end if
-      if (llunerr < 0) then
-         llunerr = 6
+      if (llunerr == 0) then
+         llunerr = error_unit
       end if
 
       ! Ensure the problem size is valid
@@ -224,7 +225,7 @@ contains
 
       if (linfo5 /= 0) then
          linfo = 10000*linfo5 + 1000*linfo4 + 100*linfo3 + 10*linfo2 + linfo1
-         if (llunerr > 0 .and. liprint /= 0) then
+         if (llunerr /= 0 .and. liprint /= 0) then
             call dodphd(head, llunrpt)
             call dodpe1( &
                llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1, &
@@ -275,7 +276,7 @@ contains
 
       if (linfo5 /= 0) then
          linfo = 10000*linfo5 + 1000*linfo4 + 100*linfo3 + 10*linfo2 + linfo1
-         if (llunerr > 0 .and. liprint /= 0) then
+         if (llunerr /= 0 .and. liprint /= 0) then
             call dodphd(head, llunrpt)
             call dodpe1( &
                llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1, &
@@ -319,7 +320,7 @@ contains
       if (linfo5 /= 0) then
          linfo = 10000*mod(linfo5, 10) + 1000*mod(linfo4, 10) + &
                  100*mod(linfo3, 10) + 10*mod(linfo2, 10) + mod(linfo1, 10)
-         if (llunerr > 0 .and. liprint /= 0) then
+         if (llunerr /= 0 .and. liprint /= 0) then
             call dodphd(head, llunrpt)
             call dodpe1( &
                llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1, &
@@ -574,7 +575,7 @@ contains
       if (linfo1 /= 0) then
          linfo = 100000 + linfo1
          linfo1 = 0
-         if (llunerr > 0 .and. liprint /= 0) then
+         if (llunerr /= 0 .and. liprint /= 0) then
             call dodphd(head, llunrpt)
             call dodpe1( &
                llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1, &
