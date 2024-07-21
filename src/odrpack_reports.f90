@@ -14,7 +14,7 @@ contains
       x, ldx, ifixx, ldifx, delta, wd, ldwd, ld2wd, tt, ldtt, stpd, ldstpd &
       , y, ldy, we, ldwe, ld2we, pnlty, beta, ifixb, ssf, stpb, lower, &
       upper, job, neta, taufac, sstol, partol, maxit, wss, wssdel, wsseps)
-   !! Generates initial summary report.
+   !! Generate initial summary report.
    ! Routines Called  DHSTEP
    ! Date Written   860529   (YYMMDD)
    ! Revision Date  920619   (YYMMDD)
@@ -126,7 +126,7 @@ contains
          !! The variable controlling problem initialization and computational method.
       integer, intent(in) :: neta
          !! The number of accurate digits in the function results. A negative value indicates
-         !! that `neta` was estimated by ODRPACK95. A positive value indicates the value was
+         !! that `neta` was estimated by 'odrpack'. A positive value indicates the value was
          !! supplied by the user.
       real(wp), intent(in) :: taufac
          !! The factor used to compute the initial trust region diameter.
@@ -618,7 +618,7 @@ contains
    1152 format &
          ('                       E=', I1, ' ==> method is explicit OLS.')
    1200 format &
-         ('       NDIGIT = ', I5, '          (estimated by ODRPACK95)')
+         ('       NDIGIT = ', I5, '          (estimated by ODRPACK)')
    1210 format &
          ('       NDIGIT = ', I5, '          (supplied by user)')
    1300 format &
@@ -721,7 +721,7 @@ contains
       (ipr, lunrpt, fstitr, implct, prtpen, &
       pnlty, &
       niter, nfev, wss, actred, prered, alpha, tau, pnorm, np, beta)
-   !! Generates iteration reports.
+   !! Generate iteration reports.
    ! Routines Called  (NONE)
    ! Date Written   860529   (YYMMDD)
    ! Revision Date  920304   (YYMMDD)
@@ -908,7 +908,7 @@ contains
       wss, wssdel, wsseps, pnlty, rvar, idf, &
       beta, sdbeta, ifixb2, f, delta, &
       lower, upper)
-   !! Generates final summary report.
+   !! Generate final summary report.
    ! Routines Called  DPPT
    ! Date Written   860529   (YYMMDD)
    ! REvision Date  920619   (YYMMDD)
@@ -1496,7 +1496,7 @@ contains
       wss, rvar, idf, sdbeta, &
       niter, nfev, njev, actred, prered, &
       tau, pnorm, alpha, f, rcond, irank, info, istop)
-   !! Generates computation reports.
+   !! Generate computation reports.
    ! Routines Called  DFLAGS, DODPC1, DODPC2, DODPC3, DODPHD
    ! Date Written   860529   (YYMMDD)
    ! Revision Date  920619   (YYMMDD)
@@ -2608,7 +2608,7 @@ contains
    6000 format &
          (/'     Number of reliable digits in function results       ', &
          I5/ &
-         '        (estimated by ODRPACK95)')
+         '        (estimated by ODRPACK)')
    6100 format &
          (/'     Number of reliable digits in function results       ', &
          I5/ &
@@ -2834,7 +2834,7 @@ contains
       d4 = mod(info, 100)/10
       d5 = mod(info, 10)
 
-      ! Print appropriate error messages for ODRPACK95 invoked stop
+      ! Print appropriate error messages for ODRPACK invoked stop
       if ((d1 >= 1 .and. d1 <= 3) .or. (d1 == 7 .or. d1 == 9)) then
 
          ! Print appropriate messages for errors in
