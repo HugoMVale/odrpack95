@@ -354,11 +354,11 @@ contains
          linfo1 = linfo1 + 1
       end if
 
-      if (any(size(y) < (/n, nq/))) then
+      if (any(size(y) < [n, nq])) then
          linfo1 = linfo1 + 2
       end if
 
-      if (any(size(x) < (/n, m/))) then
+      if (any(size(x) < [n, m])) then
          linfo1 = linfo1 + 4
       end if
 
@@ -377,7 +377,7 @@ contains
 
       if (present(ifixx)) then
          ldifx = size(ifixx, 1)
-         if (any(size(ifixx) <= (/0, 0/))) then
+         if (any(size(ifixx) <= [0, 0])) then
             linfo1 = linfo1 + 128
          end if
          if (.not. (ifixx(1, 1) < 0 .or. ldifx == 1 .or. ldifx >= n) &
@@ -431,7 +431,7 @@ contains
 
       if (present(scld)) then
          ldscld = size(scld, 1)
-         if (any(size(scld) <= (/0, 0/))) then
+         if (any(size(scld) <= [0, 0])) then
             linfo1 = linfo1 + 2048
          end if
          if (.not. (scld(1, 1) <= zero .or. ldscld == 1 .or. ldscld >= n) &
@@ -465,7 +465,7 @@ contains
 
       if (present(stpd)) then
          ldstpd = size(stpd, 1)
-         if (any(size(stpd) <= (/0, 0/))) then
+         if (any(size(stpd) <= [0, 0])) then
             linfo1 = linfo1 + 512
          end if
          if (.not. (stpd(1, 1) <= zero .or. ldstpd == 1 .or. ldstpd >= n) &
@@ -489,7 +489,7 @@ contains
       if (present(we)) then
          ldwe = size(we, 1)
          ld2we = size(we, 2)
-         if (any(size(we) <= (/0, 0, 0/))) then
+         if (any(size(we) <= [0, 0, 0])) then
             linfo1 = linfo1 + 16
          end if
          if (.not. (we(1, 1, 1) < zero .or. &
@@ -513,7 +513,7 @@ contains
       if (present(wd)) then
          ldwd = size(wd, 1)
          ld2wd = size(wd, 2)
-         if (any(size(wd) <= (/0, 0, 0/))) then
+         if (any(size(wd) <= [0, 0, 0])) then
             linfo1 = linfo1 + 32
          end if
          if (.not. (wd(1, 1, 1) < zero .or. &
@@ -552,10 +552,10 @@ contains
 
       if (present(delta)) then
          !if (allocated(delta)) then
-         if (any(shape(delta) < (/n, m/))) then
+         if (any(shape(delta) < [n, m])) then
             linfo1 = linfo1 + 8
          end if
-         lwork(1:n*m) = reshape(delta(1:n, 1:m), (/n*m/))
+         lwork(1:n*m) = reshape(delta(1:n, 1:m), [n*m])
          !end if
       end if
 
@@ -631,7 +631,7 @@ contains
 
       if (present(delta)) then
          !if (allocated(delta)) then
-         delta(1:n, 1:m) = reshape(lwork(1:n*m), (/n, m/))
+         delta(1:n, 1:m) = reshape(lwork(1:n*m), [n, m])
          !end if
       end if
 
@@ -962,7 +962,7 @@ contains
        stpb, stpd, ldstpd, sclb, scld, ldscld, &
        work, lwork, tempret, iwork, liwork, &
        maxit1, tstimp, info, lower, upper)
-   !! Performs error checking and initialization, and begins procedure for performing orthogonal
+   !! Perform error checking and initialization, and begin procedure for performing orthogonal
    !! distance regression (ODR) or ordinary linear or nonlinear least squares (OLS).
       ! Routines Called  FCN, DCOPY, DDOT, DETAF, DFCTRW, DFLAGS,
       !                  DINIWK, DIWINF, DJCK, DNRM2, DODCHK, DODMN,
