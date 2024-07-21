@@ -154,7 +154,7 @@ contains
       integer :: i, iwrk, j, k
       logical :: forvcv
 
-      ! External BLAS/LAPACK procedures
+      ! External BLAS/LINPACK procedures
       real(wp), external :: ddot, dnrm2
 
       ! Variable Definitions (alphabetically)
@@ -1242,7 +1242,7 @@ contains
       integer :: ideval, j, k, k1, l
       logical :: ferror
 
-      ! External BLAS/LAPACK procedures
+      ! External BLAS/LINPACK procedures
       real(wp), external :: ddot
 
       ! Variable Definitions (alphabetically)
@@ -1415,7 +1415,7 @@ contains
       real(wp) :: xi, s, t
       integer j, k
 
-      ! External BLAS/LAPACK procedures
+      ! External BLAS/LINPACK procedures
       real(wp), external :: ddot
 
       ! Variable Definitions (alphabetically)
@@ -2211,7 +2211,7 @@ contains
       integer :: i, j, istart
       logical :: anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
 
-      ! External BLAS/LAPACK procedures
+      ! External BLAS/LINPACK procedures
       external :: dcopy
 
       ! Variable Definitions (alphabetically)
@@ -4591,7 +4591,7 @@ contains
       ! Local arrays
       real(wp) :: dum(2)
 
-      ! External BLAS/LAPACK procedures
+      ! External BLAS/LINPACK procedures
       real(wp), external :: dnrm2
       integer, external :: idamax
       external :: dchex, dqrdc, dqrsl, drot, drotg, dtrco, dtrsl
@@ -5011,7 +5011,7 @@ contains
       integer :: i, iunfix, j, junfix, kp
       logical :: forvcv
 
-      ! External BLAS/LAPACK procedures
+      ! External BLAS/LINPACK procedures
       external :: dpodi
 
       ! Variable definitions (alphabetically)
@@ -6027,7 +6027,7 @@ contains
       real(wp) :: temp
       integer :: j1, j, jn
 
-      ! External BLAS/LAPACK procedures
+      ! External BLAS/LINPACK procedures
       real(wp), external :: ddot
       external :: daxpy
 
@@ -6138,7 +6138,7 @@ contains
       ! Local scalars
       integer :: i, n1
 
-      ! External BLAS/LAPACK procedures
+      ! External BLAS/LINPACK procedures
       external :: dcopy
 
       ! Variable Definitions (alphabetically)
