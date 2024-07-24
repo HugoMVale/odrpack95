@@ -549,12 +549,10 @@ contains
       end if
 
       if (present(delta)) then
-         !if (allocated(delta)) then
          if (any(shape(delta) < [n, m])) then
             linfo1 = linfo1 + 8
          end if
          lwork(1:n*m) = reshape(delta(1:n, 1:m), [n*m])
-         !end if
       end if
 
       if (present(lower)) then
@@ -628,9 +626,7 @@ contains
       end if
 
       if (present(delta)) then
-         !if (allocated(delta)) then
          delta(1:n, 1:m) = reshape(lwork(1:n*m), [n, m])
-         !end if
       end if
 
       if (present(info)) then
@@ -1007,7 +1003,7 @@ contains
       integer, intent(in) :: ld2we
          !! The second dimension of array `we`.
       real(wp), intent(in) :: wd(ldwd, ld2wd, m)
-         !! The `delta`        weights.
+         !! The `delta` weights.
       integer, intent(in) :: ldwd
          !! The leading dimension of array `wd`.
       integer, intent(in) :: ld2wd
@@ -1323,7 +1319,6 @@ contains
          if (implct) then
             call dcopy(n*nq, work(fni), 1, work(fi), 1)
          else
-            !call dxmy( n, nq, work( fni), n, y, ldy, work( fi), n)
             work(fi:fi + (n*nq - 1)) = &
                work(fni:fni + (n*nq - 1)) - reshape(y(1:n, :), shape=[n*nq])
          end if
@@ -1413,7 +1408,6 @@ contains
             if (implct) then
                call dcopy(n*nq, work(fni), 1, work(fi), 1)
             else
-               !call dxmy( n, nq, work( fni), n, y, ldy, work( fi), n)
                work(fi:fi + (n*nq - 1)) = &
                   work(fni:fni + (n*nq - 1)) - reshape(y(1:n, :), shape=[n*nq])
             end if
