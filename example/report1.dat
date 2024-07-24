@@ -1,5 +1,5 @@
  ********************************************************* 
- * ODRPACK95 version 1.00 of 12-27-2005 (REAL (KIND=wp)) * 
+ * ODRPACK95 version 1.00 of 12-27-2005 (REAL (wp)) * 
  ********************************************************* 
 
 
@@ -19,7 +19,7 @@
           DELTA( 3, 1)    -2.39E+00     2.96E-06    Verified
 
      Number of reliable digits in function results          16
-        (estimated by ODRPACK95)
+        (estimated by ODRPACK)
 
      Number of digits of agreement required between      
      user supplied and finite difference derivative for  
@@ -31,7 +31,7 @@
 
           X( 3, 1)   5.00000000E+00
  ********************************************************* 
- * ODRPACK95 version 1.00 of 12-27-2005 (REAL (KIND=wp)) * 
+ * ODRPACK95 version 1.00 of 12-27-2005 (REAL (wp)) * 
  ********************************************************* 
 
 
@@ -54,7 +54,7 @@
                                derivatives were checked.
                                results appear correct.
                        E=0 ==> method is explicit ODR.
-       NDIGIT =    16          (estimated by ODRPACK95)
+       NDIGIT =    16          (estimated by ODRPACK)
        TAUFAC =     1.00E+00
 
  --- Stopping Criteria:

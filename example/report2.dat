@@ -1,5 +1,5 @@
  ********************************************************* 
- * ODRPACK95 version 1.00 of 12-27-2005 (REAL (KIND=wp)) * 
+ * ODRPACK95 version 1.00 of 12-27-2005 (REAL (wp)) * 
  ********************************************************* 
 
 
@@ -20,7 +20,7 @@
                                derivatives re-evaluated at the solution.
                        D=0 ==> derivatives are estimated by forward differences.
                        E=1 ==> method is implicit ODR.
-       NDIGIT =    15          (estimated by ODRPACK95)
+       NDIGIT =    15          (estimated by ODRPACK)
        TAUFAC =     1.00E+00
 
  --- Stopping Criteria:
