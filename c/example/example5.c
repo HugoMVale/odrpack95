@@ -71,13 +71,16 @@ int main()
     double we[NQ][1][1] = {-1.0};
     double wd[M][1][1] = {-1.0};
     int iprint = 2002;
-    int lunerr = 8;
-    int lunrpt = 8;
     int info = 0;
+
     char *fn = "report5.txt";
+    int lunrpt = 0;
+    int lunerr = 0;
     int ierr = 0;
 
     open_file(&lunrpt, fn, &ierr);
+    // printf("Error code (ierr): %d\n", ierr);
+    lunerr = lunrpt;
 
     // odr_short_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x,
     //             (double *)we, &ldwe, &ld2we,
@@ -117,6 +120,13 @@ int main()
                &info);
 
     close_file(&lunrpt, &ierr);
+    // printf("Error code (ierr): %d\n", ierr);
+
+    workidx_t workidx;
+    _Bool isodr = true;
+
+    dwinf_c(&n, &m, &np, &nq, &ldwe, &ld2we, &isodr, &workidx);
+    printf("length of `work`: %d\n", workidx.lwkmn);
 
     // for (int i = 0; i < M; i++)
     // {
