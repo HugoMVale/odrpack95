@@ -2344,8 +2344,7 @@ contains
             else
                iwork(ldtti) = n
                do j = 1, m
-                  call dcopy(n, scld(1, j), 1, &
-                             work(tti + (j - 1)*iwork(ldtti)), 1)
+                  call dcopy(n, scld(1, j), 1, work(tti + (j - 1)*iwork(ldtti)), 1)
                end do
             end if
          end if
@@ -2363,7 +2362,6 @@ contains
                      if (ifixx(1, j) == 0) then
                         istart = deltai + (j - 1)*n
                         work(istart:istart + (n - 1)) = zero
-                        !call dzero( n,1, work( deltai+( j-1)* n), n)
                      end if
                   end do
                else
