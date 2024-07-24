@@ -1,7 +1,7 @@
 module odrpack_capi
    !! C bindings for 'odrpack'.
 
-   use, intrinsic :: iso_c_binding, only: c_bool, c_char, c_double, c_f_pointer, c_int, c_ptr
+   use, intrinsic :: iso_c_binding, only: c_bool, c_char, c_double, c_f_pointer, c_int, c_ptr 
    use odrpack_kinds, only: wp
    use odrpack, only: odr
    use odrpack_core, only: dwinf
@@ -339,6 +339,7 @@ contains
 
       character(kind=c_char), pointer :: filename_fptr(:)
       character(len=:), allocatable :: filename
+      character(len=256) :: errmsg
       integer :: length, i
 
       length = strlen(filename_cptr)
@@ -349,11 +350,15 @@ contains
       do i = 1, length
          filename(i:i) = filename_fptr(i)
       end do
-
+ 
       if (lun > 0) then
-         open (file=filename, unit=lun, status='replace', iostat=ierr)
+         open (file=filename, unit=lun, status='replace', iostat=ierr, iomsg=errmsg)
       else
-         open (file=filename, newunit=lun, status='replace', iostat=ierr)
+         open (file=filename, newunit=lun, status='replace', iostat=ierr, iomsg=errmsg)
+      end if
+
+      if (ierr /= 0) then
+         print *, "I/O error: ", trim(errmsg) 
       end if
 
    end subroutine open_file
