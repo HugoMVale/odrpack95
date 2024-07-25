@@ -429,8 +429,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       if (itest .eq. 1) then
 
-!  Test simple odr problem
-!  with analytic derivatives.
+!  Test simple odr problem with analytic derivatives.
 
          lun = lunrpt
          write (lun, 1000)
@@ -449,8 +448,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 2) then
 
-!  Test simple ols problem
-!  with forward difference derivatives.
+!  Test simple ols problem with forward difference derivatives.
 
          lun = lunrpt
          write (lun, 1000)
@@ -574,8 +572,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 6) then
 
-!  Test stiff stopping conditions for unscaled odr problem
-!  with analytic derivatives.
+!  Test stiff stopping conditions for unscaled odr problem  with analytic derivatives.
 
          lun = lunrpt
          write (lun, 1000)
@@ -597,8 +594,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 7) then
 
-!  Test restart for unscaled odr problem
-!  with analytic derivatives.
+!  Test restart for unscaled odr problem with analytic derivatives.
 
          lun = lunrpt
          write (lun, 1000)
@@ -663,7 +659,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 !  Test multiresponse odr problem
 !  with central difference derivatives ,
 !  DELTA initialized to nonzero values,
-!  variable fixing,  and weighting.
+!  variable fixing, and weighting.
 
          lun = lunrpt
          write (lun, 1000)
@@ -705,10 +701,6 @@ subroutine dodrx(tstfac, passed, lunsum)
 
 !  Set weights
             if (x(i, 1) .eq. 100.0E0_wp .or. x(i, 1) .eq. 150.0E0_wp) then
-!--------------------------------^---------------------------^-----------------
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
-!------------------------------------------------------------------------------
                we(i, 1, 1) = 0.0E0_wp
                we(i, 1, 2) = 0.0E0_wp
                we(i, 2, 1) = 0.0E0_wp
@@ -861,8 +853,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 17) then
 
-!  Test bounded odr problem where
-!  bounds are ill defined.
+!  Test bounded odr problem where bounds are ill defined.
 
          lun = lunrpt
          write (lun, 1000)
