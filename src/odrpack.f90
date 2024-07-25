@@ -130,9 +130,9 @@ contains
       !! Scaling values for `beta`. `Shape: (np)`.
       real(wp), intent(in), optional :: scld(:, :)
          !! Scaling values for `delta`. `Shape: (1<=ldscld<=n, m)`. See p. 32.
-      real(wp), intent(inout), pointer, optional :: work(:)
+      real(wp), intent(inout), optional :: work(:)
          !! Real work space.
-      integer, intent(inout), pointer, optional :: iwork(:)
+      integer, intent(inout), optional :: iwork(:)
          !! Integer work space.
       integer, intent(out), optional :: info
          !! Variable designating why the computations were stopped.
@@ -142,7 +142,6 @@ contains
          !! Upper bound on `beta`. `Shape: (np)`.
 
       ! Local variables
-      ! TODO: remove save? replace pointer with allocatable?
       integer :: ldwe, ld2we, ldwd, ld2wd, ldifx, ldscld, ldstpd, ljob, lndigit, lmaxit, &
                  liprint, llunerr, llunrpt, linfo, lenwork, leniwork, linfo1, linfo2, linfo3, &
                  linfo4, linfo5
@@ -152,9 +151,9 @@ contains
                   lsclb(np), lscld(n, m), lupper(np), wd1(1, 1, 1)
       real(wp), allocatable :: tempret(:, :)
 
-      real(wp), pointer, save :: lwork(:)
-      integer, pointer, save :: liwork(:)
-      logical :: head
+      real(wp), pointer :: lwork(:)
+      integer, pointer :: liwork(:)
+      logical :: head, isodr
 
       ! Set LINFO to zero indicating no errors have been found thus far
       linfo = 0
@@ -231,8 +230,7 @@ contains
                llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1, &
                n, m, nq, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-               lenwork, leniwork &
-               )
+               lenwork, leniwork)
          end if
          if (present(info)) then
             info = linfo
@@ -247,25 +245,14 @@ contains
             if (.not. present(delta)) then
                linfo5 = 7
                linfo4 = 1
-               ! elseif (.not. allocated(delta)) then
-               !    linfo5 = 7
-               !    linfo4 = 1
             end if
          end if
          if (job >= 10000) then
             if (.not. present(iwork)) then
                linfo5 = 7
                linfo2 = 1
-            elseif (.not. associated(iwork)) then
-               linfo5 = 7
-               linfo2 = 1
             end if
-         end if
-         if (job >= 10000) then
             if (.not. present(work)) then
-               linfo5 = 7
-               linfo3 = 1
-            elseif (.not. associated(work)) then
                linfo5 = 7
                linfo3 = 1
             end if
@@ -282,8 +269,7 @@ contains
                llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1, &
                n, m, nq, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-               lenwork, leniwork &
-               )
+               lenwork, leniwork)
          end if
          if (present(info)) then
             info = linfo
@@ -291,28 +277,16 @@ contains
          return
       end if
 
-      ! Determine the size of WORK
-      if (ljob < 0 .or. mod(ljob, 10) <= 1) then
-         lenwork = 18 + 13*np + np**2 + m + m**2 + 4*n*nq + 6*n*m + 2*n*nq*np + &
-                   2*n*nq*m + nq**2 + 5*nq + nq*(np + m) + n*nq*nq
-      else
-         lenwork = 18 + 13*np + np**2 + m + m**2 + 4*n*nq + 2*n*m + 2*n*nq*np + &
-                   5*nq + nq*(np + m) + n*nq*nq
-      end if
+      ! Determine the size of the work arrays
+      isodr = (ljob < 0 .or. mod(ljob, 10) <= 1)
+      call length_workspace(n, m, np, nq, isodr, lenwork, leniwork)
 
-      ! Determine the size of IWORK
-      leniwork = 20 + 2*np + nq*(np + m)
-
-      ! Allocate the work arrays
+      ! Allocate the local (internal) work arrays
       allocate (lwork(lenwork), tempret(max(n, np), max(nq, m)), stat=linfo3)
       allocate (liwork(leniwork), stat=linfo2)
       lwork = zero
       liwork = 0
-      ! if (present(delta)) then
-      !    if (.not. allocated(delta)) then
-      !       allocate (delta(n, m), stat=linfo4)
-      !    end if
-      ! end if
+      
       if (linfo4 /= 0 .or. linfo3 /= 0 .or. linfo2 /= 0) then
          linfo5 = 8
       end if
@@ -334,8 +308,8 @@ contains
          return
       end if
 
-      ! Set array variable defaults except IWORK
-      lwork(1:n*m) = zero
+      ! Set local(internal) array variable defaults except IWORK
+      !lwork(1:n*m) = zero ! redundant - done above
       lifixb(1) = -1
       lifixx(1, 1) = -1
       llower(1:np) = -huge(zero)
@@ -393,14 +367,12 @@ contains
       end if
 
       if (present(iwork)) then
-         if (associated(iwork)) then
-            if (size(iwork) < leniwork) then
-               linfo1 = linfo1 + 8192
-            end if
-            !  This is a restart, copy IWORK.
-            if (mod(ljob/10000, 10) >= 1) then
-               liwork(1:leniwork) = iwork(1:leniwork)
-            end if
+         if (size(iwork) < leniwork) then
+            linfo1 = linfo1 + 8192
+         end if
+         !  This is a restart, copy IWORK.
+         if (mod(ljob/10000, 10) >= 1) then
+            liwork(1:leniwork) = iwork(1:leniwork)
          end if
       end if
 
@@ -525,7 +497,7 @@ contains
          if (ld2wd > m) then
             ld2wd = m
          end if
-         if (wd(1, 1, 1) <= 0.0_wp) then
+         if (wd(1, 1, 1) <= zero) then
             lwd(1, 1, 1) = wd(1, 1, 1)
          else
             lwd(1:ldwd, 1:ld2wd, 1:m) = wd(1:ldwd, 1:ld2wd, 1:m)
@@ -533,18 +505,16 @@ contains
       end if
 
       if (present(work)) then
-         if (associated(work)) then
-            if (size(work) < lenwork) then
-               linfo1 = linfo1 + 4096
-            end if
-            !  Deltas are in WORK, copy them.
-            if (mod(ljob/1000, 10) >= 1 .and. .not. present(delta)) then
-               lwork(1:n*m) = work(1:n*m)
-            end if
-            !  This is a restart, copy WORK.
-            if (mod(ljob/10000, 10) >= 1) then
-               lwork(1:lenwork) = work(1:lenwork)
-            end if
+         if (size(work) < lenwork) then
+            linfo1 = linfo1 + 4096
+         end if
+         !  Deltas are in WORK, copy them.
+         if (mod(ljob/1000, 10) >= 1 .and. .not. present(delta)) then
+            lwork(1:n*m) = work(1:n*m)
+         end if
+         !  This is a restart, copy WORK.
+         if (mod(ljob/10000, 10) >= 1) then
+            lwork(1:lenwork) = work(1:lenwork)
          end if
       end if
 
@@ -579,8 +549,7 @@ contains
                llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1, &
                n, m, nq, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-               lenwork, leniwork &
-               )
+               lenwork, leniwork)
          end if
          if (present(info)) then
             info = linfo
@@ -634,26 +603,16 @@ contains
       end if
 
       if (present(iwork)) then
-         if (.not. associated(iwork)) then
-            iwork => liwork
-         else
-            iwork(1:leniwork) = liwork(1:leniwork)
-            deallocate (liwork)
-         end if
-      else
-         deallocate (liwork)
+         iwork(1:leniwork) = liwork(1:leniwork)
       end if
-
+           
       if (present(work)) then
-         if (.not. associated(work)) then
-            work => lwork
-         else
-            work(1:lenwork) = lwork(1:lenwork)
-            deallocate (lwork)
-         end if
-      else
-         deallocate (lwork)
+         work(1:lenwork) = lwork(1:lenwork)
       end if
+      
+      ! Dealocation is required because the work arrays are pointers (not allocatables)
+      deallocate (liwork)
+      deallocate (lwork)
 
    end subroutine odr
 
@@ -2542,5 +2501,36 @@ contains
       end if
 
    end subroutine dodmn
+
+   subroutine length_workspace(n, m, np, nq, isodr, lenwork, leniwork)
+   !! Calculate the length of the workspace arrays.
+      integer, intent(in) :: n
+         !! Number of observations.
+      integer, intent(in) :: m
+         !! Number of columns of data in the independent variable.
+      integer, intent(in) :: np
+         !! Number of function parameters.
+      integer, intent(in) :: nq
+         !! Number of responses per observation.
+      logical, intent(in) :: isodr
+         !! The variable designating whether the solution is by ODR (`isodr = .true.`)
+         !! or by OLS (`isodr = .false.`).
+      integer, intent(out) :: lenwork
+         !! Length of `work` array.
+      integer, intent(out) :: leniwork
+         !! Length of `iwork` array.
+      
+      if(isodr) then
+         lenwork = 18 + 13*np + np**2 + m + m**2 + 4*n*nq + 6*n*m + 2*n*nq*np + &
+                   2*n*nq*m + nq**2 + 5*nq + nq*(np + m) + n*nq*nq
+      else
+         lenwork = 18 + 13*np + np**2 + m + m**2 + 4*n*nq + 2*n*m + 2*n*nq*np + &
+                   5*nq + nq*(np + m) + n*nq*nq
+      end if
+
+      leniwork = 20 + 2*np + nq*(np + m)
+
+   end subroutine length_workspace
+
 
 end module odrpack

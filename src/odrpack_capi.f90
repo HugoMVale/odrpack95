@@ -3,19 +3,9 @@ module odrpack_capi
 
    use, intrinsic :: iso_c_binding, only: c_bool, c_char, c_double, c_f_pointer, c_int, c_ptr 
    use odrpack_kinds, only: wp
-   use odrpack, only: odr
+   use odrpack, only: odr, length_workspace
    use odrpack_core, only: dwinf
    implicit none
-   private
-
-   public :: odr_basic_c
-   public :: odr_short_c
-   public :: odr_long_c
-   public :: fcn_tc
-   public :: dwinf_c
-   public :: workidx_t
-   public :: open_file
-   public :: close_file
 
    abstract interface
       subroutine fcn_tc(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, ldifx, &
@@ -466,5 +456,28 @@ contains
       workidx%lwkmn = lwkmn
 
    end subroutine dwinf_c
+
+   subroutine length_workspace_c(n, m, np, nq, isodr, lenwork, leniwork) bind(C)
+   !! Calculate the length of the workspace arrays.
+      integer(c_int), intent(in) :: n
+         !! Number of observations.
+      integer(c_int), intent(in) :: m
+         !! Number of columns of data in the independent variable.
+      integer(c_int), intent(in) :: np
+         !! Number of function parameters.
+      integer(c_int), intent(in) :: nq
+         !! Number of responses per observation.
+      logical(c_bool), intent(in) :: isodr
+         !! The variable designating whether the solution is by ODR (`isodr = .true.`)
+         !! or by OLS (`isodr = .false.`).
+      integer(c_int), intent(out) :: lenwork
+         !! Length of real `work` array.
+      integer(c_int), intent(out) :: leniwork
+         !! Length of integer `iwork` array.
+      
+      call length_workspace(n, m, np, nq, logical(isodr, kind=kind(.true.)), &
+                            lenwork, leniwork)
+   
+   end subroutine length_workspace_c
 
 end module odrpack_capi
