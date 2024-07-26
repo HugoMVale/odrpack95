@@ -70,7 +70,7 @@ int main()
     int ld2wd = 1;
     double we[NQ][1][1] = {-1.0};
     double wd[M][1][1] = {-1.0};
-    int iprint = 2002;
+    int iprint = 2001;
     int info = 0;
 
     char *fn = "report5.txt";
@@ -106,6 +106,12 @@ int main()
     double partol = -1.0;
     int maxit = -1;
     job = 1020;
+    int lenwork, leniwork;
+    _Bool isodr = true;
+
+    workspace_dimensions_c(&n, &m, &np, &nq, &isodr, &lenwork, &leniwork);
+    printf("lenwork: %d\n", lenwork);
+    printf("leniwork: %d\n", leniwork);
 
     odr_long_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x,
                (double *)we, &ldwe, &ld2we,
@@ -122,11 +128,8 @@ int main()
     close_file(&lunrpt, &ierr);
     // printf("Error code (ierr): %d\n", ierr);
 
-    workidx_t workidx;
-    _Bool isodr = true;
-
-    dwinf_c(&n, &m, &np, &nq, &ldwe, &ld2we, &isodr, &workidx);
-    printf("length of `work`: %d\n", workidx.lwkmn);
+    // workidx_t workidx;
+    // dwinf_c(&n, &m, &np, &nq, &ldwe, &ld2we, &isodr, &workidx);
 
     // for (int i = 0; i < M; i++)
     // {

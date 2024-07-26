@@ -130,9 +130,9 @@ contains
       !! Scaling values for `beta`. `Shape: (np)`.
       real(wp), intent(in), optional :: scld(:, :)
          !! Scaling values for `delta`. `Shape: (1<=ldscld<=n, m)`. See p. 32.
-      real(wp), intent(inout), optional :: work(:)
+      real(wp), intent(inout), optional, target :: work(:)
          !! Real work space.
-      integer, intent(inout), optional :: iwork(:)
+      integer, intent(inout), optional, target :: iwork(:)
          !! Integer work space.
       integer, intent(out), optional :: info
          !! Variable designating why the computations were stopped.
@@ -279,7 +279,7 @@ contains
 
       ! Determine the size of the work arrays
       isodr = (ljob < 0 .or. mod(ljob, 10) <= 1)
-      call length_workspace(n, m, np, nq, isodr, lenwork, leniwork)
+      call workspace_dimensions(n, m, np, nq, isodr, lenwork, leniwork)
 
       ! Allocate the local (internal) work arrays
       allocate (lwork(lenwork), tempret(max(n, np), max(nq, m)), stat=linfo3)
@@ -2502,8 +2502,8 @@ contains
 
    end subroutine dodmn
 
-   subroutine length_workspace(n, m, np, nq, isodr, lenwork, leniwork)
-   !! Calculate the length of the workspace arrays.
+   subroutine workspace_dimensions(n, m, np, nq, isodr, lenwork, leniwork)
+   !! Calculate the dimensions of the workspace arrays.
       integer, intent(in) :: n
          !! Number of observations.
       integer, intent(in) :: m
@@ -2530,7 +2530,7 @@ contains
 
       leniwork = 20 + 2*np + nq*(np + m)
 
-   end subroutine length_workspace
+   end subroutine workspace_dimensions
 
 
 end module odrpack

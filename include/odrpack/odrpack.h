@@ -313,7 +313,7 @@ ODRPACK_EXTERN void dwinf_c(
     workidx_t *workidx);
 
 /**
- * @brief Calculate the length of the workspace arrays.
+ * @brief Calculate the dimensions of the workspace arrays.
  *
  * @param n        `==>` Number of observations.
  * @param m        `==>` Number of columns of data in the explanatory variable.
@@ -323,7 +323,7 @@ ODRPACK_EXTERN void dwinf_c(
  * @param lenwork  `<==` Length of real `work` array.
  * @param leniwork `<==` Length of integer `iwork` array.
  */
-ODRPACK_EXTERN void length_workspace_c(
+ODRPACK_EXTERN void workspace_dimensions_c(
     const int *n,
     const int *m,
     const int *np,

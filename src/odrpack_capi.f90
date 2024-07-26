@@ -3,7 +3,7 @@ module odrpack_capi
 
    use, intrinsic :: iso_c_binding, only: c_bool, c_char, c_double, c_f_pointer, c_int, c_ptr 
    use odrpack_kinds, only: wp
-   use odrpack, only: odr, length_workspace
+   use odrpack, only: odr, workspace_dimensions
    use odrpack_core, only: dwinf
    implicit none
 
@@ -457,8 +457,8 @@ contains
 
    end subroutine dwinf_c
 
-   subroutine length_workspace_c(n, m, np, nq, isodr, lenwork, leniwork) bind(C)
-   !! Calculate the length of the workspace arrays.
+   subroutine workspace_dimensions_c(n, m, np, nq, isodr, lenwork, leniwork) bind(C)
+   !! Calculate the dimensions of the workspace arrays.
       integer(c_int), intent(in) :: n
          !! Number of observations.
       integer(c_int), intent(in) :: m
@@ -475,9 +475,9 @@ contains
       integer(c_int), intent(out) :: leniwork
          !! Length of integer `iwork` array.
       
-      call length_workspace(n, m, np, nq, logical(isodr, kind=kind(.true.)), &
-                            lenwork, leniwork)
+      call workspace_dimensions(n, m, np, nq, logical(isodr, kind=kind(.true.)), &
+                                lenwork, leniwork)
    
-   end subroutine length_workspace_c
+   end subroutine workspace_dimensions_c
 
 end module odrpack_capi
