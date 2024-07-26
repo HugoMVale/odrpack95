@@ -14,7 +14,7 @@
  *
  * @param lun      `<=>` Logical unit number.
  * @param filename `==>` String containing the file name.
- * @param ierr     `<==` Error code.
+ * @param ierr     `<==` Error code (compiler dependent).
  */
 ODRPACK_EXTERN void open_file(
     int *lun,
@@ -25,7 +25,7 @@ ODRPACK_EXTERN void open_file(
  * @brief Close a file associated with a specified logical unit number.
  *
  * @param lun    `==>` Logical unit number.
- * @param ierr   `<==` Error code.
+ * @param ierr   `<==` Error code (compiler dependent).
  */
 ODRPACK_EXTERN void close_file(
     const int *lun,
