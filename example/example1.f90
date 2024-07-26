@@ -54,7 +54,7 @@ contains
 end module example1_model
 
 program example1
-!! Explicit ODR job, with user-supplied analytic derivatives and nondefault ifixx.
+!! Explicit ODR job, with user-supplied analytic derivatives and nondefault `ifixx`.
    use odrpack, only: odr
    use odrpack_kinds, only: wp
    use example1_model, only: fcn

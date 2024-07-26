@@ -926,7 +926,7 @@ contains
        info, &
        lower, upper)
    !! Compute noise and number of good digits in function results.
-   !! (Adapted from STARPAC subroutine ETAFUN.)
+      ! Adapted from STARPAC subroutine ETAFUN.
       ! Routines Called  FCN
       ! Date Written   860529   (YYMMDD)
       ! Revision Date  920619   (YYMMDD)
@@ -1385,7 +1385,7 @@ contains
 
    subroutine dfctr(oksemi, a, lda, n, info)
    !! Factor the positive (semi)definite matrix `a` using a modified Cholesky factorization.
-   !! (Adapted from LINPACK subroutine DPOFA.)
+      ! Adapted from LINPACK subroutine DPOFA.
       ! Routines Called  DDOT
       ! Date Written   910706   (YYMMDD)
       ! Revision Date  920619   (YYMMDD)
@@ -3024,7 +3024,7 @@ contains
        wrk1, wrk2, wrk6, &
        interval)
    !! Driver routine for the derivative checking process.
-   !! (Adapted from STARPAC subroutine DCKCNT.)
+      ! Adapted from STARPAC subroutine DCKCNT.
       ! Routines Called  FCN, DHSTEP, DJCKM
       ! Date Written   860529   (YYMMDD)
       ! Revision Date  920619   (YYMMDD)
@@ -3353,7 +3353,7 @@ contains
        wrk1, wrk2, wrk6)
    !! Check whether high curvature could be the cause of the disagreement between the numerical
    !! and analytic derviatives.
-   !! (Adapted from STARPAC subroutine DCKCRV.)
+      ! Adapted from STARPAC subroutine DCKCRV.
       ! Routines Called  DJCKF, DPVB, DPVD
       ! Date Written   860529   (YYMMDD)
       ! Revision Date  920619   (YYMMDD)
@@ -3603,7 +3603,7 @@ contains
        wrk1, wrk2, wrk6)
    !! Check whether finite precision arithmetic could be the cause of the disagreement between
    !! the derivatives.
-   !! (Adapted from STARPAC subroutine DCKFPA.)
+      ! Adapted from STARPAC subroutine DCKFPA.
       ! Routines Called  DPVB, DPVD
       ! Date Written   860529   (YYMMDD)
       ! Revision Date  920619   (YYMMDD)
@@ -3786,7 +3786,7 @@ contains
        diffj, msg1, msg, istop, nfev, &
        wrk1, wrk2, wrk6, interval)
    !! Check user supplied analytic derivatives against numerical derivatives.
-   !! (Adapted from STARPAC subroutine DCKMN.)
+      ! Adapted from STARPAC subroutine DCKMN.
       ! Routines Called  DJCKC, DJCKZ, DPVB, DPVD
       ! Date Written   860529   (YYMMDD)
       ! Revision Date  920619   (YYMMDD)
@@ -4046,7 +4046,7 @@ contains
        wrk1, wrk2, wrk6)
    !! Recheck the derivatives in the case where the finite difference derivative disagrees with
    !! the analytic derivative and the analytic derivative is zero.
-   !! (Adapted from STARPAC subroutine DCKZRO.)
+      ! Adapted from STARPAC subroutine DCKZRO.
       ! Routines Called  DPVB, DPVD
       ! Date Written   860529   (YYMMDD)
       ! Revision Date  920619   (YYMMDD)
@@ -5233,13 +5233,13 @@ contains
    end subroutine dpack
 
    real(wp) pure function dppnml(p) result(dppnmlr)
-   !! Compute the percent point function value for the normal (Gaussian) distribution with mean 0
-   !! and standard deviation 1, and with probability density function:
+   !! Compute the percent point function value for the normal (Gaussian) distribution with
+   !!  mean 0 and standard deviation 1, and with probability density function:
    !!
    !!       `f(x) = (1/sqrt(2*pi))*exp(-x^2/2)`
    !!
-   !! (Adapted from DATAPAC subroutine TPPF, with modifications to facilitate conversion to
-   !! real(wp) automatically).
+      ! Adapted from DATAPAC subroutine TPPF, with modifications to facilitate conversion to
+      ! real(wp) automatically.
       ! Routines Called  (NONE)
       ! Date Written   901207   (YYMMDD)
       ! Revision Date  920304   (YYMMDD)
@@ -5338,8 +5338,8 @@ contains
    real(wp) pure function dppt(p, idf) result(dpptr)
    !! Compute the percent point function value for the student's T distribution with `idf`
    !! degrees of freedom.
-   !! (Adapted from DATAPAC subroutine TPPF, with modifications to facilitate conversion to
-   !! real(wp) automatically.)
+      ! Adapted from DATAPAC subroutine TPPF, with modifications to facilitate conversion to
+      ! real(wp) automatically.
       ! Routines Called  DPPNML
       ! Date Written   901207   (YYMMDD)
       ! Revision Date  920304   (YYMMDD)
@@ -5987,12 +5987,12 @@ contains
    !!
    !! where `t` is an upper or lower triangular matrix of order `n`, and the solution `x`
    !! overwrites the RHS `b`.
-   !! (Adapted from LINPACK subroutine DTRSL.)
+   !! Adapted from LINPACK subroutine DTRSL.
    !!
    !! References:
    !! * Dongarra J.J., Bunch J.R., Moler C.B., Stewart G.W., *LINPACK Users Guide*, SIAM, 1979.
       ! @note: This is one of the most time-consuming subroutines in ODRPACK (~25% of total).
-      ! Routines Called  DAXPY,DDOT
+      ! Routines Called  DAXPY, DDOT
       ! Date Written   920220   (YYMMDD)
       ! Revision Date  920619   (YYMMDD)
 

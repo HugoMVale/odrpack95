@@ -1,5 +1,6 @@
 module odrpack
-
+!! Main driver routines for finding the weighted explicit or implicit orthogonal distance
+!! regression (ODR) or ordinary linear or nonlinear least squares (OLS) solution.
    use odrpack_kinds, only: wp
    use, intrinsic :: iso_fortran_env, only: error_unit, output_unit
    implicit none
