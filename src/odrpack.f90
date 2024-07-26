@@ -151,9 +151,12 @@ contains
                   lsclb(np), lscld(n, m), lupper(np), wd1(1, 1, 1)
       real(wp), allocatable :: tempret(:, :)
 
+      real(wp), allocatable, target :: loc_work(:)
       real(wp), pointer :: lwork(:)
+      integer, allocatable, target :: loc_iwork(:)
       integer, pointer :: liwork(:)
-      logical :: head, isodr
+
+      logical :: head, isodr, restart
 
       ! Set LINFO to zero indicating no errors have been found thus far
       linfo = 0
@@ -280,13 +283,21 @@ contains
       ! Determine the size of the work arrays
       isodr = (ljob < 0 .or. mod(ljob, 10) <= 1)
       call workspace_dimensions(n, m, np, nq, isodr, lenwork, leniwork)
-
-      ! Allocate the local (internal) work arrays
-      allocate (lwork(lenwork), tempret(max(n, np), max(nq, m)), stat=linfo3)
-      allocate (liwork(leniwork), stat=linfo2)
-      lwork = zero
-      liwork = 0
       
+      ! Allocate the local work arrays, if not provided by user
+      ! The complementary case is treated below, because of the way the info flags are designed 
+      if (.not. present(iwork)) then
+         allocate (loc_iwork(leniwork), stat=linfo2)
+         liwork => loc_iwork
+      end if
+
+      if (.not. present(work)) then
+         allocate (loc_work(lenwork), stat=linfo3)
+         lwork => loc_work
+      end if
+     
+      allocate (tempret(max(n, np), max(nq, m)), stat=linfo4)
+
       if (linfo4 /= 0 .or. linfo3 /= 0 .or. linfo2 /= 0) then
          linfo5 = 8
       end if
@@ -308,8 +319,7 @@ contains
          return
       end if
 
-      ! Set local(internal) array variable defaults except IWORK
-      !lwork(1:n*m) = zero ! redundant - done above
+      ! Set local (internal) array variable defaults except IWORK and WORK
       lifixb(1) = -1
       lifixx(1, 1) = -1
       llower(1:np) = -huge(zero)
@@ -365,14 +375,12 @@ contains
             lifixx(1:ldifx, 1:m) = ifixx(1:ldifx, 1:m)
          end if
       end if
-
+    
       if (present(iwork)) then
-         if (size(iwork) < leniwork) then
-            linfo1 = linfo1 + 8192
-         end if
-         !  This is a restart, copy IWORK.
-         if (mod(ljob/10000, 10) >= 1) then
-            liwork(1:leniwork) = iwork(1:leniwork)
+         if (size(iwork) >= leniwork) then
+            liwork => iwork(1:leniwork)
+         else
+             linfo1 = linfo1 + 8192           
          end if
       end if
 
@@ -505,20 +513,20 @@ contains
       end if
 
       if (present(work)) then
-         if (size(work) < lenwork) then
+         if (size(work) >= lenwork) then
+            lwork => work(1:lenwork)
+         else
             linfo1 = linfo1 + 4096
-         end if
-         !  Deltas are in WORK, copy them.
-         if (mod(ljob/1000, 10) >= 1 .and. .not. present(delta)) then
-            lwork(1:n*m) = work(1:n*m)
-         end if
-         !  This is a restart, copy WORK.
-         if (mod(ljob/10000, 10) >= 1) then
-            lwork(1:lenwork) = work(1:lenwork)
          end if
       end if
 
-      if (present(delta)) then
+      restart = (mod(ljob/10000, 10) >= 1)
+      if (.not. restart) then
+         lwork = zero
+         liwork = 0
+      end if
+
+      if (present(delta) .and. (.not. restart)) then
          if (any(shape(delta) < [n, m])) then
             linfo1 = linfo1 + 8
          end if
@@ -601,18 +609,6 @@ contains
       if (present(info)) then
          info = linfo
       end if
-
-      if (present(iwork)) then
-         iwork(1:leniwork) = liwork(1:leniwork)
-      end if
-           
-      if (present(work)) then
-         work(1:lenwork) = lwork(1:lenwork)
-      end if
-      
-      ! Dealocation is required because the work arrays are pointers (not allocatables)
-      deallocate (liwork)
-      deallocate (lwork)
 
    end subroutine odr
 
