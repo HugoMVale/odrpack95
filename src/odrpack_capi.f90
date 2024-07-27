@@ -4,7 +4,7 @@ module odrpack_capi
    use, intrinsic :: iso_c_binding, only: c_bool, c_char, c_double, c_f_pointer, c_int, c_ptr 
    use odrpack_kinds, only: wp
    use odrpack, only: odr, workspace_dimensions
-   use odrpack_core, only: dwinf
+   use odrpack_core, only: diwinf, dwinf 
    implicit none
 
    abstract interface
@@ -112,7 +112,34 @@ module odrpack_capi
       integer(c_int) :: lower
       integer(c_int) :: upper
       integer(c_int) :: lwkmn
-   end type
+   end type workidx_t
+
+   type, bind(C) :: iworkidx_t
+   !! 0-based indices of the variables stored in the integer work array.
+      integer(c_int) :: msgb
+      integer(c_int) :: msgd
+      integer(c_int) :: ifix2
+      integer(c_int) :: istop
+      integer(c_int) :: nnzw
+      integer(c_int) :: npp
+      integer(c_int) :: idf
+      integer(c_int) :: job
+      integer(c_int) :: iprin
+      integer(c_int) :: luner
+      integer(c_int) :: lunrp
+      integer(c_int) :: nrow
+      integer(c_int) :: ntol
+      integer(c_int) :: neta
+      integer(c_int) :: maxit
+      integer(c_int) :: niter
+      integer(c_int) :: nfev
+      integer(c_int) :: njev
+      integer(c_int) :: int2
+      integer(c_int) :: irank
+      integer(c_int) :: ldtt
+      integer(c_int) :: bound
+      integer(c_int) :: liwkmn
+  end type iworkidx_t
 
 contains
 
@@ -363,6 +390,56 @@ contains
       close (unit=lun, iostat=ierr)
 
    end subroutine close_file
+
+   pure subroutine diwinf_c(m, np, nq, iworkidx) bind(C)
+   !! Get storage locations within integer work space.
+      integer(c_int), intent(in) :: m
+         !! The number of columns of data in the independent variable.
+      integer(c_int), intent(in) :: np
+         !! The number of function parameters.
+      integer(c_int), intent(in) :: nq
+         !! The number of responses per observation.
+      type(iworkidx_t), intent(out) :: iworkidx
+         !! 0-based indexes of integer work array.
+
+      integer :: msgbi, msgdi, ifix2i, istopi, nnzwi, nppi, idfi, jobi, iprini, luneri, &
+                 lunrpi, nrowi, ntoli, netai, maxiti, niteri, nfevi, njevi, int2i, iranki, &
+                 ldtti, boundi, liwkmn
+               
+      call diwinf(m, np, nq, &
+                  msgbi, msgdi, ifix2i, istopi, &
+                  nnzwi, nppi, idfi, &
+                  jobi, iprini, luneri, lunrpi, &
+                  nrowi, ntoli, netai, &
+                  maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
+                  boundi, &
+                  liwkmn)
+
+      iworkidx%msgb = msgbi - 1
+      iworkidx%msgd = msgdi - 1
+      iworkidx%ifix2 = ifix2i - 1
+      iworkidx%istop = istopi - 1
+      iworkidx%nnzw = nnzwi - 1
+      iworkidx%npp = nppi - 1
+      iworkidx%idf = idfi - 1
+      iworkidx%job = jobi - 1
+      iworkidx%iprin = iprini - 1
+      iworkidx%luner = luneri - 1
+      iworkidx%lunrp = lunrpi - 1
+      iworkidx%nrow = nrowi - 1
+      iworkidx%ntol = ntoli - 1
+      iworkidx%neta = netai - 1
+      iworkidx%maxit = maxiti - 1
+      iworkidx%niter = niteri - 1
+      iworkidx%nfev = nfevi - 1
+      iworkidx%njev = njevi - 1
+      iworkidx%int2 = int2i - 1
+      iworkidx%irank = iranki - 1
+      iworkidx%ldtt = ldtti - 1
+      iworkidx%bound = boundi - 1
+      iworkidx%liwkmn = liwkmn
+
+   end subroutine diwinf_c
 
    subroutine dwinf_c(n, m, np, nq, ldwe, ld2we, isodr, workidx) bind(C)
    !! Get storage locations within real work space.

@@ -232,6 +232,36 @@ ODRPACK_EXTERN void odr_long_c(
     int *info);
 
 /**
+ * @brief 0-based locations within integer work array.
+ */
+typedef struct
+{
+    int msgb;   /**< The starting location in array `iwork` of array `msgb`. */
+    int msgd;   /**< The starting location in array `iwork` of array `msgd`. */
+    int ifix2;  /**< The starting location in array `iwork` of array `ifix2`. */
+    int istop;  /**< The location in array `iwork` of variable `istop`. */
+    int nnzw;   /**< The location in array `iwork` of variable `nnzw`. */
+    int npp;    /**< The location in array `iwork` of variable `npp`. */
+    int idf;    /**< The location in array `iwork` of variable `idf`. */
+    int job;    /**< The location in array `iwork` of variable `job`. */
+    int iprin;  /**< The location in array `iwork` of variable `iprint`. */
+    int luner;  /**< The location in array `iwork` of variable `lunerr`. */
+    int lunrp;  /**< The location in array `iwork` of variable `lunrpt`. */
+    int nrow;   /**< The location in array `iwork` of variable `nrow`. */
+    int ntol;   /**< The location in array `iwork` of variable `ntol`. */
+    int neta;   /**< The location in array `iwork` of variable `neta`. */
+    int maxit;  /**< The location in array `iwork` of variable `maxit`. */
+    int niter;  /**< The location in array `iwork` of variable `niter`. */
+    int nfev;   /**< The location in array `iwork` of variable `nfev`. */
+    int njev;   /**< The location in array `iwork` of variable `njev`. */
+    int int2;   /**< The location in array `iwork` of variable `int2`. */
+    int irank;  /**< The location in array `iwork` of variable `irank`. */
+    int ldtt;   /**< The location in array `iwork` of variable `ldtt`. */
+    int bound;  /**< The location in array `iwork` of variable `bound`. */
+    int liwkmn; /**< The minimum acceptable length of array `iwork`. */
+} iworkidx_t;
+
+/**
  * @brief 0-based locations within real work array.
  */
 typedef struct
@@ -291,7 +321,21 @@ typedef struct
 } workidx_t;
 
 /**
- * @brief Set storage locations within real work space.
+ * @brief Get storage locations within integer work space.
+ *
+ * @param n        `==>` Number of observations.
+ * @param np       `==>` Number of function parameters.
+ * @param nq       `==>` Number of responses per observation.
+ * @param iworkidx `<==` 0-based indexes of integer work array.
+ */
+ODRPACK_EXTERN void diwinf_c(
+    const int *n,
+    const int *np,
+    const int *nq,
+    iworkidx_t *iworkidx);
+
+/**
+ * @brief Get storage locations within real work space.
  *
  * @param n       `==>` Number of observations.
  * @param m       `==>` Number of columns of data in the explanatory variable.

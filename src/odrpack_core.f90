@@ -1969,7 +1969,7 @@ contains
        maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
        boundi, &
        liwkmn)
-   !! Set storage locations within integer work space.
+   !! Get storage locations within integer work space.
       ! Routines Called  (NONE)
       ! Date Written   860529   (YYMMDD)
       ! Revision Date  920304   (YYMMDD)
@@ -6350,7 +6350,7 @@ contains
        wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
        loweri, upperi, &
        lwkmn)
-   !! Set storage locations within REAL (wp) work space.
+   !! Get storage locations within REAL (wp) work space.
       ! Routines Called  (NONE)
       ! Date Written   860529   (YYMMDD)
       ! Revision Date  920619   (YYMMDD)
