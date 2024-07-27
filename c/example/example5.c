@@ -60,10 +60,8 @@ int main()
     double upper[NP] = {10.0, 0.9};
     double x[M][N] = {{0.982, 1.998, 4.978, 6.01}};
     double y[NQ][N] = {{2.7, 7.4, 148.0, 403.0}};
+    double delta[M][N] = {{0.0, 0.0, 0.0, 0.0}};
 
-    // odr_basic_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x, lower, upper, &job);
-
-    // extra arguments for use with odr_short_c and odr_long_c
     int ldwe = 1;
     int ld2we = 1;
     int ldwd = 1;
@@ -78,19 +76,6 @@ int main()
     int lunerr = 0;
     int ierr = 0;
 
-    open_file(&lunrpt, fn, &ierr);
-    // printf("Error code (ierr): %d\n", ierr);
-    lunerr = lunrpt;
-
-    // odr_short_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x,
-    //             (double *)we, &ldwe, &ld2we,
-    //             (double *)wd, &ldwd, &ld2wd,
-    //             lower, upper,
-    //             &job, &iprint, &lunerr, &lunrpt,
-    //             &info);
-
-    // extra arguments for use with odr_long_c
-    double delta[M][N] = {{0.1, 0.1, 0.1, 0.1}};
     int ifixb[NP] = {1, 1};
     int ifixx[M][1] = {-1};
     int ldifx = 1;
@@ -104,14 +89,33 @@ int main()
     double taufac = -1.0;
     double sstol = -1.0;
     double partol = -1.0;
-    int maxit = -1;
+    int maxit = 45;
     job = 1020;
-    int lwork, liwork;
     _Bool isodr = true;
+    int lwork, liwork;
 
+    // Calculate workspace dimensions
     workspace_dimensions_c(&n, &m, &np, &nq, &isodr, &lwork, &liwork);
     printf("lwork: %d\n", lwork);
     printf("liwork: %d\n", liwork);
+
+    // Allocate memory for array `work`
+    double *work = (double *)malloc(lwork * sizeof(double));
+    if (work == NULL)
+    {
+        fprintf(stderr, "Failed to allocate memory for work array\n");
+    }
+
+    // Allocate memory for array `iwork`
+    int *iwork = (int *)malloc(liwork * sizeof(int));
+    if (iwork == NULL)
+    {
+        fprintf(stderr, "Failed to allocate memory for iwork array\n");
+    }
+
+    open_file(&lunrpt, fn, &ierr);
+    // printf("Error code (ierr): %d\n", ierr);
+    lunerr = lunrpt;
 
     odr_long_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x,
                (double *)we, &ldwe, &ld2we,
@@ -119,8 +123,10 @@ int main()
                ifixb, (int *)ifixx, &ldifx,
                stpb, (double *)stpd, &ldstpd,
                sclb, (double *)scld, &ldscld,
-               lower, upper,
+               work, &lwork,
+               iwork, &liwork,
                (double *)delta,
+               lower, upper,
                &job, &ndigit, &taufac, &sstol, &partol,
                &maxit, &iprint, &lunerr, &lunrpt,
                &info);
@@ -131,10 +137,41 @@ int main()
     // Get the variable locations within the integer and real work space
     iworkidx_t iworkidx;
     workidx_t workidx;
-    diwinf_c(&n, &np, &nq, &iworkidx);
+    diwinf_c(&m, &np, &nq, &iworkidx);
     dwinf_c(&n, &m, &np, &nq, &ldwe, &ld2we, &isodr, &workidx);
 
-    printf("nfev: %d\n", iworkidx.nfev);
+    // Print some outputs
+    printf("info: %d\n", info);
+
+    for (int i = 0; i < NP; i++)
+    {
+        printf("beta[%d] = %f\n", i, beta[i]);
+    }
+
+    for (int i = 0; i < M; i++)
+    {
+        for (int j = 0; j < N; j++)
+        {
+            printf("delta[%d][%d] = %f\n", i, j, delta[i][j]);
+        }
+    }
+
+    printf("nfev: %d\n", iwork[iworkidx.nfev]);
+    printf("rcond : %f\n", work[workidx.rcond]);
+
+    printf("\n");
+    for (int i = 0; i < liwork; i++)
+    {
+        printf("iwork[%d] = %d\n", i, iwork[i]);
+    }
+    printf("\n");
+    for (int i = 0; i < lwork; i++)
+    {
+        printf("work[%d] = %f\n", i, work[i]);
+    }
+
+    free(work);
+    free(iwork);
 
     return 0;
 }
