@@ -9,7 +9,7 @@ foreach t : tests
     executable(
       'test-@0@'.format(t),
       sources: files('test_@0@.f90'.format(t.underscorify())),
-      dependencies: odrpack_dep,
+      link_with: odrpack_lib,
     ),
     suite: 'unit',
   )

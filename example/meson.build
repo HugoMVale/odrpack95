@@ -4,6 +4,6 @@ foreach example : examples
     executable(
       'example@0@'.format(example),
       sources: files('example@0@.f90'.format(example.underscorify())),
-      dependencies: odrpack_dep,
+      link_with: odrpack_lib,
     )
 endforeach

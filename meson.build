@@ -5,7 +5,7 @@ project(
   'fortran',
   version: '1.0.0',
   meson_version: '>=0.55',
-  default_options: ['default_library=both', 'buildtype=debugoptimized', 'fortran_std=none'],
+  default_options: ['default_library=static', 'buildtype=debugoptimized', 'fortran_std=none'],
 )
 
 odrpack_lic = files(
@@ -14,31 +14,18 @@ odrpack_lic = files(
 
 # Sources
 srcs = files(
-  'src/lpkbls.f',
-  'src/odrpack.f90',
-  'src/odrpack_core.f90',
-  'src/odrpack_capi.f90',
-  'src/odrpack_reports.f90',
+  'src/blas.f',
+  'src/linpack.f',
   'src/odrpack_kinds.F90',
+  'src/odrpack_core.f90',
+  'src/odrpack.f90',
+  'src/odrpack_reports.f90',
 )
 
 odrpack_lib = library(
   meson.project_name(),
   sources: srcs,
   install: false,
-)
-
-odrpack_dep = declare_dependency(link_with: odrpack_lib)
-
-# minpack_inc = minpack_lib.private_dir_include()
-# minpack_dep = declare_dependency(
-#   link_with: minpack_lib,
-#   include_directories: [minpack_inc, include_directories('include')],
-#   variables: {'includedir': meson.current_source_dir() / 'include'},
-# )
-
-odrpack_header = files(
-  'include/odrpack/odrpack.h',
 )
 
 # Examples
