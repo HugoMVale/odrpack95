@@ -143,9 +143,14 @@ module odrpack_capi
 
 contains
 
-   subroutine odr_basic_c(fcn, n, m, np, nq, beta, y, x, lower, upper, job) bind(C)
-   !! "Basic" wrapper for the `odr` routine including mandatory arguments and very few optional
-   !! arguments.
+   subroutine odr_short_c(&
+      fcn, &
+      n, m, np, nq, &
+      beta, y, x, &
+      delta, &
+      lower, upper, &
+      job) bind(C)
+   !! "Short-call" wrapper for the `odr` routine including very few optional arguments.
       procedure(fcn_tc) :: fcn
          !! User-supplied subroutine for evaluating the model.
       integer(c_int), intent(in) :: n
@@ -162,6 +167,8 @@ contains
          !! Dependent variable. Unused when the model is implicit.
       real(c_double), intent(in) :: x(n, m)
          !! Explanatory variable.
+      real(c_double), intent(inout), optional :: delta(n, m)
+         !! Error in the `x` data. Initial guess on input and estimated value on output.
       real(c_double), intent(in), optional :: lower(np)
          !! Lower bound on `beta`.
       real(c_double), intent(in), optional :: upper(np)
@@ -169,22 +176,23 @@ contains
       integer(c_int), intent(in), optional :: job
          !! Variable controlling initialization and computational method.
 
-      call odr(fcn, n, m, np, nq, beta, y, x, lower=lower, upper=upper, job=job)
+      call odr(fcn, n, m, np, nq, beta, y, x, &
+               delta=delta, &
+               lower=lower, upper=upper, &
+               job=job)
 
-   end subroutine odr_basic_c
+   end subroutine odr_short_c
 
-   subroutine odr_short_c( &
+   subroutine odr_medium_c( &
       fcn, &
       n, m, np, nq, &
       beta, y, x, &
       we, ldwe, ld2we, &
       wd, ldwd, ld2wd, &
+      delta, &
       lower, upper, &
-      job, &
-      iprint, lunerr, lunrpt, &
-      info) bind(C)
-   !! "Short" wrapper for the `odr` routine including mandatory arguments and most commonly used
-   !! optional arguments. Similar to the short-call statement of the original ODRPACK `DODR`.
+      job, iprint, lunerr, lunrpt, info) bind(C)
+   !! "Medium-call" wrapper for the `odr` routine including most commonly used optional arguments.
       procedure(fcn_tc) :: fcn
          !! User-supplied subroutine for evaluating the model.
       integer(c_int), intent(in) :: n
@@ -213,6 +221,8 @@ contains
          !! Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
       integer(c_int), intent(in) :: ld2wd
          !! Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
+      real(c_double), intent(inout), optional :: delta(n, m)
+         !! Error in the `x` data. Initial guess on input and estimated value on output.
       real(c_double), intent(in), optional :: lower(np)
          !! Lower bound on `beta`.
       real(c_double), intent(in), optional :: upper(np)
@@ -230,12 +240,13 @@ contains
 
       call odr(fcn, n, m, np, nq, beta, y, x, &
                we=we, wd=wd, &
+               delta=delta, &
                lower=lower, upper=upper, &
                job=job, &
                iprint=iprint, lunerr=lunerr, lunrpt=lunrpt, &
                info=info)
 
-   end subroutine odr_short_c
+   end subroutine odr_medium_c
 
    subroutine odr_long_c( &
       fcn, &
@@ -246,13 +257,14 @@ contains
       ifixb, ifixx, ldifx, &
       stpb, stpd, ldstpd, &
       sclb, scld, ldscld, &
-      lower, upper, &
+      work, lwork, iwork, liwork, &
       delta, &
+      lower, upper, &
       job, ndigit, taufac, &
       sstol, partol, maxit, &
       iprint, lunerr, lunrpt, &
       info) bind(C)
-   !! "Long" wrapper for the `odr` routine including mandatory arguments and all optional
+   !! "Long-call" wrapper for the `odr` routine including mandatory arguments and all optional
    !! arguments.
       procedure(fcn_tc) :: fcn
          !! User-supplied subroutine for evaluating the model.
@@ -300,12 +312,21 @@ contains
          !! Scaling values for `delta`.
       integer(c_int), intent(in) :: ldscld
          !! Leading dimension of array `scld`, `ldscld ∈ {1, n}`.
+      real(c_double), intent(inout) :: work(lwork)
+         !! Real work space.
+      integer(c_int), intent(in) :: lwork
+         !! Length of array `work`.
+      integer(c_int), intent(inout) :: iwork(liwork)
+         !! Integer work space.
+      integer(c_int), intent(in) :: liwork
+         !! Length of array `iwork`.
+      real(c_double), intent(inout), optional :: delta(n, m)
+         !! Error in the `x` data. `Shape: (n, m)`. Initial guess on input and estimated value
+         !! on output.
       real(c_double), intent(in), optional :: lower(np)
          !! Lower bound on `beta`.
       real(c_double), intent(in), optional :: upper(np)
          !! Upper bound on `beta`.
-      real(c_double), intent(inout), optional :: delta(n, m)
-         !! Initial error in the `x` data.
       integer(c_int), intent(in), optional :: job
          !! Variable controlling initialization and computational method.
       integer(c_int), intent(in), optional :: ndigit
@@ -340,7 +361,8 @@ contains
                stpd=stpd, &
                sclb=sclb, &
                scld=scld, &
-               info=info)
+               info=info, &
+               work=work, iwork=iwork)
 
    end subroutine odr_long_c
 
@@ -480,6 +502,7 @@ contains
                  loweri, upperi, &
                  lwkmn)
 
+      workidx%delta = deltai - 1
       workidx%eps = epsi - 1
       workidx%xplus = xplusi - 1
       workidx%fn = fni - 1
@@ -534,7 +557,7 @@ contains
 
    end subroutine dwinf_c
 
-   subroutine workspace_dimensions_c(n, m, np, nq, isodr, lenwork, leniwork) bind(C)
+   subroutine workspace_dimensions_c(n, m, np, nq, isodr, lwork, liwork) bind(C)
    !! Calculate the dimensions of the workspace arrays.
       integer(c_int), intent(in) :: n
          !! Number of observations.
@@ -547,13 +570,13 @@ contains
       logical(c_bool), intent(in) :: isodr
          !! The variable designating whether the solution is by ODR (`isodr = .true.`)
          !! or by OLS (`isodr = .false.`).
-      integer(c_int), intent(out) :: lenwork
+      integer(c_int), intent(out) :: lwork
          !! Length of real `work` array.
-      integer(c_int), intent(out) :: leniwork
+      integer(c_int), intent(out) :: liwork
          !! Length of integer `iwork` array.
       
       call workspace_dimensions(n, m, np, nq, logical(isodr, kind=kind(.true.)), &
-                                lenwork, leniwork)
+                                lwork, liwork)
    
    end subroutine workspace_dimensions_c
 

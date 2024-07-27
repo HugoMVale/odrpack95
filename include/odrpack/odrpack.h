@@ -75,7 +75,7 @@ typedef void (*odrpack_fcn)(
     int *istop);
 
 /**
- * @brief "Basic" wrapper for the ODR routine including mandatory arguments and very few
+ * @brief "Short-call" wrapper for the ODR routine including mandatory arguments and very few
  * optional arguments.
  *
  * @param fcn    `==>` User-supplied subroutine for evaluating the model.
@@ -86,11 +86,12 @@ typedef void (*odrpack_fcn)(
  * @param beta   `<=>` Array [np] of function parameters.
  * @param y      `==>` Array [nq][n] of dependent variable. Unused when the model is implicit.
  * @param x      `==>` Array [m][n] of explanatory variable.
- * @param job    `==>` Optional variable controlling initialization and computational method.
+ * @param delta  `<=>` Optional array [m][n] with initial error in the `x` data.
  * @param lower  `==>` Optional array [np] with lower bound on `beta`.
  * @param upper  `==>` Optional array [np] with upper bound on `beta`.
+ * @param job    `==>` Optional variable controlling initialization and computational method.
  */
-ODRPACK_EXTERN void odr_basic_c(
+ODRPACK_EXTERN void odr_short_c(
     odrpack_fcn fcn,
     const int *n,
     const int *m,
@@ -99,13 +100,14 @@ ODRPACK_EXTERN void odr_basic_c(
     double *beta,
     const double *y,
     const double *x,
+    double *delta,
     const double *lower,
     const double *upper,
     const int *job);
 
 /**
- * @brief "Short" wrapper for the ODR routine including mandatory arguments and most commonly
- * used optional arguments. Similar to the short-call statement of the original ODRPACK `DODR`.
+ * @brief "Medium-call" wrapper for the ODR routine including mandatory arguments and most
+ * commonly used optional arguments.
  *
  * @param fcn    `==>` User-supplied subroutine for evaluating the model.
  * @param n      `==>` Number of observations.
@@ -121,6 +123,7 @@ ODRPACK_EXTERN void odr_basic_c(
  * @param wd     `==>` Array [m][ld2wd][ldwd] with `delta` weights.
  * @param ldwd   `==>` Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
  * @param ld2wd  `==>` Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
+ * @param delta  `<=>` Optional array [m][n] with initial error in the `x` data.
  * @param lower  `==>` Optional array [np] with lower bound on `beta`.
  * @param upper  `==>` Optional array [np] with upper bound on `beta`.
  * @param job    `==>` Optional variable controlling initialization and computational method.
@@ -129,7 +132,7 @@ ODRPACK_EXTERN void odr_basic_c(
  * @param lunrpt `==>` Optional logical unit number for computation reports.
  * @param info   `<==` Optional variable designating why the computations were stopped.
  */
-ODRPACK_EXTERN void odr_short_c(
+ODRPACK_EXTERN void odr_medium_c(
     odrpack_fcn fcn,
     const int *n,
     const int *m,
@@ -144,6 +147,7 @@ ODRPACK_EXTERN void odr_short_c(
     const double *wd,
     const int *ldwd,
     const int *ld2wd,
+    double *delta,
     const double *lower,
     const double *upper,
     const int *job,
@@ -153,8 +157,8 @@ ODRPACK_EXTERN void odr_short_c(
     int *info);
 
 /**
- * @brief "Long" wrapper for the ODR routine including mandatory arguments and most commonly
- * used optional arguments. Similar to the long-call statement of the original ODRPACK `DODC`.
+ * @brief "Long-call" wrapper for the ODR routine including mandatory arguments and all
+ * optional arguments.
  *
  * @param fcn    `==>` User-supplied subroutine for evaluating the model.
  * @param n      `==>` Number of observations.
@@ -179,9 +183,13 @@ ODRPACK_EXTERN void odr_short_c(
  * @param sclb   `==>` Input array [np] with scaling values for `beta`.
  * @param scld   `==>` Input array [m][ldscld] with scaling values for `delta`.
  * @param ldscld `==>` Leading dimension of array `scld`, `ldscld ∈ {1, n}`.
+ * @param work   `<=>` Real work space.
+ * @param lwork  `==>` Length of array `work`.
+ * @param iwork  `<=>` Integer work space.
+ * @param liwork `==>` Length of array `iwork`.
+ * @param delta  `<=>` Optional array [m][n] with initial error in the `x` data.
  * @param lower  `==>` Optional array [np] with lower bound on `beta`.
  * @param upper  `==>` Optional array [np] with upper bound on `beta`.
- * @param delta  `<=>` Optional array [m][n] with initial error in the `x` data.
  * @param job    `==>` Optional variable controlling initialization and computational method.
  * @param ndigit `==>` Optional number of accurate digits in the function results, as supplied by the user.
  * @param taufac `==>` Optional factor used to compute the initial trust region diameter.
@@ -217,9 +225,13 @@ ODRPACK_EXTERN void odr_long_c(
     const double *sclb,
     const double *scld,
     const int *ldscld,
+    double *work,
+    const int *lwork,
+    int *iwork,
+    const int *liwork,
+    double *delta,
     const double *lower,
     const double *upper,
-    const double *delta,
     const int *job,
     const int *ndigit,
     const double *taufac,
