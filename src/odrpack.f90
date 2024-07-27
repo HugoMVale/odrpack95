@@ -24,8 +24,7 @@ contains
        info, &
        lower, upper)
    !! Driver routine for finding the weighted explicit or implicit orthogonal distance
-   !! regression (ODR) or ordinary linear or nonlinear least squares (OLS) solution (long call
-   !! statement).
+   !! regression (ODR) or ordinary linear or nonlinear least squares (OLS) solution.
       ! Date Written:   860529   (YYMMDD)
       ! Revision Date:  20040301 (YYYYMMDD)
       ! Category No.:  G2E,I1B1
@@ -92,7 +91,8 @@ contains
       real(wp), intent(in) :: x(:, :)
          !! Explanatory variable. `Shape: (n, m)`.
       real(wp), intent(inout), optional :: delta(:, :)
-         !! Initial error in the `x` data. `Shape: (n, m)`.
+         !! Error in the `x` data. `Shape: (n, m)`. Initial guess on input and estimated value
+         !! on output.
       real(wp), intent(in), optional :: we(:, :, :)
          !! `epsilon` weights. `Shape: (1<=ldwe<=n, 1<=ld2we<=nq, nq)`. See p. 25.
       real(wp), intent(in), optional :: wd(:, :, :)
@@ -143,29 +143,29 @@ contains
          !! Upper bound on `beta`. `Shape: (np)`.
 
       ! Local variables
-      integer :: ldwe, ld2we, ldwd, ld2wd, ldifx, ldscld, ldstpd, ljob, lndigit, lmaxit, &
-                 liprint, llunerr, llunrpt, linfo, lenwork, leniwork, linfo1, linfo2, linfo3, &
-                 linfo4, linfo5
-      integer :: lifixb(np), lifixx(n, m)
-      real(wp) :: ltaufac, lsstol, lpartol
-      real(wp) :: llower(np), lwe(n, nq, nq), lwd(n, m, m), lstpb(np), lstpd(n, m), &
-                  lsclb(np), lscld(n, m), lupper(np), wd1(1, 1, 1)
+      integer :: ldwe, ld2we, ldwd, ld2wd, ldifx, ldscld, ldstpd, job_, ndigit_, maxit_, &
+                 iprint_, lunerr_, lunrpt_, info_, lwork, liwork, info1_, info2_, info3_, &
+                 info4_, info5_
+      integer :: ifixb_(np), ifixx_(n, m)
+      real(wp) :: taufac_, sstol_, partol_
+      real(wp) :: lower_(np), we_(n, nq, nq), wd_(n, m, m), stpb_(np), stpd_(n, m), &
+                  sclb_(np), scld_(n, m), upper_(np), wd1(1, 1, 1)
       real(wp), allocatable :: tempret(:, :)
 
-      real(wp), allocatable, target :: loc_work(:)
-      real(wp), pointer :: lwork(:)
-      integer, allocatable, target :: loc_iwork(:)
-      integer, pointer :: liwork(:)
+      real(wp), allocatable, target :: work_local(:)
+      real(wp), pointer :: work_(:)
+      integer, allocatable, target :: iwork_local(:)
+      integer, pointer :: iwork_(:)
 
       logical :: head, isodr, restart
 
       ! Set LINFO to zero indicating no errors have been found thus far
-      linfo = 0
-      linfo1 = 0
-      linfo2 = 0
-      linfo3 = 0
-      linfo4 = 0
-      linfo5 = 0
+      info_ = 0
+      info1_ = 0
+      info2_ = 0
+      info3_ = 0
+      info4_ = 0
+      info5_ = 0
 
       ! Set all scalar variable defaults except JOB
       ldwe = 1
@@ -175,306 +175,306 @@ contains
       ldifx = 1
       ldscld = 1
       ldstpd = 1
-      liprint = -1
-      llunerr = 0
-      llunrpt = 0
-      lmaxit = -1
-      lndigit = -1
-      lpartol = negone
-      lsstol = negone
-      ltaufac = negone
+      iprint_ = -1
+      lunerr_ = 0
+      lunrpt_ = 0
+      maxit_ = -1
+      ndigit_ = -1
+      partol_ = negone
+      sstol_ = negone
+      taufac_ = negone
       head = .true.
 
       !  Check for the option arguments for printing (so error messages can be
       !  printed appropriately from here on out
       if (present(iprint)) then
-         liprint = iprint
+         iprint_ = iprint
       end if
 
       if (present(lunrpt)) then
-         llunrpt = lunrpt
+         lunrpt_ = lunrpt
       end if
-      if (llunrpt == 0) then
-         llunrpt = output_unit
+      if (lunrpt_ == 0) then
+         lunrpt_ = output_unit
       end if
 
       if (present(lunerr)) then
-         llunerr = lunerr
+         lunerr_ = lunerr
       end if
-      if (llunerr == 0) then
-         llunerr = error_unit
+      if (lunerr_ == 0) then
+         lunerr_ = error_unit
       end if
 
       ! Ensure the problem size is valid
       if (n <= 0) then
-         linfo5 = 1
-         linfo4 = 1
+         info5_ = 1
+         info4_ = 1
       end if
 
       if (m <= 0) then
-         linfo5 = 1
-         linfo3 = 1
+         info5_ = 1
+         info3_ = 1
       end if
 
       if (np <= 0) then
-         linfo5 = 1
-         linfo2 = 1
+         info5_ = 1
+         info2_ = 1
       end if
 
       if (nq <= 0) then
-         linfo5 = 1
-         linfo1 = 1
+         info5_ = 1
+         info1_ = 1
       end if
 
-      if (linfo5 /= 0) then
-         linfo = 10000*linfo5 + 1000*linfo4 + 100*linfo3 + 10*linfo2 + linfo1
-         if (llunerr /= 0 .and. liprint /= 0) then
-            call dodphd(head, llunrpt)
+      if (info5_ /= 0) then
+         info_ = 10000*info5_ + 1000*info4_ + 100*info3_ + 10*info2_ + info1_
+         if (lunerr_ /= 0 .and. iprint_ /= 0) then
+            call dodphd(head, lunrpt_)
             call dodpe1( &
-               llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1, &
+               lunerr_, info_, info5_, info4_, info3_, info2_, info1_, &
                n, m, nq, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-               lenwork, leniwork)
+               lwork, liwork)
          end if
          if (present(info)) then
-            info = linfo
+            info = info_
          end if
          return
       end if
 
       ! Define LJOB and check that necessary arguments are passed for JOB
       if (present(job)) then
-         ljob = job
+         job_ = job
          if (mod(job, 10000)/1000 >= 1) then
             if (.not. present(delta)) then
-               linfo5 = 7
-               linfo4 = 1
+               info5_ = 7
+               info4_ = 1
             end if
          end if
          if (job >= 10000) then
             if (.not. present(iwork)) then
-               linfo5 = 7
-               linfo2 = 1
+               info5_ = 7
+               info2_ = 1
             end if
             if (.not. present(work)) then
-               linfo5 = 7
-               linfo3 = 1
+               info5_ = 7
+               info3_ = 1
             end if
          end if
       else
-         ljob = -1
+         job_ = -1
       end if
 
-      if (linfo5 /= 0) then
-         linfo = 10000*linfo5 + 1000*linfo4 + 100*linfo3 + 10*linfo2 + linfo1
-         if (llunerr /= 0 .and. liprint /= 0) then
-            call dodphd(head, llunrpt)
+      if (info5_ /= 0) then
+         info_ = 10000*info5_ + 1000*info4_ + 100*info3_ + 10*info2_ + info1_
+         if (lunerr_ /= 0 .and. iprint_ /= 0) then
+            call dodphd(head, lunrpt_)
             call dodpe1( &
-               llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1, &
+               lunerr_, info_, info5_, info4_, info3_, info2_, info1_, &
                n, m, nq, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-               lenwork, leniwork)
+               lwork, liwork)
          end if
          if (present(info)) then
-            info = linfo
+            info = info_
          end if
          return
       end if
 
       ! Determine the size of the work arrays
-      isodr = (ljob < 0 .or. mod(ljob, 10) <= 1)
-      call workspace_dimensions(n, m, np, nq, isodr, lenwork, leniwork)
+      isodr = (job_ < 0 .or. mod(job_, 10) <= 1)
+      call workspace_dimensions(n, m, np, nq, isodr, lwork, liwork)
       
       ! Allocate the local work arrays, if not provided by user
       ! The complementary case is treated below, because of the way the info flags are designed 
       if (.not. present(iwork)) then
-         allocate (loc_iwork(leniwork), stat=linfo2)
-         liwork => loc_iwork
+         allocate (iwork_local(liwork), stat=info2_)
+         iwork_ => iwork_local
       end if
 
       if (.not. present(work)) then
-         allocate (loc_work(lenwork), stat=linfo3)
-         lwork => loc_work
+         allocate (work_local(lwork), stat=info3_)
+         work_ => work_local
       end if
      
-      allocate (tempret(max(n, np), max(nq, m)), stat=linfo4)
+      allocate (tempret(max(n, np), max(nq, m)), stat=info4_)
 
-      if (linfo4 /= 0 .or. linfo3 /= 0 .or. linfo2 /= 0) then
-         linfo5 = 8
+      if (info4_ /= 0 .or. info3_ /= 0 .or. info2_ /= 0) then
+         info5_ = 8
       end if
 
-      if (linfo5 /= 0) then
-         linfo = 10000*mod(linfo5, 10) + 1000*mod(linfo4, 10) + &
-                 100*mod(linfo3, 10) + 10*mod(linfo2, 10) + mod(linfo1, 10)
-         if (llunerr /= 0 .and. liprint /= 0) then
-            call dodphd(head, llunrpt)
+      if (info5_ /= 0) then
+         info_ = 10000*mod(info5_, 10) + 1000*mod(info4_, 10) + &
+                 100*mod(info3_, 10) + 10*mod(info2_, 10) + mod(info1_, 10)
+         if (lunerr_ /= 0 .and. iprint_ /= 0) then
+            call dodphd(head, lunrpt_)
             call dodpe1( &
-               llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1, &
+               lunerr_, info_, info5_, info4_, info3_, info2_, info1_, &
                n, m, nq, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-               lenwork, leniwork)
+               lwork, liwork)
          end if
          if (present(info)) then
-            info = linfo
+            info = info_
          end if
          return
       end if
 
-      ! Set local (internal) array variable defaults except IWORK and WORK
-      lifixb(1) = -1
-      lifixx(1, 1) = -1
-      llower(1:np) = -huge(zero)
-      lsclb(1) = negone
-      lscld(1, 1) = negone
-      lstpb(1) = negone
-      lstpd(1, 1) = negone
-      lupper(1:np) = huge(zero)
-      lwe(1, 1, 1) = negone
-      lwd(1, 1, 1) = negone
+      ! Set internal array variable defaults except IWORK and WORK
+      ifixb_(1) = -1
+      ifixx_(1, 1) = -1
+      lower_(1:np) = -huge(zero)
+      sclb_(1) = negone
+      scld_(1, 1) = negone
+      stpb_(1) = negone
+      stpd_(1, 1) = negone
+      upper_(1:np) = huge(zero)
+      we_(1, 1, 1) = negone
+      wd_(1, 1, 1) = negone
 
       ! Check the size of required arguments and return errors if they are too small
       if (size(beta) < np) then
-         linfo1 = linfo1 + 1
+         info1_ = info1_ + 1
       end if
 
       if (any(size(y) < [n, nq])) then
-         linfo1 = linfo1 + 2
+         info1_ = info1_ + 2
       end if
 
       if (any(size(x) < [n, m])) then
-         linfo1 = linfo1 + 4
+         info1_ = info1_ + 4
       end if
 
       ! Check the presence of optional arguments and copy their values internally or
       ! report errors as necessary
       if (present(ifixb)) then
          if (size(ifixb) < np) then
-            linfo1 = linfo1 + 64
+            info1_ = info1_ + 64
          end if
          if (ifixb(1) < 0) then
-            lifixb(1) = ifixb(1)
+            ifixb_(1) = ifixb(1)
          else
-            lifixb(1:np) = ifixb(1:np)
+            ifixb_(1:np) = ifixb(1:np)
          end if
       end if
 
       if (present(ifixx)) then
          ldifx = size(ifixx, 1)
          if (any(size(ifixx) <= [0, 0])) then
-            linfo1 = linfo1 + 128
+            info1_ = info1_ + 128
          end if
          if (.not. (ifixx(1, 1) < 0 .or. ldifx == 1 .or. ldifx >= n) &
              .or. size(ifixx, 2) < m) then
-            linfo1 = linfo1 + 128
+            info1_ = info1_ + 128
          end if
          if (ldifx > n) then
             ldifx = n
          end if
          if (ifixx(1, 1) < 0) then
-            lifixx(1, 1) = ifixx(1, 1)
+            ifixx_(1, 1) = ifixx(1, 1)
          else
-            lifixx(1:ldifx, 1:m) = ifixx(1:ldifx, 1:m)
+            ifixx_(1:ldifx, 1:m) = ifixx(1:ldifx, 1:m)
          end if
       end if
     
       if (present(iwork)) then
-         if (size(iwork) >= leniwork) then
-            liwork => iwork(1:leniwork)
+         if (size(iwork) >= liwork) then
+            iwork_ => iwork(1:liwork)
          else
-             linfo1 = linfo1 + 8192           
+             info1_ = info1_ + 8192           
          end if
       end if
 
       if (present(maxit)) then
-         lmaxit = maxit
+         maxit_ = maxit
       end if
 
       if (present(ndigit)) then
-         lndigit = ndigit
+         ndigit_ = ndigit
       end if
 
       if (present(partol)) then
-         lpartol = partol
+         partol_ = partol
       end if
 
       if (present(sclb)) then
          if (size(sclb) < np) then
-            linfo1 = linfo1 + 1024
+            info1_ = info1_ + 1024
          end if
          if (sclb(1) <= zero) then
-            lsclb(1) = sclb(1)
+            sclb_(1) = sclb(1)
          else
-            lsclb(1:np) = sclb(1:np)
+            sclb_(1:np) = sclb(1:np)
          end if
       end if
 
       if (present(scld)) then
          ldscld = size(scld, 1)
          if (any(size(scld) <= [0, 0])) then
-            linfo1 = linfo1 + 2048
+            info1_ = info1_ + 2048
          end if
          if (.not. (scld(1, 1) <= zero .or. ldscld == 1 .or. ldscld >= n) &
              .or. size(scld, 2) < m) then
-            linfo1 = linfo1 + 2048
+            info1_ = info1_ + 2048
          end if
          if (ldscld > n) then
             ldscld = n
          end if
          if (scld(1, 1) <= zero) then
-            lscld(1, 1) = scld(1, 1)
+            scld_(1, 1) = scld(1, 1)
          else
-            lscld(1:ldscld, 1:m) = scld(1:ldscld, 1:m)
+            scld_(1:ldscld, 1:m) = scld(1:ldscld, 1:m)
          end if
       end if
 
       if (present(sstol)) then
-         lsstol = sstol
+         sstol_ = sstol
       end if
 
       if (present(stpb)) then
          if (size(stpb) < np) then
-            linfo1 = linfo1 + 256
+            info1_ = info1_ + 256
          end if
          if (stpb(1) <= zero) then
-            lstpb(1) = stpb(1)
+            stpb_(1) = stpb(1)
          else
-            lstpb(1:np) = stpb(1:np)
+            stpb_(1:np) = stpb(1:np)
          end if
       end if
 
       if (present(stpd)) then
          ldstpd = size(stpd, 1)
          if (any(size(stpd) <= [0, 0])) then
-            linfo1 = linfo1 + 512
+            info1_ = info1_ + 512
          end if
          if (.not. (stpd(1, 1) <= zero .or. ldstpd == 1 .or. ldstpd >= n) &
              .or. size(stpd, 2) < m) then
-            linfo1 = linfo1 + 512
+            info1_ = info1_ + 512
          end if
          if (ldstpd > n) then
             ldstpd = n
          end if
          if (stpd(1, 1) <= zero) then
-            lstpd(1, 1) = stpd(1, 1)
+            stpd_(1, 1) = stpd(1, 1)
          else
-            lstpd(1:ldstpd, 1:m) = stpd(1:ldstpd, 1:m)
+            stpd_(1:ldstpd, 1:m) = stpd(1:ldstpd, 1:m)
          end if
       end if
 
       if (present(taufac)) then
-         ltaufac = taufac
+         taufac_ = taufac
       end if
 
       if (present(we)) then
          ldwe = size(we, 1)
          ld2we = size(we, 2)
          if (any(size(we) <= [0, 0, 0])) then
-            linfo1 = linfo1 + 16
+            info1_ = info1_ + 16
          end if
          if (.not. (we(1, 1, 1) < zero .or. &
                     ((ldwe == 1 .or. ldwe >= n) .and. &
                      (ld2we == 1 .or. ld2we >= nq))) .or. size(we, 3) < nq) then
-            linfo1 = linfo1 + 16
+            info1_ = info1_ + 16
          end if
          if (ldwe > n) then
             ldwe = n
@@ -483,9 +483,9 @@ contains
             ld2we = nq
          end if
          if (we(1, 1, 1) < zero) then
-            lwe(1, 1, 1) = we(1, 1, 1)
+            we_(1, 1, 1) = we(1, 1, 1)
          else
-            lwe(1:ldwe, 1:ld2we, 1:nq) = we(1:ldwe, 1:ld2we, 1:nq)
+            we_(1:ldwe, 1:ld2we, 1:nq) = we(1:ldwe, 1:ld2we, 1:nq)
          end if
       end if
 
@@ -493,12 +493,12 @@ contains
          ldwd = size(wd, 1)
          ld2wd = size(wd, 2)
          if (any(size(wd) <= [0, 0, 0])) then
-            linfo1 = linfo1 + 32
+            info1_ = info1_ + 32
          end if
          if (.not. (wd(1, 1, 1) < zero .or. &
                     ((ldwd == 1 .or. ldwd >= n) .and. &
                      (ld2wd == 1 .or. ld2wd >= m))) .or. size(wd, 3) < m) then
-            linfo1 = linfo1 + 32
+            info1_ = info1_ + 32
          end if
          if (ldwd > n) then
             ldwd = n
@@ -507,82 +507,82 @@ contains
             ld2wd = m
          end if
          if (wd(1, 1, 1) <= zero) then
-            lwd(1, 1, 1) = wd(1, 1, 1)
+            wd_(1, 1, 1) = wd(1, 1, 1)
          else
-            lwd(1:ldwd, 1:ld2wd, 1:m) = wd(1:ldwd, 1:ld2wd, 1:m)
+            wd_(1:ldwd, 1:ld2wd, 1:m) = wd(1:ldwd, 1:ld2wd, 1:m)
          end if
       end if
 
       if (present(work)) then
-         if (size(work) >= lenwork) then
-            lwork => work(1:lenwork)
+         if (size(work) >= lwork) then
+            work_ => work(1:lwork)
          else
-            linfo1 = linfo1 + 4096
+            info1_ = info1_ + 4096
          end if
       end if
 
-      restart = (mod(ljob/10000, 10) >= 1)
+      restart = (mod(job_/10000, 10) >= 1)
       if (.not. restart) then
-         lwork = zero
-         liwork = 0
+         work_ = zero
+         iwork_ = 0
       end if
 
       if (present(delta) .and. (.not. restart)) then
          if (any(shape(delta) < [n, m])) then
-            linfo1 = linfo1 + 8
+            info1_ = info1_ + 8
          end if
-         lwork(1:n*m) = reshape(delta(1:n, 1:m), [n*m])
+         work_(1:n*m) = reshape(delta(1:n, 1:m), [n*m])
       end if
 
       if (present(lower)) then
          if (size(lower) < np) then
-            linfo1 = linfo1 + 32768
+            info1_ = info1_ + 32768
          end if
-         llower(1:np) = lower(1:np)
+         lower_(1:np) = lower(1:np)
       end if
 
       if (present(upper)) then
          if (size(upper) < np) then
-            linfo1 = linfo1 + 16384
+            info1_ = info1_ + 16384
          end if
-         lupper(1:np) = upper(1:np)
+         upper_(1:np) = upper(1:np)
       end if
 
       ! Report an error if any of the array sizes didn't match.
-      if (linfo1 /= 0) then
-         linfo = 100000 + linfo1
-         linfo1 = 0
-         if (llunerr /= 0 .and. liprint /= 0) then
-            call dodphd(head, llunrpt)
+      if (info1_ /= 0) then
+         info_ = 100000 + info1_
+         info1_ = 0
+         if (lunerr_ /= 0 .and. iprint_ /= 0) then
+            call dodphd(head, lunrpt_)
             call dodpe1( &
-               llunerr, linfo, linfo5, linfo4, linfo3, linfo2, linfo1, &
+               lunerr_, info_, info5_, info4_, info3_, info2_, info1_, &
                n, m, nq, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-               lenwork, leniwork)
+               lwork, liwork)
          end if
          if (present(info)) then
-            info = linfo
+            info = info_
          end if
          return
       end if
 
-      if (lwd(1, 1, 1) /= 0) then
+      if (wd_(1, 1, 1) /= 0) then
          call dodcnt &
             (fcn, &
              n, m, np, nq, &
              beta(1:np), &
              y(1:n, 1:nq), n, x(1:n, 1:m), n, &
-             lwe(1:ldwe, 1:ld2we, 1:nq), ldwe, ld2we, &
-             lwd(1:ldwd, 1:ld2wd, 1:m), ldwd, ld2wd, &
-             lifixb, lifixx(1:ldifx, 1:m), ldifx, &
-             ljob, lndigit, ltaufac, &
-             lsstol, lpartol, lmaxit, &
-             liprint, llunerr, llunrpt, &
-             lstpb, lstpd(1:ldstpd, 1:m), ldstpd, &
-             lsclb, lscld(1:ldscld, 1:m), ldscld, &
-             lwork, lenwork, tempret, liwork, leniwork, &
-             linfo, &
-             llower, lupper)
+             we_(1:ldwe, 1:ld2we, 1:nq), ldwe, ld2we, &
+             wd_(1:ldwd, 1:ld2wd, 1:m), ldwd, ld2wd, &
+             ifixb_, ifixx_(1:ldifx, 1:m), ldifx, &
+             job_, ndigit_, taufac_, &
+             sstol_, partol_, maxit_, &
+             iprint_, lunerr_, lunrpt_, &
+             stpb_, stpd_(1:ldstpd, 1:m), ldstpd, &
+             sclb_, scld_(1:ldscld, 1:m), ldscld, &
+             work_, lwork, tempret, iwork_, liwork, &
+             info_, &
+             lower_, upper_)
       else
          wd1(1, 1, 1) = negone
          call dodcnt &
@@ -590,25 +590,25 @@ contains
              n, m, np, nq, &
              beta(1:np), &
              y(1:n, 1:nq), n, x(1:n, 1:m), n, &
-             lwe(1:ldwe, 1:ld2we, 1:nq), ldwe, ld2we, &
+             we_(1:ldwe, 1:ld2we, 1:nq), ldwe, ld2we, &
              wd1, 1, 1, &
-             lifixb, lifixx(1:ldifx, 1:m), ldifx, &
-             ljob, lndigit, ltaufac, &
-             lsstol, lpartol, lmaxit, &
-             liprint, llunerr, llunrpt, &
-             lstpb, lstpd(1:ldstpd, 1:m), ldstpd, &
-             lsclb, lscld(1:ldscld, 1:m), ldscld, &
-             lwork, lenwork, tempret, liwork, leniwork, &
-             linfo, &
-             llower, lupper)
+             ifixb_, ifixx_(1:ldifx, 1:m), ldifx, &
+             job_, ndigit_, taufac_, &
+             sstol_, partol_, maxit_, &
+             iprint_, lunerr_, lunrpt_, &
+             stpb_, stpd_(1:ldstpd, 1:m), ldstpd, &
+             sclb_, scld_(1:ldscld, 1:m), ldscld, &
+             work_, lwork, tempret, iwork_, liwork, &
+             info_, &
+             lower_, upper_)
       end if
 
       if (present(delta)) then
-         delta(1:n, 1:m) = reshape(lwork(1:n*m), [n, m])
+         delta(1:n, 1:m) = reshape(work_(1:n*m), [n, m])
       end if
 
       if (present(info)) then
-         info = linfo
+         info = info_
       end if
 
    end subroutine odr
@@ -2499,7 +2499,7 @@ contains
 
    end subroutine dodmn
 
-   subroutine workspace_dimensions(n, m, np, nq, isodr, lenwork, leniwork)
+   subroutine workspace_dimensions(n, m, np, nq, isodr, lwork, liwork)
    !! Calculate the dimensions of the workspace arrays.
       integer, intent(in) :: n
          !! Number of observations.
@@ -2512,20 +2512,20 @@ contains
       logical, intent(in) :: isodr
          !! The variable designating whether the solution is by ODR (`isodr = .true.`)
          !! or by OLS (`isodr = .false.`).
-      integer, intent(out) :: lenwork
+      integer, intent(out) :: lwork
          !! Length of `work` array.
-      integer, intent(out) :: leniwork
+      integer, intent(out) :: liwork
          !! Length of `iwork` array.
       
       if(isodr) then
-         lenwork = 18 + 13*np + np**2 + m + m**2 + 4*n*nq + 6*n*m + 2*n*nq*np + &
+         lwork = 18 + 13*np + np**2 + m + m**2 + 4*n*nq + 6*n*m + 2*n*nq*np + &
                    2*n*nq*m + nq**2 + 5*nq + nq*(np + m) + n*nq*nq
       else
-         lenwork = 18 + 13*np + np**2 + m + m**2 + 4*n*nq + 2*n*m + 2*n*nq*np + &
+         lwork = 18 + 13*np + np**2 + m + m**2 + 4*n*nq + 2*n*m + 2*n*nq*np + &
                    5*nq + nq*(np + m) + n*nq*nq
       end if
 
-      leniwork = 20 + 2*np + nq*(np + m)
+      liwork = 20 + 2*np + nq*(np + m)
 
    end subroutine workspace_dimensions
 
