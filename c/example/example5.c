@@ -106,12 +106,12 @@ int main()
     double partol = -1.0;
     int maxit = -1;
     job = 1020;
-    int lenwork, leniwork;
+    int lwork, liwork;
     _Bool isodr = true;
 
-    workspace_dimensions_c(&n, &m, &np, &nq, &isodr, &lenwork, &leniwork);
-    printf("lenwork: %d\n", lenwork);
-    printf("leniwork: %d\n", leniwork);
+    workspace_dimensions_c(&n, &m, &np, &nq, &isodr, &lwork, &liwork);
+    printf("lwork: %d\n", lwork);
+    printf("liwork: %d\n", liwork);
 
     odr_long_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x,
                (double *)we, &ldwe, &ld2we,
@@ -128,17 +128,13 @@ int main()
     close_file(&lunrpt, &ierr);
     // printf("Error code (ierr): %d\n", ierr);
 
-    // workidx_t workidx;
-    // dwinf_c(&n, &m, &np, &nq, &ldwe, &ld2we, &isodr, &workidx);
+    // Get the variable locations within the integer and real work space
+    iworkidx_t iworkidx;
+    workidx_t workidx;
+    diwinf_c(&n, &np, &nq, &iworkidx);
+    dwinf_c(&n, &m, &np, &nq, &ldwe, &ld2we, &isodr, &workidx);
 
-    // for (int i = 0; i < M; i++)
-    // {
-    //     for (int j = 0; j < N; j++)
-    //     {
-    //         printf("%lf ", delta[i][j]);
-    //     }
-    //     printf("\n");
-    // }
+    printf("nfev: %d\n", iworkidx.nfev);
 
     return 0;
 }

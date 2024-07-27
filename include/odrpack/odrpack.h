@@ -359,13 +359,13 @@ ODRPACK_EXTERN void dwinf_c(
 /**
  * @brief Calculate the dimensions of the workspace arrays.
  *
- * @param n        `==>` Number of observations.
- * @param m        `==>` Number of columns of data in the explanatory variable.
- * @param np       `==>` Number of function parameters.
- * @param nq       `==>` Number of responses per observation.
- * @param isodr    `==>` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
- * @param lenwork  `<==` Length of real `work` array.
- * @param leniwork `<==` Length of integer `iwork` array.
+ * @param n      `==>` Number of observations.
+ * @param m      `==>` Number of columns of data in the explanatory variable.
+ * @param np     `==>` Number of function parameters.
+ * @param nq     `==>` Number of responses per observation.
+ * @param isodr  `==>` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
+ * @param lwork  `<==` Length of real `work` array.
+ * @param liwork `<==` Length of integer `iwork` array.
  */
 ODRPACK_EXTERN void workspace_dimensions_c(
     const int *n,
@@ -373,7 +373,7 @@ ODRPACK_EXTERN void workspace_dimensions_c(
     const int *np,
     const int *nq,
     const _Bool *isodr,
-    int *lenwork,
-    int *leniwork);
+    int *lwork,
+    int *liwork);
 
 #endif // ODRPACK_H
