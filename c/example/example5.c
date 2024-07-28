@@ -13,33 +13,31 @@ void fcn(int *n, int *m, int *np, int *nq, int *ldn, int *ldm, int *ldnp, double
          double *xplusd, int *ifixb, int *ifixx, int *ldifx, int *ideval, double *f,
          double *fjacb, double *fjacd, int *istop)
 {
-    int i;
-
     *istop = 0;
 
-    // Calculate model
+    // Model function
     if (*ideval % 10 != 0)
     {
-        for (i = 0; i < *n; i++)
+        for (int i = 0; i < *n; i++)
         {
             f[i] = beta[0] * exp(beta[1] * xplusd[i]);
         }
     }
 
-    // Calculate model partials with respect to `beta`
+    // Model partial derivatives wrt `beta`
     if ((*ideval / 10) % 10 != 0)
     {
-        for (i = 0; i < *n; i++)
+        for (int i = 0; i < *n; i++)
         {
             fjacb[i] = exp(beta[1] * xplusd[i]);
             fjacb[*n + i] = beta[0] * xplusd[i] * exp(beta[1] * xplusd[i]);
         }
     }
 
-    // Calculate model partials with respect to `delta`
+    // Model partial derivatives wrt `delta`
     if ((*ideval / 100) % 10 != 0)
     {
-        for (i = 0; i < *n; i++)
+        for (int i = 0; i < *n; i++)
         {
             fjacd[i] = beta[0] * beta[1] * exp(beta[1] * xplusd[i]);
         }
@@ -124,7 +122,9 @@ int main()
     lunerr = lunrpt;
 
     // Call odr
-    odr_long_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x,
+    odr_long_c(fcn, &n, &m, &np, &nq,
+               beta,
+               (double *)y, (double *)x,
                (double *)we, &ldwe, &ld2we,
                (double *)wd, &ldwd, &ld2wd,
                ifixb, (int *)ifixx, &ldifx,
