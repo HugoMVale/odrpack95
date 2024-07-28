@@ -189,6 +189,7 @@ contains
       beta, y, x, &
       we, ldwe, ld2we, &
       wd, ldwd, ld2wd, &
+      ifixb, ifixx, ldifx, &
       delta, &
       lower, upper, &
       job, iprint, lunerr, lunrpt, info) bind(C)
@@ -221,6 +222,12 @@ contains
          !! Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
       integer(c_int), intent(in) :: ld2wd
          !! Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
+      integer(c_int), intent(in) :: ifixb(np)
+         !! Values designating whether the elements of `beta` are fixed at their input values or not.
+      integer(c_int), intent(in) :: ifixx(ldifx, m)
+         !! Values designating whether the elements of `x` are fixed at their input values or not.
+      integer(c_int), intent(in) :: ldifx
+         !! Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.
       real(c_double), intent(inout), optional :: delta(n, m)
          !! Error in the `x` data. Initial guess on input and estimated value on output.
       real(c_double), intent(in), optional :: lower(np)
@@ -240,6 +247,7 @@ contains
 
       call odr(fcn, n, m, np, nq, beta, y, x, &
                we=we, wd=wd, &
+               ifixb=ifixb, ifixx=ifixx, &
                delta=delta, &
                lower=lower, upper=upper, &
                job=job, &
@@ -264,8 +272,7 @@ contains
       sstol, partol, maxit, &
       iprint, lunerr, lunrpt, &
       info) bind(C)
-   !! "Long-call" wrapper for the `odr` routine including mandatory arguments and all optional
-   !! arguments.
+   !! "Long-call" wrapper for the `odr` routine including all optional arguments.
       procedure(fcn_tc) :: fcn
          !! User-supplied subroutine for evaluating the model.
       integer(c_int), intent(in) :: n
@@ -352,8 +359,7 @@ contains
                delta=delta, &
                we=we, wd=wd, &
                lower=lower, upper=upper, &
-               ifixb=ifixb, &
-               ifixx=ifixx, &
+               ifixb=ifixb, ifixx=ifixx, &
                job=job, ndigit=ndigit, taufac=taufac, &
                sstol=sstol, partol=partol, maxit=maxit, &
                iprint=iprint, lunerr=lunerr, lunrpt=lunrpt, &

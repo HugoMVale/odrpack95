@@ -123,6 +123,9 @@ ODRPACK_EXTERN void odr_short_c(
  * @param wd     `==>` Array [m][ld2wd][ldwd] with `delta` weights.
  * @param ldwd   `==>` Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
  * @param ld2wd  `==>` Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
+ * @param ifixb  `==>` Array [np] with values designating whether the elements of `beta` are fixed at their input values or not.
+ * @param ifixx  `==>` Array [m][ldifx] with values designating whether the elements of `x` are fixed at their input values or not.
+ * @param ldifx  `==>` Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.
  * @param delta  `<=>` Optional array [m][n] with initial error in the `x` data.
  * @param lower  `==>` Optional array [np] with lower bound on `beta`.
  * @param upper  `==>` Optional array [np] with upper bound on `beta`.
@@ -147,6 +150,9 @@ ODRPACK_EXTERN void odr_medium_c(
     const double *wd,
     const int *ldwd,
     const int *ld2wd,
+    const int *ifixb,
+    const int *ifixx,
+    const int *ldifx,
     double *delta,
     const double *lower,
     const double *upper,
