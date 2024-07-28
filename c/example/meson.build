@@ -1,4 +1,4 @@
-examples = ['5']
+examples = ['3', '5']
 
 foreach example : examples
     executable(
