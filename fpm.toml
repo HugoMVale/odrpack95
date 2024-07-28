@@ -7,8 +7,8 @@ copyright = "Copyright 2024, HugoMVale"
 
 [build]
 auto-executables = false
+auto-examples = false
 auto-tests = true
-auto-examples = true
 module-naming = false
 link = ["openblas"]
 
