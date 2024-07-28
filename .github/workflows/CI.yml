@@ -2,6 +2,9 @@ name: Build and test pkg
 
 on: [push, pull_request]
 
+env:
+  FLAGS: "-Wno-compare-reals"
+
 jobs:
   linux-gcc-build:
     runs-on: ${{ matrix.os }}
@@ -13,10 +16,8 @@ jobs:
         include:
           - os: ubuntu-latest
             os-arch: linux-x86_64
-
     env:
       FC: gfortran
-      FLAGS: "-Wno-compare-reals -Wno-implicit-interface"
       GCC_V: ${{ matrix.gcc_v }}
 
     steps:
