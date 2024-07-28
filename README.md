@@ -21,10 +21,16 @@ variable.
 This project aims to modernize the original code, namely:
 
 * [x] Modify the tests so they can be automatically run in the CI.
-* [x] Conversion from fixed (`.f`) to free-form (`.f90`) source.
-* [ ] Fix warnings, etc.
-* [ ] Implement a C API.
+* [x] Convert from fixed-form (`.f`) to free-form (`.f90`).
+* [x] Convert from upper case to lower case.
+* [x] Split the code in modules.
+* [x] Add `intent(in/out)` to all procedures.
+* [x] Remove labeled do loops, and (almost) all gotos.
+* [x] Implement a C API.
+* [x] Generate automatic code documentation with FORD.
 * [ ] Implement python bindings to the C API.
+* [ ] Replace LINPACK calls by LAPACK. Code profiling shows that LINPACK calls are not time
+      consuming, so this change is motivated by code maintainability, not by performance.
 
 ## Build instructions
 
