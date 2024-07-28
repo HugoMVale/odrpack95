@@ -6,3 +6,4 @@ _site
 notes.md
 test/*.txt
 build
+_build
