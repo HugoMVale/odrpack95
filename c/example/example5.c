@@ -1,12 +1,12 @@
 /*
-This is a translation of example 5 from the ODRPACK95 documentation.
+This is an adaptation of example 5 from the ODRPACK95 documentation.
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include "../../include/odrpack/odrpack.h"
+#include "../include/odrpack/odrpack.h"
 
 // User-supplied function for evaluating the model and its partial derivatives
 void fcn(int *n, int *m, int *np, int *nq, int *ldn, int *ldm, int *ldnp, double *beta,
@@ -52,9 +52,15 @@ int main()
 #define N 4
 #define M 1
 #define NQ 1
+#define LDWE 1
+#define LD2WE 1
+#define LDWD 1
+#define LD2WD 1
+#define LDIFX 1
+#define LDSTPD 1
+#define LDSCLD 1
 
     int n = N, m = M, np = NP, nq = NQ;
-    int job = 20;
     double beta[NP] = {2.0, 0.5};
     double lower[NP] = {0.0, 0.0};
     double upper[NP] = {10.0, 0.9};
@@ -62,61 +68,62 @@ int main()
     double y[NQ][N] = {{2.7, 7.4, 148.0, 403.0}};
     double delta[M][N] = {{0.0, 0.0, 0.0, 0.0}};
 
-    int ldwe = 1;
-    int ld2we = 1;
-    int ldwd = 1;
-    int ld2wd = 1;
-    double we[NQ][1][1] = {-1.0};
-    double wd[M][1][1] = {-1.0};
-    int iprint = 2001;
-    int info = 0;
+    int ldwe = LDWE, ld2we = LD2WE, ldwd = LDWD, ld2wd = LD2WD;
+    double we[NQ][LD2WE][LDWE] = {{{-1.0}}};
+    double wd[M][LD2WE][LDWD] = {{{-1.0}}};
 
-    char *fn = "report5.txt";
-    int lunrpt = 0;
-    int lunerr = 0;
-    int ierr = 0;
-
+    int ldifx = LDIFX;
     int ifixb[NP] = {1, 1};
-    int ifixx[M][1] = {-1};
-    int ldifx = 1;
+    int ifixx[M][LDIFX] = {{-1}};
+
+    int ldstpd = LDSTPD;
     double stpb[NP] = {-1.0, -1.0};
-    double stpd[M][1] = {-1.0};
-    int ldstpd = 1;
+    double stpd[M][LDSTPD] = {{-1.0}};
+    int ldscld = LDSCLD;
     double sclb[NP] = {-1.0, -1.0};
-    double scld[M][1] = {-1.0};
-    int ldscld = 1;
+    double scld[M][LDSCLD] = {{-1.0}};
+
     int ndigit = -1;
     double taufac = -1.0;
     double sstol = -1.0;
     double partol = -1.0;
     int maxit = 45;
-    job = 1020;
     _Bool isodr = true;
-    int lwork, liwork;
 
-    // Calculate workspace dimensions
+    int job = 1020;
+    int iprint = 2001;
+    int info = 0;
+
+    // Determine workspace requirements
+    int lwork, liwork;
     workspace_dimensions_c(&n, &m, &np, &nq, &isodr, &lwork, &liwork);
-    printf("lwork: %d\n", lwork);
-    printf("liwork: %d\n", liwork);
+    // printf("lwork: %d\n", lwork);
+    // printf("liwork: %d\n", liwork);
 
     // Allocate memory for array `work`
     double *work = (double *)malloc(lwork * sizeof(double));
     if (work == NULL)
     {
-        fprintf(stderr, "Failed to allocate memory for work array\n");
+        fprintf(stderr, "Failed to allocate memory for 'work' array\n");
     }
 
     // Allocate memory for array `iwork`
     int *iwork = (int *)malloc(liwork * sizeof(int));
     if (iwork == NULL)
     {
-        fprintf(stderr, "Failed to allocate memory for iwork array\n");
+        fprintf(stderr, "Failed to allocate memory for 'iwork' array\n");
     }
 
+    // Open report file
+    char *fn = "report5.txt";
+    int lunrpt = 0;
+    int lunerr = 0;
+    int ierr = 0;
     open_file(&lunrpt, fn, &ierr);
     // printf("Error code (ierr): %d\n", ierr);
     lunerr = lunrpt;
 
+    // Call odr
     odr_long_c(fcn, &n, &m, &np, &nq, beta, (double *)y, (double *)x,
                (double *)we, &ldwe, &ld2we,
                (double *)wd, &ldwd, &ld2wd,
