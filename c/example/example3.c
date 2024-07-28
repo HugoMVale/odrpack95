@@ -5,7 +5,7 @@ This is a translation of example 3 from the ODRPACK95 documentation.
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "../../include/odrpack/odrpack.h"
+#include "../include/odrpack/odrpack.h"
 
 // User-supplied function for evaluating the model
 void fcn(int *n, int *m, int *np, int *nq, int *ldn, int *ldm, int *ldnp, double *beta,
@@ -16,10 +16,9 @@ void fcn(int *n, int *m, int *np, int *nq, int *ldn, int *ldm, int *ldnp, double
     // Local variables
     double freq, omega, ctheta, stheta, theta, phi, r;
     const double pi = 4 * atan(1.0);
-    int i;
 
     // Check for unacceptable values for this problem
-    for (i = 0; i < *n; i++)
+    for (int i = 0; i < *n; i++)
     {
         if (xplusd[i * *m] < 0.0)
         {
@@ -33,10 +32,10 @@ void fcn(int *n, int *m, int *np, int *nq, int *ldn, int *ldm, int *ldnp, double
     ctheta = cos(theta);
     stheta = sin(theta);
 
-    // Compute predicted values
+    // Model function
     if ((*ideval % 10) >= 1)
     {
-        for (i = 0; i < *n; i++)
+        for (int i = 0; i < *n; i++)
         {
             freq = xplusd[i];
             omega = pow(2.0 * pi * freq * exp(-beta[2]), beta[3]);
@@ -58,37 +57,32 @@ int main()
 
     // Variable declarations
     int n = N, m = M, np = NP, nq = NQ;
-    int i, info, iprint, j, job, lunerr, lunrpt;
-    int ifixx[M][N];
+    int ldwe = N, ld2we = NQ, ldwd = N, ld2wd = M, ldifx = N;
     double beta[NP], x[M][N], y[NQ][N], delta[M][N], wd[M][M][N], we[NQ][NQ][N];
+    int ifixx[M][N];
+    int ifixb[NP] = {1, 1, 1, 1, 1};
 
     // Read problem data
     FILE *data_file = fopen("./data3.dat", "r");
-    for (i = 0; i < NP; i++)
+    for (int i = 0; i < NP; i++)
     {
         fscanf(data_file, "%lf", &beta[i]);
     }
-    for (i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
-        for (j = 0; j < m; j++)
+        for (int j = 0; j < m; j++)
         {
             fscanf(data_file, "%lf", &x[j][i]);
         }
-        for (j = 0; j < nq; j++)
+        for (int j = 0; j < nq; j++)
         {
             fscanf(data_file, "%lf", &y[j][i]);
         }
     }
-
-    // Close files
     fclose(data_file);
 
-    // Specify task as explicit orthogonal distance regression with central difference derivatives
-    job = 01010;
-    iprint = 2002;
-
     // Initialize delta and specify first decade of frequencies as fixed
-    for (i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
         if (x[0][i] < 100.0)
         {
@@ -123,7 +117,7 @@ int main()
     }
 
     // Set weights
-    for (i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
         if (x[0][i] == 100.0 || x[0][i] == 150.0)
         {
@@ -142,8 +136,24 @@ int main()
         wd[0][0][i] = 1.0e-4 / pow(x[0][i], 2);
     }
 
+    // Specify task as explicit orthogonal distance regression with central difference derivatives
+    int job = 1010;
+    int iprint = 2002;
+
+    int lunrpt = 0; // stdout
+    int lunerr = 0; // stderr
+    int info = 0;
+
     // Compute solution
-    odr_c(fcn, n, m, NP, nq, &beta, (double *)y, (double *)x, delta, we, wd, ifixx, &job, &iprint, &lunerr, &lunrpt, &info);
+    odr_medium_c(fcn, &n, &m, &np, &nq,
+                 beta,
+                 (double *)y, (double *)x,
+                 (double *)we, &ldwe, &ld2we,
+                 (double *)wd, &ldwd, &ld2wd,
+                 ifixb, (int *)ifixx, &ldifx,
+                 (double *)delta,
+                 NULL, NULL,
+                 &job, &iprint, &lunerr, &lunrpt, &info);
 
     return 0;
 }
