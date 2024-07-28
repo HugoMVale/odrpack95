@@ -38,15 +38,15 @@ jobs:
       - name: Build and test
         run: |
           gfortran --version
-          fpm test --profile debug --verbose
-          fpm test --profile release --verbose
+          fpm test --profile debug --flag "-Wno-compare-reals" --verbose
+          fpm test --profile release --flag "-Wno-compare-reals" --verbose
       
       - name: Generate coverage report
         if: ${{ matrix.gcc_v == '10' }}
         run: |
           gfortran --version
           rm -rf ./build/gfortran*
-          fpm test --profile debug --flag "--coverage"
+          fpm test --profile debug --flag "--coverage -Wno-compare-reals"
           gcov ./build/gfortran*/odrpack95/src*.gcda -r ./src/ -b -w
           
       - name: Run examples
