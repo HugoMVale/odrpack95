@@ -16,6 +16,7 @@ jobs:
 
     env:
       FC: gfortran
+      FLAGS: "-Wno-compare-reals -Wno-implicit-interface"
       GCC_V: ${{ matrix.gcc_v }}
 
     steps:
@@ -39,15 +40,15 @@ jobs:
       - name: Build and test
         run: |
           gfortran --version
-          fpm test --profile debug --flag "-Wno-compare-reals" --verbose
-          fpm test --profile release --flag "-Wno-compare-reals" --verbose
+          fpm test --profile debug --flag $FLAGS --verbose
+          fpm test --profile release --flag $FLAGS --verbose
       
       - name: Generate coverage report
         if: ${{ matrix.gcc_v == '10' }}
         run: |
           gfortran --version
           rm -rf ./build/gfortran*
-          fpm test --profile debug --flag "--coverage -Wno-compare-reals"
+          fpm test --profile debug --flag "$FLAGS --coverage"
           gcov ./build/gfortran*/odrpack95/src*.gcda -r ./src/ -b -w
           
       - name: Run examples
@@ -86,5 +87,5 @@ jobs:
       - name: Build and test
         run: |
           gfortran --version
-          fpm test --profile debug --flag "-Wno-compare-reals" --verbose
-          fpm test --profile release --flag "-Wno-compare-reals" --verbose
+          fpm test --profile debug --flag $FLAGS --verbose
+          fpm test --profile release --flag $FLAGS --verbose
