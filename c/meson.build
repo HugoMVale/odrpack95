@@ -12,9 +12,10 @@ odrpack_lic = files(
   '../LICENSE',
 )
 
+openblas = dependency('openblas', required: true)
+
 # Sources
 srcs = files(
-  '../src/blas.f',
   '../src/linpack.f',
   '../src/odrpack_kinds.F90',
   '../src/odrpack_core.f90',
@@ -26,6 +27,7 @@ srcs = files(
 odrpack_c_lib = library(
   meson.project_name(),
   sources: srcs,
+  dependencies: [openblas],
   install: false,
 )
 

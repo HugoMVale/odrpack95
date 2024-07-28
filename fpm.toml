@@ -10,6 +10,7 @@ auto-executables = false
 auto-tests = true
 auto-examples = true
 module-naming = false
+link = ["openblas"]
 
 [install]
 library = false
