@@ -22,12 +22,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install GFortran
+      - name: Install GFortran, OpenBLAS
         if: contains(matrix.os, 'ubuntu')
         run: |
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_V} 100 \
           --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-${GCC_V} \
           --slave /usr/bin/gcov gcov /usr/bin/gcov-${GCC_V}
+          sudo apt-get install libopenblas-base
 
       - name: Install fpm
         uses: fortran-lang/setup-fpm@v5
@@ -71,7 +72,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Install MSYS2, GFortran, fpm
+      - name: Install MSYS2, GFortran, fpm, OpenBLAS
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
@@ -85,5 +86,5 @@ jobs:
       - name: Build and test
         run: |
           gfortran --version
-          fpm test --profile debug --verbose
-          fpm test --profile release --verbose
+          fpm test --profile debug --flag "-Wno-compare-reals" --verbose
+          fpm test --profile release --flag "-Wno-compare-reals" --verbose
