@@ -14,7 +14,7 @@ model can be either explicit or implicit. Additionally, `odrpack` can be used to
 the errors are attributed to the observations of the dependent variable.
 
 <p align="center">
-  <img src="https://en.wikipedia.org/wiki/Deming_regression#/media/File:Total_least_squares.svg" width="500" alt="Deming regression; special case of ODR.">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Total_least_squares.svg/220px-Total_least_squares.svg.png" width="200" alt="Deming regression; special case of ODR.">
 </p>
 
 ## Revision history
