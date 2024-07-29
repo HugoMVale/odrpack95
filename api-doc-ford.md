@@ -26,9 +26,6 @@ predocmark_alt: <
 md_extensions: markdown.extensions.toc
 ---
 
-About
-=====
-
 `odrpack` is a package for weighted orthogonal distance regression (ODR), also known as [errors-in-variables regression](https://en.wikipedia.org/wiki/Errors-in-variables_models). 
 It is designed primarily for instances when both the explanatory and response variables have significant errors. 
 The package implements a highly efficient algorithm for minimizing the sum of the squares of the weighted orthogonal
