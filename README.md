@@ -29,7 +29,7 @@ the errors are attributed to the observations of the dependent variable.
 The detailed revision history of ODRPACK and ODRPACK95 is provided on page iv of the 
 [User's Reference Guide for ODRPACK95](https://github.com/HugoMVale/odrpack95/blob/main/original/Doc/guide.pdf).
 
-### odrpack vs ODRPACK95
+### Why odrpack?
 
 This project aims to modernize the ODRPACK95 code, namely:
 
@@ -38,7 +38,7 @@ This project aims to modernize the ODRPACK95 code, namely:
 * [x] Convert from upper case to lower case.
 * [x] Split the code in modules.
 * [x] Add `intent(in/out)` to all procedures.
-* [x] Remove labeled do loops, and (almost) all gotos.
+* [x] Remove `DATA` statements, labeled do loops, and (most) `goto`s.
 * [x] Implement a C API.
 * [x] Generate automatic code documentation with FORD.
 * [ ] Implement python bindings to the C API.
