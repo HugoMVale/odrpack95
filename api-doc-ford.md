@@ -4,6 +4,7 @@ license: bsd
 summary: odrpack is a package for weighted orthogonal distance regression (ODR), also known as errors-in-variables regression.
 src_dir: ./src
          ./example
+         ./c
 exclude: ./src/lpkbls.f
 output_dir: _site
 page_dir: ./doc
