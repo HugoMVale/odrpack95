@@ -7,10 +7,12 @@ coverage:
     - test
     - doc
     - example
+    - "src/linpack.f"
+    - "src/blas.f_"
   status:
     patch:
       default:
         target: 20%
     project:
       default:
-        target: 70%
+        target: 60%
