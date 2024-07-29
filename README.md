@@ -1,4 +1,4 @@
-# odrpack95
+# odrpack
 
 [![CI](https://github.com/HugoMVale/odrpack95/actions/workflows/CI.yml/badge.svg)](https://github.com/HugoMVale/odrpack95/actions)
 [![codecov](https://codecov.io/gh/HugoMVale/odrpack95/branch/main/graph/badge.svg?token=1XL5LQSO9P)](https://codecov.io/gh/HugoMVale/odrpack95)
@@ -6,19 +6,32 @@
 
 ## Description
 
-ODRPACK95 is a portable collection of Fortran 95 subprograms for
-fitting a model to data with bound constraints on the model
-parameters.  It is designed primarily for instances when the
-explanatory as well as the response variables have significant
-errors, implementing a highly efficient algorithm for solving the
-weighted orthogonal distance regression problem, i.e., for minimizing
-the sum of the squares of the weighted orthogonal distances between
-each data point and the curve described by the model equation.  It
-can also be used to solve the ordinary least squares problem where
-all of the errors are attributed to the observations of the dependent
-variable.
+`odrpack` is a package for weighted orthogonal distance regression (ODR), also known as [errors-in-variables regression](https://en.wikipedia.org/wiki/Errors-in-variables_models). 
+It is designed primarily for instances when both the explanatory and response variables have significant errors. 
+The package implements a highly efficient algorithm for minimizing the sum of the squares of the weighted orthogonal
+distances between each data point and the curve described by the model equation, subject to parameter bounds. The nonlinear
+model can be either explicit or implicit. Additionally, `odrpack` can be used to solve the ordinary least squares problem where all of
+the errors are attributed to the observations of the dependent variable.
 
-This project aims to modernize the original code, namely:
+<p align="center">
+  <img src="https://en.wikipedia.org/wiki/Deming_regression#/media/File:Total_least_squares.svg" width="500" alt="Deming regression; special case of ODR.">
+</p>
+
+## Revision history
+
+|    Version    | Year |   Standard   |
+|:-------------:|:----:|:------------:|
+|  odrpack      | 2024 | Fortran 2018 |
+| ODRPACK95 1.0 | 2004 |  Fortran 95  |
+|  ODRPACK 2.0  | 1992 |  FORTRAN 77  |
+|  ODRPACK 1.0  | 1989 |  FORTRAN 77  |
+
+The detailed revision history of ODRPACK and ODRPACK95 is provided on page iv of the 
+[User's Reference Guide for ODRPACK95](https://github.com/HugoMVale/odrpack95/blob/main/original/Doc/guide.pdf).
+
+### odrpack vs ODRPACK95
+
+This project aims to modernize the ODRPACK95 code, namely:
 
 * [x] Modify the tests so they can be automatically run in the CI.
 * [x] Convert from fixed-form (`.f`) to free-form (`.f90`).
