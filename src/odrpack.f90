@@ -1040,7 +1040,7 @@ contains
       real(wp) :: betaj(np)
       integer :: interval(np)
 
-      ! External BLAS/LINPACK procedures
+      ! External BLAS procedures
       real(wp), external :: ddot, dnrm2
       external :: dcopy
 
@@ -1736,7 +1736,7 @@ contains
       ! Local arrays
       real(wp) :: loweru(np), upperu(np), wss(3)
 
-      ! External BLAS/LINPACK procedures
+      ! External BLAS procedures
       real(wp), external :: ddot, dnrm2
       external :: dcopy
 

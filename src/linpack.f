@@ -1,3 +1,8 @@
+      MODULE LINPACK
+C      
+      IMPLICIT NONE
+C
+      CONTAINS       
 *DCHEX
       SUBROUTINE DCHEX(R,LDR,P,K,L,Z,LDZ,NZ,C,S,JOB)
 C***Begin Prologue  DCHEX
@@ -92,12 +97,19 @@ C...Used modules
       use odrpack_kinds, only: wp
 
 C...Scalar arguments
-      INTEGER
-     &   JOB,K,L,LDR,LDZ,NZ,P
+      INTEGER, INTENT(IN) :: JOB
+      INTEGER, INTENT(IN) :: K
+      INTEGER, INTENT(IN) :: L
+      INTEGER, INTENT(IN) :: LDR
+      INTEGER, INTENT(IN) :: LDZ
+      INTEGER, INTENT(IN) :: NZ
+      INTEGER, INTENT(IN) :: P
 
 C...Array arguments
-      REAL(wp)
-     &   C(*),R(LDR,*),S(*),Z(LDZ,*)
+      REAL(wp), INTENT(OUT) :: C(*)
+      REAL(wp), INTENT(INOUT) :: R(LDR,*)
+      REAL(wp), INTENT(OUT) :: S(*)
+      REAL(wp), INTENT(INOUT) :: Z(LDZ,*)
 
 C...Local scalars
       REAL(wp)
@@ -308,10 +320,13 @@ C...Used modules
       use odrpack_kinds, only: wp
 
 C...Scalar arguments
-      INTEGER JOB,LDA,N
+      INTEGER, INTENT(IN) :: JOB
+      INTEGER, INTENT(IN) :: LDA
+      INTEGER, INTENT(IN) :: N
 
 C...Array arguments
-      REAL(wp) A(LDA,*),DET(*)
+      REAL(wp), INTENT(INOUT) :: A(LDA,*)
+      REAL(wp), INTENT(OUT) :: DET(*)
 
 C...Local scalars
       REAL(wp) S,T
@@ -459,14 +474,16 @@ C...Used modules
       use odrpack_kinds, only: wp
 
 C...Scalar arguments
-      INTEGER
-     &   JOB,LDX,N,P
+      INTEGER, INTENT(IN) :: JOB
+      INTEGER, INTENT(IN) :: LDX
+      INTEGER, INTENT(IN) :: N
+      INTEGER, INTENT(IN) :: P
 
 C...Array arguments
-      REAL(wp)
-     &   QRAUX(*),WORK(*),X(LDX,*)
-      INTEGER
-     &   JPVT(*)
+      REAL(wp), INTENT(OUT) :: QRAUX(*)
+      REAL(wp), INTENT(OUT) :: WORK(*)
+      REAL(wp), INTENT(INOUT) :: X(LDX,*)
+      INTEGER, INTENT(INOUT) :: JPVT(*)
 
 C...Local scalars
       REAL(wp)
@@ -728,13 +745,21 @@ C...Used modules
       use odrpack_kinds, only: wp
 
 C...Scalar arguments
-      INTEGER
-     &   INFO,JOB,K,LDX,N
+      INTEGER, INTENT(OUT) :: INFO
+      INTEGER, INTENT(IN) :: JOB
+      INTEGER, INTENT(IN) :: K
+      INTEGER, INTENT(IN) :: LDX
+      INTEGER, INTENT(IN) :: N
 
 C...Array arguments
-      REAL(wp)
-     &   B(*),QRAUX(*),QTY(*),QY(*),RSD(*),X(LDX,*),XB(*),
-     &   Y(*)
+      REAL(wp), INTENT(OUT) :: B(*)
+      REAL(wp), INTENT(IN) :: QRAUX(*)
+      REAL(wp), INTENT(OUT) :: QTY(*)
+      REAL(wp), INTENT(OUT) :: QY(*)
+      REAL(wp), INTENT(OUT) :: RSD(*)
+      REAL(wp), INTENT(INOUT) :: X(LDX,*)
+      REAL(wp), INTENT(OUT) :: XB(*)
+      REAL(wp), INTENT(IN) :: Y(*)
 
 C...Local scalars
       REAL(wp)
@@ -745,10 +770,7 @@ C...Local scalars
      &   CB,CQTY,CQY,CR,CXB
 
 C...External functions
-      REAL(wp)
-     &   DDOT
-      EXTERNAL
-     &   DDOT
+      REAL(wp), EXTERNAL :: DDOT
 
 C...External subroutines
       EXTERNAL
@@ -939,14 +961,14 @@ C...Used modules
       use odrpack_kinds, only: wp
 
 C...Scalar arguments
-      REAL(wp)
-     &   RCOND
-      INTEGER
-     &   JOB,LDT,N
+      REAL(wp), INTENT(OUT) :: RCOND
+      INTEGER, INTENT(IN) :: JOB
+      INTEGER, INTENT(IN) :: LDT
+      INTEGER, INTENT(IN) :: N
 
 C...Array arguments
-      REAL(wp)
-     &   T(LDT,*),Z(*)
+      REAL(wp), INTENT(IN) :: T(LDT,*)
+      REAL(wp), INTENT(OUT) :: Z(*)
 
 C...Local scalars
       REAL(wp)
@@ -957,10 +979,7 @@ C...Local scalars
      &   LOWER
 
 C...External functions
-      REAL(wp)
-     &   DASUM
-      EXTERNAL
-     &   DASUM
+      REAL(wp), EXTERNAL :: DASUM
 
 C...External subroutines
       EXTERNAL
@@ -1129,12 +1148,14 @@ C...Used modules
       use odrpack_kinds, only: wp
 
 C...Scalar arguments
-      INTEGER
-     &   INFO,JOB,LDT,N
+      INTEGER, INTENT(OUT) :: INFO
+      INTEGER, INTENT(IN) :: JOB
+      INTEGER, INTENT(IN) :: LDT
+      INTEGER, INTENT(IN) :: N
 
 C...Array arguments
-      REAL(wp)
-     &   B(*),T(LDT,*)
+      REAL(wp), INTENT(INOUT) :: B(*)
+      REAL(wp), INTENT(IN) :: T(LDT,*)
 
 C...Local scalars
       REAL(wp)
@@ -1143,10 +1164,7 @@ C...Local scalars
      &   CASE,J,JJ
 
 C...External functions
-      REAL(wp)
-     &   DDOT
-      EXTERNAL
-     &   DDOT
+      REAL(wp), EXTERNAL :: DDOT
 
 C...External subroutines
       EXTERNAL
@@ -1234,3 +1252,5 @@ C        Solve trans(T)*X=B for T upper triangular.
   150 CONTINUE
       RETURN
       END
+C      
+      END MODULE LINPACK

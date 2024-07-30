@@ -154,7 +154,7 @@ contains
       integer :: i, iwrk, j, k
       logical :: forvcv
 
-      ! External BLAS/LINPACK procedures
+      ! External BLAS procedures
       real(wp), external :: ddot, dnrm2
 
       ! Variable Definitions (alphabetically)
@@ -1242,7 +1242,7 @@ contains
       integer :: ideval, j, k, k1, l
       logical :: ferror
 
-      ! External BLAS/LINPACK procedures
+      ! External BLAS procedures
       real(wp), external :: ddot
 
       ! Variable Definitions (alphabetically)
@@ -1415,7 +1415,7 @@ contains
       real(wp) :: xi, s, t
       integer j, k
 
-      ! External BLAS/LINPACK procedures
+      ! External BLAS procedures
       real(wp), external :: ddot
 
       ! Variable Definitions (alphabetically)
@@ -2211,7 +2211,7 @@ contains
       integer :: i, j, istart
       logical :: anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
 
-      ! External BLAS/LINPACK procedures
+      ! External BLAS procedures
       external :: dcopy
 
       ! Variable Definitions (alphabetically)
@@ -4488,6 +4488,7 @@ contains
       ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero, one
+      use linpack, only: dchex, dqrdc, dqrsl, dtrco, dtrsl
 
       integer, intent(in) :: n
          !! The number of observations.
@@ -4581,10 +4582,10 @@ contains
       ! Local arrays
       real(wp) :: dum(2)
 
-      ! External BLAS/LINPACK procedures
+      ! External BLAS procedures
       real(wp), external :: dnrm2
       integer, external :: idamax
-      external :: dchex, dqrdc, dqrsl, drot, drotg, dtrco, dtrsl
+      external :: drot, drotg
 
       ! Variable definitions (alphabetically)
       !  ALPHA:   The Levenberg-Marquardt parameter.
@@ -4906,6 +4907,7 @@ contains
       ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero
+      use linpack, only: dpodi
 
       integer, intent(in) :: n
          !! The number of observations.
@@ -5000,9 +5002,6 @@ contains
       real(wp) :: temp
       integer :: i, iunfix, j, junfix, kp
       logical :: forvcv
-
-      ! External BLAS/LINPACK procedures
-      external :: dpodi
 
       ! Variable definitions (alphabetically)
       !  DELTA:   The estimated errors in the explanatory variables.
@@ -5204,7 +5203,7 @@ contains
       ! Local scalars
       integer :: i
 
-      ! External subroutines
+      ! External BLAS procedures
       external :: dcopy
 
       ! Variable definitions (alphabetically)
@@ -6017,7 +6016,7 @@ contains
       real(wp) :: temp
       integer :: j1, j, jn
 
-      ! External BLAS/LINPACK procedures
+      ! External BLAS procedures
       real(wp), external :: ddot
       external :: daxpy
 
@@ -6128,7 +6127,7 @@ contains
       ! Local scalars
       integer :: i, n1
 
-      ! External BLAS/LINPACK procedures
+      ! External BLAS procedures
       external :: dcopy
 
       ! Variable Definitions (alphabetically)
