@@ -2,7 +2,6 @@ module odrpack_capi
    !! C-bindings for 'odrpack'.
 
    use, intrinsic :: iso_c_binding, only: c_bool, c_char, c_double, c_f_pointer, c_int, c_ptr 
-   use odrpack_kinds, only: wp
    use odrpack, only: odr, workspace_dimensions
    use odrpack_core, only: diwinf, dwinf 
    implicit none
