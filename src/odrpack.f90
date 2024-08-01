@@ -922,6 +922,7 @@ contains
       use odrpack_core, only: fcn_t, detaf, dfctrw, dflags, diniwk, diwinf, djck, dodchk, &
                               dpack, dsetn, dunpac, dwght, dwinf, derstep, mbfb
       use odrpack_reports, only: dodper
+      use blas_interfaces, only: ddot, dnrm2, dcopy
 
       logical, intent(inout) :: head
          !! The variable designating whether the heading is to be printed (`head = .true.`)
@@ -1039,10 +1040,6 @@ contains
       ! Local arrays
       real(wp) :: betaj(np)
       integer :: interval(np)
-
-      ! External BLAS procedures
-      real(wp), external :: ddot, dnrm2
-      external :: dcopy
 
       ! Variable Definitions (alphabetically)
       !  ACTRSI:   The location in array work of variable ACTRS.
@@ -1590,6 +1587,7 @@ contains
       use odrpack_core, only: fcn_t, dacces, devjac, dflags, dunpac, dwght, dpack, dodvcv, &
                               dodlm
       use odrpack_reports, only: dodpcr
+      use blas_interfaces, only: ddot, dnrm2, dcopy
 
       logical, intent(inout) :: head
          !! The variable designating whether the heading is to be printed (`head = .true.`)
@@ -1648,11 +1646,11 @@ contains
          !! The current estimated values of the unfixed `beta`s.
       real(wp), intent(out) :: betan(np)
          !! The new estimated values of the unfixed `beta`s.
-      real(wp), intent(in) :: betas(np)
+      real(wp), intent(inout) :: betas(np)
          !! The saved estimated values of the unfixed `beta`s.
       real(wp), intent(out) :: s(np)
          !! The step for `beta`.
-      real(wp), intent(in) :: delta(n, m)
+      real(wp), intent(inout) :: delta(n, m)
          !! The estimated errors in the explanatory variables.
       real(wp), intent(out) :: deltan(n, m)
          !! The new estimated errors in the explanatory variables.
@@ -1735,10 +1733,6 @@ contains
 
       ! Local arrays
       real(wp) :: loweru(np), upperu(np), wss(3)
-
-      ! External BLAS procedures
-      real(wp), external :: ddot, dnrm2
-      external :: dcopy
 
       ! Variable Definitions (alphabetically)
       !  ACCESS:  The variable designating whether information is to be accessed from the work
@@ -2499,7 +2493,7 @@ contains
 
    end subroutine dodmn
 
-   subroutine workspace_dimensions(n, m, np, nq, isodr, lwork, liwork)
+   pure subroutine workspace_dimensions(n, m, np, nq, isodr, lwork, liwork)
    !! Calculate the dimensions of the workspace arrays.
       integer, intent(in) :: n
          !! Number of observations.

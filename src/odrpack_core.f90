@@ -68,6 +68,7 @@ contains
       ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero
+      use blas_interfaces, only: ddot, dnrm2
 
       integer, intent(in) :: n
          !! The number of observations.
@@ -153,9 +154,6 @@ contains
       real(wp) :: alpha1, alphan, bot, phi1, phi2, sa, top
       integer :: i, iwrk, j, k
       logical :: forvcv
-
-      ! External BLAS procedures
-      real(wp), external :: ddot, dnrm2
 
       ! Variable Definitions (alphabetically)
       !  ALPHAN:  The new Levenberg-Marquardt parameter.
@@ -1149,6 +1147,7 @@ contains
       ! Revision Date  920304   (YYMMDD)
 
       use odrpack_kinds, only: zero
+      use blas_interfaces, only: ddot
 
       procedure(fcn_t) :: fcn
          !! The user-supplied subroutine for evaluating the model.
@@ -1241,9 +1240,6 @@ contains
       ! Local scalars
       integer :: ideval, j, k, k1, l
       logical :: ferror
-
-      ! External BLAS procedures
-      real(wp), external :: ddot
 
       ! Variable Definitions (alphabetically)
       !  ANAJAC:  The variable designating whether the Jacobians are computed by finite differences
@@ -1383,7 +1379,7 @@ contains
 
    end subroutine devjac
 
-   subroutine dfctr(oksemi, a, lda, n, info)
+   pure subroutine dfctr(oksemi, a, lda, n, info)
    !! Factor the positive (semi)definite matrix `a` using a modified Cholesky factorization.
       ! Adapted from LINPACK subroutine DPOFA.
       ! Routines Called  DDOT
@@ -1392,6 +1388,7 @@ contains
       ! References  Dongarra J.J., Bunch J.R., Moler C.B., Stewart G.W., *LINPACK Users Guide*, SIAM, 1979.
 
       use odrpack_kinds, only: zero, ten
+      use blas_interfaces, only: ddot
 
       logical, intent(in) :: oksemi
          !! The indicating whether the factored array can be positive semidefinite
@@ -1414,9 +1411,6 @@ contains
       ! Local scalars
       real(wp) :: xi, s, t
       integer j, k
-
-      ! External BLAS procedures
-      real(wp), external :: ddot
 
       ! Variable Definitions (alphabetically)
       !  A:       The array to be factored.  Upon return, A contains the upper triangular matrix
@@ -1475,7 +1469,7 @@ contains
 
    end subroutine dfctr
 
-   subroutine dfctrw &
+   pure subroutine dfctrw &
       (n, m, nq, npp, &
        isodr, &
        we, ldwe, ld2we, wd, ldwd, ld2wd, &
@@ -2106,7 +2100,7 @@ contains
 
    end subroutine diwinf
 
-   subroutine diniwk &
+   pure subroutine diniwk &
       (n, m, np, work, lwork, iwork, liwork, &
        x, ldx, ifixx, ldifx, scld, ldscld, &
        beta, sclb, &
@@ -2123,6 +2117,7 @@ contains
       ! Revision Date  920304   (YYMMDD)
 
       use odrpack_kinds, only: zero, one, two, three
+      use blas_interfaces, only: dcopy
 
       integer, intent(in) :: n
          !! The number of observations.
@@ -2210,9 +2205,6 @@ contains
       ! Local scalars
       integer :: i, j, istart
       logical :: anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
-
-      ! External BLAS procedures
-      external :: dcopy
 
       ! Variable Definitions (alphabetically)
       !  ANAJAC:  The variable designating whether the Jacobians are computed by finite differences
@@ -4489,6 +4481,7 @@ contains
 
       use odrpack_kinds, only: zero, one
       use linpack, only: dchex, dqrdc, dqrsl, dtrco, dtrsl
+      use blas_interfaces, only: dnrm2, drot, drotg, idamax
 
       integer, intent(in) :: n
          !! The number of observations.
@@ -4581,11 +4574,6 @@ contains
 
       ! Local arrays
       real(wp) :: dum(2)
-
-      ! External BLAS procedures
-      real(wp), external :: dnrm2
-      integer, external :: idamax
-      external :: drot, drotg
 
       ! Variable definitions (alphabetically)
       !  ALPHA:   The Levenberg-Marquardt parameter.
@@ -5183,11 +5171,13 @@ contains
 
    end subroutine dodvcv
 
-   subroutine dpack(n2, n1, v1, v2, ifix)
+   pure subroutine dpack(n2, n1, v1, v2, ifix)
    !! Select the unfixed elements of `v2` and return them in `v1`.
       ! Routines Called  DCOPY
       ! Date Written   860529   (YYMMDD)
       ! Revision Date  920304   (YYMMDD)
+
+      use blas_interfaces, only: dcopy
 
       integer, intent(in) :: n2
          !! The number of items in `v2`.
@@ -5202,9 +5192,6 @@ contains
 
       ! Local scalars
       integer :: i
-
-      ! External BLAS procedures
-      external :: dcopy
 
       ! Variable definitions (alphabetically)
       !  I:       An indexing variable.
@@ -5979,7 +5966,7 @@ contains
 
    end subroutine dsetn
 
-   subroutine dsolve(n, t, ldt, b, job)
+   pure subroutine dsolve(n, t, ldt, b, job)
    !! Solve systems of the form:
    !!
    !!  `t * x = b  or  trans(t) * x = b`
@@ -5996,6 +5983,7 @@ contains
       ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero
+      use blas_interfaces, only: daxpy, ddot
 
       integer, intent(in) :: n
          !! The number of rows and columns of data in array `t`.
@@ -6015,10 +6003,6 @@ contains
       ! Local scalars
       real(wp) :: temp
       integer :: j1, j, jn
-
-      ! External BLAS procedures
-      real(wp), external :: ddot
-      external :: daxpy
 
       ! Variable Definitions (alphabetically)
       !  B:       On input:  the right hand side;  On exit:  the solution
@@ -6108,11 +6092,13 @@ contains
 
    end subroutine dsolve
 
-   subroutine dunpac(n2, v1, v2, ifix)
+   pure subroutine dunpac(n2, v1, v2, ifix)
    !! Copy the elements of `v1` into the locations of `v2` which are unfixed.
       ! Routines Called  DCOPY
       ! Date Written   860529   (YYMMDD)
       ! Revision Date  920304   (YYMMDD)
+
+      use blas_interfaces, only: dcopy
 
       integer, intent(in) :: n2
          !! The number of items in `v2`.
@@ -6126,9 +6112,6 @@ contains
 
       ! Local scalars
       integer :: i, n1
-
-      ! External BLAS procedures
-      external :: dcopy
 
       ! Variable Definitions (alphabetically)
       !  I:       An indexing variable.
@@ -6155,7 +6138,7 @@ contains
 
    end subroutine dunpac
 
-   subroutine dvevtr &
+   pure subroutine dvevtr &
       (m, nq, indx, &
        v, ldv, ld2v, e, lde, ve, ldve, ld2ve, vev, ldvev, &
        wrk5)

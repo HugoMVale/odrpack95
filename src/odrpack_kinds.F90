@@ -4,16 +4,19 @@ module odrpack_kinds
     implicit none
     private
 
-    public :: wp
+    public :: sp, dp, wp
     public :: negone, zero, half, one, two, three, eight, ten, fiftn, hundred
     public :: pi
     
+    integer, parameter :: sp = real32
+    integer, parameter :: dp = real64
+
 #ifdef REAL32
-    integer, parameter :: wp = real32
+    integer, parameter :: wp = sp
 #elif REAL64
-    integer, parameter :: wp = real64
+    integer, parameter :: wp = dp
 #else
-    integer, parameter :: wp = real64
+    integer, parameter :: wp = dp
 #endif
 
     real(wp), parameter :: negone = -1.0_wp

@@ -4,7 +4,7 @@ C
 C
       CONTAINS       
 *DCHEX
-      SUBROUTINE DCHEX(R,LDR,P,K,L,Z,LDZ,NZ,C,S,JOB)
+      PURE SUBROUTINE DCHEX(R,LDR,P,K,L,Z,LDZ,NZ,C,S,JOB)
 C***Begin Prologue  DCHEX
 C***Date Written   780814   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
@@ -95,6 +95,7 @@ C***End Prologue  DCHEX
 
 C...Used modules
       use odrpack_kinds, only: wp
+      use blas_interfaces, only: drotg
 
 C...Scalar arguments
       INTEGER, INTENT(IN) :: JOB
@@ -116,10 +117,6 @@ C...Local scalars
      &   T,T1
       INTEGER
      &   I,II,IL,IU,J,JJ,KM1,KP1,LM1,LMK
-
-C...External subroutines
-      EXTERNAL
-     &   DROTG
 
 C...Intrinsic functions
       INTRINSIC
@@ -263,7 +260,7 @@ C        Apply the rotations to Z.
       RETURN
       END
 *DPODI
-      SUBROUTINE DPODI(A,LDA,N,DET,JOB)
+      PURE SUBROUTINE DPODI(A,LDA,N,DET,JOB)
 C***Begin Prologue  DPODI
 C***Date Written   780814   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
@@ -318,6 +315,7 @@ C***End Prologue  DPODI
 
 C...Used modules
       use odrpack_kinds, only: wp
+      use blas_interfaces, only: daxpy, dscal
 
 C...Scalar arguments
       INTEGER, INTENT(IN) :: JOB
@@ -331,9 +329,6 @@ C...Array arguments
 C...Local scalars
       REAL(wp) S,T
       INTEGER I,J,JM1,K,KP1
-
-C...External subroutines
-      EXTERNAL DAXPY,DSCAL
 
 C...Intrinsic functions
       INTRINSIC MOD
@@ -398,7 +393,7 @@ C        Form  inverse(R) * trans(inverse(R))
       RETURN
       END
 *DQRDC
-      SUBROUTINE DQRDC(X,LDX,N,P,QRAUX,JPVT,WORK,JOB)
+      PURE SUBROUTINE DQRDC(X,LDX,N,P,QRAUX,JPVT,WORK,JOB)
 C***Begin Prologue  DQRDC
 C***Date Written   780814   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
@@ -472,6 +467,7 @@ C***End Prologue  DQRDC
 
 C...Used modules
       use odrpack_kinds, only: wp
+      use blas_interfaces, only: ddot, dnrm2, daxpy, dscal, dswap
 
 C...Scalar arguments
       INTEGER, INTENT(IN) :: JOB
@@ -492,16 +488,6 @@ C...Local scalars
      &   J,JJ,JP,L,LP1,LUP,MAXJ,PL,PU
       LOGICAL
      &   NEGJ,SWAPJ
-
-C...External functions
-      REAL(wp)
-     &   DDOT,DNRM2
-      EXTERNAL
-     &   DDOT,DNRM2
-
-C...External subroutines
-      EXTERNAL
-     &   DAXPY,DSCAL,DSWAP
 
 C...Intrinsic functions
       INTRINSIC
@@ -627,7 +613,7 @@ C              Save the transformation.
       RETURN
       END
 *DQRSL
-      SUBROUTINE DQRSL(X,LDX,N,K,QRAUX,Y,QY,QTY,B,RSD,XB,JOB,INFO)
+      PURE SUBROUTINE DQRSL(X,LDX,N,K,QRAUX,Y,QY,QTY,B,RSD,XB,JOB,INFO)
 C***Begin Prologue  DQRSL
 C***Date Written   780814   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
@@ -743,6 +729,7 @@ C***End Prologue  DQRSL
 
 C...Used modules
       use odrpack_kinds, only: wp
+      use blas_interfaces, only: ddot, daxpy, dcopy
 
 C...Scalar arguments
       INTEGER, INTENT(OUT) :: INFO
@@ -768,13 +755,6 @@ C...Local scalars
      &   I,J,JJ,JU,KP1
       LOGICAL
      &   CB,CQTY,CQY,CR,CXB
-
-C...External functions
-      REAL(wp), EXTERNAL :: DDOT
-
-C...External subroutines
-      EXTERNAL
-     &   DAXPY,DCOPY
 
 C...Intrinsic functions
       INTRINSIC
@@ -907,7 +887,7 @@ C           Compute RSD or XB as required.
       RETURN
       END
 *DTRCO
-      SUBROUTINE DTRCO(T,LDT,N,RCOND,Z,JOB)
+      PURE SUBROUTINE DTRCO(T,LDT,N,RCOND,Z,JOB)
 C***Begin Prologue  DTRCO
 C***Date Written   780814   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
@@ -959,6 +939,7 @@ C***End Prologue  DTRCO
 
 C...Used modules
       use odrpack_kinds, only: wp
+      use blas_interfaces, only: dasum, daxpy, dscal
 
 C...Scalar arguments
       REAL(wp), INTENT(OUT) :: RCOND
@@ -977,13 +958,6 @@ C...Local scalars
      &   I1,J,J1,J2,K,KK,L
       LOGICAL
      &   LOWER
-
-C...External functions
-      REAL(wp), EXTERNAL :: DASUM
-
-C...External subroutines
-      EXTERNAL
-     &   DAXPY,DSCAL
 
 C...Intrinsic functions
       INTRINSIC
@@ -1094,7 +1068,7 @@ C     Make ZNORM = 1.0
       RETURN
       END
 *DTRSL
-      SUBROUTINE DTRSL(T,LDT,N,B,JOB,INFO)
+      PURE SUBROUTINE DTRSL(T,LDT,N,B,JOB,INFO)
 C***Begin Prologue  DTRSL
 C***Date Written   780814   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
@@ -1146,6 +1120,7 @@ C***End Prologue  DTRSL
 
 C...Used modules
       use odrpack_kinds, only: wp
+      use blas_interfaces, only: ddot, daxpy
 
 C...Scalar arguments
       INTEGER, INTENT(OUT) :: INFO
@@ -1162,13 +1137,6 @@ C...Local scalars
      &   TEMP
       INTEGER
      &   CASE,J,JJ
-
-C...External functions
-      REAL(wp), EXTERNAL :: DDOT
-
-C...External subroutines
-      EXTERNAL
-     &   DAXPY
 
 C...Intrinsic functions
       INTRINSIC

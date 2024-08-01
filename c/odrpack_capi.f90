@@ -468,7 +468,7 @@ contains
 
    end subroutine diwinf_c
 
-   subroutine dwinf_c(n, m, np, nq, ldwe, ld2we, isodr, workidx) bind(C)
+   pure subroutine dwinf_c(n, m, np, nq, ldwe, ld2we, isodr, workidx) bind(C)
    !! Get storage locations within real work space.
       integer(c_int), intent(in) :: n
          !! Number of observations.
@@ -562,7 +562,7 @@ contains
 
    end subroutine dwinf_c
 
-   subroutine workspace_dimensions_c(n, m, np, nq, isodr, lwork, liwork) bind(C)
+   pure subroutine workspace_dimensions_c(n, m, np, nq, isodr, lwork, liwork) bind(C)
    !! Calculate the dimensions of the workspace arrays.
       integer(c_int), intent(in) :: n
          !! Number of observations.
