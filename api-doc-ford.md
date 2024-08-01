@@ -2,12 +2,12 @@
 project: odrpack
 license: bsd
 summary: odrpack is a package for weighted orthogonal distance regression (ODR), also known as errors-in-variables regression.
-src_dir: ./src
-         ./example
-         ./c
-exclude: ./src/lpkbls.f
+src_dir: src
+         example
+         c
+exclude: src/linpack.f
 output_dir: _site
-page_dir: ./doc
+page_dir: doc
 extra_mods: iso_fortran_env:https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORTRAN_005fENV.html
             iso_c_binding:https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fC_005fBINDING.html#ISO_005fC_005fBINDING
 source: true
