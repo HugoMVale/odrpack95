@@ -58,8 +58,8 @@ use and maintain. The main changes include:
 
 * The build configuration files provided with the code (see further below) assume
 OpenBLAS is locally installed. If another BLAS source is preferred, the configuration files
-must be adjusted accordingly. Alternatively, the subset of required BLAS functions is
-available in [src/blas.f_](/src/blas.f_); you need to remove the underscore and edit the
+should be adjusted accordingly. Alternatively, the subset of required BLAS functions is
+available in [src/blas.f_](/src/blas.f_); it suffices to remove the underscore and edit the
 build configuration files.
 * The subset of required LINPACK functions is available in [src/linpack.f](/src/linpack.f) and
 is already included in the build configuration files. No action is required.
