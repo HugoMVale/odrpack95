@@ -6,6 +6,7 @@ module blas_interfaces
    interface
 
       pure real(sp) function sasum(n, x, incx)
+      !! Sum of magnitudes of vector components.
          import :: sp
          integer, intent(in) :: n
          real(sp), intent(in) :: x(*)
@@ -13,7 +14,7 @@ module blas_interfaces
       end function sasum
 
       pure real(dp) function dasum(n, x, incx)
-      !! Takes the sum of the absolute values.
+      !! Sum of magnitudes of vector components.
          import :: dp
          integer, intent(in) :: n
          real(dp), intent(in) :: x(*)
@@ -21,6 +22,7 @@ module blas_interfaces
       end function dasum
 
       pure subroutine saxpy(n, a, x, incx, y, incy)
+      !! Computation `Y = A*X + Y`.
          import :: sp
          integer, intent(in) :: n
          real(sp), intent(in) :: a
@@ -31,7 +33,7 @@ module blas_interfaces
       end subroutine saxpy
 
       pure subroutine daxpy(n, a, x, incx, y, incy)
-      !! Constant times a vector plus a vector.
+      !! Computation `Y = A*X + Y`.
          import :: dp
          integer, intent(in) :: n
          real(dp), intent(in) :: a
@@ -42,6 +44,7 @@ module blas_interfaces
       end subroutine daxpy
 
       pure subroutine scopy(n, x, incx, y, incy)
+      !! Vector copy `Y = X`.
          import :: sp
          integer, intent(in) :: n
          real(sp), intent(in) :: x(*)
@@ -51,7 +54,7 @@ module blas_interfaces
       end subroutine scopy
 
       pure subroutine dcopy(n, x, incx, y, incy)
-      !! Copies a vector, x, to a vector, y.
+      !! Vector copy `Y = X`.
          import :: dp
          integer, intent(in) :: n
          real(dp), intent(in) :: x(*)
@@ -61,6 +64,7 @@ module blas_interfaces
       end subroutine dcopy
 
       pure real(sp) function sdot(n, x, incx, y, incy)
+      !! Inner product of vectors.
          import :: sp
          integer, intent(in) :: n
          real(sp), intent(in) :: x(*)
@@ -70,7 +74,7 @@ module blas_interfaces
       end function sdot
 
       pure real(dp) function ddot(n, x, incx, y, incy)
-      !! Forms the dot product of two vectors.
+      !! Inner product of vectors.
          import :: dp
          integer, intent(in) :: n
          real(dp), intent(in) :: x(*)
@@ -80,6 +84,7 @@ module blas_interfaces
       end function ddot
 
       pure real(sp) function snrm2(n, x, incx)
+      !! Euclidean length (L2 Norm) of vector.
          import :: sp
          integer, intent(in) :: n
          real(sp), intent(in) :: x(*)
@@ -87,7 +92,7 @@ module blas_interfaces
       end function snrm2
 
       pure real(dp) function dnrm2(n, x, incx)
-      !! Euclidean norm of a vector.
+      !! Euclidean length (L2 Norm) of vector.
          import :: dp
          integer, intent(in) :: n
          real(dp), intent(in) :: x(*)
@@ -95,6 +100,7 @@ module blas_interfaces
       end function dnrm2
 
       pure subroutine srot(n, x, incx, y, incy, c, s)
+      !! Apply Givens rotation.
          import :: sp
          integer, intent(in) :: n
          real(sp), intent(inout) :: x(*)
@@ -106,7 +112,7 @@ module blas_interfaces
       end subroutine srot
 
       pure subroutine drot(n, x, incx, y, incy, c, s)
-      !! Applies a plane rotation.
+      !! Apply Givens rotation.
          import :: dp
          integer, parameter :: wp = dp
          integer, intent(in) :: n
@@ -119,6 +125,7 @@ module blas_interfaces
       end subroutine drot
 
       pure subroutine srotg(a, b, c, s)
+      !! Construct plane Givens rotation.
          import :: sp
          real(sp), intent(in) :: a
          real(sp), intent(in) :: b
@@ -127,6 +134,7 @@ module blas_interfaces
       end subroutine srotg
 
       pure subroutine drotg(a, b, c, s)
+      !! Construct plane Givens rotation.
          import :: dp
          real(dp), intent(in) :: a
          real(dp), intent(in) :: b
@@ -135,6 +143,7 @@ module blas_interfaces
       end subroutine drotg
 
       pure subroutine sscal(n, a, x, incx)
+      !! Vector scale `X = A*X`.
          import :: sp
          integer, intent(in) :: n
          real(sp), intent(in) :: a
@@ -143,7 +152,7 @@ module blas_interfaces
       end subroutine sscal
 
       pure subroutine dscal(n, a, x, incx)
-      !! Scales a vector by a constant.
+      !! Vector scale `X = A*X`.
          import :: dp
          integer, intent(in) :: n
          real(dp), intent(in) :: a
@@ -152,6 +161,7 @@ module blas_interfaces
       end subroutine dscal
 
       pure subroutine sswap(n, x, incx, y, incy)
+      !! Interchange vectors.
          import :: sp
          integer, intent(in) :: n
          real(sp), intent(in) :: x(*)
@@ -161,7 +171,7 @@ module blas_interfaces
       end subroutine sswap
 
       pure subroutine dswap(n, x, incx, y, incy)
-      !! Interchanges two vectors.
+      !! Interchange vectors.
          import :: dp
          integer, intent(in) :: n
          real(dp), intent(in) :: x(*)
@@ -171,6 +181,7 @@ module blas_interfaces
       end subroutine dswap
 
       pure integer function isamax(n, x, incx)
+      !! Find largest component of vector.
          import :: sp
          integer, intent(in) :: n
          real(sp), intent(in) :: x(*)
@@ -178,7 +189,7 @@ module blas_interfaces
       end function isamax
 
       pure integer function idamax(n, x, incx)
-      !! Finds the index of the first element having maximum absolute value.
+      !! Find largest component of vector.
          import :: dp
          integer, intent(in) :: n
          real(dp), intent(in) :: x(*)
