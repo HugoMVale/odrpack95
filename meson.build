@@ -15,6 +15,7 @@ odrpack_lic = files(
 # Sources
 srcs = files(
   'src/linpack.f',
+  'src/blas_interfaces.f90',
   'src/odrpack_kinds.F90',
   'src/odrpack_core.f90',
   'src/odrpack.f90',
