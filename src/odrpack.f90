@@ -118,9 +118,15 @@ contains
       integer, intent(in), optional :: iprint
          !! Print control variable.
       integer, intent(in), optional :: lunerr
-         !! Logical unit number for error messages.
+         !! Logical unit number for error messages. Available options are:
+         !!   0 => no output. 
+         !!   6 => output to standard error.
+         !!   other => output to logical unit number `lunerr`.  
       integer, intent(in), optional :: lunrpt
-         !! Logical unit number for computation reports.
+         !! Logical unit number for computation reports. Available options are:
+         !!   0 => no output. 
+         !!   6 => output to standard error.
+         !!   other => output to logical unit number `lunrpt`.  
       real(wp), intent(in), optional :: stpb(:)
          !! Relative step for computing finite difference derivatives with respect to `beta`.
          !! `Shape: (np)`.
@@ -176,8 +182,8 @@ contains
       ldscld = 1
       ldstpd = 1
       iprint_ = -1
-      lunerr_ = 0
-      lunrpt_ = 0
+      lunerr_ = 6
+      lunrpt_ = 6
       maxit_ = -1
       ndigit_ = -1
       partol_ = negone
@@ -194,14 +200,14 @@ contains
       if (present(lunrpt)) then
          lunrpt_ = lunrpt
       end if
-      if (lunrpt_ == 0) then
+      if (lunrpt_ == 6) then
          lunrpt_ = output_unit
       end if
 
       if (present(lunerr)) then
          lunerr_ = lunerr
       end if
-      if (lunerr_ == 0) then
+      if (lunerr_ == 6) then
          lunerr_ = error_unit
       end if
 

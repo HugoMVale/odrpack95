@@ -238,9 +238,15 @@ contains
       integer(c_int), intent(in), optional :: iprint
          !! Print control variable.
       integer(c_int), intent(in), optional :: lunerr
-         !! Logical unit number for error messages.
+         !! Logical unit number for error messages. Available options are:
+         !!   0 => no output. 
+         !!   6 => output to standard error.
+         !!   other => output to logical unit number `lunerr`.  
       integer(c_int), intent(in), optional :: lunrpt
-         !! Logical unit number for computation reports.
+         !! Logical unit number for computation reports. Available options are:
+         !!   0 => no output. 
+         !!   6 => output to standard error.
+         !!   other => output to logical unit number `lunrpt`.  
       integer(c_int), intent(out), optional :: info
          !! Logical unit number for computation reports.
 
@@ -348,9 +354,15 @@ contains
       integer(c_int), intent(in), optional :: iprint
          !! Print control variable.
       integer(c_int), intent(in), optional :: lunerr
-         !! Logical unit number for error messages.
+         !! Logical unit number for error messages. Available options are:
+         !!   0 => no output. 
+         !!   6 => output to standard error.
+         !!   other => output to logical unit number `lunerr`.  
       integer(c_int), intent(in), optional :: lunrpt
-         !! Logical unit number for computation reports.
+         !! Logical unit number for computation reports. Available options are:
+         !!   0 => no output. 
+         !!   6 => output to standard error.
+         !!   other => output to logical unit number `lunrpt`. 
       integer(c_int), intent(out), optional :: info
          !! Variable designating why the computations were stopped.
 
