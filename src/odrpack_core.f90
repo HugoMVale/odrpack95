@@ -4740,9 +4740,7 @@ contains
       ! Do QR factorization (with column pivoting of TFJACB if ALPHA = 0)
       if (alpha == zero) then
          ipvt = 1
-         do k = 1, np
-            kpvt(k) = 0
-         end do
+         kpvt(1:np) = 0
       else
          ipvt = 0
       end if
