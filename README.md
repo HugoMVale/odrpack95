@@ -19,18 +19,11 @@ the errors are attributed to the observations of the dependent variable.
 
 ## History
 
-The first version of the library, named ODRPACK, was originally released in 1989[^1], and the
-last "official" update, named ODRPACK95, dates from 2004[^2]. The full revision history is
+The first version of the library, named ODRPACK, was originally released in 1989 [1], and the
+last "official" update, named ODRPACK95, dates from 2004 [2]. The full revision history is
 provided on page iv of the [User's Reference Guide for ODRPACK95](https://github.com/HugoMVale/odrpack95/blob/main/original/Doc/guide.pdf).
 
-|    Version    | Year |   Standard   |
-|:-------------:|:----:|:------------:|
-|  odrpack      | 2024 | Fortran 2018 |
-| ODRPACK95 1.0 | 2004 |  Fortran 95  |
-|  ODRPACK 2.0  | 1992 |  FORTRAN 77  |
-|  ODRPACK 1.0  | 1989 |  FORTRAN 77  |
-
-`odrpack` is a modernization of the ODRPACK95 code[^3], intented to make the library easier to
+`odrpack` is a modernization of the ODRPACK95 code [3], intented to make the library easier to
 use and maintain. The main changes include:
 
 * [x] Conversion from fixed-form (`.f`) to free-form (`.f90`).
@@ -42,13 +35,20 @@ use and maintain. The main changes include:
 * [x] Implementation of a C API.
 * [x] Automatic code documentation with FORD.
 
+|    Version    | Year |   Standard   |
+|:-------------:|:----:|:------------:|
+|  odrpack      | 2024 | Fortran 2018 |
+| ODRPACK95 1.0 | 2004 |  Fortran 95  |
+|  ODRPACK 2.0  | 1992 |  FORTRAN 77  |
+|  ODRPACK 1.0  | 1989 |  FORTRAN 77  |
+
 **References**
 
-[^1] Paul T. Boggs, Janet R. Donaldson, Richaard h. Byrd, and Robert B. Schnabel. 1989. Algorithm 676: ODRPACK: software for weighted orthogonal distance regression. ACM Trans. Math. Softw. 15, 4 (Dec. 1989), 348–364. https://doi.org/10.1145/76909.76913
+[1] Paul T. Boggs, Janet R. Donaldson, Richaard h. Byrd, and Robert B. Schnabel. 1989. Algorithm 676: ODRPACK: software for weighted orthogonal distance regression. ACM Trans. Math. Softw. 15, 4 (Dec. 1989), 348–364. https://doi.org/10.1145/76909.76913
 
-[^2] Jason W. Zwolak, Paul T. Boggs, and Layne T. Watson. 2007. Algorithm 869: ODRPACK95: A weighted orthogonal distance regression code with bound constraints. ACM Trans. Math. Softw. 33, 4 (August 2007), 27–es. https://doi.org/10.1145/1268776.1268782
+[2] Jason W. Zwolak, Paul T. Boggs, and Layne T. Watson. 2007. Algorithm 869: ODRPACK95: A weighted orthogonal distance regression code with bound constraints. ACM Trans. Math. Softw. 33, 4 (August 2007), 27–es. https://doi.org/10.1145/1268776.1268782
 
-[^3] Original source code from [Netlib](https://www.netlib.org/odrpack/).
+[3] Original source code from [Netlib](https://www.netlib.org/odrpack/).
 
 ## Build instructions
 
@@ -57,7 +57,8 @@ use and maintain. The main changes include:
 `odrpack` depends on a small number of functions from BLAS and LINPACK.
 
 * The build configuration files provided with the code (see further below) assume
-OpenBLAS is locally installed. If another BLAS source is preferred, the configuration files need to be adjusted accordingly. Alternatively, the subset of required BLAS functions is
+OpenBLAS is locally installed. If another BLAS source is preferred, the configuration files
+must be adjusted accordingly. Alternatively, the subset of required BLAS functions is
 available in [src/blas.f_](/src/blas.f_); you need to remove the underscore and edit the
 build configuration files.
 * The subset of required LINPACK functions is available in [src/linpack.f](/src/linpack.f) and
@@ -109,7 +110,3 @@ meson test -C _build
 
 * The original ODERPACK95 code is [public domain](https://github.com/scipy/scipy/issues/7107#issuecomment-307378785).
 * Any modications done in the course of this project are covered by BSD-3.
-
-## References
-
-
