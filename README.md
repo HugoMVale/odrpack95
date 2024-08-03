@@ -17,7 +17,11 @@ the errors are attributed to the observations of the dependent variable.
   <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Total_least_squares.svg/220px-Total_least_squares.svg.png" width="200" alt="Deming regression; special case of ODR.">
 </p>
 
-## Revision history
+## History
+
+The first version of the library, named ODRPACK, was originally released in 1989[^1], and the
+last "official" update, named ODRPACK95, dates from 2004[^2]. The full revision history is
+provided on page iv of the [User's Reference Guide for ODRPACK95](https://github.com/HugoMVale/odrpack95/blob/main/original/Doc/guide.pdf).
 
 |    Version    | Year |   Standard   |
 |:-------------:|:----:|:------------:|
@@ -26,26 +30,38 @@ the errors are attributed to the observations of the dependent variable.
 |  ODRPACK 2.0  | 1992 |  FORTRAN 77  |
 |  ODRPACK 1.0  | 1989 |  FORTRAN 77  |
 
-The detailed revision history of ODRPACK and ODRPACK95 is provided on page iv of the 
-[User's Reference Guide for ODRPACK95](https://github.com/HugoMVale/odrpack95/blob/main/original/Doc/guide.pdf).
+`odrpack` is a modernization of the ODRPACK95 code[^3], intented to make the library easier to
+use and maintain. The main changes include:
 
-### Why odrpack?
+* [x] Conversion from fixed-form (`.f`) to free-form (`.f90`).
+* [x] Conversion from upper case to lower case.
+* [x] Modularization.
+* [x] Removal of `DATA` statements, labeled do loops, and (most) `goto`s.
+* [x] Addition of `intent(in/out)` to all procedures.
+* [x] Addition of explicit interfaces to BLAS routines.
+* [x] Implementation of a C API.
+* [x] Automatic code documentation with FORD.
 
-This project aims to modernize the ODRPACK95 code, namely:
+**References**
 
-* [x] Modify the tests so they can be automatically run in the CI.
-* [x] Convert from fixed-form (`.f`) to free-form (`.f90`).
-* [x] Convert from upper case to lower case.
-* [x] Split the code in modules.
-* [x] Add `intent(in/out)` to all procedures.
-* [x] Remove `DATA` statements, labeled do loops, and (most) `goto`s.
-* [x] Implement a C API.
-* [x] Generate automatic code documentation with FORD.
-* [ ] Implement python bindings to the C API.
-* [ ] Replace LINPACK calls by LAPACK. Code profiling shows that LINPACK calls are not time
-      consuming, so this change is motivated by code maintainability, not by performance.
+[^1] Paul T. Boggs, Janet R. Donaldson, Richaard h. Byrd, and Robert B. Schnabel. 1989. Algorithm 676: ODRPACK: software for weighted orthogonal distance regression. ACM Trans. Math. Softw. 15, 4 (Dec. 1989), 348–364. https://doi.org/10.1145/76909.76913
+
+[^2] Jason W. Zwolak, Paul T. Boggs, and Layne T. Watson. 2007. Algorithm 869: ODRPACK95: A weighted orthogonal distance regression code with bound constraints. ACM Trans. Math. Softw. 33, 4 (August 2007), 27–es. https://doi.org/10.1145/1268776.1268782
+
+[^3] Original source code from [Netlib](https://www.netlib.org/odrpack/).
 
 ## Build instructions
+
+### Dependencies
+
+`odrpack` depends on a small number of functions from BLAS and LINPACK.
+
+* The build configuration files provided with the code (see further below) assume
+OpenBLAS is locally installed. If another BLAS source is preferred, the configuration files need to be adjusted accordingly. Alternatively, the subset of required BLAS functions is
+available in [src/blas.f_](/src/blas.f_); you need to remove the underscore and edit the
+build configuration files.
+* The subset of required LINPACK functions is available in [src/linpack.f](/src/linpack.f) and
+is already included in the build configuration files. No action is required.
 
 ### With fpm
 
@@ -63,7 +79,7 @@ To run the tests, do:
 fpm test --profile release
 ```
 
-To run the provided example, do:
+To run the provided examples, do:
 
 ```sh
 fpm run --example "example_name" --profile release
@@ -96,6 +112,4 @@ meson test -C _build
 
 ## References
 
-* Original code from [Netlib](https://www.netlib.org/odrpack/).
-* Paul T. Boggs, Janet R. Donaldson, Richaard h. Byrd, and Robert B. Schnabel. 1989. Algorithm 676: ODRPACK: software for weighted orthogonal distance regression. ACM Trans. Math. Softw. 15, 4 (Dec. 1989), 348–364. https://doi.org/10.1145/76909.76913
-* Jason W. Zwolak, Paul T. Boggs, and Layne T. Watson. 2007. Algorithm 869: ODRPACK95: A weighted orthogonal distance regression code with bound constraints. ACM Trans. Math. Softw. 33, 4 (August 2007), 27–es. https://doi.org/10.1145/1268776.1268782
+
