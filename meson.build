@@ -2,7 +2,7 @@
 
 project(
   'odrpack',
-  'fortran',
+  ['fortran', 'c'],
   version: '1.0.0',
   meson_version: '>=0.55',
   default_options: ['default_library=static', 'buildtype=debugoptimized', 'fortran_std=none'],
@@ -28,8 +28,11 @@ odrpack_lib = library(
   meson.project_name(),
   sources: srcs,
   dependencies: [openblas],
-  install: false
+  install: true
 )
+
+# C interface
+subdir('c')
 
 # Examples
 subdir('example')
