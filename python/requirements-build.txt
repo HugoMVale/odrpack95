@@ -1,0 +1,6 @@
+# Build dependencies (for editable install pip install --no-build-isolation -e .)
+meson-python>=0.15.0
+ninja
+pybind11
+numpy
+wheel
