@@ -2,5 +2,6 @@
 meson-python>=0.15.0
 ninja
 pybind11
+pybind11-stubgen
 numpy
 wheel
