@@ -383,13 +383,13 @@ contains
 
    end subroutine odr_long_c
 
-   subroutine open_file(lun, filename_cptr, ierr) bind(C)
+   subroutine open_file(filename_cptr, lun, ierr) bind(C)
    !! Open a new file associated with a specified logical unit number.
+      type(c_ptr), intent(in), value :: filename_cptr
+         !! C-string containing the file name.
       integer(c_int), intent(inout) :: lun
          !! Logical unit number. If `lun > 0`, the user-supplied logical unit number is used.
          !! Otherwise, a new logical unit number is assigned.
-      type(c_ptr), intent(in), value :: filename_cptr
-         !! C-string containing the file name.
       integer(c_int), intent(out) :: ierr
          !! Error code returned by `iostat`.
 
