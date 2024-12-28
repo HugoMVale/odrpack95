@@ -12,13 +12,13 @@
 /**
  * @brief Open a new file associated with a specified logical unit number.
  *
- * @param lun      `<=>` Logical unit number.
  * @param filename `==>` String containing the file name.
+ * @param lun      `<=>` Logical unit number.
  * @param ierr     `<==` Error code (compiler dependent).
  */
 ODRPACK_EXTERN void open_file(
-    int *lun,
     const char *filename,
+    int *lun,
     int *ierr);
 
 /**
@@ -55,23 +55,23 @@ ODRPACK_EXTERN void close_file(
  *                1 - current `beta` and `x + delta` are not acceptable; ODRPACK95 should select values closer to most recently used values if possible,
  *               -1 - current `beta` and `x + delta` are not acceptable; ODRPACK95 should stop.
  */
-typedef void (*odrpack_fcn)(
-    int *n,
-    int *m,
-    int *np,
-    int *nq,
-    int *ldn,
-    int *ldm,
-    int *ldnp,
-    double *beta,
-    double *xplusd,
-    int *ifixb,
-    int *ifixx,
-    int *ldifx,
-    int *ideval,
-    double *f,
-    double *fjacb,
-    double *fjacd,
+typedef void (*odrpack_fcn_t)(
+    const int *n,
+    const int *m,
+    const int *np,
+    const int *nq,
+    const int *ldn,
+    const int *ldm,
+    const int *ldnp,
+    const double beta[],
+    const double xplusd[],
+    const int ifixb[],
+    const int ifixx[],
+    const int *ldifx,
+    const int *ideval,
+    double f[],
+    double fjacb[],
+    double fjacd[],
     int *istop);
 
 /**
@@ -92,17 +92,17 @@ typedef void (*odrpack_fcn)(
  * @param job    `==>` Optional variable controlling initialization and computational method.
  */
 ODRPACK_EXTERN void odr_short_c(
-    odrpack_fcn fcn,
+    odrpack_fcn_t fcn,
     const int *n,
     const int *m,
     const int *np,
     const int *nq,
-    double *beta,
-    const double *y,
-    const double *x,
-    double *delta,
-    const double *lower,
-    const double *upper,
+    double beta[],
+    const double y[],
+    const double x[],
+    double delta[],
+    const double lower[],
+    const double upper[],
     const int *job);
 
 /**
@@ -136,26 +136,26 @@ ODRPACK_EXTERN void odr_short_c(
  * @param info   `<==` Optional variable designating why the computations were stopped.
  */
 ODRPACK_EXTERN void odr_medium_c(
-    odrpack_fcn fcn,
+    odrpack_fcn_t fcn,
     const int *n,
     const int *m,
     const int *np,
     const int *nq,
-    double *beta,
-    const double *y,
-    const double *x,
-    const double *we,
+    double beta[],
+    const double y[],
+    const double x[],
+    const double we[],
     const int *ldwe,
     const int *ld2we,
-    const double *wd,
+    const double wd[],
     const int *ldwd,
     const int *ld2wd,
-    const int *ifixb,
-    const int *ifixx,
+    const int ifixb[],
+    const int ifixx[],
     const int *ldifx,
-    double *delta,
-    const double *lower,
-    const double *upper,
+    double delta[],
+    const double lower[],
+    const double upper[],
     const int *job,
     const int *iprint,
     const int *lunerr,
@@ -208,36 +208,36 @@ ODRPACK_EXTERN void odr_medium_c(
  * @param info   `<==` Optional variable designating why the computations were stopped.
  */
 ODRPACK_EXTERN void odr_long_c(
-    odrpack_fcn fcn,
+    odrpack_fcn_t fcn,
     const int *n,
     const int *m,
     const int *np,
     const int *nq,
-    double *beta,
-    const double *y,
-    const double *x,
-    const double *we,
+    double beta[],
+    const double y[],
+    const double x[],
+    const double we[],
     const int *ldwe,
     const int *ld2we,
-    const double *wd,
+    const double wd[],
     const int *ldwd,
     const int *ld2wd,
-    const int *ifixb,
-    const int *ifixx,
+    const int ifixb[],
+    const int ifixx[],
     const int *ldifx,
-    const double *stpb,
-    const double *scpd,
+    const double stpb[],
+    const double scpd[],
     const int *ldstpd,
-    const double *sclb,
-    const double *scld,
+    const double sclb[],
+    const double scld[],
     const int *ldscld,
-    double *work,
+    double work[],
     const int *lwork,
-    int *iwork,
+    int iwork[],
     const int *liwork,
-    double *delta,
-    const double *lower,
-    const double *upper,
+    double delta[],
+    const double lower[],
+    const double upper[],
     const int *job,
     const int *ndigit,
     const double *taufac,

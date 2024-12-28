@@ -8,9 +8,11 @@ This is a translation of example 3 from the ODRPACK95 documentation.
 #include "../include/odrpack/odrpack.h"
 
 // User-supplied function for evaluating the model
-void fcn(int *n, int *m, int *np, int *nq, int *ldn, int *ldm, int *ldnp, double *beta,
-         double *xplusd, int *ifixb, int *ifixx, int *ldifx, int *ideval, double *f,
-         double *fjacb, double *fjacd, int *istop)
+void fcn(const int *n, const int *m, const int *np, const int *nq,
+         const int *ldn, const int *ldm, const int *ldnp,
+         const double beta[], const double xplusd[],
+         const int ifixb[], const int ifixx[], const int *ldifx, const int *ideval,
+         double f[], double fjacb[], double fjacd[], int *istop)
 {
 
     // Local variables
