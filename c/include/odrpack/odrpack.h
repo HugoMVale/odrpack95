@@ -114,18 +114,18 @@ ODRPACK_EXTERN void odr_short_c(
  * @param m      `==>` Number of columns of data in the independent variable.
  * @param np     `==>` Number of function parameters.
  * @param nq     `==>` Number of responses per observation.
+ * @param ldwe   `==>` Leading dimension of array `we`, `ldwe ∈ {1, n}`.
+ * @param ld2we  `==>` Second dimension of array `we`, `ld2we ∈ {1, n}`.
+ * @param ldwd   `==>` Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
+ * @param ld2wd  `==>` Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
+ * @param ldifx  `==>` Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.
  * @param beta   `<=>` Array [np] of function parameters.
  * @param y      `==>` Array [nq][n] of dependent variable. Unused when the model is implicit.
  * @param x      `==>` Array [m][n] of explanatory variable.
- * @param we     `==>` Array [nq][ld2we][ldwe] with `epsilon` weights.
- * @param ldwe   `==>` Leading dimension of array `we`, `ldwe ∈ {1, n}`.
- * @param ld2we  `==>` Second dimension of array `we`, `ld2we ∈ {1, n}`.
- * @param wd     `==>` Array [m][ld2wd][ldwd] with `delta` weights.
- * @param ldwd   `==>` Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
- * @param ld2wd  `==>` Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
- * @param ifixb  `==>` Array [np] with values designating whether the elements of `beta` are fixed at their input values or not.
- * @param ifixx  `==>` Array [m][ldifx] with values designating whether the elements of `x` are fixed at their input values or not.
- * @param ldifx  `==>` Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.
+ * @param we     `==>` Optional array [nq][ld2we][ldwe] with `epsilon` weights.
+ * @param wd     `==>` Optional array [m][ld2wd][ldwd] with `delta` weights.
+ * @param ifixb  `==>` Optional array [np] with values designating whether the elements of `beta` are fixed at their input values or not.
+ * @param ifixx  `==>` Optional array [m][ldifx] with values designating whether the elements of `x` are fixed at their input values or not.
  * @param delta  `<=>` Optional array [m][n] with initial error in the `x` data.
  * @param lower  `==>` Optional array [np] with lower bound on `beta`.
  * @param upper  `==>` Optional array [np] with upper bound on `beta`.
@@ -141,18 +141,18 @@ ODRPACK_EXTERN void odr_medium_c(
     const int *m,
     const int *np,
     const int *nq,
+    const int *ldwe,
+    const int *ld2we,
+    const int *ldwd,
+    const int *ld2wd,
+    const int *ldifx,
     double beta[],
     const double y[],
     const double x[],
     const double we[],
-    const int *ldwe,
-    const int *ld2we,
     const double wd[],
-    const int *ldwd,
-    const int *ld2wd,
     const int ifixb[],
     const int ifixx[],
-    const int *ldifx,
     double delta[],
     const double lower[],
     const double upper[],
@@ -171,31 +171,31 @@ ODRPACK_EXTERN void odr_medium_c(
  * @param m      `==>` Number of columns of data in the independent variable.
  * @param np     `==>` Number of function parameters.
  * @param nq     `==>` Number of responses per observation.
+ * @param ldwe   `==>` Leading dimension of array `we`, `ldwe ∈ {1, n}`.
+ * @param ld2we  `==>` Second dimension of array `we`, `ld2we ∈ {1, n}`.
+ * @param ldwd   `==>` Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
+ * @param ld2wd  `==>` Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
+ * @param ldifx  `==>` Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.
+ * @param ldstpd `==>` Leading dimension of array `stpd`, `ldstpd ∈ {1, n}`.
+ * @param ldscld `==>` Leading dimension of array `scld`, `ldscld ∈ {1, n}`.
+ * @param lwork  `==>` Length of array `work`.
+ * @param liwork `==>` Length of array `iwork`.
  * @param beta   `<=>` Array [np] of function parameters.
  * @param y      `==>` Array [nq][n] of dependent variable. Unused when the model is implicit.
  * @param x      `==>` Array [m][n] of explanatory variable.
- * @param we     `==>` Array [nq][ld2we][ldwe] with `epsilon` weights.
- * @param ldwe   `==>` Leading dimension of array `we`, `ldwe ∈ {1, n}`.
- * @param ld2we  `==>` Second dimension of array `we`, `ld2we ∈ {1, n}`.
- * @param wd     `==>` Array [m][ld2wd][ldwd] with `delta` weights.
- * @param ldwd   `==>` Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
- * @param ld2wd  `==>` Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
- * @param ifixb  `==>` Array [np] with values designating whether the elements of `beta` are fixed at their input values or not.
- * @param ifixx  `==>` Array [m][ldifx] with values designating whether the elements of `x` are fixed at their input values or not.
- * @param ldifx  `==>` Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.
- * @param stpb   `==>` Input array [np] with relative step for computing finite difference derivatives with respect to `beta`.
- * @param stpd   `==>` Input array [m][ldstpd] with relative step for computing finite difference derivatives with respect to `delta`.
- * @param ldstpd `==>` Leading dimension of array `stpd`, `ldstpd ∈ {1, n}`.
- * @param sclb   `==>` Input array [np] with scaling values for `beta`.
- * @param scld   `==>` Input array [m][ldscld] with scaling values for `delta`.
- * @param ldscld `==>` Leading dimension of array `scld`, `ldscld ∈ {1, n}`.
- * @param work   `<=>` Real work space.
- * @param lwork  `==>` Length of array `work`.
- * @param iwork  `<=>` Integer work space.
- * @param liwork `==>` Length of array `iwork`.
+ * @param we     `==>` Optional array [nq][ld2we][ldwe] with `epsilon` weights.
+ * @param wd     `==>` Optional array [m][ld2wd][ldwd] with `delta` weights.
+ * @param ifixb  `==>` Optional array [np] with values designating whether the elements of `beta` are fixed at their input values or not.
+ * @param ifixx  `==>` Optional array [m][ldifx] with values designating whether the elements of `x` are fixed at their input values or not.
+ * @param stpb   `==>` Optional array [np] with relative step for computing finite difference derivatives with respect to `beta`.
+ * @param stpd   `==>` Optional array [m][ldstpd] with relative step for computing finite difference derivatives with respect to `delta`.
+ * @param sclb   `==>` Optional array [np] with scaling values for `beta`.
+ * @param scld   `==>` Optional array [m][ldscld] with scaling values for `delta`.
  * @param delta  `<=>` Optional array [m][n] with initial error in the `x` data.
  * @param lower  `==>` Optional array [np] with lower bound on `beta`.
  * @param upper  `==>` Optional array [np] with upper bound on `beta`.
+ * @param work   `<=>` Optional real work space.
+ * @param iwork  `<=>` Optional integer work space.
  * @param job    `==>` Optional variable controlling initialization and computational method.
  * @param ndigit `==>` Optional number of accurate digits in the function results, as supplied by the user.
  * @param taufac `==>` Optional factor used to compute the initial trust region diameter.
@@ -213,31 +213,31 @@ ODRPACK_EXTERN void odr_long_c(
     const int *m,
     const int *np,
     const int *nq,
+    const int *ldwe,
+    const int *ld2we,
+    const int *ldwd,
+    const int *ld2wd,
+    const int *ldifx,
+    const int *ldstpd,
+    const int *ldscld,
+    const int *lwork,
+    const int *liwork,
     double beta[],
     const double y[],
     const double x[],
     const double we[],
-    const int *ldwe,
-    const int *ld2we,
     const double wd[],
-    const int *ldwd,
-    const int *ld2wd,
     const int ifixb[],
     const int ifixx[],
-    const int *ldifx,
     const double stpb[],
     const double scpd[],
-    const int *ldstpd,
     const double sclb[],
     const double scld[],
-    const int *ldscld,
-    double work[],
-    const int *lwork,
-    int iwork[],
-    const int *liwork,
     double delta[],
     const double lower[],
     const double upper[],
+    double work[],
+    int iwork[],
     const int *job,
     const int *ndigit,
     const double *taufac,

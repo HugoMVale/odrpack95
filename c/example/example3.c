@@ -148,11 +148,12 @@ int main()
 
     // Compute solution
     odr_medium_c(fcn, &n, &m, &np, &nq,
+                 &ldwe, &ld2we, &ldwd, &ld2wd, &ldifx,
                  beta,
                  (double *)y, (double *)x,
-                 (double *)we, &ldwe, &ld2we,
-                 (double *)wd, &ldwd, &ld2wd,
-                 ifixb, (int *)ifixx, &ldifx,
+                 (double *)we,
+                 (double *)wd,
+                 ifixb, (int *)ifixx,
                  (double *)delta,
                  NULL, NULL,
                  &job, &iprint, &lunerr, &lunrpt, &info);

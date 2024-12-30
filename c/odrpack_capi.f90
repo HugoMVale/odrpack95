@@ -1,9 +1,9 @@
 module odrpack_capi
    !! C-bindings for 'odrpack'.
 
-   use, intrinsic :: iso_c_binding, only: c_bool, c_char, c_double, c_f_pointer, c_int, c_ptr 
+   use, intrinsic :: iso_c_binding, only: c_bool, c_char, c_double, c_f_pointer, c_int, c_ptr
    use odrpack, only: odr, workspace_dimensions
-   use odrpack_core, only: diwinf, dwinf 
+   use odrpack_core, only: diwinf, dwinf
    implicit none
 
    abstract interface
@@ -138,11 +138,11 @@ module odrpack_capi
       integer(c_int) :: ldtt
       integer(c_int) :: bound
       integer(c_int) :: liwkmn
-  end type iworkidx_t
+   end type iworkidx_t
 
 contains
 
-   subroutine odr_short_c(&
+   subroutine odr_short_c( &
       fcn, &
       n, m, np, nq, &
       beta, y, x, &
@@ -185,10 +185,12 @@ contains
    subroutine odr_medium_c( &
       fcn, &
       n, m, np, nq, &
+      ldwe, ld2we, &
+      ldwd, ld2wd, &
+      ldifx, &
       beta, y, x, &
-      we, ldwe, ld2we, &
-      wd, ldwd, ld2wd, &
-      ifixb, ifixx, ldifx, &
+      we, wd, &
+      ifixb, ifixx, &
       delta, &
       lower, upper, &
       job, iprint, lunerr, lunrpt, info) bind(C)
@@ -203,30 +205,30 @@ contains
          !! Number of function parameters.
       integer(c_int), intent(in) :: nq
          !! Number of responses per observation.
+      integer(c_int), intent(in) :: ldwe
+         !! Leading dimension of array `we`, `ldwe ∈ {1, n}`.
+      integer(c_int), intent(in) :: ld2we
+         !! Second dimension of array `we`, `ld2we ∈ {1, n}`.
+      integer(c_int), intent(in) :: ldwd
+         !! Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
+      integer(c_int), intent(in) :: ld2wd
+         !! Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
+      integer(c_int), intent(in) :: ldifx
+         !! Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.
       real(c_double), intent(inout) :: beta(np)
          !! Function parameters.
       real(c_double), intent(in) :: y(n, nq)
          !! Dependent variable. Unused when the model is implicit.
       real(c_double), intent(in) :: x(n, m)
          !! Explanatory variable.
-      real(c_double), intent(in) :: we(ldwe, ld2we, nq)
+      real(c_double), intent(in), optional :: we(ldwe, ld2we, nq)
          !! `epsilon` weights.
-      integer(c_int), intent(in) :: ldwe
-         !! Leading dimension of array `we`, `ldwe ∈ {1, n}`.
-      integer(c_int), intent(in) :: ld2we
-         !! Second dimension of array `we`, `ld2we ∈ {1, n}`.
-      real(c_double), intent(in) :: wd(ldwd, ld2wd, m)
+      real(c_double), intent(in), optional :: wd(ldwd, ld2wd, m)
          !! `delta` weights.
-      integer(c_int), intent(in) :: ldwd
-         !! Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
-      integer(c_int), intent(in) :: ld2wd
-         !! Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
-      integer(c_int), intent(in) :: ifixb(np)
+      integer(c_int), intent(in), optional :: ifixb(np)
          !! Values designating whether the elements of `beta` are fixed at their input values or not.
-      integer(c_int), intent(in) :: ifixx(ldifx, m)
+      integer(c_int), intent(in), optional :: ifixx(ldifx, m)
          !! Values designating whether the elements of `x` are fixed at their input values or not.
-      integer(c_int), intent(in) :: ldifx
-         !! Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.
       real(c_double), intent(inout), optional :: delta(n, m)
          !! Error in the `x` data. Initial guess on input and estimated value on output.
       real(c_double), intent(in), optional :: lower(np)
@@ -239,14 +241,14 @@ contains
          !! Print control variable.
       integer(c_int), intent(in), optional :: lunerr
          !! Logical unit number for error messages. Available options are:
-         !!   0 => no output. 
+         !!   0 => no output.
          !!   6 => output to standard error.
-         !!   other => output to logical unit number `lunerr`.  
+         !!   other => output to logical unit number `lunerr`.
       integer(c_int), intent(in), optional :: lunrpt
          !! Logical unit number for computation reports. Available options are:
-         !!   0 => no output. 
+         !!   0 => no output.
          !!   6 => output to standard error.
-         !!   other => output to logical unit number `lunrpt`.  
+         !!   other => output to logical unit number `lunrpt`.
       integer(c_int), intent(out), optional :: info
          !! Logical unit number for computation reports.
 
@@ -264,15 +266,19 @@ contains
    subroutine odr_long_c( &
       fcn, &
       n, m, np, nq, &
+      ldwe, ld2we, &
+      ldwd, ld2wd, &
+      ldifx, &
+      ldstpd, ldscld, &
+      liwork, lwork, &
       beta, y, x, &
-      we, ldwe, ld2we, &
-      wd, ldwd, ld2wd, &
-      ifixb, ifixx, ldifx, &
-      stpb, stpd, ldstpd, &
-      sclb, scld, ldscld, &
-      work, lwork, iwork, liwork, &
+      we, wd, &
+      ifixb, ifixx, &
+      stpb, stpd, &
+      sclb, scld, &
       delta, &
       lower, upper, &
+      work, iwork, &
       job, ndigit, taufac, &
       sstol, partol, maxit, &
       iprint, lunerr, lunrpt, &
@@ -288,50 +294,46 @@ contains
          !! Number of function parameters.
       integer(c_int), intent(in) :: nq
          !! Number of responses per observation.
+      integer(c_int), intent(in) :: ldwe
+         !! Leading dimension of array `we`, `ldwe ∈ {1, n}`.
+      integer(c_int), intent(in) :: ld2we
+         !! Second dimension of array `we`, `ld2we ∈ {1, n}`.
+      integer(c_int), intent(in) :: ldwd
+         !! Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
+      integer(c_int), intent(in) :: ld2wd
+         !! Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
+      integer(c_int), intent(in) :: ldifx
+         !! Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.
+      integer(c_int), intent(in) :: ldstpd
+         !! Leading dimension of array `stpd`, `ldstpd ∈ {1, n}`.
+      integer(c_int), intent(in) :: ldscld
+         !! Leading dimension of array `scld`, `ldscld ∈ {1, n}`.
+      integer(c_int), intent(in) :: lwork
+         !! Length of array `work`.
+      integer(c_int), intent(in) :: liwork
+         !! Length of array `iwork`.
       real(c_double), intent(inout) :: beta(np)
          !! Function parameters.
       real(c_double), intent(in) :: y(n, nq)
          !! Dependent variable. Unused when the model is implicit.
       real(c_double), intent(in) :: x(n, m)
          !! Explanatory variable.
-      real(c_double), intent(in) :: we(ldwe, ld2we, nq)
+      real(c_double), intent(in), optional :: we(ldwe, ld2we, nq)
          !! `epsilon` weights.
-      integer(c_int), intent(in) :: ldwe
-         !! Leading dimension of array `we`, `ldwe ∈ {1, n}`.
-      integer(c_int), intent(in) :: ld2we
-         !! Second dimension of array `we`, `ld2we ∈ {1, n}`.
-      real(c_double), intent(in) :: wd(ldwd, ld2wd, m)
+      real(c_double), intent(in), optional :: wd(ldwd, ld2wd, m)
          !! `delta` weights.
-      integer(c_int), intent(in) :: ldwd
-         !! Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
-      integer(c_int), intent(in) :: ld2wd
-         !! Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
-      integer(c_int), intent(in) :: ifixb(np)
+      integer(c_int), intent(in), optional :: ifixb(np)
          !! Values designating whether the elements of `beta` are fixed at their input values or not.
-      integer(c_int), intent(in) :: ifixx(ldifx, m)
+      integer(c_int), intent(in), optional :: ifixx(ldifx, m)
          !! Values designating whether the elements of `x` are fixed at their input values or not.
-      integer(c_int), intent(in) :: ldifx
-         !! Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.
-      real(c_double), intent(in) :: stpb(np)
+      real(c_double), intent(in), optional :: stpb(np)
          !! Relative step for computing finite difference derivatives with respect to `beta`.
-      real(c_double), intent(in) :: stpd(ldstpd, m)
+      real(c_double), intent(in), optional :: stpd(ldstpd, m)
          !! Relative step for computing finite difference derivatives with respect to `delta`.
-      integer(c_int), intent(in) :: ldstpd
-         !! Leading dimension of array `stpd`, `ldstpd ∈ {1, n}`.
-      real(c_double), intent(in) :: sclb(np)
+      real(c_double), intent(in), optional :: sclb(np)
          !! Scaling values for `beta`.
-      real(c_double), intent(in) :: scld(ldscld, m)
+      real(c_double), intent(in), optional :: scld(ldscld, m)
          !! Scaling values for `delta`.
-      integer(c_int), intent(in) :: ldscld
-         !! Leading dimension of array `scld`, `ldscld ∈ {1, n}`.
-      real(c_double), intent(inout) :: work(lwork)
-         !! Real work space.
-      integer(c_int), intent(in) :: lwork
-         !! Length of array `work`.
-      integer(c_int), intent(inout) :: iwork(liwork)
-         !! Integer work space.
-      integer(c_int), intent(in) :: liwork
-         !! Length of array `iwork`.
       real(c_double), intent(inout), optional :: delta(n, m)
          !! Error in the `x` data. `Shape: (n, m)`. Initial guess on input and estimated value
          !! on output.
@@ -339,6 +341,10 @@ contains
          !! Lower bound on `beta`.
       real(c_double), intent(in), optional :: upper(np)
          !! Upper bound on `beta`.
+      real(c_double), intent(inout), optional :: work(lwork)
+         !! Real work space.
+      integer(c_int), intent(inout), optional :: iwork(liwork)
+         !! Integer work space.
       integer(c_int), intent(in), optional :: job
          !! Variable controlling initialization and computational method.
       integer(c_int), intent(in), optional :: ndigit
@@ -355,29 +361,27 @@ contains
          !! Print control variable.
       integer(c_int), intent(in), optional :: lunerr
          !! Logical unit number for error messages. Available options are:
-         !!   0 => no output. 
+         !!   0 => no output.
          !!   6 => output to standard error.
-         !!   other => output to logical unit number `lunerr`.  
+         !!   other => output to logical unit number `lunerr`.
       integer(c_int), intent(in), optional :: lunrpt
          !! Logical unit number for computation reports. Available options are:
-         !!   0 => no output. 
+         !!   0 => no output.
          !!   6 => output to standard error.
-         !!   other => output to logical unit number `lunrpt`. 
+         !!   other => output to logical unit number `lunrpt`.
       integer(c_int), intent(out), optional :: info
          !! Variable designating why the computations were stopped.
 
       call odr(fcn, n, m, np, nq, beta, y, x, &
-               delta=delta, &
                we=we, wd=wd, &
-               lower=lower, upper=upper, &
                ifixb=ifixb, ifixx=ifixx, &
-               job=job, ndigit=ndigit, taufac=taufac, &
-               sstol=sstol, partol=partol, maxit=maxit, &
+               delta=delta, &
+               lower=lower, upper=upper, &
+               job=job, &
+               ndigit=ndigit, taufac=taufac, sstol=sstol, partol=partol, maxit=maxit, &
                iprint=iprint, lunerr=lunerr, lunrpt=lunrpt, &
-               stpb=stpb, &
-               stpd=stpd, &
-               sclb=sclb, &
-               scld=scld, &
+               stpb=stpb, stpd=stpd, &
+               sclb=sclb, scld=scld, &
                info=info, &
                work=work, iwork=iwork)
 
@@ -406,7 +410,7 @@ contains
       do i = 1, length
          filename(i:i) = filename_fptr(i)
       end do
- 
+
       if (lun > 0) then
          open (file=filename, unit=lun, status='replace', iostat=ierr, iomsg=errmsg)
       else
@@ -414,7 +418,7 @@ contains
       end if
 
       if (ierr /= 0) then
-         print *, "I/O error: ", trim(errmsg) 
+         print *, "I/O error: ", trim(errmsg)
       end if
 
    end subroutine open_file
@@ -444,7 +448,7 @@ contains
       integer :: msgbi, msgdi, ifix2i, istopi, nnzwi, nppi, idfi, jobi, iprini, luneri, &
                  lunrpi, nrowi, ntoli, netai, maxiti, niteri, nfevi, njevi, int2i, iranki, &
                  ldtti, boundi, liwkmn
-               
+
       call diwinf(m, np, nq, &
                   msgbi, msgdi, ifix2i, istopi, &
                   nnzwi, nppi, idfi, &
@@ -591,10 +595,10 @@ contains
          !! Length of real `work` array.
       integer(c_int), intent(out) :: liwork
          !! Length of integer `iwork` array.
-      
+
       call workspace_dimensions(n, m, np, nq, logical(isodr, kind=kind(.true.)), &
                                 lwork, liwork)
-   
+
    end subroutine workspace_dimensions_c
 
 end module odrpack_capi

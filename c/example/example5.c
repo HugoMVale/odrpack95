@@ -125,19 +125,20 @@ int main()
 
     // Call odr
     odr_long_c(fcn, &n, &m, &np, &nq,
+               &ldwe, &ld2we, &ldwd, &ld2wd,
+               &ldifx, &ldstpd, &ldscld,
+               &lwork, &liwork,
                beta,
                (double *)y, (double *)x,
-               (double *)we, &ldwe, &ld2we,
-               (double *)wd, &ldwd, &ld2wd,
-               ifixb, (int *)ifixx, &ldifx,
-               stpb, (double *)stpd, &ldstpd,
-               sclb, (double *)scld, &ldscld,
-               work, &lwork,
-               iwork, &liwork,
+               (double *)we, (double *)wd,
+               ifixb, (int *)ifixx,
+               stpb, (double *)stpd,
+               sclb, (double *)scld,
                (double *)delta,
                lower, upper,
-               &job, &ndigit, &taufac, &sstol, &partol,
-               &maxit, &iprint, &lunerr, &lunrpt,
+               work, iwork,
+               &job, &ndigit, &taufac, &sstol, &partol, &maxit,
+               &iprint, &lunerr, &lunrpt,
                &info);
 
     close_file(&lunrpt, &ierr);
