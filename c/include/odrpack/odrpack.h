@@ -115,7 +115,7 @@ ODRPACK_EXTERN void odr_short_c(
  * @param np     `==>` Number of function parameters.
  * @param nq     `==>` Number of responses per observation.
  * @param ldwe   `==>` Leading dimension of array `we`, `ldwe ∈ {1, n}`.
- * @param ld2we  `==>` Second dimension of array `we`, `ld2we ∈ {1, n}`.
+ * @param ld2we  `==>` Second dimension of array `we`, `ld2we ∈ {1, nq}`.
  * @param ldwd   `==>` Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
  * @param ld2wd  `==>` Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
  * @param ldifx  `==>` Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.
@@ -172,7 +172,7 @@ ODRPACK_EXTERN void odr_medium_c(
  * @param np     `==>` Number of function parameters.
  * @param nq     `==>` Number of responses per observation.
  * @param ldwe   `==>` Leading dimension of array `we`, `ldwe ∈ {1, n}`.
- * @param ld2we  `==>` Second dimension of array `we`, `ld2we ∈ {1, n}`.
+ * @param ld2we  `==>` Second dimension of array `we`, `ld2we ∈ {1, nq}`.
  * @param ldwd   `==>` Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
  * @param ld2wd  `==>` Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
  * @param ldifx  `==>` Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.

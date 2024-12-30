@@ -94,15 +94,15 @@ contains
          !! Error in the `x` data. `Shape: (n, m)`. Initial guess on input and estimated value
          !! on output.
       real(wp), intent(in), optional :: we(:, :, :)
-         !! `epsilon` weights. `Shape: (1<=ldwe<=n, 1<=ld2we<=nq, nq)`. See p. 25.
+         !! `epsilon` weights. `Shape: ({1,n}, {1,nq}, nq)`. See p. 25.
       real(wp), intent(in), optional :: wd(:, :, :)
-         !! `delta` weights. `Shape: (1<=ldwd<=n, 1<=ld2wd<=m, m)`. See p. 26.
+         !! `delta` weights. `Shape: ({1,n}, {1,m}, m)`. See p. 26.
       integer, intent(in), optional :: ifixb(:)
          !! Values designating whether the elements of `beta` are fixed at their input values
          !! or not. `Shape: (np)`.
       integer, intent(in), optional :: ifixx(:, :)
          !! Values designating whether the elements of `x` are fixed at their input values
-         !! or not. `Shape: (1<=ldifx<=n, m)`. See p. 27.
+         !! or not. `Shape: ({1,n}, m)`. See p. 27.
       integer, intent(in), optional :: job
          !! Variable controlling problem initialization and computational method.
       integer, intent(in), optional :: ndigit
@@ -119,24 +119,24 @@ contains
          !! Print control variable.
       integer, intent(in), optional :: lunerr
          !! Logical unit number for error messages. Available options are:
-         !!   0 => no output. 
-         !!   6 => output to standard error.
-         !!   other => output to logical unit number `lunerr`.  
+         !!   0 => no output.
+         !!   6 => output to standard error (default).
+         !!   other => output to logical unit number `lunerr`.
       integer, intent(in), optional :: lunrpt
          !! Logical unit number for computation reports. Available options are:
-         !!   0 => no output. 
-         !!   6 => output to standard error.
-         !!   other => output to logical unit number `lunrpt`.  
+         !!   0 => no output.
+         !!   6 => output to standard error (default).
+         !!   other => output to logical unit number `lunrpt`.
       real(wp), intent(in), optional :: stpb(:)
          !! Relative step for computing finite difference derivatives with respect to `beta`.
          !! `Shape: (np)`.
       real(wp), intent(in), optional :: stpd(:, :)
          !! Relative step for computing finite difference derivatives with respect to `delta`.
-         !! `Shape: (1<=ldstpd<=n, m)`. See p. 31.
+         !! `Shape: ({1,n}, m)`. See p. 31.
       real(wp), intent(in), optional :: sclb(:)
       !! Scaling values for `beta`. `Shape: (np)`.
       real(wp), intent(in), optional :: scld(:, :)
-         !! Scaling values for `delta`. `Shape: (1<=ldscld<=n, m)`. See p. 32.
+         !! Scaling values for `delta`. `Shape: ({1,n}, m)`. See p. 32.
       real(wp), intent(inout), optional, target :: work(:)
          !! Real work space.
       integer, intent(inout), optional, target :: iwork(:)
@@ -290,9 +290,9 @@ contains
       ! Determine the size of the work arrays
       isodr = (job_ < 0 .or. mod(job_, 10) <= 1)
       call workspace_dimensions(n, m, np, nq, isodr, lwork, liwork)
-      
+
       ! Allocate the local work arrays, if not provided by user
-      ! The complementary case is treated below, because of the way the info flags are designed 
+      ! The complementary case is treated below, because of the way the info flags are designed
       if (.not. present(iwork)) then
          allocate (iwork_local(liwork), stat=info2_)
          iwork_ => iwork_local
@@ -302,7 +302,7 @@ contains
          allocate (work_local(lwork), stat=info3_)
          work_ => work_local
       end if
-     
+
       allocate (tempret(max(n, np), max(nq, m)), stat=info4_)
 
       if (info4_ /= 0 .or. info3_ /= 0 .or. info2_ /= 0) then
@@ -382,12 +382,12 @@ contains
             ifixx_(1:ldifx, 1:m) = ifixx(1:ldifx, 1:m)
          end if
       end if
-    
+
       if (present(iwork)) then
          if (size(iwork) >= liwork) then
             iwork_ => iwork(1:liwork)
          else
-             info1_ = info1_ + 8192           
+            info1_ = info1_ + 8192
          end if
       end if
 
@@ -2516,18 +2516,17 @@ contains
          !! Length of `work` array.
       integer, intent(out) :: liwork
          !! Length of `iwork` array.
-      
-      if(isodr) then
+
+      if (isodr) then
          lwork = 18 + 13*np + np**2 + m + m**2 + 4*n*nq + 6*n*m + 2*n*nq*np + &
-                   2*n*nq*m + nq**2 + 5*nq + nq*(np + m) + n*nq*nq
+                 2*n*nq*m + nq**2 + 5*nq + nq*(np + m) + n*nq*nq
       else
          lwork = 18 + 13*np + np**2 + m + m**2 + 4*n*nq + 2*n*m + 2*n*nq*np + &
-                   5*nq + nq*(np + m) + n*nq*nq
+                 5*nq + nq*(np + m) + n*nq*nq
       end if
 
       liwork = 20 + 2*np + nq*(np + m)
 
    end subroutine workspace_dimensions
-
 
 end module odrpack

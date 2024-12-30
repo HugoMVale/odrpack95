@@ -208,7 +208,7 @@ contains
       integer(c_int), intent(in) :: ldwe
          !! Leading dimension of array `we`, `ldwe ∈ {1, n}`.
       integer(c_int), intent(in) :: ld2we
-         !! Second dimension of array `we`, `ld2we ∈ {1, n}`.
+         !! Second dimension of array `we`, `ld2we ∈ {1, nq}`.
       integer(c_int), intent(in) :: ldwd
          !! Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
       integer(c_int), intent(in) :: ld2wd
@@ -297,7 +297,7 @@ contains
       integer(c_int), intent(in) :: ldwe
          !! Leading dimension of array `we`, `ldwe ∈ {1, n}`.
       integer(c_int), intent(in) :: ld2we
-         !! Second dimension of array `we`, `ld2we ∈ {1, n}`.
+         !! Second dimension of array `we`, `ld2we ∈ {1, nq}`.
       integer(c_int), intent(in) :: ldwd
          !! Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
       integer(c_int), intent(in) :: ld2wd
