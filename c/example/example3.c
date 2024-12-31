@@ -142,8 +142,8 @@ int main()
     int job = 1010;
     int iprint = 2002;
 
-    int lunrpt = 0; // stdout
-    int lunerr = 0; // stderr
+    int lunrpt = 6; // stdout
+    int lunerr = 6; // stderr
     int info = 0;
 
     // Compute solution
