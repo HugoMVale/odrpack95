@@ -270,7 +270,7 @@ contains
       ldwd, ld2wd, &
       ldifx, &
       ldstpd, ldscld, &
-      liwork, lwork, &
+      lwork, liwork, &
       beta, y, x, &
       we, wd, &
       ifixb, ifixx, &
