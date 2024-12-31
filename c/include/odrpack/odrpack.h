@@ -230,7 +230,7 @@ ODRPACK_EXTERN void odr_long_c(
     const int ifixb[],
     const int ifixx[],
     const double stpb[],
-    const double scpd[],
+    const double stpd[],
     const double sclb[],
     const double scld[],
     double delta[],
