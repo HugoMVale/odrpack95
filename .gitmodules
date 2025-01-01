@@ -2,3 +2,6 @@
 	path = extern/pybind11
 	url = ../../pybind/pybind11
 	branch = stable
+[submodule "extern/nanobind"]
+	path = extern/nanobind
+	url = https://github.com/wjakob/nanobind
