@@ -341,13 +341,13 @@ typedef struct
 /**
  * @brief Get storage locations within integer work space.
  *
- * @param n        `==>` Number of observations.
+ * @param m        `==>` Number of columns of data in the explanatory variable.
  * @param np       `==>` Number of function parameters.
  * @param nq       `==>` Number of responses per observation.
  * @param iworkidx `<==` 0-based indexes of integer work array.
  */
 ODRPACK_EXTERN void diwinf_c(
-    const int *n,
+    const int *m,
     const int *np,
     const int *nq,
     iworkidx_t *iworkidx);
@@ -394,4 +394,4 @@ ODRPACK_EXTERN void workspace_dimensions_c(
     int *lwork,
     int *liwork);
 
-#endif // ODRPACK_H
+#endif  // ODRPACK_H
