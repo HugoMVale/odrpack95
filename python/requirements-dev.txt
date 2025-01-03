@@ -1,8 +1,0 @@
-# Testing
-pytest
-
-# Build
-cibuildwheel
-
-# General purpose
-ipykernel
