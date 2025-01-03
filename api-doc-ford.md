@@ -1,6 +1,6 @@
 ---
 project: odrpack
-license: bsd
+license: mit
 summary: odrpack is a package for weighted orthogonal distance regression (ODR), also known as errors-in-variables regression.
 src_dir: src
          example

@@ -1,6 +1,6 @@
 name = "odrpack95"
 version = "1.0.0"
-license = "BSD 3-Clause License"
+license = "MIT"
 author = "HugoMVale"
 maintainer = "57530119+HugoMVale@users.noreply.github.com"
 copyright = "Copyright 2024, HugoMVale"
