@@ -13,8 +13,6 @@
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-const bool DEBUG = true;
-
 /*
 The following class is necessary to ensure that the static variables used to store the callback
 functions are automatically reset upon normal or abnormal exit from the `odr_wrapper` function.
@@ -39,65 +37,38 @@ Fortran code automatically interprets `nullptr` as an absent optional argument.
 This approach avoids the redundant definition of default values in multiple
 places.
 */
-auto odr_wrapper(int n, int m, int npar, int nq,
-                 int ldwe, int ld2we, int ldwd,
-                 int ld2wd, int ldifx, int ldstpd, int ldscld,
-                 py::function fcn_f,
-                 py::function fcn_fjacb,
-                 py::function fcn_fjacd,
-                 py::array_t<double, py::array::c_style> beta,
-                 py::array_t<double, py::array::c_style> y,
-                 py::array_t<double, py::array::c_style> x,
-                 py::array_t<double, py::array::c_style> delta,
-                 std::optional<py::array_t<double, py::array::c_style>> we,
-                 std::optional<py::array_t<double, py::array::c_style>> wd,
-                 std::optional<py::array_t<int, py::array::c_style>> ifixb,
-                 std::optional<py::array_t<int, py::array::c_style>> ifixx,
-                 std::optional<py::array_t<double, py::array::c_style>> stpb,
-                 std::optional<py::array_t<double, py::array::c_style>> stpd,
-                 std::optional<py::array_t<double, py::array::c_style>> sclb,
-                 std::optional<py::array_t<double, py::array::c_style>> scld,
-                 std::optional<py::array_t<double, py::array::c_style>> lower,
-                 std::optional<py::array_t<double, py::array::c_style>> upper,
-                 std::optional<py::array_t<double, py::array::c_style>> work,
-                 std::optional<py::array_t<int, py::array::c_style>> iwork,
-                 std::optional<int> job, std::optional<int> ndigit,
-                 std::optional<double> taufac, std::optional<double> sstol,
-                 std::optional<double> partol, std::optional<int> maxit,
-                 std::optional<int> iprint, std::optional<std::string> errfile,
-                 std::optional<std::string> rptfile)
+int odr_wrapper(int n, int m, int npar, int nq,
+                int ldwe, int ld2we, int ldwd,
+                int ld2wd, int ldifx, int ldstpd, int ldscld,
+                const py::function fcn_f,
+                const py::function fcn_fjacb,
+                const py::function fcn_fjacd,
+                py::array_t<double, py::array::c_style> beta,
+                py::array_t<double, py::array::c_style> y,
+                py::array_t<double, py::array::c_style> x,
+                py::array_t<double, py::array::c_style> delta,
+                std::optional<py::array_t<double, py::array::c_style>> we,
+                std::optional<py::array_t<double, py::array::c_style>> wd,
+                std::optional<py::array_t<int, py::array::c_style>> ifixb,
+                std::optional<py::array_t<int, py::array::c_style>> ifixx,
+                std::optional<py::array_t<double, py::array::c_style>> stpb,
+                std::optional<py::array_t<double, py::array::c_style>> stpd,
+                std::optional<py::array_t<double, py::array::c_style>> sclb,
+                std::optional<py::array_t<double, py::array::c_style>> scld,
+                std::optional<py::array_t<double, py::array::c_style>> lower,
+                std::optional<py::array_t<double, py::array::c_style>> upper,
+                std::optional<py::array_t<double, py::array::c_style>> work,
+                std::optional<py::array_t<int, py::array::c_style>> iwork,
+                std::optional<int> job, std::optional<int> ndigit,
+                std::optional<double> taufac, std::optional<double> sstol,
+                std::optional<double> partol, std::optional<int> maxit,
+                std::optional<int> iprint, std::optional<std::string> errfile,
+                std::optional<std::string> rptfile)
 
 {
-    if (DEBUG) {
-        std::cout << "n=" << n << std::endl;
-        std::cout << "m=" << m << std::endl;
-        std::cout << "npar=" << npar << std::endl;
-        std::cout << "nq=" << nq << std::endl;
-        std::cout << "ldwe=" << ldwe << std::endl;
-        std::cout << "ld2we=" << ld2we << std::endl;
-        std::cout << "ldwd=" << ldwd << std::endl;
-        std::cout << "ld2wd=" << ld2wd << std::endl;
-        std::cout << "ldifx=" << ldifx << std::endl;
-        std::cout << "x=" << x << std::endl;
-        std::cout << "y=" << y << std::endl;
-        std::cout << "beta=" << beta << std::endl;
-        std::cout << "delta=" << delta << std::endl;
-        if (we) std::cout << "we=" << we.value() << std::endl;
-        if (wd) std::cout << "wd=" << wd.value() << std::endl;
-        if (ifixb) std::cout << "ifixb=" << ifixb.value() << std::endl;
-        if (ifixx) std::cout << "ifixx=" << ifixx.value() << std::endl;
-
-        if (lower) std::cout << "lower=" << lower.value() << std::endl;
-        if (upper) std::cout << "upper=" << upper.value() << std::endl;
-        if (job) std::cout << "job=" << job.value() << std::endl;
-        if (iprint) std::cout << "iprint=" << iprint.value() << std::endl;
-        if (errfile) std::cout << "errfile=" << errfile.value() << std::endl;
-        if (rptfile) std::cout << "rptfile=" << rptfile.value() << std::endl;
-    }
-
     // Create pointers to the NumPy arrays and scalar arguments
-    // All arrays are assumed to be contiguous and correctly shaped, allowing
-    // direct pointer assignment without additional checks
+    // All input arrays are guaranteed to be contiguous and correctly shaped, allowing direct
+    // pointer assignment without additional checks
     auto y_ptr = y.data();
     auto x_ptr = x.data();
     auto beta_ptr = beta.mutable_data();
@@ -133,8 +104,8 @@ auto odr_wrapper(int n, int m, int npar, int nq,
     if (iwork) liwork = iwork.value().size();
 
     // Build static pointers to the Python functions
-    // The static variables are necessary to ensure that the Python functions can
-    // be accessed from the C-style function 'fcn'
+    // The static variables are necessary to ensure that the Python functions can be accessed
+    // within the C-style function 'fcn'
     static py::function fcn_f_holder;
     fcn_f_holder = std::move(fcn_f);
     auto cleaner_1 = SelfCleaningPyObject(fcn_f_holder);
