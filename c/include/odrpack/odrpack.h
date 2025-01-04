@@ -371,7 +371,7 @@ ODRPACK_EXTERN void dwinf_c(
     const int *nq,
     const int *ldwe,
     const int *ld2we,
-    const _Bool *isodr,
+    const bool *isodr,
     workidx_t *workidx);
 
 /**
@@ -390,7 +390,7 @@ ODRPACK_EXTERN void workspace_dimensions_c(
     const int *m,
     const int *np,
     const int *nq,
-    const _Bool *isodr,
+    const bool *isodr,
     int *lwork,
     int *liwork);
 
