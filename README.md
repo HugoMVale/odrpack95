@@ -109,4 +109,4 @@ meson test -C _build
 ## Licence
 
 * The original ODERPACK95 code is [public domain](https://github.com/scipy/scipy/issues/7107#issuecomment-307378785).
-* Any modications done in the course of this project are covered by BSD-3.
+* Any modications done in the course of this project are covered by the MIT licence.
