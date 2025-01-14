@@ -8,16 +8,16 @@ contains
 
    impure subroutine dodpc1 &
       (ipr, lunrpt, &
-      anajac, cdjac, chkjac, initd, restrt, isodr, implct, dovcv, redoj, &
-      msgb1, msgb, msgd1, msgd, &
-      n, m, np, nq, npp, nnzw, &
-      x, ldx, ifixx, ldifx, delta, wd, ldwd, ld2wd, tt, ldtt, stpd, ldstpd &
-      , y, ldy, we, ldwe, ld2we, pnlty, beta, ifixb, ssf, stpb, lower, &
-      upper, job, neta, taufac, sstol, partol, maxit, wss, wssdel, wsseps)
+       anajac, cdjac, chkjac, initd, restrt, isodr, implct, dovcv, redoj, &
+       msgb1, msgb, msgd1, msgd, &
+       n, m, np, nq, npp, nnzw, &
+       x, ldx, ifixx, ldifx, delta, wd, ldwd, ld2wd, tt, ldtt, stpd, ldstpd &
+       , y, ldy, we, ldwe, ld2we, pnlty, beta, ifixb, ssf, stpb, lower, &
+       upper, job, neta, taufac, sstol, partol, maxit, wss, wssdel, wsseps)
    !! Generate initial summary report.
-   ! Routines Called  DHSTEP
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
+      ! Routines Called  DHSTEP
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero
       use odrpack_core, only: dhstep
@@ -36,7 +36,7 @@ contains
          !! The variable designating whether the user-supplied Jacobians are to be checked
          !! (`chkjac = .true.`) or not (`chkjac = .false.`).
       logical, intent(in) :: initd
-         !! The variable designating whether `delta` is initialized to zero (`initd = .true.`) 
+         !! The variable designating whether `delta` is initialized to zero (`initd = .true.`)
          !! or to the values in the first `n` by `m` elements of array `work` (`initd = .false.`).
       logical, intent(in) :: restrt
          !! The variable designating whether the call is a restart (`restrt = .true.`) or
@@ -209,7 +209,7 @@ contains
       !  NQ:      The number of responses per observation.
       !  PARTOL:  The parameter convergence stopping tolerance.
       !  PNLTY:   The penalty parameter for an implicit model.
-      !  REDOJ:   The variable designating whether the Jacobian matrix is to be recomputed for 
+      !  REDOJ:   The variable designating whether the Jacobian matrix is to be recomputed for
       !           the computation of the covariance matrix (REDOJ=TRUE) or not (REDOJ=FALSE).
       !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or
       !           not (RESTRT=FALSE).
@@ -322,8 +322,8 @@ contains
          ! Print function parameter data
          write (lunrpt, 4000)
          if (chkjac .and. &
-            ((msgb1 >= 1) .or. &
-            (msgd1 >= 1))) then
+             ((msgb1 >= 1) .or. &
+              (msgd1 >= 1))) then
             write (lunrpt, 4110)
          elseif (anajac) then
             write (lunrpt, 4120)
@@ -342,8 +342,8 @@ contains
             end if
             if (anajac) then
                if (chkjac .and. &
-                  ((msgb1 >= 1) .or. &
-                  (msgd1 >= 1))) then
+                   ((msgb1 >= 1) .or. &
+                    (msgd1 >= 1))) then
                   itemp = -1
                   do l = 1, nq
                      itemp = max(itemp, msgb(l, j))
@@ -384,8 +384,8 @@ contains
          if (isodr) then
             write (lunrpt, 2010)
             if (chkjac .and. &
-               ((msgb1 >= 1) .or. &
-               (msgd1 >= 1))) then
+                ((msgb1 >= 1) .or. &
+                 (msgd1 >= 1))) then
                write (lunrpt, 2110)
             elseif (anajac) then
                write (lunrpt, 2120)
@@ -449,9 +449,9 @@ contains
 
                   if (anajac) then
                      if (chkjac .and. &
-                        (((msgb1 >= 1) .or. &
+                         (((msgb1 >= 1) .or. &
                            (msgd1 >= 1)) .and. &
-                        (i == 1))) then
+                          (i == 1))) then
                         itemp = -1
                         do l = 1, nq
                            itemp = max(itemp, msgd(l, j))
@@ -554,177 +554,177 @@ contains
 
       ! Format statements
 
-   1000 format &
+1000  format &
          (/' --- Problem Size:'/ &
-         '            N = ', I5, &
-         '          (number with nonzero weight = ', I5, ')'/ &
-         '           NQ = ', I5/ &
-         '            M = ', I5/ &
-         '           NP = ', I5, &
-         '          (number unfixed = ', I5, ')')
-   1100 format &
+           '            N = ', I5, &
+           '          (number with nonzero weight = ', I5, ')'/ &
+           '           NQ = ', I5/ &
+           '            M = ', I5/ &
+           '           NP = ', I5, &
+           '          (number unfixed = ', I5, ')')
+1100  format &
          (/' --- Control Values:'/ &
-         '          JOB = ', I5.5/ &
-         '              = ABCDE, where')
-   1110 format &
+           '          JOB = ', I5.5/ &
+           '              = ABCDE, where')
+1110  format &
          ('                       A=', I1, ' ==> fit is a restart.')
-   1111 format &
+1111  format &
          ('                       A=', I1, ' ==> fit is not a restart.')
-   1120 format &
+1120  format &
          ('                       B=', I1, ' ==> deltas are initialized', &
-         ' to zero.')
-   1121 format &
+          ' to zero.')
+1121  format &
          ('                       B=', I1, ' ==> deltas are initialized', &
-         ' by user.')
-   1122 format &
+          ' by user.')
+1122  format &
          ('                       B=', I1, ' ==> deltas are fixed at', &
-         ' zero since E=', I1, '.')
-   1130 format &
+          ' zero since E=', I1, '.')
+1130  format &
          ('                       C=', I1, ' ==> covariance matrix will', &
-         ' be computed using')
-   1131 format &
+          ' be computed using')
+1131  format &
          ('                               derivatives re-', &
-         'evaluated at the solution.')
-   1132 format &
+          'evaluated at the solution.')
+1132  format &
          ('                               derivatives from the', &
-         ' last iteration.')
-   1133 format &
+          ' last iteration.')
+1133  format &
          ('                       C=', I1, ' ==> covariance matrix will', &
-         ' not be computed.')
-   1140 format &
+          ' not be computed.')
+1140  format &
          ('                       D=', I1, ' ==> derivatives are', &
-         ' supplied by user.')
-   1141 format &
+          ' supplied by user.')
+1141  format &
          ('                               derivatives were checked.'/ &
-         '                               results appear questionable.')
-   1142 format &
+          '                               results appear questionable.')
+1142  format &
          ('                               derivatives were checked.'/ &
-         '                               results appear correct.')
-   1143 format &
+          '                               results appear correct.')
+1143  format &
          ('                               derivatives were not', &
-         ' checked.')
-   1144 format &
+          ' checked.')
+1144  format &
          ('                       D=', I1, ' ==> derivatives are', &
-         ' estimated by central', &
-         ' differences.')
-   1145 format &
+          ' estimated by central', &
+          ' differences.')
+1145  format &
          ('                       D=', I1, ' ==> derivatives are', &
-         ' estimated by forward', &
-         ' differences.')
-   1150 format &
+          ' estimated by forward', &
+          ' differences.')
+1150  format &
          ('                       E=', I1, ' ==> method is implicit ODR.')
-   1151 format &
+1151  format &
          ('                       E=', I1, ' ==> method is explicit ODR.')
-   1152 format &
+1152  format &
          ('                       E=', I1, ' ==> method is explicit OLS.')
-   1200 format &
+1200  format &
          ('       NDIGIT = ', I5, '          (estimated by ODRPACK)')
-   1210 format &
+1210  format &
          ('       NDIGIT = ', I5, '          (supplied by user)')
-   1300 format &
+1300  format &
          ('       TAUFAC = ', 1P, E12.2)
-   1400 format &
+1400  format &
          (/' --- Stopping Criteria:'/ &
-         '        SSTOL = ', 1P, E12.2, &
-         '   (sum of squares stopping tolerance)'/ &
-         '       PARTOL = ', 1P, E12.2, &
-         '   (parameter stopping tolerance)'/ &
-         '        MAXIT = ', I5, &
-         '          (maximum number of iterations)')
-   1500 format &
+           '        SSTOL = ', 1P, E12.2, &
+           '   (sum of squares stopping tolerance)'/ &
+           '       PARTOL = ', 1P, E12.2, &
+           '   (parameter stopping tolerance)'/ &
+           '        MAXIT = ', I5, &
+           '          (maximum number of iterations)')
+1500  format &
          (/' --- Initial Sum of Squared Weighted Deltas =', &
-         17X, 1P, E17.8)
-   1510 format &
+           17X, 1P, E17.8)
+1510  format &
          ('         Initial Penalty Function Value     =', 1P, E17.8/ &
-         '                 Penalty Term               =', 1P, E17.8/ &
-         '                 Penalty Parameter          =', 1P, E10.1)
-   1600 format &
+          '                 Penalty Term               =', 1P, E17.8/ &
+          '                 Penalty Parameter          =', 1P, E10.1)
+1600  format &
          (/' --- Initial Weighted Sum of Squares        =', &
-         17X, 1P, E17.8)
-   1610 format &
+           17X, 1P, E17.8)
+1610  format &
          ('         Sum of Squared Weighted Deltas     =', 1P, E17.8/ &
-         '         Sum of Squared Weighted Epsilons   =', 1P, E17.8)
-   2010 format &
+          '         Sum of Squared Weighted Epsilons   =', 1P, E17.8)
+2010  format &
          (/' --- Explanatory Variable and Delta Weight Summary:')
-   2020 format &
+2020  format &
          (/' --- Explanatory Variable Summary:')
-   2110 format &
+2110  format &
          (/'       Index      X(I,J)  DELTA(I,J)    Fixed', &
-         '     Scale    Weight    Derivative'/ &
-         '                                             ', &
-         '                        Assessment'/, &
-         '       (I,J)                          (IFIXX)', &
-         '    (SCLD)      (WD)              '/)
-   2120 format &
+           '     Scale    Weight    Derivative'/ &
+           '                                             ', &
+           '                        Assessment'/, &
+           '       (I,J)                          (IFIXX)', &
+           '    (SCLD)      (WD)              '/)
+2120  format &
          (/'       Index      X(I,J)  DELTA(I,J)    Fixed', &
-         '     Scale    Weight              '/ &
-         '                                             ', &
-         '                                  '/, &
-         '       (I,J)                          (IFIXX)', &
-         '    (SCLD)      (WD)              '/)
-   2130 format &
+           '     Scale    Weight              '/ &
+           '                                             ', &
+           '                                  '/, &
+           '       (I,J)                          (IFIXX)', &
+           '    (SCLD)      (WD)              '/)
+2130  format &
          (/'       Index      X(I,J)  DELTA(I,J)    Fixed', &
-         '     Scale    Weight    Derivative'/ &
-         '                                             ', &
-         '                         Step Size'/, &
-         '       (I,J)                          (IFIXX)', &
-         '    (SCLD)      (WD)        (STPD)'/)
-   2140 format &
+           '     Scale    Weight    Derivative'/ &
+           '                                             ', &
+           '                         Step Size'/, &
+           '       (I,J)                          (IFIXX)', &
+           '    (SCLD)      (WD)        (STPD)'/)
+2140  format &
          (/'       Index      X(I,J)'/ &
-         '       (I,J)            '/)
-   3000 format &
+           '       (I,J)            '/)
+3000  format &
          (/' --- Response Variable and Epsilon Error Weight', &
-         ' Summary:')
-   3100 format &
+           ' Summary:')
+3100  format &
          (/'       Index      Y(I,L)      Weight'/ &
-         '       (I,L)                    (WE)'/)
-   4000 format &
+           '       (I,L)                    (WE)'/)
+4000  format &
          (/' --- Function Parameter Summary:')
-   4110 format &
+4110  format &
          (/'       Index   BETA(K)    Fixed     Scale   LOWER(K)', &
-         '   UPPER(K)    Derivative'/ &
-         '                                                    ', &
-         '               Assessment'/, &
-         '         (K)            (IFIXB)    (SCLB)           ', &
-         '                         '/)
-   4120 format &
+           '   UPPER(K)    Derivative'/ &
+           '                                                    ', &
+           '               Assessment'/, &
+           '         (K)            (IFIXB)    (SCLB)           ', &
+           '                         '/)
+4120  format &
          (/'       Index   BETA(K)    Fixed     Scale   LOWER(K)', &
-         '   UPPER(K)              '/ &
-         '                                                    ', &
-         '                         '/, &
-         '         (K)            (IFIXB)    (SCLB)           ', &
-         '                         '/)
-   4200 format &
+           '   UPPER(K)              '/ &
+           '                                                    ', &
+           '                         '/, &
+           '         (K)            (IFIXB)    (SCLB)           ', &
+           '                         '/)
+4200  format &
          (/'       Index   BETA(K)    Fixed     Scale   LOWER(K)', &
-         '   UPPER(K)    Derivative'/ &
-         '                                                    ', &
-         '                Step Size'/, &
-         '         (K)            (IFIXB)    (SCLB)           ', &
-         '                   (STPB)'/)
-   4310 format &
+           '   UPPER(K)    Derivative'/ &
+           '                                                    ', &
+           '                Step Size'/, &
+           '         (K)            (IFIXB)    (SCLB)           ', &
+           '                   (STPB)'/)
+4310  format &
          (7X, I5, 1P, E10.2, 4X, A5, E10.2, E11.2E3, E11.2E3, 1X, A13)
-   4320 format &
+4320  format &
          (7X, I5, 1P, E10.2, 4X, A5, E10.2, E11.2E3, E11.2E3, 1X, E13.5)
-   5110 format &
+5110  format &
          (9X, A2, I1, 1P, 2E12.3, 4X, A5, 2E10.2, 1X, A13)
-   5120 format &
+5120  format &
          (8X, A2, I2, 1P, 2E12.3, 4X, A5, 2E10.2, 1X, A13)
-   5210 format &
+5210  format &
          (9X, A2, I1, 1P, 2E12.3, 4X, A5, 2E10.2, 1X, E13.5)
-   5220 format &
+5220  format &
          (8X, A2, I2, 1P, 2E12.3, 4X, A5, 2E10.2, 1X, E13.5)
-   6000 format &
+6000  format &
          (' ')
    end subroutine dodpc1
 
    impure subroutine dodpc2 &
       (ipr, lunrpt, fstitr, implct, prtpen, &
-      pnlty, &
-      niter, nfev, wss, actred, prered, alpha, tau, pnorm, np, beta)
+       pnlty, &
+       niter, nfev, wss, actred, prered, alpha, tau, pnorm, np, beta)
    !! Generate iteration reports.
-   ! Routines Called  (NONE)
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920304   (YYMMDD)
+      ! Routines Called  (NONE)
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920304   (YYMMDD)
 
       use odrpack_kinds, only: zero
 
@@ -851,67 +851,67 @@ contains
 
       ! Format statements
 
-   1121 format &
+1121  format &
          (// &
-         '         Cum.      Penalty    Act. Rel.   Pred. Rel.'/ &
-         '  It.  No. FN     Function   Sum-of-Sqs   Sum-of-Sqs', &
-         '              G-N'/ &
-         ' Num.   Evals        Value    Reduction    Reduction', &
-         '  TAU/PNORM  Step'/ &
-         ' ----  ------  -----------  -----------  -----------', &
-         '  ---------  ----')
-   1122 format &
+           '         Cum.      Penalty    Act. Rel.   Pred. Rel.'/ &
+           '  It.  No. FN     Function   Sum-of-Sqs   Sum-of-Sqs', &
+           '              G-N'/ &
+           ' Num.   Evals        Value    Reduction    Reduction', &
+           '  TAU/PNORM  Step'/ &
+           ' ----  ------  -----------  -----------  -----------', &
+           '  ---------  ----')
+1122  format &
          (// &
-         '         Cum.                 Act. Rel.   Pred. Rel.'/ &
-         '  It.  No. FN     Weighted   Sum-of-Sqs   Sum-of-Sqs', &
-         '              G-N'/ &
-         ' Num.   Evals   Sum-of-Sqs    Reduction    Reduction', &
-         '  TAU/PNORM  Step'/ &
-         ' ----  ------  -----------  -----------  -----------', &
-         '  ---------  ----'/)
-   1131 format &
+           '         Cum.                 Act. Rel.   Pred. Rel.'/ &
+           '  It.  No. FN     Weighted   Sum-of-Sqs   Sum-of-Sqs', &
+           '              G-N'/ &
+           ' Num.   Evals   Sum-of-Sqs    Reduction    Reduction', &
+           '  TAU/PNORM  Step'/ &
+           ' ----  ------  -----------  -----------  -----------', &
+           '  ---------  ----'/)
+1131  format &
          (// &
-         '         Cum.      Penalty    Act. Rel.   Pred. Rel.'/ &
-         '  It.  No. FN     Function   Sum-of-Sqs   Sum-of-Sqs', &
-         '              G-N      BETA -------------->'/ &
-         ' Num.   Evals        Value    Reduction    Reduction', &
-         '  TAU/PNORM  Step     Index           Value'/ &
-         ' ----  ------  -----------  -----------  -----------', &
-         '  ---------  ----     -----           -----')
-   1132 format &
+           '         Cum.      Penalty    Act. Rel.   Pred. Rel.'/ &
+           '  It.  No. FN     Function   Sum-of-Sqs   Sum-of-Sqs', &
+           '              G-N      BETA -------------->'/ &
+           ' Num.   Evals        Value    Reduction    Reduction', &
+           '  TAU/PNORM  Step     Index           Value'/ &
+           ' ----  ------  -----------  -----------  -----------', &
+           '  ---------  ----     -----           -----')
+1132  format &
          (// &
-         '         Cum.                 Act. Rel.   Pred. Rel.'/ &
-         '  It.  No. FN     Weighted   Sum-of-Sqs   Sum-of-Sqs', &
-         '              G-N      BETA -------------->'/ &
-         ' Num.   Evals   Sum-of-Sqs    Reduction    Reduction', &
-         '  TAU/PNORM  Step     Index           Value'/ &
-         ' ----  ------  -----------  -----------  -----------', &
-         '  ---------  ----     -----           -----'/)
-   1133 format &
+           '         Cum.                 Act. Rel.   Pred. Rel.'/ &
+           '  It.  No. FN     Weighted   Sum-of-Sqs   Sum-of-Sqs', &
+           '              G-N      BETA -------------->'/ &
+           ' Num.   Evals   Sum-of-Sqs    Reduction    Reduction', &
+           '  TAU/PNORM  Step     Index           Value'/ &
+           ' ----  ------  -----------  -----------  -----------', &
+           '  ---------  ----     -----           -----'/)
+1133  format &
          (/' Penalty Parameter Value = ', 1P, E10.1)
-   1141 format &
+1141  format &
          (1X, I4, I8, 1X, 1P, E12.5, 2E13.4, E11.3, 3X, A3, 7X, I3, 3E16.8)
-   1142 format &
+1142  format &
          (1X, I4, I8, 1X, 1P, E12.5, 2E13.4, E11.3, 3X, A3, 1X, I3, ' To', I3, 3E16.8)
-   1151 format &
+1151  format &
          (76X, I3, 1P, E16.8)
-   1152 format &
+1152  format &
          (70X, I3, ' To', I3, 1P, 3E16.8)
 
    end subroutine dodpc2
 
    impure subroutine dodpc3 &
       (ipr, lunrpt, &
-      isodr, implct, didvcv, dovcv, redoj, anajac, &
-      n, m, np, nq, npp, &
-      info, niter, nfev, njev, irank, rcond, istop, &
-      wss, wssdel, wsseps, pnlty, rvar, idf, &
-      beta, sdbeta, ifixb2, f, delta, &
-      lower, upper)
+       isodr, implct, didvcv, dovcv, redoj, anajac, &
+       n, m, np, nq, npp, &
+       info, niter, nfev, njev, irank, rcond, istop, &
+       wss, wssdel, wsseps, pnlty, rvar, idf, &
+       beta, sdbeta, ifixb2, f, delta, &
+       lower, upper)
    !! Generate final summary report.
-   ! Routines Called  DPPT
-   ! Date Written   860529   (YYMMDD)
-   ! REvision Date  920619   (YYMMDD)
+      ! Routines Called  DPPT
+      ! Date Written   860529   (YYMMDD)
+      ! REvision Date  920619   (YYMMDD)
 
       use odrpack_core, only: dppt
 
@@ -1204,7 +1204,7 @@ contains
       ! Print EPSILON's and DELTA's together in a column if the number of
       ! columns of data in EPSILON and DELTA is less than or equal to three.
       if (implct .and. &
-         (m <= 4)) then
+          (m <= 4)) then
          write (lunrpt, 4100)
          write (fmt1, 9110) m
          write (lunrpt, fmt1) (j, j=1, m)
@@ -1213,7 +1213,7 @@ contains
          end do
 
       elseif (isodr .and. &
-            (nq + m <= 4)) then
+              (nq + m <= 4)) then
          write (lunrpt, 4110)
          write (fmt1, 9120) nq, m
          write (lunrpt, fmt1) (l, l=1, nq), (j, j=1, m)
@@ -1222,7 +1222,7 @@ contains
          end do
 
       elseif (.not. isodr .and. &
-            ((nq >= 2) .and. &
+              ((nq >= 2) .and. &
                (nq <= 4))) then
          write (lunrpt, 4120)
          write (fmt1, 9130) nq
@@ -1277,229 +1277,229 @@ contains
 
       ! Format statements
 
-   1000 format &
+1000  format &
          (/' --- Stopping Conditions:')
-   1011 format &
+1011  format &
          ('         INFO = ', I5, ' ==> sum of squares convergence.')
-   1012 format &
+1012  format &
          ('         INFO = ', I5, ' ==> parameter convergence.')
-   1013 format &
+1013  format &
          ('         INFO = ', I5, ' ==> sum of squares convergence and', &
-         ' parameter convergence.')
-   1014 format &
+          ' parameter convergence.')
+1014  format &
          ('         INFO = ', I5, ' ==> iteration limit reached.')
-   1015 format &
+1015  format &
          ('         INFO = ', I5, ' ==> unexpected value,', &
-         ' probably indicating'/ &
-         '                           incorrectly specified', &
-         ' user input.')
-   1020 format &
+          ' probably indicating'/ &
+          '                           incorrectly specified', &
+          ' user input.')
+1020  format &
          ('         INFO = ', I5.4/ &
-         '              =  ABCD, where a nonzero value for digit A,', &
-         ' B, or C indicates why'/ &
-         '                       the results might be questionable,', &
-         ' and digit D indicates'/ &
-         '                       the actual stopping condition.')
-   1021 format &
+          '              =  ABCD, where a nonzero value for digit A,', &
+          ' B, or C indicates why'/ &
+          '                       the results might be questionable,', &
+          ' and digit D indicates'/ &
+          '                       the actual stopping condition.')
+1021  format &
          ('                       A=1 ==> derivatives are', &
-         ' questionable.')
-   1022 format &
+          ' questionable.')
+1022  format &
          ('                       B=1 ==> user set ISTOP to', &
-         ' nonzero value during last'/ &
-         '                               call to subroutine FCN.')
-   1023 format &
+          ' nonzero value during last'/ &
+          '                               call to subroutine FCN.')
+1023  format &
          ('                       C=1 ==> derivatives are not', &
-         ' full rank at the solution.')
-   1024 format &
+          ' full rank at the solution.')
+1024  format &
          ('                       C=2 ==> derivatives are zero', &
-         ' rank at the solution.')
-   1031 format &
+          ' rank at the solution.')
+1031  format &
          ('                       D=1 ==> sum of squares convergence.')
-   1032 format &
+1032  format &
          ('                       D=2 ==> parameter convergence.')
-   1033 format &
+1033  format &
          ('                       D=3 ==> sum of squares convergence', &
-         ' and parameter convergence.')
-   1034 format &
+          ' and parameter convergence.')
+1034  format &
          ('                       D=4 ==> iteration limit reached.')
-   1035 format &
+1035  format &
          ('                       D=', I1, ' ==> unexpected value,', &
-         ' probably indicating'/ &
-         '                               incorrectly specified', &
-         ' user input.')
-   1040 format &
+          ' probably indicating'/ &
+          '                               incorrectly specified', &
+          ' user input.')
+1040  format &
          ('         INFO = ', I5.5/ &
-         '              = ABCDE, where a nonzero value for a given', &
-         ' digit indicates an'/ &
-         '                       abnormal stopping condition.')
-   1042 format &
+          '              = ABCDE, where a nonzero value for a given', &
+          ' digit indicates an'/ &
+          '                       abnormal stopping condition.')
+1042  format &
          ('                       A=5 ==> user stopped computations', &
-         ' in subroutine FCN.')
-   1043 format &
+          ' in subroutine FCN.')
+1043  format &
          ('                       B=', I1, ' ==> computations were', &
-         ' stopped during the'/ &
-         '                                    function evaluation.')
-   1044 format &
+          ' stopped during the'/ &
+          '                                    function evaluation.')
+1044  format &
          ('                       C=', I1, ' ==> computations were', &
-         ' stopped because'/ &
-         '                                    derivatives with', &
-         ' respect to delta were'/ &
-         '                                    computed by', &
-         ' subroutine FCN when'/ &
-         '                                    fit is OLS.')
-   1045 format &
+          ' stopped because'/ &
+          '                                    derivatives with', &
+          ' respect to delta were'/ &
+          '                                    computed by', &
+          ' subroutine FCN when'/ &
+          '                                    fit is OLS.')
+1045  format &
          ('                       C=', I1, ' ==> computations were', &
-         ' stopped during the'/ &
-         '                                    jacobian evaluation.')
-   1050 format &
+          ' stopped during the'/ &
+          '                                    jacobian evaluation.')
+1050  format &
          ('                       A=6 ==> numerical instabilities', &
-         ' have been detected,'/ &
-         '                               possibly indicating', &
-         ' a discontinuity in the'/ &
-         '                               derivatives or a poor', &
-         ' poor choice of problem'/ &
-         '                               scale or weights.')
-   1060 format &
+          ' have been detected,'/ &
+          '                               possibly indicating', &
+          ' a discontinuity in the'/ &
+          '                               derivatives or a poor', &
+          ' poor choice of problem'/ &
+          '                               scale or weights.')
+1060  format &
          ('                       A=', I1, ' ==> unexpected value,', &
-         ' probably indicating'/ &
-         '                               incorrectly specified', &
-         ' user input.')
-   1300 format &
+          ' probably indicating'/ &
+          '                               incorrectly specified', &
+          ' user input.')
+1300  format &
          ('        NITER = ', I5, &
-         '          (number of iterations)')
-   1310 format &
+          '          (number of iterations)')
+1310  format &
          ('         NFEV = ', I5, &
-         '          (number of function evaluations)')
-   1320 format &
+          '          (number of function evaluations)')
+1320  format &
          ('         NJEV = ', I5, &
-         '          (number of jacobian evaluations)')
-   1330 format &
+          '          (number of jacobian evaluations)')
+1330  format &
          ('        IRANK = ', I5, &
-         '          (rank deficiency)')
-   1340 format &
+          '          (rank deficiency)')
+1340  format &
          ('        RCOND = ', 1P, E12.2, &
-         '   (inverse condition number)')
-   !1341 FORMAT
-   !       +  ('                      ==> POSSIBLY FEWER THAN 2 SIGNIFICANT',
-   !       +                        ' DIGITS IN RESULTS;'/
-   !       +   '                          SEE ODRPACK95 REFERENCE',
-   !       +                        ' GUIDE, SECTION 4.C.')
-   1350 format &
+          '   (inverse condition number)')
+      !1341 FORMAT
+      !       +  ('                      ==> POSSIBLY FEWER THAN 2 SIGNIFICANT',
+      !       +                        ' DIGITS IN RESULTS;'/
+      !       +   '                          SEE ODRPACK95 REFERENCE',
+      !       +                        ' GUIDE, SECTION 4.C.')
+1350  format &
          ('        ISTOP = ', I5, &
-         '          (returned by user from', &
-         ' subroutine FCN)')
-   2000 format &
+          '          (returned by user from', &
+          ' subroutine FCN)')
+2000  format &
          (/' --- Final Sum of Squared Weighted Deltas = ', &
-         17X, 1P, E17.8)
-   2010 format &
+           17X, 1P, E17.8)
+2010  format &
          ('         Final Penalty Function Value     = ', 1P, E17.8/ &
-         '               Penalty Term               = ', 1P, E17.8/ &
-         '               Penalty Parameter          = ', 1P, E10.1)
-   2100 format &
+          '               Penalty Term               = ', 1P, E17.8/ &
+          '               Penalty Parameter          = ', 1P, E10.1)
+2100  format &
          (/' --- Final Weighted Sums of Squares       = ', 17X, 1P, E17.8)
-   2110 format &
+2110  format &
          ('         Sum of Squared Weighted Deltas   = ', 1P, E17.8/ &
-         '         Sum of Squared Weighted Epsilons = ', 1P, E17.8)
-   2200 format &
+          '         Sum of Squared Weighted Epsilons = ', 1P, E17.8)
+2200  format &
          (/' --- Residual Standard Deviation          = ', &
-         17X, 1P, E17.8/ &
-         '         Degrees of Freedom               =', I5)
-   3000 format &
+           17X, 1P, E17.8/ &
+           '         Degrees of Freedom               =', I5)
+3000  format &
          (/' --- Estimated BETA(J), J = 1, ..., NP:')
-   4100 format &
+4100  format &
          (/' --- Estimated DELTA(I,*), I = 1, ..., N:')
-   4110 format &
+4110  format &
          (/' --- Estimated EPSILON(I) and DELTA(I,*), I = 1, ..., N:')
-   4120 format &
+4120  format &
          (/' --- Estimated EPSILON(I), I = 1, ..., N:')
-   4130 format(5X, I5, 1P, 5E16.8)
-   4200 format &
+4130  format(5X, I5, 1P, 5E16.8)
+4200  format &
          (/' --- Estimated EPSILON(I,', I3, '), I = 1, ..., N:')
-   4300 format &
+4300  format &
          (/' --- Estimated DELTA(I,', I3, '), I = 1, ..., N:')
-   7100 format &
+7100  format &
          (/'           Index           Value'/)
-   7200 format &
+7200  format &
          (/'           Index           Value -------------->'/)
-   7300 format &
+7300  format &
          (/'                     BETA      LOWER     UPPER      S.D. ', &
-         ' ___ 95% Confidence ___'/ &
-         '                                                    BETA ', &
-         '        Interval'/)
-   7310 format &
+           ' ___ 95% Confidence ___'/ &
+           '                                                    BETA ', &
+           '        Interval'/)
+7310  format &
          (/'     N.B. standard errors and confidence intervals are', &
-         ' computed using'/ &
-         '          derivatives calculated at the beginning', &
-         ' of the last iteration,'/ &
-         '          and not using derivatives re-evaluated at the', &
-         ' final solution.')
-   7410 format &
+           ' computed using'/ &
+           '          derivatives calculated at the beginning', &
+           ' of the last iteration,'/ &
+           '          and not using derivatives re-evaluated at the', &
+           ' final solution.')
+7410  format &
          (/'     N.B. the standard errors of the estimated betas were', &
-         ' not computed because'/ &
-         '          the derivatives were not available.  Either MAXIT', &
-         ' is 0 and the third'/ &
-         '          digit of JOB is greater than 1, or the most', &
-         ' recently tried values of'/ &
-         '          BETA and/or X+DELTA were identified as', &
-         ' unacceptable by user supplied'/ &
-         '          subroutine FCN.')
-   7420 format &
+           ' not computed because'/ &
+           '          the derivatives were not available.  Either MAXIT', &
+           ' is 0 and the third'/ &
+           '          digit of JOB is greater than 1, or the most', &
+           ' recently tried values of'/ &
+           '          BETA and/or X+DELTA were identified as', &
+           ' unacceptable by user supplied'/ &
+           '          subroutine FCN.')
+7420  format &
          (/'     N.B. the standard errors of the estimated betas were', &
-         ' not computed.'/ &
-         '          (see info above.)')
-   7500 format &
+           ' not computed.'/ &
+           '          (see info above.)')
+7500  format &
          (/'                     BETA         Status')
-   8100 format &
+8100  format &
          (11X, I5, 1P, E16.8)
-   8200 format &
+8200  format &
          (3X, I5, ' to', I5, 1P, 7E16.8)
-   8400 format &
+8400  format &
          (3X, I5, 1X, 1P, E16.8, 1X, E10.2, E10.2, E10.2, 1X, E10.2, 1X, 'to', E10.2)
-   8500 format &
+8500  format &
          (3X, I5, 1X, 1P, E16.8, 1X, E10.2, E10.2, 4X, 'Estimated')
-   8600 format &
+8600  format &
          (3X, I5, 1X, 1P, E16.8, 1X, E10.2, E10.2, 4X, '    Fixed')
-   8700 format &
+8700  format &
          (3X, I5, 1X, 1P, E16.8, 1X, E10.2, E10.2, 4X, '  Dropped')
-   8800 format &
+8800  format &
          (/'     N.B. no parameters were fixed by the user or', &
-         ' dropped at the last'/ &
-         '          iteration because they caused the model to be', &
-         ' rank deficient.')
-   8900 format &
+           ' dropped at the last'/ &
+           '          iteration because they caused the model to be', &
+           ' rank deficient.')
+8900  format &
          (/'     N.B. no change was made to the user supplied parameter', &
-         ' values because'/ &
-         '          MAXIT=0.')
-   9110 format &
+           ' values because'/ &
+           '          MAXIT=0.')
+9110  format &
          ('(/''         I'',', &
-         I2, '(''      DELTA(I,'',I1,'')'')/)')
-   9120 format &
+          I2, '(''      DELTA(I,'',I1,'')'')/)')
+9120  format &
          ('(/''         I'',', &
-         I2, '(''    EPSILON(I,'',I1,'')''),', &
-         I2, '(''      DELTA(I,'',I1,'')'')/)')
-   9130 format &
+          I2, '(''    EPSILON(I,'',I1,'')''),', &
+          I2, '(''      DELTA(I,'',I1,'')'')/)')
+9130  format &
          ('(/''         I'',', &
-         I2, '(''    EPSILON(I,'',I1,'')'')/)')
+          I2, '(''    EPSILON(I,'',I1,'')'')/)')
 
    end subroutine dodpc3
 
    impure subroutine dodpcr &
       (ipr, lunrpt, &
-      head, prtpen, fstitr, didvcv, iflag, &
-      n, m, np, nq, npp, nnzw, &
-      msgb, msgd, beta, y, ldy, x, ldx, delta, &
-      we, ldwe, ld2we, wd, ldwd, ld2wd, &
-      ifixb, ifixx, ldifx, &
-      lower, upper, &
-      ssf, tt, ldtt, stpb, stpd, ldstpd, &
-      job, neta, taufac, sstol, partol, maxit, &
-      wss, rvar, idf, sdbeta, &
-      niter, nfev, njev, actred, prered, &
-      tau, pnorm, alpha, f, rcond, irank, info, istop)
+       head, prtpen, fstitr, didvcv, iflag, &
+       n, m, np, nq, npp, nnzw, &
+       msgb, msgd, beta, y, ldy, x, ldx, delta, &
+       we, ldwe, ld2we, wd, ldwd, ld2wd, &
+       ifixb, ifixx, ldifx, &
+       lower, upper, &
+       ssf, tt, ldtt, stpb, stpd, ldstpd, &
+       job, neta, taufac, sstol, partol, maxit, &
+       wss, rvar, idf, sdbeta, &
+       niter, nfev, njev, actred, prered, &
+       tau, pnorm, alpha, f, rcond, irank, info, istop)
    !! Generate computation reports.
-   ! Routines Called  DFLAGS, DODPC1, DODPC2, DODPC3, DODPHD
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
+      ! Routines Called  DFLAGS, DODPC1, DODPC2, DODPC3, DODPHD
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_core, only: dflags
 
@@ -1562,7 +1562,7 @@ contains
       integer, intent(in) :: ld2wd
          !! The second dimension of array `wd`.
       integer, intent(in) :: ifixb(np)
-         !! The values designating whether the elements of `beta` are fixed at their input 
+         !! The values designating whether the elements of `beta` are fixed at their input
          !! values or not.
       integer, intent(in) :: ifixx(ldifx, m)
          !! The values designating whether the elements of `x` are fixed at their input values
@@ -1600,7 +1600,7 @@ contains
       integer, intent(in) :: maxit
          !! The maximum number of iterations allowed.
       real(wp), intent(in) :: wss(3)
-         !! The sum-of-squares of the weighted `epsilon`s and `delta`s, the sum-of-squares of 
+         !! The sum-of-squares of the weighted `epsilon`s and `delta`s, the sum-of-squares of
          !! the weighted `delta`s, and the sum-of-squares of the weighted `epsilon`s.
       real(wp), intent(in) :: rvar
          !! The residual variance.
@@ -1709,10 +1709,10 @@ contains
       !  PNLTY:   The penalty parameter for an implicit model.
       !  PNORM:   The norm of the scaled estimated parameters.
       !  PRERED:  The predicted relative reduction in the sum-of-squares.
-      !  PRTPEN:  The variable designating whether the penalty parameter is  to be printed in 
+      !  PRTPEN:  The variable designating whether the penalty parameter is  to be printed in
       !           the iteration report (PRTPEN=TRUE) or not (PRTPEN=FALSE).
       !  RCOND:   The approximate reciprocal condition number of TFJACB.
-      !  REDOJ:   The variable designating whether the Jacobian matrix is to be recomputed for 
+      !  REDOJ:   The variable designating whether the Jacobian matrix is to be recomputed for
       !           the computation of the covariance matrix (REDOJ=TRUE) or not (REDOJ=FALSE).
       !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or not
       !           (RESTRT=FALSE).
@@ -1753,12 +1753,12 @@ contains
          write (lunrpt, 1200) typ
          call dodpc1 &
             (ipr, lunrpt, &
-            anajac, cdjac, chkjac, initd, restrt, isodr, implct, dovcv, redoj, &
-            msgb(1), msgb(2), msgd(1), msgd(2), n, m, np, nq, npp, nnzw, x, &
-            ldx, ifixx, ldifx, delta, wd, ldwd, ld2wd, tt, ldtt, stpd, ldstpd, &
-            y, ldy, we, ldwe, ld2we, pnlty, beta, ifixb, ssf, stpb, lower, &
-            upper, job, neta, taufac, sstol, partol, maxit, wss(1), wss(2), &
-            wss(3))
+             anajac, cdjac, chkjac, initd, restrt, isodr, implct, dovcv, redoj, &
+             msgb(1), msgb(2), msgd(1), msgd(2), n, m, np, nq, npp, nnzw, x, &
+             ldx, ifixx, ldifx, delta, wd, ldwd, ld2wd, tt, ldtt, stpd, ldstpd, &
+             y, ldy, we, ldwe, ld2we, pnlty, beta, ifixb, ssf, stpb, lower, &
+             upper, job, neta, taufac, sstol, partol, maxit, wss(1), wss(2), &
+             wss(3))
 
          ! Print iteration reports
       elseif (iflag == 2) then
@@ -1768,8 +1768,8 @@ contains
          end if
          call dodpc2 &
             (ipr, lunrpt, fstitr, implct, prtpen, &
-            pnlty, &
-            niter, nfev, wss(1), actred, prered, alpha, tau, pnorm, np, beta)
+             pnlty, &
+             niter, nfev, wss(1), actred, prered, alpha, tau, pnorm, np, beta)
 
          ! Print final summary
       elseif (iflag == 3) then
@@ -1777,33 +1777,33 @@ contains
          write (lunrpt, 1400) typ
          call dodpc3 &
             (ipr, lunrpt, &
-            isodr, implct, didvcv, dovcv, redoj, anajac, &
-            n, m, np, nq, npp, &
-            info, niter, nfev, njev, irank, rcond, istop, &
-            wss(1), wss(2), wss(3), pnlty, rvar, idf, &
-            beta, sdbeta, ifixb, f, delta, lower, upper)
+             isodr, implct, didvcv, dovcv, redoj, anajac, &
+             n, m, np, nq, npp, &
+             info, niter, nfev, njev, irank, rcond, istop, &
+             wss(1), wss(2), wss(3), pnlty, rvar, idf, &
+             beta, sdbeta, ifixb, f, delta, lower, upper)
       end if
 
       ! Format statements
 
-   1200 format &
+1200  format &
          (/' *** Initial summary for fit by method of ', A3, ' ***')
-   1300 format &
+1300  format &
          (/' *** Iteration reports for fit by method of ', A3, ' ***')
-   1400 format &
+1400  format &
          (/' *** Final summary for fit by method of ', A3, ' ***')
 
    end subroutine dodpcr
 
    impure subroutine dodpe1 &
       (lunerr, info, d1, d2, d3, d4, d5, &
-      n, m, nq, &
-      ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-      lwkmn, liwkmn)
+       n, m, nq, &
+       ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
+       lwkmn, liwkmn)
    !! Print error reports.
-   ! Routines Called  (NONE)
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
+      ! Routines Called  (NONE)
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
 
       integer, intent(in) :: lunerr
          !! The logical unit number used for error messages.
@@ -2123,223 +2123,223 @@ contains
 
       ! Format statements
 
-   1100 format &
+1100  format &
          (/' ERROR :  N is less than one.')
-   1200 format &
+1200  format &
          (/' ERROR :  M is less than one.')
-   1300 format &
+1300  format &
          (/' ERROR :  NP is less than one'/ &
-         '          or NP is greater than N.')
-   1400 format &
+           '          or NP is greater than N.')
+1400  format &
          (/' ERROR :  NQ is less than one.')
-   2110 format &
+2110  format &
          (/' ERROR :  LDX is less than N.')
-   2120 format &
+2120  format &
          (/' ERROR :  LDY is less than N.')
-   2210 format &
+2210  format &
          (/' ERROR :  LDIFX is less than N'/ &
-         '          and LDIFX is not equal to one.')
-   2220 format &
+           '          and LDIFX is not equal to one.')
+2220  format &
          (/' ERROR :  LDSCLD is less than N'/ &
-         '          and LDSCLD is not equal to one.')
-   2230 format &
+           '          and LDSCLD is not equal to one.')
+2230  format &
          (/' ERROR :  LDSTPD is less than N'/ &
-         '          and LDSTPD is not equal to one.')
-   2310 format &
+           '          and LDSTPD is not equal to one.')
+2310  format &
          (/' ERROR :  LDWE is less than N'/ &
-         '          and LDWE is not equal to one or'/ &
-         '          or'/ &
-         '          LD2WE is less than NQ'/ &
-         '          and LD2WE is not equal to one.')
-   2320 format &
+           '          and LDWE is not equal to one or'/ &
+           '          or'/ &
+           '          LD2WE is less than NQ'/ &
+           '          and LD2WE is not equal to one.')
+2320  format &
          (/' ERROR :  LDWD is less than N'/ &
-         '          and LDWD is not equal to one.')
-   2410 format &
+           '          and LDWD is not equal to one.')
+2410  format &
          (/' ERROR :  LWORK is less than ', I7, ','/ &
-         '          the smallest acceptable dimension of array WORK.')
-   2420 format &
+           '          the smallest acceptable dimension of array WORK.')
+2420  format &
          (/' ERROR :  LIWORK is less than ', I7, ','/ &
-         '          the smallest acceptable dimension of array', &
-         ' IWORK.')
-   3110 format &
+           '          the smallest acceptable dimension of array', &
+           ' IWORK.')
+3110  format &
          (/' ERROR :  SCLD(I,J) is less than or equal to zero'/ &
-         '          for some I = 1, ..., N and J = 1, ..., M.'// &
-         '          when SCLD(1,1) is greater than zero'/ &
-         '          and LDSCLD is greater than or equal to N then'/ &
-         '          each of the N by M elements of'/ &
-         '          SCLD must be greater than zero.')
-   3120 format &
+           '          for some I = 1, ..., N and J = 1, ..., M.'// &
+           '          when SCLD(1,1) is greater than zero'/ &
+           '          and LDSCLD is greater than or equal to N then'/ &
+           '          each of the N by M elements of'/ &
+           '          SCLD must be greater than zero.')
+3120  format &
          (/' ERROR :  SCLD(1,J) is less than or equal to zero'/ &
-         '          for some J = 1, ..., M.'// &
-         '          when SCLD(1,1) is greater than zero'/ &
-         '          and LDSCLD is equal to one then'/ &
-         '          each of the 1 by M elements of'/ &
-         '          SCLD must be greater than zero.')
-   3130 format &
+           '          for some J = 1, ..., M.'// &
+           '          when SCLD(1,1) is greater than zero'/ &
+           '          and LDSCLD is equal to one then'/ &
+           '          each of the 1 by M elements of'/ &
+           '          SCLD must be greater than zero.')
+3130  format &
          (/' ERROR :  SCLB(K) is less than or equal to zero'/ &
-         '          for some K = 1, ..., NP.'// &
-         '          all NP elements of', &
-         '          SCLB must be greater than zero.')
-   3210 format &
+           '          for some K = 1, ..., NP.'// &
+           '          all NP elements of', &
+           '          SCLB must be greater than zero.')
+3210  format &
          (/' ERROR :  STPD(I,J) is less than or equal to zero'/ &
-         '          for some I = 1, ..., N and J = 1, ..., M.'// &
-         '          when STPD(1,1) is greater than zero'/ &
-         '          and LDSTPD is greater than or equal to N then'/ &
-         '          each of the N by M elements of'/ &
-         '          STPD must be greater than zero.')
-   3220 format &
+           '          for some I = 1, ..., N and J = 1, ..., M.'// &
+           '          when STPD(1,1) is greater than zero'/ &
+           '          and LDSTPD is greater than or equal to N then'/ &
+           '          each of the N by M elements of'/ &
+           '          STPD must be greater than zero.')
+3220  format &
          (/' ERROR :  STPD(1,J) is less than or equal to zero'/ &
-         '          for some J = 1, ..., M.'// &
-         '          when STPD(1,1) is greater than zero'/ &
-         '          and LDSTPD is equal to one then'/ &
-         '          each of the 1 by M elements of'/ &
-         '          STPD must be greater than zero.')
-   3230 format &
+           '          for some J = 1, ..., M.'// &
+           '          when STPD(1,1) is greater than zero'/ &
+           '          and LDSTPD is equal to one then'/ &
+           '          each of the 1 by M elements of'/ &
+           '          STPD must be greater than zero.')
+3230  format &
          (/' ERROR :  STPB(K) is less than or equal to zero'/ &
-         '          for some K = 1, ..., NP.'// &
-         '          all NP elements of', &
-         ' STPB must be greater than zero.')
-   3310 format &
+           '          for some K = 1, ..., NP.'// &
+           '          all NP elements of', &
+           ' STPB must be greater than zero.')
+3310  format &
          (/' ERROR :  At least one of the (NQ by NQ) arrays starting'/ &
-         '          in WE(I,1,1), I = 1, ..., N, is not positive'/ &
-         '          semidefinite.  When WE(1,1,1) is greater than'/ &
-         '          or equal to zero, and LDWE is greater than or'/ &
-         '          equal to N, and LD2WE is greater than or equal'/ &
-         '          to NQ, then each of the (NQ by NQ) arrays in WE'/ &
-         '          must be positive semidefinite.')
-   3320 format &
+           '          in WE(I,1,1), I = 1, ..., N, is not positive'/ &
+           '          semidefinite.  When WE(1,1,1) is greater than'/ &
+           '          or equal to zero, and LDWE is greater than or'/ &
+           '          equal to N, and LD2WE is greater than or equal'/ &
+           '          to NQ, then each of the (NQ by NQ) arrays in WE'/ &
+           '          must be positive semidefinite.')
+3320  format &
          (/' ERROR :  At least one of the (1 by NQ) arrays starting'/ &
-         '          in WE(I,1,1), I = 1, ..., N, has a negative'/ &
-         '          element.  When WE(1,1,1) is greater than or'/ &
-         '          equal to zero, and LDWE is greater than or equal'/ &
-         '          to N, and LD2WE is equal to 1, then each of the'/ &
-         '          (1 by NQ) arrays in WE must have only non-'/ &
-         '          negative elements.')
-   3410 format &
+           '          in WE(I,1,1), I = 1, ..., N, has a negative'/ &
+           '          element.  When WE(1,1,1) is greater than or'/ &
+           '          equal to zero, and LDWE is greater than or equal'/ &
+           '          to N, and LD2WE is equal to 1, then each of the'/ &
+           '          (1 by NQ) arrays in WE must have only non-'/ &
+           '          negative elements.')
+3410  format &
          (/' ERROR :  The (NQ by NQ) array starting in WE(1,1,1) is'/ &
-         '          not positive semidefinite.  When WE(1,1,1) is'/ &
-         '          greater than or equal to zero, and LDWE is equal'/ &
-         '          to 1, and LD2WE is greater than or equal to NQ,'/ &
-         '          then the (NQ by NQ) array in WE must be positive'/ &
-         '          semidefinite.')
-   3420 format &
+           '          not positive semidefinite.  When WE(1,1,1) is'/ &
+           '          greater than or equal to zero, and LDWE is equal'/ &
+           '          to 1, and LD2WE is greater than or equal to NQ,'/ &
+           '          then the (NQ by NQ) array in WE must be positive'/ &
+           '          semidefinite.')
+3420  format &
          (/' ERROR :  The (1 by NQ) array starting in WE(1,1,1) has'/ &
-         '          a negative element.  When WE(1,1,1) is greater'/ &
-         '          than or equal to zero, and LDWE is equal to 1,'/ &
-         '          and LD2WE is equal to 1, then the (1 by NQ)'/ &
-         '          array in WE must have only nonnegative elements.')
-   3500 format &
+           '          a negative element.  When WE(1,1,1) is greater'/ &
+           '          than or equal to zero, and LDWE is equal to 1,'/ &
+           '          and LD2WE is equal to 1, then the (1 by NQ)'/ &
+           '          array in WE must have only nonnegative elements.')
+3500  format &
          (/' ERROR :  The number of nonzero arrays in array WE is'/ &
-         '          less than NP.')
-   4310 format &
+           '          less than NP.')
+4310  format &
          (/' ERROR :  At least one of the (M by M) arrays starting'/ &
-         '          in WD(I,1,1), I = 1, ..., N, is not positive'/ &
-         '          definite.  When WD(1,1,1) is greater than zero,'/ &
-         '          and LDWD is greater than or equal to N, and'/ &
-         '          LD2WD is greater than or equal to M, then each'/ &
-         '          of the (M by M) arrays in WD must be positive'/ &
-         '          definite.')
-   4320 format &
+           '          in WD(I,1,1), I = 1, ..., N, is not positive'/ &
+           '          definite.  When WD(1,1,1) is greater than zero,'/ &
+           '          and LDWD is greater than or equal to N, and'/ &
+           '          LD2WD is greater than or equal to M, then each'/ &
+           '          of the (M by M) arrays in WD must be positive'/ &
+           '          definite.')
+4320  format &
          (/' ERROR :  At least one of the (1 by M) arrays starting'/ &
-         '          in WD(I,1,1), I = 1, ..., N, has a nonpositive'/ &
-         '          element.  When WD(1,1,1) is greater than zero,'/ &
-         '          and LDWD is greater than or equal to N, and'/ &
-         '          LD2WD is equal to 1, then each of the (1 by M)'/ &
-         '          arrays in WD must have only positive elements.')
-   4410 format &
+           '          in WD(I,1,1), I = 1, ..., N, has a nonpositive'/ &
+           '          element.  When WD(1,1,1) is greater than zero,'/ &
+           '          and LDWD is greater than or equal to N, and'/ &
+           '          LD2WD is equal to 1, then each of the (1 by M)'/ &
+           '          arrays in WD must have only positive elements.')
+4410  format &
          (/' ERROR :  The (M by M) array starting in WD(1,1,1) is'/ &
-         '          not positive definite.  When WD(1,1,1) is'/ &
-         '          greater than zero, and LDWD is equal to 1, and'/ &
-         '          LD2WD is greater than or equal to M, then the'/ &
-         '          (M by M) array in WD must be positive definite.')
-   4420 format &
+           '          not positive definite.  When WD(1,1,1) is'/ &
+           '          greater than zero, and LDWD is equal to 1, and'/ &
+           '          LD2WD is greater than or equal to M, then the'/ &
+           '          (M by M) array in WD must be positive definite.')
+4420  format &
          (/' ERROR :  The (1 by M) array starting in WD(1,1,1) has a'/ &
-         '          nonpositive element.  When WD(1,1,1) is greater'/ &
-         '          than zero, and LDWD is equal to 1, and LD2WD is'/ &
-         '          equal to 1, then the (1 by M) array in WD must'/ &
-         '          have only positive elements.')
-   5000 format &
+           '          nonpositive element.  When WD(1,1,1) is greater'/ &
+           '          than zero, and LDWD is equal to 1, and LD2WD is'/ &
+           '          equal to 1, then the (1 by M) array in WD must'/ &
+           '          have only positive elements.')
+5000  format &
          (/' ERROR :  JOB requires the optional argument DELTA and'/ &
-         '          DELTA is not present or not associated.')
-   5100 format &
+           '          DELTA is not present or not associated.')
+5100  format &
          (/' ERROR :  JOB requires the optional argument WORK and'/ &
-         '          WORK is not present or not associated.')
-   5200 format &
+           '          WORK is not present or not associated.')
+5200  format &
          (/' ERROR :  JOB requires the optional argument IWORK and'/ &
-         '          IWORK is not present or not associated.')
-   6000 format &
+           '          IWORK is not present or not associated.')
+6000  format &
          (/' ERROR :  LOWER(K)>UPPER(K) for some K.  Adjust the'/ &
-         '          the bounds so that LOWER(K)<=UPPER(K) holds'/ &
-         '          for all K.')
-   6100 format &
+           '          the bounds so that LOWER(K)<=UPPER(K) holds'/ &
+           '          for all K.')
+6100  format &
          (/' ERROR :  BETA(K)>UPPER(K) or BETA(K)<LOWER(K) '/ &
-         '          for some K.  Adjust the bounds or BETA so '/ &
-         '          that LOWER(K)<=BETA(K)<=UPPER(K) holds'/ &
-         '          for all K.')
-   6210 format &
+           '          for some K.  Adjust the bounds or BETA so '/ &
+           '          that LOWER(K)<=BETA(K)<=UPPER(K) holds'/ &
+           '          for all K.')
+6210  format &
          (/' ERROR :  UPPER(K)-LOWER(K) < 400*BETA(K)*EPSMAC  '/ &
-         '          for some K and EPSMAC having the largest '/ &
-         '          value such that 1+EPSMAC/=1.  This '/ &
-         '          constraint on UPPER and LOWER is necessary'/ &
-         '          for the calculation of NDIGIT.  Increase the'/ &
-         '          range of the bounds or specify NDIGIT '/ &
-         '          explicitly.')
-   6220 format &
+           '          for some K and EPSMAC having the largest '/ &
+           '          value such that 1+EPSMAC/=1.  This '/ &
+           '          constraint on UPPER and LOWER is necessary'/ &
+           '          for the calculation of NDIGIT.  Increase the'/ &
+           '          range of the bounds or specify NDIGIT '/ &
+           '          explicitly.')
+6220  format &
          (/' ERROR :  UPPER(K)-LOWER(K) < ABS(STEP) for some'/ &
-         '          K where step is the step size for numeric'/ &
-         '          derivatives.  Increase the bounds or supply'/ &
-         '          an analytic jacobian.')
-   7200 format &
+           '          K where step is the step size for numeric'/ &
+           '          derivatives.  Increase the bounds or supply'/ &
+           '          an analytic jacobian.')
+7200  format &
          (/' ERROR :  DELTA could not be allocated. ')
-   7300 format &
+7300  format &
          (/' ERROR :  WORK could not be allocated. ')
-   7400 format &
+7400  format &
          (/' ERROR :  IWORK could not be allocated. ')
-   8000 format &
+8000  format &
          (/' ERROR :  BETA has incorrect size. ')
-   8001 format &
+8001  format &
          (/' ERROR :  Y has incorrect size. ')
-   8002 format &
+8002  format &
          (/' ERROR :  X has incorrect size. ')
-   8003 format &
+8003  format &
          (/' ERROR :  DELTA has incorrect size. ')
-   8004 format &
+8004  format &
          (/' ERROR :  WE has incorrect size. ')
-   8005 format &
+8005  format &
          (/' ERROR :  WD has incorrect size. ')
-   8006 format &
+8006  format &
          (/' ERROR :  IFIXB has incorrect size. ')
-   8007 format &
+8007  format &
          (/' ERROR :  IFIXX has incorrect size. ')
-   8008 format &
+8008  format &
          (/' ERROR :  STPB has incorrect size. ')
-   8009 format &
+8009  format &
          (/' ERROR :  STPD has incorrect size. ')
-   8010 format &
+8010  format &
          (/' ERROR :  SCLB has incorrect size. ')
-   8011 format &
+8011  format &
          (/' ERROR :  SCLD has incorrect size. ')
-   8012 format &
+8012  format &
          (/' ERROR :  WORK has incorrect size. ')
-   8013 format &
+8013  format &
          (/' ERROR :  IWORK has incorrect size. ')
-   8014 format &
+8014  format &
          (/' ERROR :  UPPER has incorrect size. ')
-   8015 format &
+8015  format &
          (/' ERROR :  LOWER has incorrect size. ')
 
    end subroutine dodpe1
 
    impure subroutine dodpe2 &
       (lunerr, &
-      n, m, np, nq, &
-      fjacb, fjacd, &
-      diff, msgb1, msgb, isodr, msgd1, msgd, &
-      xplusd, nrow, neta, ntol)
+       n, m, np, nq, &
+       fjacb, fjacd, &
+       diff, msgb1, msgb, isodr, msgd1, msgd, &
+       xplusd, nrow, neta, ntol)
    !! Generate the derivative checking report.
-   ! Routines Called  (NONE)
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
+      ! Routines Called  (NONE)
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
 
       integer, intent(in) :: lunerr
          !! The logical unit number used for error messages.
@@ -2528,111 +2528,111 @@ contains
 
       ! Format statements
 
-   1000 format &
+1000  format &
          (//' *** Derivative checking report for fit by method of ', A3, &
-         ' ***'/)
-   2100 format(/'     For response ', I2, ' of observation ', I5/)
-   2200 format('                      ', '         User', &
-            '               ', '                '/ &
-            '                      ', '     Supplied', &
-            '     Relative', '    Derivative '/ &
-            '        Derivative WRT', '        Value', &
-            '   Difference', '    Assessment '/)
-   3100 format('             BETA(', I3, ')', '       ---   ', &
-            '       ---   ', '    Unchecked')
-   3200 format('             BETA(', I3, ')', 1P, 2E13.2, 3X, A1, &
-            'Verified')
-   3300 format('             BETA(', I3, ')', 1P, 2E13.2, 3X, A1, &
-            'Questionable (see note ', I1, ')')
-   3400 format('             BETA(', I3, ')', 1P, 1E13.2, 13X, 3X, A1, &
-            'Questionable (see note ', I1, ')')
-   3500 format('             BETA(', I3, ')', 1P, 13X, 13X, 3X, A1, &
-            'Small bounds (see note ', I1, ')')
-   4100 format('          DELTA(', I2, ',', I2, ')', '       ---   ', &
-            '       ---   ', '    Unchecked')
-   4200 format('          DELTA(', I2, ',', I2, ')', 1P, 2E13.2, 3X, A1, &
-            'Verified')
-   4300 format('          DELTA(', I2, ',', I2, ')', 1P, 2E13.2, 3X, A1, &
-            'Questionable (see note ', I1, ')')
-   5000 format &
+           ' ***'/)
+2100  format(/'     For response ', I2, ' of observation ', I5/)
+2200  format('                      ', '         User', &
+             '               ', '                '/ &
+             '                      ', '     Supplied', &
+             '     Relative', '    Derivative '/ &
+             '        Derivative WRT', '        Value', &
+             '   Difference', '    Assessment '/)
+3100  format('             BETA(', I3, ')', '       ---   ', &
+             '       ---   ', '    Unchecked')
+3200  format('             BETA(', I3, ')', 1P, 2E13.2, 3X, A1, &
+             'Verified')
+3300  format('             BETA(', I3, ')', 1P, 2E13.2, 3X, A1, &
+             'Questionable (see note ', I1, ')')
+3400  format('             BETA(', I3, ')', 1P, 1E13.2, 13X, 3X, A1, &
+             'Questionable (see note ', I1, ')')
+3500  format('             BETA(', I3, ')', 1P, 13X, 13X, 3X, A1, &
+             'Small bounds (see note ', I1, ')')
+4100  format('          DELTA(', I2, ',', I2, ')', '       ---   ', &
+             '       ---   ', '    Unchecked')
+4200  format('          DELTA(', I2, ',', I2, ')', 1P, 2E13.2, 3X, A1, &
+             'Verified')
+4300  format('          DELTA(', I2, ',', I2, ')', 1P, 2E13.2, 3X, A1, &
+             'Questionable (see note ', I1, ')')
+5000  format &
          (/'     NOTES:')
-   5100 format &
+5100  format &
          (/'      (1) User supplied and finite difference derivatives', &
-         ' agree, but'/ &
-         '          results are questionable because both are zero.')
-   5200 format &
+           ' agree, but'/ &
+           '          results are questionable because both are zero.')
+5200  format &
          (/'      (2) User supplied and finite difference derivatives', &
-         ' agree, but'/ &
-         '          results are questionable because one is', &
-         ' identically zero'/ &
-         '          and the other is only approximately zero.')
-   5300 format &
+           ' agree, but'/ &
+           '          results are questionable because one is', &
+           ' identically zero'/ &
+           '          and the other is only approximately zero.')
+5300  format &
          (/'      (3) User supplied and finite difference derivatives', &
-         ' disagree, but'/ &
-         '          results are questionable because one is', &
-         ' identically zero'/ &
-         '          and the other is not.')
-   5400 format &
+           ' disagree, but'/ &
+           '          results are questionable because one is', &
+           ' identically zero'/ &
+           '          and the other is not.')
+5400  format &
          (/'      (4) User supplied and finite difference derivatives', &
-         ' disagree, but'/ &
-         '          finite difference derivative is questionable', &
-         ' because either'/ &
-         '          the ratio of relative curvature to relative', &
-         ' slope is too high'/ &
-         '          or the scale is wrong.')
-   5500 format &
+           ' disagree, but'/ &
+           '          finite difference derivative is questionable', &
+           ' because either'/ &
+           '          the ratio of relative curvature to relative', &
+           ' slope is too high'/ &
+           '          or the scale is wrong.')
+5500  format &
          (/'      (5) User supplied and finite difference derivatives', &
-         ' disagree, but'/ &
-         '          finite difference derivative is questionable', &
-         ' because the'/ &
-         '          ratio of relative curvature to relative slope is', &
-         ' too high.')
-   5600 format &
+           ' disagree, but'/ &
+           '          finite difference derivative is questionable', &
+           ' because the'/ &
+           '          ratio of relative curvature to relative slope is', &
+           ' too high.')
+5600  format &
          (/'      (6) User supplied and finite difference derivatives', &
-         ' disagree, but'/ &
-         '          have at least 2 digits in common.')
-   5700 format &
+           ' disagree, but'/ &
+           '          have at least 2 digits in common.')
+5700  format &
          (/'      (7) User supplied and finite difference derivatives', &
-         ' disagree, and'/ &
-         '          have fewer than 2 digits in common.  derivative', &
-         ' checking must'/ &
-         '          be turned off in order to proceed.')
-   5800 format &
+           ' disagree, and'/ &
+           '          have fewer than 2 digits in common.  derivative', &
+           ' checking must'/ &
+           '          be turned off in order to proceed.')
+5800  format &
          (/'      (8) User supplied and finite difference derivatives', &
-         ' disagree, and'/ &
-         '          bound constraints are too small to calculate', &
-         ' further'/ &
-         '          information.')
-   5900 format &
+           ' disagree, and'/ &
+           '          bound constraints are too small to calculate', &
+           ' further'/ &
+           '          information.')
+5900  format &
          (/'      (9) Bound constraints too small to check derivative.')
-   6000 format &
+6000  format &
          (/'     Number of reliable digits in function results       ', &
-         I5/ &
-         '        (estimated by ODRPACK)')
-   6100 format &
+           I5/ &
+           '        (estimated by ODRPACK)')
+6100  format &
          (/'     Number of reliable digits in function results       ', &
-         I5/ &
-         '        (supplied by user)')
-   7000 format &
+           I5/ &
+           '        (supplied by user)')
+7000  format &
          (/'     Number of digits of agreement required between      '/ &
-         '     user supplied and finite difference derivative for  '/ &
-         '     user supplied derivative to be considered verified  ', &
-         I5)
-   8100 format &
+           '     user supplied and finite difference derivative for  '/ &
+           '     user supplied derivative to be considered verified  ', &
+           I5)
+8100  format &
          (/'     Row number at which derivatives were checked        ', &
-         I5// &
-         '       -values of the explanatory variables at this row'/)
-   8110 format &
+           I5// &
+           '       -values of the explanatory variables at this row'/)
+8110  format &
          (10X, 'X(', I2, ',', I2, ')', 1X, 1P, 3E16.8)
 
    end subroutine dodpe2
 
    impure subroutine dodpe3(lunerr, d2, d3)
-   !! Print error reports indicating that computations were stopped in user-supplied 
+   !! Print error reports indicating that computations were stopped in user-supplied
    !! subroutine `fcn`.
-   ! Routines Called  (NONE)
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
+      ! Routines Called  (NONE)
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
 
       integer :: lunerr
          !! The logical unit number used for error messages.
@@ -2661,63 +2661,63 @@ contains
 
       ! Format statements
 
-   1100 format &
+1100  format &
          (//' Variable ISTOP has been returned with a nonzero value  '/ &
-         ' from user supplied subroutine FCN when invoked using the'/ &
-         ' initial estimates of BETA and DELTA supplied by the     '/ &
-         ' user.  The initial estimates must be adjusted to allow  '/ &
-         ' proper evaluation of subroutine FCN before the          '/ &
-         ' regression procedure can continue.')
-   1200 format &
+           ' from user supplied subroutine FCN when invoked using the'/ &
+           ' initial estimates of BETA and DELTA supplied by the     '/ &
+           ' user.  The initial estimates must be adjusted to allow  '/ &
+           ' proper evaluation of subroutine FCN before the          '/ &
+           ' regression procedure can continue.')
+1200  format &
          (//' Variable ISTOP has been returned with a nonzero value  '/ &
-         ' from user supplied subroutine FCN.  This occurred during'/ &
-         ' the computation of the number of reliable digits in the '/ &
-         ' predicted values (F) returned from subroutine FCN, indi-'/ &
-         ' cating that changes in the initial estimates of BETA(K),'/ &
-         ' K=1,NP, as small as 2*BETA(K)*SQRT(MACHINE PRECISION),  '/ &
-         ' where MACHINE PRECISION is defined as the smallest value'/ &
-         ' E such that 1+E>1 on the computer being used, prevent   '/ &
-         ' subroutine FCN from being properly evaluated.  The      '/ &
-         ' initial estimates must be adjusted to allow proper      '/ &
-         ' evaluation of subroutine FCN during these computations  '/ &
-         ' before the regression procedure can continue.')
-   1300 format &
+           ' from user supplied subroutine FCN.  This occurred during'/ &
+           ' the computation of the number of reliable digits in the '/ &
+           ' predicted values (F) returned from subroutine FCN, indi-'/ &
+           ' cating that changes in the initial estimates of BETA(K),'/ &
+           ' K=1,NP, as small as 2*BETA(K)*SQRT(MACHINE PRECISION),  '/ &
+           ' where MACHINE PRECISION is defined as the smallest value'/ &
+           ' E such that 1+E>1 on the computer being used, prevent   '/ &
+           ' subroutine FCN from being properly evaluated.  The      '/ &
+           ' initial estimates must be adjusted to allow proper      '/ &
+           ' evaluation of subroutine FCN during these computations  '/ &
+           ' before the regression procedure can continue.')
+1300  format &
          (//' Variable ISTOP has been returned with a nonzero value  '/ &
-         ' from user supplied subroutine FCN.  This occurred during'/ &
-         ' the derivative checking procedure, indicating that      '/ &
-         ' changes in the initial estimates of BETA(K), K=1,NP, as '/ &
-         ' small as MAX[BETA(K),1/SCLB(K)]*10**(-NETA/2), and/or   '/ &
-         ' of DELTA(I,J), I=1,N and J=1,M, as small as             '/ &
-         ' MAX[DELTA(I,J),1/SCLD(I,J)]*10**(-NETA/2), where NETA   '/ &
-         ' is defined to be the number of reliable digits in       '/ &
-         ' predicted values (F) returned from subroutine FCN,      '/ &
-         ' prevent subroutine FCN from being properly evaluated.   '/ &
-         ' the initial estimates must be adjusted to allow proper  '/ &
-         ' evaluation of subroutine FCN during these computations  '/ &
-         ' before the regression procedure can continue.')
-   1400 format &
+           ' from user supplied subroutine FCN.  This occurred during'/ &
+           ' the derivative checking procedure, indicating that      '/ &
+           ' changes in the initial estimates of BETA(K), K=1,NP, as '/ &
+           ' small as MAX[BETA(K),1/SCLB(K)]*10**(-NETA/2), and/or   '/ &
+           ' of DELTA(I,J), I=1,N and J=1,M, as small as             '/ &
+           ' MAX[DELTA(I,J),1/SCLD(I,J)]*10**(-NETA/2), where NETA   '/ &
+           ' is defined to be the number of reliable digits in       '/ &
+           ' predicted values (F) returned from subroutine FCN,      '/ &
+           ' prevent subroutine FCN from being properly evaluated.   '/ &
+           ' the initial estimates must be adjusted to allow proper  '/ &
+           ' evaluation of subroutine FCN during these computations  '/ &
+           ' before the regression procedure can continue.')
+1400  format &
          (//' Variable ISTOP has been returned with a nonzero value  '/ &
-         ' from user supplied subroutine FCN when invoked for '/ &
-         ' derivative evaluations using the initial estimates of '/ &
-         ' BETA and DELTA supplied by the user.  The initial '/ &
-         ' estimates must be adjusted to allow proper evaluation '/ &
-         ' of subroutine FCN before the regression procedure can '/ &
-         ' continue.')
+           ' from user supplied subroutine FCN when invoked for '/ &
+           ' derivative evaluations using the initial estimates of '/ &
+           ' BETA and DELTA supplied by the user.  The initial '/ &
+           ' estimates must be adjusted to allow proper evaluation '/ &
+           ' of subroutine FCN before the regression procedure can '/ &
+           ' continue.')
 
    end subroutine dodpe3
 
    impure subroutine dodper &
       (info, lunerr, &
-      n, m, np, nq, &
-      ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-      lwkmn, liwkmn, &
-      fjacb, fjacd, &
-      diff, msgb, isodr, msgd, &
-      xplusd, nrow, neta, ntol)
+       n, m, np, nq, &
+       ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
+       lwkmn, liwkmn, &
+       fjacb, fjacd, &
+       diff, msgb, isodr, msgd, &
+       xplusd, nrow, neta, ntol)
    !! Controlling routine for printing error reports.
-   ! Routines Called  DODPE1, DODPE2, DODPE3, DODPHD
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
+      ! Routines Called  DODPE1, DODPE2, DODPE3, DODPHD
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
 
       integer, intent(inout) :: info
          !! The variable designating why the computations were stopped.
@@ -2752,7 +2752,7 @@ contains
       real(wp), intent(in) :: fjacd(n, m, nq)
          !! The Jacobian with respect to `delta`.
       real(wp), intent(in) :: diff(nq, np + m)
-         !! The relative differences between the user-supplied and finite difference 
+         !! The relative differences between the user-supplied and finite difference
          !! derivatives for each derivative checked.
       integer, intent(in) :: msgb(nq*np + 1)
          !! The error checking results for the Jacobian with respect to `beta`.
@@ -2855,49 +2855,49 @@ contains
 
       ! Print correct form of call statement
       if ((d1 >= 1 .and. d1 <= 3) .or. &
-         (d1 == 4 .and. (d2 == 2 .or. d3 == 2)) .or. &
-         (d1 == 5)) then
+          (d1 == 4 .and. (d2 == 2 .or. d3 == 2)) .or. &
+          (d1 == 5)) then
          write (lunerr, 1100)
       end if
 
       ! Format statements
 
-   1100 format &
+1100  format &
          (//' The correct form of the call statement is '// &
-         '       call odr'/ &
-         '      +     (fcn,'/ &
-         '      +     n, m, np, nq,'/ &
-         '      +     beta,'/ &
-         '      +     y, x,'/ &
-         '      +     delta*,'/ &
-         '      +     we*, wd*,'/ &
-         '      +     ifixb*, ifixx*,'/ &
-         '      +     job*, ndigit*, taufac*,'/ &
-         '      +     sstol*, partol*, maxit*,'/ &
-         '      +     iprint*, lunerr*, lunrpt*,'/ &
-         '      +     stpb*, stpd*,'/ &
-         '      +     sclb*, scld*,'/ &
-         '      +     work*, iwork*,'/ &
-         '      +     info*,'/ &
-         '      +     lower*, upper*)'/ &
-         ' * optional argument')
-   
+           '       call odr'/ &
+           '      +     (fcn,'/ &
+           '      +     n, m, np, nq,'/ &
+           '      +     beta,'/ &
+           '      +     y, x,'/ &
+           '      +     delta*,'/ &
+           '      +     we*, wd*,'/ &
+           '      +     ifixb*, ifixx*,'/ &
+           '      +     job*, ndigit*, taufac*,'/ &
+           '      +     sstol*, partol*, maxit*,'/ &
+           '      +     iprint*, lunerr*, lunrpt*,'/ &
+           '      +     stpb*, stpd*,'/ &
+           '      +     sclb*, scld*,'/ &
+           '      +     work*, iwork*,'/ &
+           '      +     info*,'/ &
+           '      +     lower*, upper*)'/ &
+           ' * optional argument')
+
    end subroutine dodper
 
    impure subroutine dodphd(head, lunit)
    !! Print report heading.
-   ! Routines Called  (NONE)
-   ! Date Written   860529   (YYMMDD)
-   ! Revision Date  920619   (YYMMDD)
+      ! Routines Called  (NONE)
+      ! Date Written   860529   (YYMMDD)
+      ! Revision Date  920619   (YYMMDD)
 
       logical, intent(inout) :: head
-         !! The variable designating whether the heading is to be printed (`head = .true.`) 
+         !! The variable designating whether the heading is to be printed (`head = .true.`)
          !! or not (`head = .false.`).
       integer, intent(in) :: lunit
          !! The logical unit number to which the heading is written.
 
       ! Variable Definitions (alphabetically)
-      !  HEAD:    The variable designating whether the heading is to be printed (HEAD=.TRUE.) 
+      !  HEAD:    The variable designating whether the heading is to be printed (HEAD=.TRUE.)
       !           or not (HEAD=.FALSE.).
       !  LUNIT:    The logical unit number to which the heading is written.
 
@@ -2908,9 +2908,9 @@ contains
 
       ! Format statements
 
-   1000 format( &
+1000  format( &
          ' ********************************************************* '/ &
-         ' * ODRPACK95 version 1.00 of 12-27-2005 (REAL (wp)) * '/ &
+         ' *                      ODRPACK REPORT                   * '/ &
          ' ********************************************************* '/ &
          )
 
