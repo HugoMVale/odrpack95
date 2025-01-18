@@ -34,6 +34,7 @@ use and maintain. The main changes include:
 * [x] Addition of explicit interfaces to BLAS routines.
 * [x] Implementation of a C API.
 * [x] Automatic code documentation with FORD.
+* [x] Python bindings, available in [PYPYI](https://pypi.org/project/odrpack/). 
 
 |    Version    | Year |   Standard   |
 |:-------------:|:----:|:------------:|
