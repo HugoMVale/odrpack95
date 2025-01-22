@@ -14,6 +14,9 @@ odrpack_lic = files(
   'LICENSE',
 )
 
+fortran_compiler = meson.get_compiler('fortran')
+c_compiler = meson.get_compiler('c')
+
 # BLAS
 if host_machine.system() == 'darwin'
   message('Using `Accelerate` framework as BLAS library.')
@@ -22,7 +25,7 @@ if host_machine.system() == 'darwin'
 else
   blas_dep = dependency('blas', required: false)
   if not blas_dep.found()
-    blas_dep = cpp_compiler.find_library('blas', required: false)
+    blas_dep = c_compiler.find_library('blas', required: false)
   endif
 endif
 
