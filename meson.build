@@ -1,8 +1,9 @@
 project(
-  'odrpack',
+  'odrpack95',
   ['fortran', 'c'],
-  version: '1.0.0',
+  version: '1.0.1',
   meson_version: '>=1.1',
+  license: 'MIT',
   default_options: [
   'default_library=static',
   'buildtype=release',
@@ -10,11 +11,7 @@ project(
   ],
 )
 
-odrpack_lic = files(
-  'LICENSE',
-)
-
-fortran_compiler = meson.get_compiler('fortran')
+# fortran_compiler = meson.get_compiler('fortran')
 c_compiler = meson.get_compiler('c')
 
 # BLAS
