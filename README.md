@@ -1,4 +1,5 @@
 # odrpack
+A modernized Fortran package for weighted orthogonal distance regression (ODR).
 
 [![CI](https://github.com/HugoMVale/odrpack95/actions/workflows/CI.yml/badge.svg)](https://github.com/HugoMVale/odrpack95/actions)
 [![codecov](https://codecov.io/gh/HugoMVale/odrpack95/branch/main/graph/badge.svg?token=1XL5LQSO9P)](https://codecov.io/gh/HugoMVale/odrpack95)
@@ -34,7 +35,7 @@ use and maintain. The main changes include:
 * [x] Addition of explicit interfaces to BLAS routines.
 * [x] Implementation of a C API.
 * [x] Automatic code documentation with FORD.
-* [x] Python bindings, available in [PYPYI](https://pypi.org/project/odrpack/). 
+* [x] Python bindings, available in the companion repo [odrpack-python](https://github.com/HugoMVale/odrpack-python). 
 
 |    Version    | Year |   Standard   |
 |:-------------:|:----:|:------------:|
@@ -57,11 +58,11 @@ use and maintain. The main changes include:
 
 `odrpack` depends on a small number of functions from BLAS and LINPACK.
 
-* The build configuration files provided with the code (see further below) assume
-OpenBLAS is locally installed. If another BLAS source is preferred, the configuration files
-should be adjusted accordingly. Alternatively, the subset of required BLAS functions is
-available in [src/blas.f_](/src/blas.f_); it suffices to remove the underscore and edit the
-build configuration files.
+* The build configuration files provided with the code (see further below) assume a suitable
+BLAS library is locally installed. Alternatively, the subset of required BLAS functions is
+available in [external/blas.f](/external/blas.f); it suffices to move the file to the `src`
+folder.
+
 * The subset of required LINPACK functions is available in [src/linpack.f](/src/linpack.f) and
 is already included in the build configuration files. No action is required.
 
@@ -92,22 +93,22 @@ fpm run --example "example_name" --profile release
 First, setup the build:
 
 ```sh
-meson setup _build
+meson setup build
 ```
 
-To build the libraries (static and dynamic), do:
+To build the libraries, do:
 
 ```sh
-meson compile -C _build
+meson compile -C build
 ```
 
 To run the tests, do:
 
 ```sh
-meson test -C _build
+meson test -C build
 ```
 
 ## Licence
 
 * The original ODERPACK95 code is [public domain](https://github.com/scipy/scipy/issues/7107#issuecomment-307378785).
-* Any modications done in the course of this project are covered by the MIT licence.
+* Modifications introduced in this project are covered under the MIT license.
