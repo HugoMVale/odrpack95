@@ -10,12 +10,12 @@ auto-executables = false
 auto-examples = true
 auto-tests = true
 module-naming = false
-link = ["openblas"]
+link = ["blas"]
 
 [install]
 library = false
 
 [fortran]
 implicit-typing = false
-implicit-external = true
+implicit-external = false
 source-form = "default"
