@@ -93,19 +93,19 @@ fpm run --example "example_name" --profile release
 First, setup the build:
 
 ```sh
-meson setup build
+meson setup builddir -Dbuild_tests=true
 ```
 
 To build the libraries, do:
 
 ```sh
-meson compile -C build
+meson compile -C builddir
 ```
 
 To run the tests, do:
 
 ```sh
-meson test -C build
+meson test -C builddir
 ```
 
 ## Licence
