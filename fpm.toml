@@ -10,7 +10,7 @@ auto-executables = false
 auto-examples = true
 auto-tests = true
 module-naming = false
-link = ["blas"]
+link = ["openblas"]      # "blas" works in linux, but not in windows
 
 [install]
 library = false
