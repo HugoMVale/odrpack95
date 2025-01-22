@@ -5,7 +5,6 @@ project(
   meson_version: '>=1.1',
   license: 'MIT',
   default_options: [
-  'default_library=static',
   'buildtype=release',
   'fortran_std=none'
   ],
@@ -41,22 +40,30 @@ odrpack_source = files(
   'src/odrpack_kinds.F90',
   'src/odrpack_core.f90',
   'src/odrpack_reports.f90',
+  'src/odrpack_capi.f90'
 )
 
-odrpack_lib = library(
+odrpack_lib = static_library(
   meson.project_name(),
   sources: [odrpack_source, blas_source],
   dependencies: [blas_dep],
-  install: true
+  # install: true
 )
 
-# C interface
-subdir('c')
+incdir = include_directories('c/include')
+
+odrpack_dep = declare_dependency(
+  include_directories: [incdir],
+  link_with: [odrpack_lib]
+)
 
 # Examples
 if get_option('build_examples')
     subdir('example')
 endif
+
+# C examples
+subdir('c')
 
 # Tests
 subdir('test')
