@@ -1,4 +1,5 @@
 option('build_examples',
        type : 'boolean',
        value : false, # Default value: don't build examples
-       description : 'Build example programs')
+       description : 'Build example programs'
+)

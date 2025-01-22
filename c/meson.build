@@ -1,5 +1,3 @@
-# meson.build
-
 odrpack_c_lib = library(
   meson.project_name() + '_c',
   sources: 'odrpack_capi.f90',
@@ -7,8 +5,7 @@ odrpack_c_lib = library(
   install: true,
 )
 
-# Examples
-subdir('example')
+if get_option('build_examples')
+  subdir('example')
+endif
 
-# # Tests
-# subdir('test')
