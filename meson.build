@@ -10,7 +10,6 @@ project(
   ],
 )
 
-# fortran_compiler = meson.get_compiler('fortran')
 c_compiler = meson.get_compiler('c')
 
 # BLAS
@@ -46,8 +45,7 @@ odrpack_source = files(
 odrpack_lib = static_library(
   meson.project_name(),
   sources: [odrpack_source, blas_source],
-  dependencies: [blas_dep],
-  # install: true
+  dependencies: [blas_dep]
 )
 
 incdir = include_directories('c/include')
