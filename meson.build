@@ -18,9 +18,9 @@ if host_machine.system() == 'darwin'
   add_project_link_arguments('-framework', 'Accelerate', language: ['c', 'fortran'])
   blas_dep = declare_dependency()
 else
-  blas_dep = dependency('openblas', required: false)
+  blas_dep = dependency('openblas', required: false, static: true)
   if not blas_dep.found()
-    blas_dep = c_compiler.find_library('openblas', required: false)
+    blas_dep = c_compiler.find_library('openblas', required: false, static: true)
   endif
 endif
 
