@@ -42,7 +42,6 @@ jobs:
           fpm test --profile release --flag $FLAGS --verbose
       
       - name: Generate coverage report
-        if: ${{ matrix.gcc_v == '10' }}
         run: |
           gfortran --version
           rm -rf ./build/gfortran*
@@ -55,8 +54,7 @@ jobs:
           fpm run --example "example5" --profile release
 
       - name: Upload coverage to Codecov
-        if: ${{ matrix.gcc_v == '10' }}
-        uses: codecov/codecov-action@v4.0.1
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
