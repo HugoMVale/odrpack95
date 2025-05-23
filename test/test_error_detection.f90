@@ -1,46 +1,31 @@
 program tester
-!***BEGIN PROLOGUE  TESTER
-!***REFER TO ODR
-!***ROUTINES CALLED  ODR
-!***DATE WRITTEN   20040322   (YYYYMMDD)
-!***REVISION DATE  20040322   (YYYYMMDD)
-!***PURPOSE  EXCERCISE ERROR REPORTING OF THE F90 VERSION OF ODRPACK95
-!***END PROLOGUE  TESTER
 
-!...USED MODULES
+   ! USED MODULES
    use odrpack_kinds, only: wp
    use odrpack, only: odr
    implicit none
 
-!...LOCAL SCALARS
-   integer :: n, m, nq, np, info, lun
+   ! LOCAL SCALARS
+   integer :: n, m, nq, np, info, lunrpt
    logical :: passed
-!  STAT
 
-!...LOCAL ARRAYS
-   real(wp) :: beta(:), y(:, :), x(:, :), upper(2), lower(2)
+   ! LOCAL ARRAYS
+   real(wp), allocatable :: beta(:), y(:, :), x(:, :)
 
-!...ALLOCATABLE ARRAYS
-   allocatable :: beta, y, x
+   ! ARRAYS IN COMMON
+   real(wp) :: upper(2), lower(2)
 
-!...EXTERNAL SUBPROGRAMS
+   ! EXTERNAL SUBPROGRAMS
    external :: fcn
 
    common/bounds/upper, lower
 
-!***FIRST EXECUTABLE STATEMENT  TESTER
-
+   ! FIRST EXECUTABLE STATEMENT  TESTER
    passed = .true.
 
-   open (unit=8, file="./test/test_error_summary.txt")
-   write (8, *) "NO SUMMARY AVAILABLE"
-   close (8)
+   open (unit=lunrpt, file="./test/test_error_report.txt")
 
-   lun = 9
-   open (unit=lun, file="./test/test_error_report.txt")
-
-!  ERROR IN PROBLEM SIZE
-
+   ! ERROR IN PROBLEM SIZE
    n = 0
    m = 0
    nq = 0
@@ -51,14 +36,13 @@ program tester
    beta(:) = 0.0_wp
 
    call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, &
-            lunrpt=lun, lunerr=lun)
+            lunrpt=lunrpt, lunerr=lunrpt)
 
    if (info /= 11111) passed = .false.
 
-   write (lun, *) "INFO = ", info
+   write (lunrpt, *) "INFO = ", info
 
-!  ERROR IN JOB SPECIFICATION WITH WORK AND IWORK
-
+   ! ERROR IN JOB SPECIFICATION WITH WORK AND IWORK
    n = 1
    m = 1
    nq = 1
@@ -70,14 +54,13 @@ program tester
    beta(:) = 0.0_wp
 
    call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, job=10000, &
-            lunrpt=lun, lunerr=lun)
+            lunrpt=lunrpt, lunerr=lunrpt)
 
    if (info /= 70110) passed = .false.
 
-   write (lun, *) "INFO = ", info
+   write (lunrpt, *) "INFO = ", info
 
-!  ERROR IN JOB SPECIFICATION WITH DELTA
-
+   ! ERROR IN JOB SPECIFICATION WITH DELTA
    n = 1
    m = 1
    nq = 1
@@ -89,14 +72,13 @@ program tester
    beta(:) = 0.0_wp
 
    call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, job=1000, &
-            lunrpt=lun, lunerr=lun)
+            lunrpt=lunrpt, lunerr=lunrpt)
 
    if (info /= 71000) passed = .false.
 
-   write (lun, *) "INFO = ", info
+   write (lunrpt, *) "INFO = ", info
 
-!  BOUNDS TOO SMALL FOR DERIVATIVE CHECKER WHEN DERIVATIVES DON'T AGREE.
-
+   ! BOUNDS TOO SMALL FOR DERIVATIVE CHECKER WHEN DERIVATIVES DON'T AGREE.
    n = 4
    m = 1
    nq = 1
@@ -111,11 +93,11 @@ program tester
    x(:, 1) = (/1.0_wp, 2.0_wp, 5.0_wp, 6.0_wp/)
 
    call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, job=0020, &
-            lunrpt=lun, lunerr=lun, lower=lower, upper=upper)
+            lunrpt=lunrpt, lunerr=lunrpt, lower=lower, upper=upper)
 
    if (info /= 1) passed = .false.
 
-   write (lun, *) "INFO = ", info
+   write (lunrpt, *) "INFO = ", info
 
 !  ERROR IN ARRAY ALLOCATION
 !  The following code is intended to force memory allocation failure.  An
@@ -151,7 +133,7 @@ program tester
 !
 !       WRITE(LUN,*) "INFO = ", INFO
 !
-   close (lun)
+   close (lunrpt)
 
    if (passed) then
       stop "Error detection tests passed. See report."
@@ -168,45 +150,38 @@ subroutine fcn &
     ifixb, ifixx, ldifx, &
     ideval, f, fjacb, fjacd, &
     istop)
-!***BEGIN PROLOGUE  FCN
-!***REFER TO  ODR
-!***ROUTINES CALLED  (NONE)
-!***DATE WRITTEN   20040322 (YYYYMMDD)
-!***REVISION DATE  20040322 (YYYYMMDD)
-!***PURPOSE  DUMMY ROUTINE FOR ODRPACK95 ERROR EXERCISER
-!***END PROLOGUE  FCN
 
-!...USED MODULES
+   ! USED MODULES
    use odrpack_kinds, only: wp, zero
    implicit none
 
-!...SCALAR ARGUMENTS
+   ! SCALAR ARGUMENTS
    integer :: ideval, istop, ldifx, ldm, ldn, ldnp, m, n, np, nq
 
-!...ARRAY ARGUMENTS
+   ! ARRAY ARGUMENTS
    real(wp) :: beta(np), f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq), &
                xplusd(ldn, m)
    integer :: ifixb(np), ifixx(ldifx, m)
 
-!...ARRAYS IN COMMON
+   ! ARRAYS IN COMMON
    real(wp) :: lower(2), upper(2)
 
-!...LOCAL SCALARS
+   ! LOCAL SCALARS
    integer :: i
 
    common/bounds/upper, lower
 
-!***FIRST EXECUTABLE STATEMENT
-!
-!  Do something with FJACD, FJACB, IFIXB and IFIXX to avoid warnings that they
-!  are not being used.  This is simply not to worry users that the example
-!  program is failing.
+   ! FIRST EXECUTABLE STATEMENT
+
+   ! Do something with FJACD, FJACB, IFIXB and IFIXX to avoid warnings that they
+   ! are not being used.  This is simply not to worry users that the example
+   ! program is failing.
    if (ifixb(1) > 0 .and. ifixx(1, 1) > 0 .and. fjacb(1, 1, 1) > zero &
        .and. fjacd(1, 1, 1) > zero) then
       ! Do nothing.
    end if
 
-   if (any(lower(1:np) > beta(1:np))) then
+   if (any(lower > beta)) then
       write (0, *) "LOWER BOUNDS VIOLATED"
       do i = 1, np
          if (lower(i) > beta(i)) then
@@ -216,7 +191,7 @@ subroutine fcn &
       end do
    end if
 
-   if (any(upper(1:np) < beta(1:np))) then
+   if (any(upper < beta)) then
       write (0, *) "UPPER BOUNDS VIOLATED"
       do i = 1, np
          if (upper(i) < beta(i)) then
