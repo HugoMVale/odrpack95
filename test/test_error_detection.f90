@@ -24,7 +24,7 @@ program tester
    allocatable :: beta, y, x
 
 !...EXTERNAL SUBPROGRAMS
-   external fcn
+   external :: fcn
 
    common/bounds/upper, lower
 
@@ -53,7 +53,7 @@ program tester
    call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, &
             lunrpt=lun, lunerr=lun)
 
-   if (info .ne. 11111) passed = .false.
+   if (info /= 11111) passed = .false.
 
    write (lun, *) "INFO = ", info
 
@@ -72,7 +72,7 @@ program tester
    call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, job=10000, &
             lunrpt=lun, lunerr=lun)
 
-   if (info .ne. 70110) passed = .false.
+   if (info /= 70110) passed = .false.
 
    write (lun, *) "INFO = ", info
 
@@ -91,7 +91,7 @@ program tester
    call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, job=1000, &
             lunrpt=lun, lunerr=lun)
 
-   if (info .ne. 71000) passed = .false.
+   if (info /= 71000) passed = .false.
 
    write (lun, *) "INFO = ", info
 
@@ -113,7 +113,7 @@ program tester
    call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, job=0020, &
             lunrpt=lun, lunerr=lun, lower=lower, upper=upper)
 
-   if (info .ne. 1) passed = .false.
+   if (info /= 1) passed = .false.
 
    write (lun, *) "INFO = ", info
 
@@ -136,7 +136,7 @@ program tester
 !       NP = 1
 !       DEALLOCATE(BETA,Y,X)
 !       ALLOCATE(BETA(NP),Y(N,NQ),X(N,M),STAT=STAT)
-!       IF (STAT.NE.0) THEN
+!       IF (STAT/=0) THEN
 !       WRITE(0,*)
 !       &       "SYSTEM ERROR: COULD NOT ALLOCATE MEMORY, TESTER ",
 !       &       "FAILED TO RUN."
@@ -185,7 +185,7 @@ subroutine fcn &
 
 !...ARRAY ARGUMENTS
    real(wp) :: beta(np), f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq), &
-                    xplusd(ldn, m)
+               xplusd(ldn, m)
    integer :: ifixb(np), ifixx(ldifx, m)
 
 !...ARRAYS IN COMMON
@@ -194,32 +194,32 @@ subroutine fcn &
 !...LOCAL SCALARS
    integer :: i
 
-   common /bounds/ upper, lower
+   common/bounds/upper, lower
 
 !***FIRST EXECUTABLE STATEMENT
 !
 !  Do something with FJACD, FJACB, IFIXB and IFIXX to avoid warnings that they
 !  are not being used.  This is simply not to worry users that the example
 !  program is failing.
-   if (ifixb(1) .gt. 0 .and. ifixx(1, 1) .gt. 0 .and. fjacb(1, 1, 1) .gt. zero &
-       .and. fjacd(1, 1, 1) .gt. zero) then
+   if (ifixb(1) > 0 .and. ifixx(1, 1) > 0 .and. fjacb(1, 1, 1) > zero &
+       .and. fjacd(1, 1, 1) > zero) then
       ! Do nothing.
    end if
 
-   if (any(lower(1:np) .gt. beta(1:np))) then
+   if (any(lower(1:np) > beta(1:np))) then
       write (0, *) "LOWER BOUNDS VIOLATED"
       do i = 1, np
-         if (lower(i) .gt. beta(i)) then
+         if (lower(i) > beta(i)) then
             write (0, *) "   IN THE ", i, " POSITION WITH ", beta(i), &
                "<", lower(i)
          end if
       end do
    end if
 
-   if (any(upper(1:np) .lt. beta(1:np))) then
+   if (any(upper(1:np) < beta(1:np))) then
       write (0, *) "UPPER BOUNDS VIOLATED"
       do i = 1, np
-         if (upper(i) .lt. beta(i)) then
+         if (upper(i) < beta(i)) then
             write (0, *) "   IN THE ", i, " POSITION WITH ", beta(i), &
                ">", upper(i)
          end if
@@ -228,20 +228,20 @@ subroutine fcn &
 
    istop = 0
 
-   if (mod(ideval, 10) .ne. 0) then
+   if (mod(ideval, 10) /= 0) then
       do i = 1, n
          f(i, 1) = beta(1)*exp(beta(2)*xplusd(i, 1))
       end do
    end if
 
-   if (mod(ideval/10, 10) .ne. 0) then
+   if (mod(ideval/10, 10) /= 0) then
       do i = 1, n
          fjacb(i, 1, 1) = exp(beta(2)*xplusd(i, 1))
          fjacb(i, 2, 1) = beta(1)*xplusd(i, 1)*exp(beta(2)*xplusd(i, 1))
       end do
    end if
 
-   if (mod(ideval/100, 10) .ne. 0) then
+   if (mod(ideval/100, 10) /= 0) then
       do i = 1, n
          fjacd(i, 1, 1) = beta(1)*beta(2)*exp(beta(2)*xplusd(i, 1))
       end do
