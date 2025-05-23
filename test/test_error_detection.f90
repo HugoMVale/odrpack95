@@ -86,12 +86,12 @@ program test_error_detection
    np = 2
    deallocate (beta, y, x)
    allocate (beta(np), y(n, nq), x(n, m))
-   beta(:) = (/-200.0_wp, -5.0_wp/)
-   upper(1:2) = (/-200.0_wp, 0.0_wp/)
-   lower(1:2) = (/-200.000029802322_wp, -5.0_wp/)
-   y(:, 1) = (/2.718281828459045_wp, 7.389056098930650_wp, &
-               148.4131591025766_wp, 403.4287934927353_wp/)
-   x(:, 1) = (/1.0_wp, 2.0_wp, 5.0_wp, 6.0_wp/)
+   beta(:) = [-200.0_wp, -5.0_wp]
+   upper(1:2) = [-200.0_wp, 0.0_wp]
+   lower(1:2) = [-200.000029802322_wp, -5.0_wp]
+   y(:, 1) = [2.718281828459045_wp, 7.389056098930650_wp, &
+              148.4131591025766_wp, 403.4287934927353_wp]
+   x(:, 1) = [1.0_wp, 2.0_wp, 5.0_wp, 6.0_wp]
 
    call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, job=0020, &
             lunrpt=lunrpt, lunerr=lunrpt, lower=lower, upper=upper)
