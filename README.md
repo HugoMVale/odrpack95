@@ -24,7 +24,7 @@ The first version of the library, named ODRPACK, was originally released in 1989
 last "official" update, named ODRPACK95, dates from 2004 [2]. The full revision history is
 provided on page iv of the [User's Reference Guide for ODRPACK95](https://github.com/HugoMVale/odrpack95/blob/main/original/Doc/guide.pdf).
 
-`odrpack` is a modernization of the ODRPACK95 code [3], intented to make the library easier to
+`odrpack` is a modernization of the ODRPACK95 code [3], intended to make the library easier to
 use and maintain. The main changes include:
 
 * [x] Conversion from fixed-form (`.f`) to free-form (`.f90`).
