@@ -7,7 +7,7 @@ program test_error_detection
    implicit none
 
    ! LOCAL SCALARS
-   integer :: n, m, nq, np, info, lunrpt
+   integer :: n, m, nq, np, info, lunerr, lunrpt
    logical :: passed
 
    ! LOCAL ARRAYS
@@ -25,6 +25,7 @@ program test_error_detection
    passed = .true.
 
    open (newunit=lunrpt, file="./test/test_error_detection_report.txt")
+   open (newunit=lunerr, file="./test/test_error_detection_error.txt")
 
    ! ERROR IN PROBLEM SIZE
    n = 0
@@ -37,7 +38,7 @@ program test_error_detection
    beta(:) = 0.0_wp
 
    call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, &
-            lunrpt=lunrpt, lunerr=lunrpt)
+            lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 11111) passed = .false.
 
@@ -55,7 +56,7 @@ program test_error_detection
    beta(:) = 0.0_wp
 
    call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, job=10000, &
-            lunrpt=lunrpt, lunerr=lunrpt)
+            lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 70110) passed = .false.
 
@@ -73,7 +74,7 @@ program test_error_detection
    beta(:) = 0.0_wp
 
    call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, job=1000, &
-            lunrpt=lunrpt, lunerr=lunrpt)
+            lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 71000) passed = .false.
 
@@ -94,7 +95,7 @@ program test_error_detection
    x(:, 1) = [1.0_wp, 2.0_wp, 5.0_wp, 6.0_wp]
 
    call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, job=0020, &
-            lunrpt=lunrpt, lunerr=lunrpt, lower=lower, upper=upper)
+            lunrpt=lunrpt, lunerr=lunerr, lower=lower, upper=upper)
 
    if (info /= 1) passed = .false.
 
@@ -135,6 +136,7 @@ program test_error_detection
 !       WRITE(LUN,*) "INFO = ", INFO
 !
    close (lunrpt)
+   close (lunerr)
 
    if (passed) then
       stop "Error detection tests passed. See report."
