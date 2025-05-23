@@ -1,28 +1,22 @@
-program dtest
-!***Begin Prologue  DTEST
-!***Refer to ODR
-!***Routines Called  DODRX
-!***Date Written   861229   (YYMMDD)
-!***Revision Date  920619   (YYMMDD)
-!***Purpose  EXERCISE FEATURES OF ODRPACK95 SOFTWARE
-!***End Prologue  DTEST
+program test_solution
+!! Solution tests for [[odrpack]].
 
-!...Used modules
+   ! Used modules
    use odrpack_kinds, only: wp
    implicit none
 
-!...Scalars in common
+   ! Scalars in common
    integer :: ntest
 
-!...Local scalars
+   ! Local scalars
    real(wp) :: tstfac
    integer :: lunerr, lunrpt, lunsum
    logical :: passed
 
-!...External subroutines
-   external :: dodrx
+   ! External subroutines
+   external :: odrx
 
-!...Common blocks
+   ! Common blocks
    common/tstset/ntest
 
 !***Variable declarations (alphabetically)
@@ -44,53 +38,39 @@ program dtest
 !       test tolerances, making the tests easier to pass and
 !       allowing small discrepancies between the computed and
 !       expected results to be automatically discounted.
-!
-!
-!***First executable statement  TEST
-!
-!
-!  Set up necessary files
-!
-!  NOTE:  ODRPACK95 generates computation and error reports on
-!       logical unit 6 by default;
-!       logical unit 'LUNSUM' used to summarize results of comparisons
-!       from exercise routine DODRX.
 
-   lunrpt = 18
-   lunerr = 18
-   lunsum = 19
+   ! Set up necessary files
+   open (newunit=lunrpt, file='./test/test_solution_report.txt')
+   open (newunit=lunerr, file='./test/test_solution_error.txt')
+   open (newunit=lunsum, file='./test/test_solution_summary.txt')
 
-   open (unit=lunrpt, file='./test/test_solution_report.txt')
-   open (unit=lunerr, file='./test/test_solution_report.txt')
-   open (unit=lunsum, file='./test/test_solution_summary.txt')
-
-!  Exercise REAL (wp) version of ODRPACK95
-!  (test reports generated on file 'RESULTS' and
-!       summarized in file 'SUMMARY')
-
+   ! Exercise REAL (wp) version of ODRPACK95
    ntest = 23
    tstfac = 1.0E0_wp
-   call dodrx(tstfac, passed, lunsum)
+   call odrx(tstfac, passed, lunrpt, lunerr, lunsum)
 
-end program dtest
+   close (lunrpt)
+   close (lunerr)
+   close (lunsum)
 
-subroutine dodrx(tstfac, passed, lunsum)
-!***Begin Prologue  DODRX
-!***Refer to ODR
-!***Routines Called  DDOT,DNRM2,ODR,DODRXD,
-!       DODRXF,DODRXW,DWGHT
-!***Date Written   860529   (YYMMDD)
-!***Revision Date  920619   (YYMMDD)
-!***Purpose  Exercise features of ODRPACK95 software
-!***End Prologue  DODRX
+end program test_solution
 
-!...Used modules
+subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
+!! Exercise features of [[odrpack]].
+
    use odrpack, only: odr
    use odrpack_kinds, only: wp
    use odrpack_core, only: dwght
+   use blas_interfaces, only: ddot, dnrm2
    implicit none
 
-!...Parameters
+   real(wp), intent(in) :: tstfac
+   logical, intent(inout) :: passed
+   integer, intent(in) :: lunrpt
+   integer, intent(in) :: lunerr
+   integer, intent(in) :: lunsum
+
+   ! Parameters
    real(wp), parameter :: base = radix(1.0E0_wp)
    integer, parameter :: maxn = 50, maxm = 3, maxnp = 10, maxnq = 2, ntests = 23, &
                          ldwe = maxn, ld2we = maxnq, ldwd = maxn, ld2wd = maxm, &
@@ -100,27 +80,22 @@ subroutine dodrx(tstfac, passed, lunsum)
                          5*maxnq + maxnq*(maxnp + maxm) + ldwe*ld2we*maxnq, &
                          liwork = 20 + maxnp + maxnq*(maxnp + maxm)
 
-!...Scalar arguments
-   real(wp) :: tstfac
-   integer :: lunsum
-   logical :: passed
-
-!...Scalars in common
+   ! Scalars in common
    integer :: ntest, setno
 
-!...Local scalars
+   ! Local scalars
    integer :: i, info, iprint, itest, job, l, ldifx, ldscld, ldstpd, ldwd1, ldwe1, &
-              ldx, ldy, ld2wd1, ld2we1, liwmin, lun, lunerr, lunrpt, lwmin, &
+              ldx, ldy, ld2wd1, ld2we1, liwmin, lun, lwmin, &
               m, maxit, msg, n, ndigit, np, nq
    real(wp) :: bnrm, epsmac, ewrt, ewrt2, hundrd, one, p01, p2, partol, sstol, &
                taufac, three, tsttol, two, wss, wssdel, wsseps, zero
    logical :: failed, fails, isodr, short
    character(len=80) :: title
 
-!...Arrays in common
+   ! Arrays in common
    real(wp) :: lower(maxnp), upper(maxnp)
 
-!...Local arrays
+   ! Local arrays
    real(wp) :: beta(maxnp), dpymp(2, ntests), &
                sclb(maxnp), scld(maxn, maxm), &
                stpb(maxnp), stpd(maxn, maxm), &
@@ -132,18 +107,15 @@ subroutine dodrx(tstfac, passed, lunsum)
    integer :: idpymp(ntests), ifixb(maxnp), ifixx(maxn, maxm)
    integer, pointer :: iwork(:)
 
-!...External functions
-   real(wp), external :: ddot, dnrm2
+   ! External subroutines
+   external :: odrxd, odrxf, odrxw
 
-!...External subroutines
-   external :: dodrxd, dodrxf, dodrxw
-
-!...Common blocks
+   ! Common blocks
    common/setid/setno
    common/tstset/ntest
    common/bounds/lower, upper
 
-!...Data statements
+   ! Data statements
    data &
       zero, p01, p2, one, two, three, hundrd &
       /0.0E0_wp, 0.01E0_wp, 0.2E0_wp, 1.0E0_wp, 2.0E0_wp, 3.0E0_wp, &
@@ -246,7 +218,7 @@ subroutine dodrx(tstfac, passed, lunsum)
       90020, 90010, 21, 1/
 
 !...Routine names used as subprogram arguments
-!       DODRXF:  The user-supplied routine for evaluating the model.
+!       odrxf:  The user-supplied routine for evaluating the model.
 
 !...Variable definitions (alphabetically)
 !       BASE:    The base of floating point numbers on the current machine
@@ -354,47 +326,33 @@ subroutine dodrx(tstfac, passed, lunsum)
 !       Y:       The response variable.
 !       ZERO:    The value 0.0E0_wp.
 
-!***First executable statement  DODRX
-
-!  Allocate work arrays and DELTA
-
+   ! Allocate work arrays and DELTA
    allocate (delta(maxn, maxm), iwork(liwork), work(lwork))
 
-!  Set logical units for error and computation reports
-
-   lunerr = 18
-   lunrpt = 18
-
-!  Initialize test tolerance
-
+   ! Initialize test tolerance
    if (tstfac .gt. one) then
       tsttol = tstfac
    else
       tsttol = one
    end if
 
-!  Initialize machine precision
-
+   ! Initialize machine precision
    epsmac = base**(1 - digits(base))
 
-!  Initialize leading dimension of X
-
+   ! Initialize leading dimension of X
    ldx = maxn
    ldy = maxn
 
-!  Initialize miscellaneous variables used in the exercise procedure
-
+   ! Initialize miscellaneous variables used in the exercise procedure
    failed = .false.
    short = .true.
    isodr = .true.
    n = 0
 
-!  Begin exercising ODRPACK95
-
+   ! Begin exercising ODRPACK95
    test: do itest = 1, ntest
 
-!  Set control values to invoke default values
-
+      ! Set control values to invoke default values
       we(1, 1, 1) = -one
       ldwe1 = ldwe
       ld2we1 = ld2we
@@ -429,7 +387,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       if (itest .eq. 1) then
 
-!  Test simple odr problem with analytic derivatives.
+         ! Test simple odr problem with analytic derivatives.
 
          lun = lunrpt
          write (lun, 1000)
@@ -439,7 +397,7 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 5
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 00020
@@ -448,7 +406,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 2) then
 
-!  Test simple ols problem with forward difference derivatives.
+         ! Test simple ols problem with forward difference derivatives.
 
          lun = lunrpt
          write (lun, 1000)
@@ -458,7 +416,7 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 5
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 00002
@@ -467,9 +425,9 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 3) then
 
-!  Test parameter fixing capabilities for poorly scaled ols problem
-!  with analytic derivatives.
-!  (derivative checking turned off.)
+         !  Test parameter fixing capabilities for poorly scaled ols problem
+         !  with analytic derivatives.
+         !  (derivative checking turned off.)
 
          lun = lunrpt
          write (lun, 1000)
@@ -479,7 +437,7 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 3
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          ifixb(1) = 1
@@ -497,11 +455,11 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 4) then
 
-!  Test weighting capabilities for odr problem with
-!  analytic derivatives.
-!  Also shows solution of poorly scaled odr problem.
-!  (derivative checking turned off.)
-!  N.B., this run continues from where test 3 left off.
+         !  Test weighting capabilities for odr problem with
+         !  analytic derivatives.
+         !  Also shows solution of poorly scaled odr problem.
+         !  (derivative checking turned off.)
+         !  N.B., this run continues from where test 3 left off.
 
          lun = lunrpt
          write (lun, 1000)
@@ -538,9 +496,8 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 5) then
 
-!  Test DELTA initialization capabilities and user-supplied scaling
-!  and use of istop to restrict parameter values
-!  for odr problem with analytic derivatives.
+         !  Test DELTA initialization capabilities and user-supplied scaling
+         !  and use of istop to restrict parameter values for odr problem with analytic derivatives.
 
          lun = lunrpt
          write (lun, 1000)
@@ -550,7 +507,7 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 1
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 01020
@@ -572,7 +529,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 6) then
 
-!  Test stiff stopping conditions for unscaled odr problem  with analytic derivatives.
+         ! Test stiff stopping conditions for unscaled odr problem  with analytic derivatives.
 
          lun = lunrpt
          write (lun, 1000)
@@ -582,7 +539,7 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 4
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 00020
@@ -594,7 +551,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 7) then
 
-!  Test restart for unscaled odr problem with analytic derivatives.
+         ! Test restart for unscaled odr problem with analytic derivatives.
 
          lun = lunrpt
          write (lun, 1000)
@@ -613,8 +570,8 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 8) then
 
-!  Test use of TAUFAC to restrict first step
-!  for odr problem with central difference derivatives.
+         ! Test use of TAUFAC to restrict first step
+         ! for odr problem with central difference derivatives.
 
          lun = lunrpt
          write (lun, 1000)
@@ -624,7 +581,7 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 6
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 00210
@@ -634,9 +591,9 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 9) then
 
-!  Test implicit odr problem
-!  with forward finite difference derivatives
-!  and covariance matrix constructed with recomputed derivatives.
+         ! Test implicit odr problem
+         ! with forward finite difference derivatives
+         ! and covariance matrix constructed with recomputed derivatives.
 
          lun = lunrpt
          write (lun, 1000)
@@ -646,7 +603,7 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 7
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 00001
@@ -656,10 +613,10 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 10) then
 
-!  Test multiresponse odr problem
-!  with central difference derivatives ,
-!  DELTA initialized to nonzero values,
-!  variable fixing, and weighting.
+         ! Test multiresponse odr problem
+         ! with central difference derivatives ,
+         ! DELTA initialized to nonzero values,
+         ! variable fixing, and weighting.
 
          lun = lunrpt
          write (lun, 1000)
@@ -669,7 +626,7 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 8
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
 
@@ -677,8 +634,9 @@ subroutine dodrx(tstfac, passed, lunsum)
          ldwe1 = ldwe
          ld2wd1 = ld2wd
          ld2we1 = ld2we
+
          do i = 1, n
-!  Initialize DELTA, and specify first decade of frequencies as fixed
+            ! Initialize DELTA, and specify first decade of frequencies as fixed
             if (x(i, 1) .lt. 100.0E0_wp) then
                delta(i, 1) = 0.0E0_wp
                ifixx(i, 1) = 0
@@ -699,7 +657,7 @@ subroutine dodrx(tstfac, passed, lunsum)
                ifixx(i, 1) = 1
             end if
 
-!  Set weights
+            ! Set weights
             if (x(i, 1) .eq. 100.0E0_wp .or. x(i, 1) .eq. 150.0E0_wp) then
                we(i, 1, 1) = 0.0E0_wp
                we(i, 1, 2) = 0.0E0_wp
@@ -719,7 +677,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 11) then
 
-!  Test detection of incorrect derivatives
+         ! Test detection of incorrect derivatives
 
          lun = lunrpt
          write (lun, 1000)
@@ -729,7 +687,7 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 6
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 00022
@@ -738,7 +696,7 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 12) then
 
-!  Test detection of incorrect derivatives
+         ! Test detection of incorrect derivatives
 
          lun = lunrpt
          write (lun, 1000)
@@ -748,7 +706,7 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 6
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 00020
@@ -757,8 +715,8 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 13) then
 
-!  Test bounded odr problem where
-!  parameters start on bound, move away, hit bound, move away, find minimum.
+         ! Test bounded odr problem where
+         ! parameters start on bound, move away, hit bound, move away, find minimum.
 
          lun = lunrpt
          write (lun, 1000)
@@ -768,21 +726,20 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 9
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 00000
          short = .false.
          isodr = .true.
          maxit = 100
-         beta(1:2) = (/200.0_wp, 5.0_wp/)
-         lower(1:2) = (/0.1_wp, 0.0_wp/)
-         upper(1:2) = (/200.0_wp, 5.0_wp/)
+         beta(1:2) = [200.0_wp, 5.0_wp]
+         lower(1:2) = [0.1_wp, 0.0_wp]
+         upper(1:2) = [200.0_wp, 5.0_wp]
 
       elseif (itest .eq. 14) then
 
-!  Test bounded odr problem where
-!  bounds are never hit.
+         ! Test bounded odr problem where bounds are never hit.
 
          lun = lunrpt
          write (lun, 1000)
@@ -792,21 +749,19 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 9
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 00000
          short = .false.
          isodr = .true.
          maxit = 100
-         lower(1:2) = (/0.0_wp, 0.0_wp/)
-         upper(1:2) = (/400.0_wp, 6.0_wp/)
+         lower(1:2) = [0.0_wp, 0.0_wp]
+         upper(1:2) = [400.0_wp, 6.0_wp]
 
       elseif (itest .eq. 15) then
 
-!  Test bounded odr problem where
-!  minimum is on boundary.
-
+         ! Test bounded odr problem where minimum is on boundary.
          lun = lunrpt
          write (lun, 1000)
          do i = 1, 2
@@ -815,22 +770,21 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 9
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 00000
          short = .false.
          isodr = .true.
          maxit = 1000
-         beta(1:2) = (/200.0_wp, 3.0_wp/)
-         lower(1:2) = (/1.1_wp, 0.0_wp/)
-         upper(1:2) = (/400.0_wp, 6.0_wp/)
+         beta(1:2) = [200.0_wp, 3.0_wp]
+         lower(1:2) = [1.1_wp, 0.0_wp]
+         upper(1:2) = [400.0_wp, 6.0_wp]
          tsttol = 500.0_wp
 
       elseif (itest .eq. 16) then
 
-!  Test bounded odr problem where
-!  initial BETA is outside bounds.
+         ! Test bounded odr problem where initial BETA is outside bounds.
 
          lun = lunrpt
          write (lun, 1000)
@@ -840,20 +794,20 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 9
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 00000
          short = .false.
          isodr = .true.
          maxit = 1000
-         beta(1:2) = (/200.0_wp, 7.0_wp/)
-         lower(1:2) = (/1.1_wp, 0.0_wp/)
-         upper(1:2) = (/200.0_wp, 5.0_wp/)
+         beta(1:2) = [200.0_wp, 7.0_wp]
+         lower(1:2) = [1.1_wp, 0.0_wp]
+         upper(1:2) = [200.0_wp, 5.0_wp]
 
       elseif (itest .eq. 17) then
 
-!  Test bounded odr problem where bounds are ill defined.
+         ! Test bounded odr problem where bounds are ill defined.
 
          lun = lunrpt
          write (lun, 1000)
@@ -863,21 +817,21 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 9
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 00000
          short = .false.
          isodr = .true.
          maxit = 1000
-         beta(1:2) = (/200.0_wp, 2.0_wp/)
-         lower(1:2) = (/10.0_wp, 0.0_wp/)
-         upper(1:2) = (/2.0_wp, 5.0_wp/)
+         beta(1:2) = [200.0_wp, 2.0_wp]
+         lower(1:2) = [10.0_wp, 0.0_wp]
+         upper(1:2) = [2.0_wp, 5.0_wp]
 
       elseif (itest .eq. 18) then
 
-!  Test bounded odr problem using centered differences where
-!  parameters start on bound, move away, hit bound, move away, find minimum.
+         ! Test bounded odr problem using centered differences where
+         ! parameters start on bound, move away, hit bound, move away, find minimum.
 
          lun = lunrpt
          write (lun, 1000)
@@ -887,21 +841,21 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 9
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 00010
          short = .false.
          isodr = .true.
          maxit = 100
-         beta(1:2) = (/200.0_wp, 5.0_wp/)
-         lower(1:2) = (/0.1_wp, 0.0_wp/)
-         upper(1:2) = (/200.0_wp, 5.0_wp/)
+         beta(1:2) = [200.0_wp, 5.0_wp]
+         lower(1:2) = [0.1_wp, 0.0_wp]
+         upper(1:2) = [200.0_wp, 5.0_wp]
 
       elseif (itest .eq. 19) then
 
-!  Test bounded odr problem when bounds are too small.
-!  Parameters start on bound.
+         ! Test bounded odr problem when bounds are too small.
+         ! Parameters start on bound.
 
          lun = lunrpt
          write (lun, 1000)
@@ -911,14 +865,14 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 9
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 00010
          short = .false.
          isodr = .true.
          maxit = 100
-         beta(1:2) = (/200.0_wp, 5.0_wp/)
+         beta(1:2) = [200.0_wp, 5.0_wp]
          upper(1) = 200.0_wp
          lower(2) = 5.0_wp
          lower(1) = upper(1) - 400*upper(1)*epsmac &
@@ -929,9 +883,9 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 20) then
 
-!  Test bounded odr problem when bounds are just big enough for ndigit
-!  calculation but too small for difference calculation.
-!  Parameters start on bound.
+         ! Test bounded odr problem when bounds are just big enough for ndigit
+         ! calculation but too small for difference calculation.
+         ! Parameters start on bound.
 
          lun = lunrpt
          write (lun, 1000)
@@ -941,14 +895,14 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 9
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 00000
          short = .false.
          isodr = .true.
          maxit = 100
-         beta(1:2) = (/-200.0_wp, -5.0_wp/)
+         beta(1:2) = [-200.0_wp, -5.0_wp]
          upper(1) = -200.0_wp
          lower(2) = -5.0_wp
          lower(1) = upper(1) + 400*upper(1)*epsmac
@@ -956,8 +910,8 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 21) then
 
-!  Test bounded odr problem when bounds are too small for derivative
-!  step sizes using forward differences.  Parameters start on bound.
+         ! Test bounded odr problem when bounds are too small for derivative
+         ! step sizes using forward differences. Parameters start on bound.
 
          lun = lunrpt
          write (lun, 1000)
@@ -967,14 +921,14 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 9
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 00000
          short = .false.
          isodr = .true.
          maxit = 100
-         beta(1:2) = (/-200.0_wp, -5.0_wp/)
+         beta(1:2) = [-200.0_wp, -5.0_wp]
          upper(1) = -200.0_wp
          lower(2) = -5.0_wp
          lower(1) = upper(1) + upper(1)*epsmac
@@ -982,10 +936,10 @@ subroutine dodrx(tstfac, passed, lunsum)
 
       elseif (itest .eq. 22) then
 
-!  Test bounded odr problem when first parameter is fixed and second is bounded.
-!  However, set the bounds on the first parameter to exclude the correct value
-!  of the second parameter.  This will exercise the packing and unpacking of
-!  parameters and ensure that bounds and fixed parameters can be mixed.
+         ! Test bounded odr problem when first parameter is fixed and second is bounded.
+         ! However, set the bounds on the first parameter to exclude the correct value
+         ! of the second parameter.  This will exercise the packing and unpacking of
+         ! parameters and ensure that bounds and fixed parameters can be mixed.
 
          lun = lunrpt
          write (lun, 1000)
@@ -995,21 +949,21 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 10
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 00010
          short = .false.
          isodr = .true.
          maxit = 100
-         beta(1:2) = (/2.5_wp, 1.5_wp/)
-         lower(1:2) = (/2.5_wp, 1.1_wp/)
-         upper(1:2) = (/10.0_wp, 5.0_wp/)
-         ifixb(1:2) = (/0, 1/)
+         beta(1:2) = [2.5_wp, 1.5_wp]
+         lower(1:2) = [2.5_wp, 1.1_wp]
+         upper(1:2) = [10.0_wp, 5.0_wp]
+         ifixb(1:2) = [0, 1]
 
       elseif (itest .eq. 23) then
 
-!  Similar to test 22 but without bounds.
+         ! Similar to test 22 but without bounds.
 
          lun = lunrpt
          write (lun, 1000)
@@ -1019,29 +973,28 @@ subroutine dodrx(tstfac, passed, lunsum)
             lun = lunsum
          end do
          setno = 10
-         call dodrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+         call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
          work = zero
          delta = zero
          job = 00010
          short = .false.
          isodr = .true.
          maxit = 100
-         beta(1:2) = (/2.5_wp, 1.5_wp/)
+         beta(1:2) = [2.5_wp, 1.5_wp]
          lower(1:2) = -huge(1.0_wp)
          upper(1:2) = huge(1.0_wp)
-         ifixb(1:2) = (/0, 1/)
+         ifixb(1:2) = [0, 1]
 
       end if
 
-      call dodrxw &
-         (n, m, np, nq, ldwe1, ld2we1, isodr, liwmin, lwmin)
+      call odrxw(n, m, np, nq, ldwe1, ld2we1, isodr, liwmin, lwmin)
 
-!  Compute solution
+      ! Compute solution
 
       write (lunrpt, 2200) title
       write (lunsum, 2200) title
       if (short) then
-         call odr(fcn=dodrxf, &
+         call odr(fcn=odrxf, &
                   n=n, m=m, np=np, nq=nq, &
                   beta=beta, &
                   y=y, x=x, &
@@ -1053,7 +1006,7 @@ subroutine dodrx(tstfac, passed, lunsum)
                   work=work, iwork=iwork, &
                   info=info)
       else
-         call odr(fcn=dodrxf, &
+         call odr(fcn=odrxf, &
                   n=n, m=m, np=np, nq=nq, &
                   beta=beta, &
                   y=y, x=x, &
@@ -1071,18 +1024,18 @@ subroutine dodrx(tstfac, passed, lunsum)
                   info=info)
       end if
 
-!  Compare results with those obtained on the cray ymp or the intel xeon running
-!  Linux using REAL (wp) version of ODRPACK95
+      ! Compare results with those obtained on the cray ymp or the intel xeon running
+      ! Linux using REAL(wp) version of ODRPACK95
 
       bnrm = dnrm2(np, beta, 1)
-      call dwght(n, m, wd, ldwd1, ld2wd1, reshape(work(1:n*m), (/n, m/)), &
+      call dwght(n, m, wd, ldwd1, ld2wd1, reshape(work(1:n*m), [n, m]), &
                  tempretl(1:n, 1:m))
-      wrk(1:n*m) = reshape(tempretl(1:n, 1:m), (/n*m/))
+      wrk(1:n*m) = reshape(tempretl(1:n, 1:m), [n*m])
       wssdel = ddot(n*m, work(1:n*m), 1, wrk(1), 1)
       call dwght(n, nq, we, ldwe1, ld2we1, &
-                 reshape(work(n*m + 1:n*m + 1 + n*nq - 1), (/n, nq/)), &
+                 reshape(work(n*m + 1:n*m + 1 + n*nq - 1), [n, nq]), &
                  tempretl(1:n, 1:nq))
-      wrk(n*m + 1:n*m + 1 + n*nq - 1) = reshape(tempretl(1:n, 1:nq), (/n*nq/))
+      wrk(n*m + 1:n*m + 1 + n*nq - 1) = reshape(tempretl(1:n, 1:nq), [n*nq])
       wsseps = ddot(n*nq, work(n*m + 1:n*m + 1 + n*nq - 1), 1, &
                     wrk(n*m + 1:n*m + 1 + n*nq - 1), 1)
       wss = wsseps + wssdel
@@ -1292,47 +1245,43 @@ subroutine dodrx(tstfac, passed, lunsum)
         ' *** Summary:', &
         ' all tests agree with expected results. ***')
 
-end
+end subroutine odrx
 
-subroutine dodrxd &
-   (title, n, m, np, nq, ldx, x, ldy, y, beta)
-!***Begin Prologue  DODRXD
-!***Refer to  ODR
-!***Routines Called  (NONE)
-!***Date Written   860529   (YYMMDD)
-!***Revision Date  920619   (YYMMDD)
-!***Purpose  Set up data for ODRPACK95 exerciser
-!***End Prologue  DODRXD
-!
-!...Used modules
+subroutine odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+!! Set up data for odrpack exerciser.
+
    use odrpack_kinds, only: wp
    implicit none
 
-!...Parameters
+   character(len=80), intent(out) :: title
+   integer, intent(out) :: n
+   integer, intent(out) :: m
+   integer, intent(out) :: np
+   integer, intent(out) :: nq
+   integer, intent(in) :: ldx
+   real(wp), intent(out) :: x(ldx, *)
+   integer, intent(in) :: ldy
+   real(wp), intent(out) :: y(ldy, *)
+   real(wp), intent(out) :: beta(*)
+
+   ! Parameters
    integer, parameter :: maxn = 50, maxm = 3, maxnp = 10, maxnq = 3, maxset = 16
 
-!...Scalar arguments
-   integer :: ldx, ldy, m, n, np, nq
-   character(len=80) :: title
-
-!...Array arguments
-   real(wp) :: beta(*), x(ldx, *), y(ldy, *)
-
-!...Scalars in common
+   ! Scalars in common
    integer :: setno
 
-!...Local scalars
+   ! Local scalars
    integer :: i, j, k, l
 
-!...Local arrays
+   ! Local arrays
    real(wp) :: bdata(maxnp, maxset), xdata(maxn, maxm, maxset), ydata(maxn, maxnq, maxset)
    integer :: mdata(maxset), ndata(maxset), npdata(maxset), nqdata(maxset)
    character(len=80) :: tdata(maxset)
 
-!...Common blocks
+   ! Common blocks
    common/setid/setno
 
-!...Data statements
+   ! Data statements
    data &
       tdata(1) &
       /' BOGGS, BYRD AND SCHNABEL, 1985, EXAMPLE 1'/
@@ -2171,7 +2120,7 @@ subroutine dodrxd &
 !       YDATA:   The response variables for each data set.
 !
 !
-!***First executable statement  DODRXD
+!***First executable statement  odrxd
 
    title = tdata(setno)
 
@@ -2196,48 +2145,48 @@ subroutine dodrxd &
       beta(k) = bdata(k, setno)
    end do
 
-end
+end subroutine odrxd
 
-subroutine dodrxf &
-   (n, m, np, nq, &
-    ldn, ldm, ldnp, &
-    beta, xplusd, &
-    ifixb, ifixx, ldifx, &
-    ideval, f, fjacb, fjacd, &
-    istop)
-!***Begin Prologue  DODRXF
-!***Refer to  ODR
-!***Routines Called  (NONE)
-!***Date Written   860529   (YYMMDD)
-!***Revision Date  920619   (YYMMDD)
-!***Purpose  Compute jacobian matricies for ODRPACK95 exerciser
-!***End Prologue  DODRXF
+subroutine odrxf( &
+   n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, ldifx, &
+   ideval, f, fjacb, fjacd, istop)
+!! Compute jacobian matricies for odrpack exerciser.
 
-!...Used modules
    use odrpack_kinds, only: wp, zero, one
    implicit none
 
-!...Scalar arguments
-   integer :: ideval, istop, ldifx, ldm, ldn, ldnp, m, n, np, nq
+   integer, intent(in) :: n
+   integer, intent(in) :: m
+   integer, intent(in) :: np
+   integer, intent(in) :: nq
+   integer, intent(in) :: ldn
+   integer, intent(in) :: ldm
+   integer, intent(in) :: ldnp
+   real(wp), intent(in) :: beta(np)
+   real(wp), intent(in) :: xplusd(ldn, m)
+   integer, intent(in) :: ifixb(np)
+   integer, intent(in) :: ifixx(ldifx, m)
+   integer, intent(in) :: ldifx
+   integer, intent(in) :: ideval
+   real(wp), intent(out) :: f(ldn, nq)
+   real(wp), intent(out) :: fjacb(ldn, ldnp, nq)
+   real(wp), intent(out) :: fjacd(ldn, ldm, nq)
+   integer, intent(out) :: istop
 
-!...Array arguments
-   real(wp) :: beta(np), f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq), xplusd(ldn, m)
-   integer :: ifixb(np), ifixx(ldifx, m)
-
-!...Scalar parameters
+   ! Scalar parameters
    integer, parameter :: maxnp = 10
 
-!...Scalars in common
+   ! Scalars in common
    integer :: setno
 
-!...Arrays in common
+   ! Arrays in common
    real(wp) :: lower(maxnp), upper(maxnp)
 
-!...Local scalars
+   ! Local scalars
    real(wp) :: ctheta, fac1, fac2, fac3, fac4, freq, omega, phi, pi, r, stheta, theta
    integer :: i, j, k
 
-!...Common blocks
+   ! Common blocks
    common/setid/setno
    common/bounds/lower, upper
 
@@ -2273,11 +2222,8 @@ subroutine dodrxf &
 !       SETNO:   The number of the data set being analyzed.
 !       XPLUSD:  Current value of explanatory variable, i.e., X + DELTA
 !       zero:    The value 0.0E0_wp.
-!
-!
-!***First executable statement  DODRXF
 
-!  Check for BETA outside bounds.  Return with error if BETA outside bounds.
+   !  Check for BETA outside bounds.  Return with error if BETA outside bounds.
 
    if (any(lower(1:np) .gt. beta(1:np))) then
       istop = -1
@@ -2291,7 +2237,7 @@ subroutine dodrxf &
 
    if (setno .eq. 1) then
 
-!  Setno. 1:  Boggs, Byrd and Schnabel, 1985, example 1
+      !  Setno. 1:  Boggs, Byrd and Schnabel, 1985, example 1
 
       if (beta(1) .le. 1.01E0_wp) then
          istop = 0
@@ -2321,7 +2267,7 @@ subroutine dodrxf &
 
    elseif (setno .eq. 2) then
 
-!  Setno. 2:  Boggs, Byrd and Schnabel, 1985, example 2
+      !  Setno. 2:  Boggs, Byrd and Schnabel, 1985, example 2
 
       istop = 0
 
@@ -2346,7 +2292,7 @@ subroutine dodrxf &
 
    elseif (setno .eq. 3) then
 
-!  Setno. 3:  Boggs, Byrd and Schnabel, 1985, example 3
+      !  Setno. 3:  Boggs, Byrd and Schnabel, 1985, example 3
 
       istop = 0
 
@@ -2381,7 +2327,7 @@ subroutine dodrxf &
 
    elseif (setno .eq. 4) then
 
-!  Setno. 4:  Himmelblau, 1970, example 6.2-4, page 188
+      !  Setno. 4:  Himmelblau, 1970, example 6.2-4, page 188
 
       istop = 0
 
@@ -2409,7 +2355,7 @@ subroutine dodrxf &
 
    elseif (setno .eq. 5) then
 
-!  Setno. 5:  Draper and Smith, 1981, exercise i, page 521-522
+      !  Setno. 5:  Draper and Smith, 1981, exercise i, page 521-522
 
       istop = 0
 
@@ -2440,8 +2386,8 @@ subroutine dodrxf &
 
    elseif (setno .eq. 6) then
 
-!  Setno. 6:  Powell and Macdonald, 1972, tables 7 and 8, page 153-154
-!          N.B.  this derivative is intentionally coded incorrectly
+      !  Setno. 6:  Powell and Macdonald, 1972, tables 7 and 8, page 153-154
+      !          N.B.  this derivative is intentionally coded incorrectly
 
       istop = 0
 
@@ -2466,8 +2412,8 @@ subroutine dodrxf &
 
    elseif (setno .eq. 7) then
 
-!  Setno. 7:  Fuller, 1987, table 3.2.10, pages 244-245
-!          N.B.  this derivative is intentionally coded incorrectly
+      !  Setno. 7:  Fuller, 1987, table 3.2.10, pages 244-245
+      !          N.B.  this derivative is intentionally coded incorrectly
 
       istop = 0
 
@@ -2497,8 +2443,8 @@ subroutine dodrxf &
 
    elseif (setno .eq. 8) then
 
-!  Setno. 8:  Bates and Watts, 1988, table A1.13, pages 280-281
-!          N.B.  This derivative is intentionally coded incorrectly
+      !  Setno. 8:  Bates and Watts, 1988, table A1.13, pages 280-281
+      !          N.B.  This derivative is intentionally coded incorrectly
 
       do i = 1, n
          if (xplusd(i, 1) .lt. 0.0E0_wp) then
@@ -2548,7 +2494,7 @@ subroutine dodrxf &
 
    elseif (setno .eq. 9) then
 
-!  Setno. 9:  Zwolak, Watson, and Tyson, 2004.
+      !  Setno. 9:  Zwolak, Watson, and Tyson, 2004.
 
       istop = 0
 
@@ -2573,7 +2519,7 @@ subroutine dodrxf &
 
    elseif (setno .eq. 10) then
 
-!  Setno. 10:  Zwolak, Watson, and Tyson, 2005.
+      !  Setno. 10:  Zwolak, Watson, and Tyson, 2005.
 
       istop = 0
 
@@ -2598,24 +2544,22 @@ subroutine dodrxf &
 
    end if
 
-end
+end subroutine odrxf
 
-subroutine dodrxw(maxn, maxm, maxnp, maxnq, ldwe, ld2we, isodr, liwmin, lwmin)
-!***Begin Prologue  DODRXW
-!***Refer to  ODR
-!***Routines Called  (NONE)
-!***Date Written   890205   (YYMMDD)
-!***Revision Date  920619   (YYMMDD)
-!***Purpose  Compute minimum lengths for work vectors
-!***Routines Called  NONE
-!***End Prologue  DODRXW
-!
-!...Used modules
+subroutine odrxw(maxn, maxm, maxnp, maxnq, ldwe, ld2we, isodr, liwmin, lwmin)
+!! Compute minimum lengths for work vectors.
+
    implicit none
 
-!...Scalar arguments
-   integer :: ldwe, ld2we, liwmin, lwmin, maxn, maxm, maxnp, maxnq
-   logical :: isodr
+   integer, intent(in) :: maxn
+   integer, intent(in) :: maxm
+   integer, intent(in) :: maxnp
+   integer, intent(in) :: maxnq
+   integer, intent(in) :: ldwe
+   integer, intent(in) :: ld2we
+   logical, intent(in) :: isodr
+   integer, intent(out) :: liwmin
+   integer, intent(out) :: lwmin
 
 !...Variable definitions (alphabetically)
 !       ISODR:   The variable designating whether the solution is by odr
@@ -2629,8 +2573,6 @@ subroutine dodrxw(maxn, maxm, maxnp, maxnq, ldwe, ld2we, isodr, liwmin, lwmin)
 !       MAXNP:   The number of function parameters.
 !       MAXNQ:   The number of responses per observation.
 
-!***First executable statement  DODRXW
-
    liwmin = 20 + maxnp + maxnq*(maxnp + maxm)
    if (isodr) then
       lwmin = 18 + 11*maxnp + maxnp**2 + maxm + maxm**2 + &
@@ -2643,4 +2585,4 @@ subroutine dodrxw(maxn, maxm, maxnp, maxnq, ldwe, ld2we, isodr, liwmin, lwmin)
               5*maxnq + maxnq*(maxnp + maxm) + ldwe*ld2we*maxnq
    end if
 
-end
+end subroutine odrxw
