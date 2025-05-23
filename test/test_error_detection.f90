@@ -1,4 +1,5 @@
-program tester
+program test_error_detection
+   !! Error detection tests for [[odrpack]].
 
    ! USED MODULES
    use odrpack_kinds, only: wp
@@ -141,7 +142,7 @@ program tester
       error stop "Error detection tests failed. See report."
    end if
 
-end program tester
+end program test_error_detection
 
 subroutine fcn &
    (n, m, np, nq, &
