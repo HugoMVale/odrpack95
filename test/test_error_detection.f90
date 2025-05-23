@@ -24,7 +24,7 @@ program test_error_detection
    ! FIRST EXECUTABLE STATEMENT  TESTER
    passed = .true.
 
-   open (newunit=lunrpt, file="./test/test_error_report.txt")
+   open (newunit=lunrpt, file="./test/test_error_detection_report.txt")
 
    ! ERROR IN PROBLEM SIZE
    n = 0
