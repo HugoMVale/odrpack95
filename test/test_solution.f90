@@ -330,7 +330,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
    allocate (delta(maxn, maxm), iwork(liwork), work(lwork))
 
    ! Initialize test tolerance
-   if (tstfac .gt. one) then
+   if (tstfac > one) then
       tsttol = tstfac
    else
       tsttol = one
@@ -385,7 +385,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
       upper(:) = huge(one)
       lower(:) = -huge(one)
 
-      if (itest .eq. 1) then
+      if (itest == 1) then
 
          ! Test simple odr problem with analytic derivatives.
 
@@ -404,7 +404,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          short = .true.
          isodr = .true.
 
-      elseif (itest .eq. 2) then
+      elseif (itest == 2) then
 
          ! Test simple ols problem with forward difference derivatives.
 
@@ -423,7 +423,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          short = .true.
          isodr = .false.
 
-      elseif (itest .eq. 3) then
+      elseif (itest == 3) then
 
          !  Test parameter fixing capabilities for poorly scaled ols problem
          !  with analytic derivatives.
@@ -453,7 +453,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          short = .false.
          isodr = .false.
 
-      elseif (itest .eq. 4) then
+      elseif (itest == 4) then
 
          !  Test weighting capabilities for odr problem with
          !  analytic derivatives.
@@ -494,7 +494,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          short = .false.
          isodr = .true.
 
-      elseif (itest .eq. 5) then
+      elseif (itest == 5) then
 
          !  Test DELTA initialization capabilities and user-supplied scaling
          !  and use of istop to restrict parameter values for odr problem with analytic derivatives.
@@ -527,7 +527,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          short = .false.
          isodr = .true.
 
-      elseif (itest .eq. 6) then
+      elseif (itest == 6) then
 
          ! Test stiff stopping conditions for unscaled odr problem  with analytic derivatives.
 
@@ -549,7 +549,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          short = .false.
          isodr = .true.
 
-      elseif (itest .eq. 7) then
+      elseif (itest == 7) then
 
          ! Test restart for unscaled odr problem with analytic derivatives.
 
@@ -568,7 +568,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          short = .false.
          isodr = .true.
 
-      elseif (itest .eq. 8) then
+      elseif (itest == 8) then
 
          ! Test use of TAUFAC to restrict first step
          ! for odr problem with central difference derivatives.
@@ -589,7 +589,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          short = .false.
          isodr = .true.
 
-      elseif (itest .eq. 9) then
+      elseif (itest == 9) then
 
          ! Test implicit odr problem
          ! with forward finite difference derivatives
@@ -611,7 +611,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          short = .true.
          isodr = .true.
 
-      elseif (itest .eq. 10) then
+      elseif (itest == 10) then
 
          ! Test multiresponse odr problem
          ! with central difference derivatives ,
@@ -637,19 +637,19 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
 
          do i = 1, n
             ! Initialize DELTA, and specify first decade of frequencies as fixed
-            if (x(i, 1) .lt. 100.0E0_wp) then
+            if (x(i, 1) < 100.0E0_wp) then
                delta(i, 1) = 0.0E0_wp
                ifixx(i, 1) = 0
-            elseif (x(i, 1) .le. 150.0E0_wp) then
+            elseif (x(i, 1) <= 150.0E0_wp) then
                delta(i, 1) = 0.0E0_wp
                ifixx(i, 1) = 1
-            elseif (x(i, 1) .le. 1000.0E0_wp) then
+            elseif (x(i, 1) <= 1000.0E0_wp) then
                delta(i, 1) = 25.0E0_wp
                ifixx(i, 1) = 1
-            elseif (x(i, 1) .le. 10000.0E0_wp) then
+            elseif (x(i, 1) <= 10000.0E0_wp) then
                delta(i, 1) = 560.0E0_wp
                ifixx(i, 1) = 1
-            elseif (x(i, 1) .le. 100000.0E0_wp) then
+            elseif (x(i, 1) <= 100000.0E0_wp) then
                delta(i, 1) = 9500.0E0_wp
                ifixx(i, 1) = 1
             else
@@ -658,7 +658,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
             end if
 
             ! Set weights
-            if (x(i, 1) .eq. 100.0E0_wp .or. x(i, 1) .eq. 150.0E0_wp) then
+            if (x(i, 1) == 100.0E0_wp .or. x(i, 1) == 150.0E0_wp) then
                we(i, 1, 1) = 0.0E0_wp
                we(i, 1, 2) = 0.0E0_wp
                we(i, 2, 1) = 0.0E0_wp
@@ -675,7 +675,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          short = .false.
          isodr = .true.
 
-      elseif (itest .eq. 11) then
+      elseif (itest == 11) then
 
          ! Test detection of incorrect derivatives
 
@@ -694,7 +694,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          short = .false.
          isodr = .false.
 
-      elseif (itest .eq. 12) then
+      elseif (itest == 12) then
 
          ! Test detection of incorrect derivatives
 
@@ -713,7 +713,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          short = .false.
          isodr = .true.
 
-      elseif (itest .eq. 13) then
+      elseif (itest == 13) then
 
          ! Test bounded odr problem where
          ! parameters start on bound, move away, hit bound, move away, find minimum.
@@ -737,7 +737,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          lower(1:2) = [0.1_wp, 0.0_wp]
          upper(1:2) = [200.0_wp, 5.0_wp]
 
-      elseif (itest .eq. 14) then
+      elseif (itest == 14) then
 
          ! Test bounded odr problem where bounds are never hit.
 
@@ -759,7 +759,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          lower(1:2) = [0.0_wp, 0.0_wp]
          upper(1:2) = [400.0_wp, 6.0_wp]
 
-      elseif (itest .eq. 15) then
+      elseif (itest == 15) then
 
          ! Test bounded odr problem where minimum is on boundary.
          lun = lunrpt
@@ -782,7 +782,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          upper(1:2) = [400.0_wp, 6.0_wp]
          tsttol = 500.0_wp
 
-      elseif (itest .eq. 16) then
+      elseif (itest == 16) then
 
          ! Test bounded odr problem where initial BETA is outside bounds.
 
@@ -805,7 +805,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          lower(1:2) = [1.1_wp, 0.0_wp]
          upper(1:2) = [200.0_wp, 5.0_wp]
 
-      elseif (itest .eq. 17) then
+      elseif (itest == 17) then
 
          ! Test bounded odr problem where bounds are ill defined.
 
@@ -828,7 +828,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          lower(1:2) = [10.0_wp, 0.0_wp]
          upper(1:2) = [2.0_wp, 5.0_wp]
 
-      elseif (itest .eq. 18) then
+      elseif (itest == 18) then
 
          ! Test bounded odr problem using centered differences where
          ! parameters start on bound, move away, hit bound, move away, find minimum.
@@ -852,7 +852,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          lower(1:2) = [0.1_wp, 0.0_wp]
          upper(1:2) = [200.0_wp, 5.0_wp]
 
-      elseif (itest .eq. 19) then
+      elseif (itest == 19) then
 
          ! Test bounded odr problem when bounds are too small.
          ! Parameters start on bound.
@@ -881,7 +881,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          upper(2) = lower(2) + 400*lower(2)*epsmac &
                     - lower(2)*epsmac
 
-      elseif (itest .eq. 20) then
+      elseif (itest == 20) then
 
          ! Test bounded odr problem when bounds are just big enough for ndigit
          ! calculation but too small for difference calculation.
@@ -908,7 +908,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          lower(1) = upper(1) + 400*upper(1)*epsmac
          upper(2) = lower(2) - 400*lower(2)*epsmac
 
-      elseif (itest .eq. 21) then
+      elseif (itest == 21) then
 
          ! Test bounded odr problem when bounds are too small for derivative
          ! step sizes using forward differences. Parameters start on bound.
@@ -934,7 +934,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          lower(1) = upper(1) + upper(1)*epsmac
          upper(2) = lower(2) - lower(2)*epsmac
 
-      elseif (itest .eq. 22) then
+      elseif (itest == 22) then
 
          ! Test bounded odr problem when first parameter is fixed and second is bounded.
          ! However, set the bounds on the first parameter to exclude the correct value
@@ -961,7 +961,7 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
          upper(1:2) = [10.0_wp, 5.0_wp]
          ifixb(1:2) = [0, 1]
 
-      elseif (itest .eq. 23) then
+      elseif (itest == 23) then
 
          ! Similar to test 22 but without bounds.
 
@@ -1040,20 +1040,20 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
                     wrk(n*m + 1:n*m + 1 + n*nq - 1), 1)
       wss = wsseps + wssdel
 
-      if (sstol .lt. zero) then
+      if (sstol < zero) then
          sstol = sqrt(epsmac)
       else
          sstol = min(sstol, one)
       end if
 
-      if (partol .lt. zero) then
+      if (partol < zero) then
          partol = epsmac**(two/three)
       else
          partol = min(partol, one)
       end if
 
-      if (info .ge. 10000) then
-         if (idpymp(itest) .eq. info) then
+      if (info >= 10000) then
+         if (idpymp(itest) == info) then
             fails = .false.
             msg = 1
          else
@@ -1061,30 +1061,30 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
             msg = 3
          end if
 
-      elseif (mod(info, 10) .eq. 1) then
-         fails = abs(wss - dpymp(2, itest)) .gt. &
+      elseif (mod(info, 10) == 1) then
+         fails = abs(wss - dpymp(2, itest)) > &
                  dpymp(2, itest)*sstol*tsttol
          msg = 2
 
-      elseif (mod(info, 10) .eq. 2) then
-         fails = abs(bnrm - dpymp(1, itest)) .gt. &
+      elseif (mod(info, 10) == 2) then
+         fails = abs(bnrm - dpymp(1, itest)) > &
                  dpymp(1, itest)*partol*tsttol
          msg = 2
 
-      elseif (mod(info, 10) .eq. 3) then
-         fails = (abs(wss - dpymp(2, itest)) .gt. &
+      elseif (mod(info, 10) == 3) then
+         fails = (abs(wss - dpymp(2, itest)) > &
                   dpymp(2, itest)*sstol*tsttol) &
                  .and. &
-                 (abs(bnrm - dpymp(1, itest)) .gt. &
+                 (abs(bnrm - dpymp(1, itest)) > &
                   dpymp(1, itest)*partol*tsttol)
          msg = 2
 
-      elseif ((mod(info, 10) .eq. 4) .and. &
-              (idpymp(itest) .eq. 4)) then
+      elseif ((mod(info, 10) == 4) .and. &
+              (idpymp(itest) == 4)) then
          fails = .false.
          msg = 1
 
-      elseif (info .eq. idpymp(itest)) then
+      elseif (info == idpymp(itest)) then
          fails = .true.
          msg = 4
       else
@@ -1106,13 +1106,13 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
             abs(dpymp(1, itest) - bnrm), abs(dpymp(2, itest) - wss)
          ewrt = abs(dpymp(1, itest))
          ewrt2 = abs(dpymp(2, itest))
-         if (ewrt .eq. zero) then
+         if (ewrt == zero) then
 !---------------------------^--------------------------------------------------
 !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
 !------------------------------------------------------------------------------
             ewrt = one
          end if
-         if (ewrt2 .eq. zero) then
+         if (ewrt2 == zero) then
 !----------------------------^-------------------------------------------------
 !!! FPT - 3087 REAL or COMPLEX quantity tested for exact equality/inequality
 !------------------------------------------------------------------------------
@@ -1122,17 +1122,17 @@ subroutine odrx(tstfac, passed, lunrpt, lunerr, lunsum)
             abs(dpymp(1, itest) - bnrm)/ewrt, &
             abs(dpymp(2, itest) - wss)/ewrt2
 
-         if (msg .eq. 1) then
+         if (msg == 1) then
             write (lun, 3310)
-         elseif (msg .eq. 2) then
+         elseif (msg == 2) then
             if (fails) then
                write (lun, 3320)
             else
                write (lun, 3330)
             end if
-         elseif (msg .eq. 3) then
+         elseif (msg == 3) then
             write (lun, 3340)
-         elseif (msg .eq. 4) then
+         elseif (msg == 4) then
             write (lun, 3350)
          end if
 
@@ -2225,37 +2225,37 @@ subroutine odrxf( &
 
    !  Check for BETA outside bounds.  Return with error if BETA outside bounds.
 
-   if (any(lower(1:np) .gt. beta(1:np))) then
+   if (any(lower(1:np) > beta(1:np))) then
       istop = -1
       return
    end if
 
-   if (any(upper(1:np) .lt. beta(1:np))) then
+   if (any(upper(1:np) < beta(1:np))) then
       istop = -2
       return
    end if
 
-   if (setno .eq. 1) then
+   if (setno == 1) then
 
       !  Setno. 1:  Boggs, Byrd and Schnabel, 1985, example 1
 
-      if (beta(1) .le. 1.01E0_wp) then
+      if (beta(1) <= 1.01E0_wp) then
          istop = 0
 
-         if (mod(ideval, 10) .ne. 0) then
+         if (mod(ideval, 10) /= 0) then
             do i = 1, n
                f(i, 1) = beta(1)/(xplusd(i, 1) - beta(2))
             end do
          end if
 
-         if (mod(ideval/10, 10) .ne. 0) then
+         if (mod(ideval/10, 10) /= 0) then
             do i = 1, n
                fjacb(i, 1, 1) = one/(xplusd(i, 1) - beta(2))
                fjacb(i, 2, 1) = beta(1)*(xplusd(i, 1) - beta(2))**(-2)
             end do
          end if
 
-         if (mod(ideval/100, 10) .ne. 0) then
+         if (mod(ideval/100, 10) /= 0) then
             do i = 1, n
                fjacd(i, 1, 1) = -beta(1)*(xplusd(i, 1) - beta(2))**(-2)
             end do
@@ -2265,7 +2265,7 @@ subroutine odrxf( &
          istop = 1
       end if
 
-   elseif (setno .eq. 2) then
+   elseif (setno == 2) then
 
       !  Setno. 2:  Boggs, Byrd and Schnabel, 1985, example 2
 
@@ -2274,29 +2274,29 @@ subroutine odrxf( &
       do i = 1, n
          fac1 = (beta(2)*xplusd(i, 1) + beta(3)*xplusd(i, 2) - one)
 
-         if (mod(ideval, 10) .ne. 0) then
+         if (mod(ideval, 10) /= 0) then
             f(i, 1) = beta(1)/fac1
          end if
 
-         if (mod(ideval/10, 10) .ne. 0) then
+         if (mod(ideval/10, 10) /= 0) then
             fjacb(i, 1, 1) = one/fac1
             fjacb(i, 2, 1) = -beta(1)*(fac1**(-2))*xplusd(i, 1)
             fjacb(i, 3, 1) = -beta(1)*(fac1**(-2))*xplusd(i, 2)
          end if
 
-         if (mod(ideval/100, 10) .ne. 0) then
+         if (mod(ideval/100, 10) /= 0) then
             fjacd(i, 1, 1) = -beta(1)*(fac1**(-2))*beta(2)
             fjacd(i, 2, 1) = -beta(1)*(fac1**(-2))*beta(3)
          end if
       end do
 
-   elseif (setno .eq. 3) then
+   elseif (setno == 3) then
 
       !  Setno. 3:  Boggs, Byrd and Schnabel, 1985, example 3
 
       istop = 0
 
-      if (mod(ideval, 10) .ne. 0) then
+      if (mod(ideval, 10) /= 0) then
          do i = 1, n
             f(i, 1) = zero
             do j = 1, 4
@@ -2306,7 +2306,7 @@ subroutine odrxf( &
          end do
       end if
 
-      if (mod(ideval/10, 10) .ne. 0) then
+      if (mod(ideval/10, 10) /= 0) then
          do i = 1, n
             fjacb(i, 5, 1) = one
             do k = 1, 4
@@ -2316,7 +2316,7 @@ subroutine odrxf( &
          end do
       end if
 
-      if (mod(ideval/100, 10) .ne. 0) then
+      if (mod(ideval/100, 10) /= 0) then
          do i = 1, n
             fjacd(i, 1, 1) = zero
             do k = 4, 1, -1
@@ -2325,20 +2325,20 @@ subroutine odrxf( &
          end do
       end if
 
-   elseif (setno .eq. 4) then
+   elseif (setno == 4) then
 
       !  Setno. 4:  Himmelblau, 1970, example 6.2-4, page 188
 
       istop = 0
 
-      if (mod(ideval, 10) .ne. 0) then
+      if (mod(ideval, 10) /= 0) then
          do i = 1, n
             f(i, 1) = beta(1)*xplusd(i, 1) + &
                       beta(2)*exp(beta(3)*xplusd(i, 2))
          end do
       end if
 
-      if (mod(ideval/10, 10) .ne. 0) then
+      if (mod(ideval/10, 10) /= 0) then
          do i = 1, n
             fjacb(i, 1, 1) = xplusd(i, 1)
             fjacb(i, 2, 1) = exp(beta(3)*xplusd(i, 2))
@@ -2346,27 +2346,27 @@ subroutine odrxf( &
          end do
       end if
 
-      if (mod(ideval/100, 10) .ne. 0) then
+      if (mod(ideval/100, 10) /= 0) then
          do i = 1, n
             fjacd(i, 1, 1) = beta(1)
             fjacd(i, 2, 1) = beta(2)*exp(beta(3)*xplusd(i, 2))*beta(3)
          end do
       end if
 
-   elseif (setno .eq. 5) then
+   elseif (setno == 5) then
 
       !  Setno. 5:  Draper and Smith, 1981, exercise i, page 521-522
 
       istop = 0
 
-      if (mod(ideval, 10) .ne. 0) then
+      if (mod(ideval, 10) /= 0) then
          do i = 1, n
             f(i, 1) = exp(-beta(1)*xplusd(i, 1)* &
                           exp(-beta(2)*(one/xplusd(i, 2) - one/620.0E0_wp)))
          end do
       end if
 
-      if (mod(ideval/10, 10) .ne. 0) then
+      if (mod(ideval/10, 10) /= 0) then
          do i = 1, n
             fac1 = one/xplusd(i, 2) - one/620.0E0_wp
             fac2 = exp(-beta(2)*fac1)
@@ -2376,7 +2376,7 @@ subroutine odrxf( &
             fjacb(i, 1, 1) = -fac4*xplusd(i, 1)*fac2
             fjacb(i, 2, 1) = fac4*fac3*fac2*fac1
 
-            if (mod(ideval/100, 10) .ne. 0) then
+            if (mod(ideval/100, 10) /= 0) then
                fjacd(i, 1, 1) = -fac4*beta(1)*fac2
                fjacd(i, 2, 1) = -fac4*fac3*fac2* &
                                 beta(2)/xplusd(i, 2)**2
@@ -2384,40 +2384,40 @@ subroutine odrxf( &
          end do
       end if
 
-   elseif (setno .eq. 6) then
+   elseif (setno == 6) then
 
       !  Setno. 6:  Powell and Macdonald, 1972, tables 7 and 8, page 153-154
       !          N.B.  this derivative is intentionally coded incorrectly
 
       istop = 0
 
-      if (mod(ideval, 10) .ne. 0) then
+      if (mod(ideval, 10) /= 0) then
          do i = 1, n
             f(i, 1) = beta(1)* &
                       (one + beta(3)*xplusd(i, 1)/beta(2))**(-one/beta(3))
          end do
       end if
 
-      if (mod(ideval/10, 10) .ne. 0) then
+      if (mod(ideval/10, 10) /= 0) then
          do i = 1, n
             fjacb(i, 1, 1) = zero
             fjacb(i, 2, 1) = zero
             fjacb(i, 3, 1) = zero
 
-            if (mod(ideval/100, 10) .ne. 0) then
+            if (mod(ideval/100, 10) /= 0) then
                fjacd(i, 1, 1) = xplusd(i, 1)
             end if
          end do
       end if
 
-   elseif (setno .eq. 7) then
+   elseif (setno == 7) then
 
       !  Setno. 7:  Fuller, 1987, table 3.2.10, pages 244-245
       !          N.B.  this derivative is intentionally coded incorrectly
 
       istop = 0
 
-      if (mod(ideval, 10) .ne. 0) then
+      if (mod(ideval, 10) /= 0) then
          do i = 1, n
             f(i, 1) = beta(3)*(xplusd(i, 1) - beta(1))**2 + &
                       2*beta(4)*(xplusd(i, 1) - beta(1))* &
@@ -2426,7 +2426,7 @@ subroutine odrxf( &
          end do
       end if
 
-      if (mod(ideval/10, 10) .ne. 0) then
+      if (mod(ideval/10, 10) /= 0) then
          do i = 1, n
             fjacb(i, 1, 1) = zero
             fjacb(i, 2, 1) = zero
@@ -2434,27 +2434,27 @@ subroutine odrxf( &
             fjacb(i, 4, 1) = zero
             fjacb(i, 5, 1) = zero
 
-            if (mod(ideval/100, 10) .ne. 0) then
+            if (mod(ideval/100, 10) /= 0) then
                fjacd(i, 1, 1) = zero
                fjacd(i, 2, 1) = zero
             end if
          end do
       end if
 
-   elseif (setno .eq. 8) then
+   elseif (setno == 8) then
 
       !  Setno. 8:  Bates and Watts, 1988, table A1.13, pages 280-281
       !          N.B.  This derivative is intentionally coded incorrectly
 
       do i = 1, n
-         if (xplusd(i, 1) .lt. 0.0E0_wp) then
+         if (xplusd(i, 1) < 0.0E0_wp) then
             istop = 1
             return
          end if
       end do
       istop = 0
 
-      if (mod(ideval, 10) .ne. 0) then
+      if (mod(ideval, 10) /= 0) then
          pi = 3.141592653589793238462643383279E0_wp
          theta = pi*beta(4)*0.5E0_wp
          ctheta = cos(theta)
@@ -2471,7 +2471,7 @@ subroutine odrxf( &
          end do
       end if
 
-      if (mod(ideval/10, 10) .ne. 0) then
+      if (mod(ideval/10, 10) /= 0) then
          do i = 1, n
             fjacb(i, 1, 1) = zero
             fjacb(i, 2, 1) = zero
@@ -2485,58 +2485,58 @@ subroutine odrxf( &
             fjacb(i, 4, 2) = zero
             fjacb(i, 5, 2) = zero
 
-            if (mod(ideval/100, 10) .ne. 0) then
+            if (mod(ideval/100, 10) /= 0) then
                fjacd(i, 1, 1) = zero
                fjacd(i, 1, 2) = zero
             end if
          end do
       end if
 
-   elseif (setno .eq. 9) then
+   elseif (setno == 9) then
 
       !  Setno. 9:  Zwolak, Watson, and Tyson, 2004.
 
       istop = 0
 
-      if (mod(ideval, 10) .ne. 0) then
+      if (mod(ideval, 10) /= 0) then
          do i = 1, n
             f(i, 1) = beta(1)*exp(beta(2)*xplusd(i, 1))
          end do
       end if
 
-      if (mod(ideval/10, 10) .ne. 0) then
+      if (mod(ideval/10, 10) /= 0) then
          do i = 1, n
             fjacb(i, 1, 1) = exp(beta(2)*xplusd(i, 1))
             fjacb(i, 2, 1) = beta(1)*xplusd(i, 1)*exp(beta(2)*xplusd(i, 1))
          end do
       end if
 
-      if (mod(ideval/100, 10) .ne. 0) then
+      if (mod(ideval/100, 10) /= 0) then
          do i = 1, n
             fjacd(i, 1, 1) = beta(1)*beta(2)*exp(beta(2)*xplusd(i, 1))
          end do
       end if
 
-   elseif (setno .eq. 10) then
+   elseif (setno == 10) then
 
       !  Setno. 10:  Zwolak, Watson, and Tyson, 2005.
 
       istop = 0
 
-      if (mod(ideval, 10) .ne. 0) then
+      if (mod(ideval, 10) /= 0) then
          do i = 1, n
             f(i, 1) = beta(1)/2.0_wp*exp(beta(2)*xplusd(i, 1))
          end do
       end if
 
-      if (mod(ideval/10, 10) .ne. 0) then
+      if (mod(ideval/10, 10) /= 0) then
          do i = 1, n
             fjacb(i, 1, 1) = exp(beta(2)*xplusd(i, 1))/2.0_wp
             fjacb(i, 2, 1) = beta(1)/2.0_wp*xplusd(i, 1)*exp(beta(2)*xplusd(i, 1))
          end do
       end if
 
-      if (mod(ideval/100, 10) .ne. 0) then
+      if (mod(ideval/100, 10) /= 0) then
          do i = 1, n
             fjacd(i, 1, 1) = beta(1)/2.0_wp*beta(2)*exp(beta(2)*xplusd(i, 1))
          end do
