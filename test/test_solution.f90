@@ -156,114 +156,99 @@ contains
          /1, 1, 3, 1, 1, 4, 1, 1, 2, 1, 1023, 40100, 2, 2, 3, 90100, 91000, 2, 90010, &
          90020, 90010, 21, 1/
 
-      !...Routine names used as subprogram arguments
-      !       odrxf:  The user-supplied routine for evaluating the model.
+      ! Routine names used as subprogram arguments
+      !  odrxf:  The user-supplied routine for evaluating the model.
 
-      !...Variable definitions (alphabetically)
-      !       BASE:    The base of floating point numbers on the current machine
-      !       BETA:    The function parameters.
-      !       BNRM:    The norm of BETA.
-      !       DELTA:   The error in the X data.
-      !       DPYMP:   The floating point results from a cray YMP using
-      !       REAL (wp).
-      !       EPSMAC:  The value of machine precision.
-      !       EWRT:    A temporary variable for the denominator of the relative error
-      !       calculations (error with respect to).
-      !       EWRT2:   A temporary variable for the denominator of the relative error
-      !       calculations (error with respect to).
-      !       FAILED:  The variable designating whether the results of all of the
-      !       demonstration runs agreed with those from the cray YMP
-      !       using REAL (wp) (FAILED=FALSE) or whether some of
-      !       the tests disagreed (FAILED=TRUE).
-      !       FAILS:   The variable designating whether the results of an
-      !       individual demonstration run agreed with those from the
-      !       cray YMP using REAL (wp) (FAILS=FALSE) or
-      !       disagree (FAILS=TRUE).
-      !       HUNDRD:  The value 100.0E0_wp.
-      !       I:       An index variable.
-      !       IDPYMP:  The integer results from a cray YMP using
-      !       REAL (wp).
-      !       IFIXB:   The values designating whether the elements of BETA are
-      !       fixed at their input values or not.
-      !       IFIXX:   The values designating whether the elements of DELTA are
-      !       fixed at their input values or not.
-      !       INFO:    The variable designating why the computations stopped.
-      !       IPRINT:  The print control variable.
-      !       ISODR:   The variable designating whether the solution is by odr
-      !       (ISODR=TRUE) or by ols (ISODR=FALSE).
-      !       ITEST:   The number of the current test being run.
-      !       IWORK:   The integer work space.
-      !       J:       An index variable.
-      !       JOB:     The variable controlling problem initialization and
-      !       computational method.
-      !       LDIFX:   The leading dimension of array IFIXX.
-      !       LDSCLD:  The leading dimension of array SCLD.
-      !       LDWD:    The leading dimension of array WD.
-      !       LDWD1:   The leading dimension of array WD as passed to ODRPACK95.
-      !       LDWE:    The leading dimension of array WE.
-      !       LDWE1:   The leading dimension of array WE as passed to ODRPACK95.
-      !       LDX:     The leading dimension of array X.
-      !       LDY:     The leading dimension of array Y.
-      !       LD2WD:   The second dimension of array WD.
-      !       LD2WD1:  The second dimension of array WD as passed to ODRPACK95.
-      !       LD2WE:   The second dimension of array WE.
-      !       LD2WE1:  The second dimension of array WE as passed to ODRPACK95.
-      !       LIWKMN:  The minimum acceptable length of array IWORK.
-      !       LIWMIN:  The minimum length of vector IWORK for a given problem.
-      !       LIWORK:  The length of vector IWORK.
-      !       LUN:     The logical unit number currently being used.
-      !       LUNERR:  The logical unit number used for error messages.
-      !       LUNRPT:  The logical unit number used for computation reports.
-      !       LUNSUM:  The logical unit number used for a summary report.
-      !       LWKMN:   The minimum acceptable length of array WORK.
-      !       LWMIN:   The minimum length of vector WORK for a given problem.
-      !       LWORK:   The length of vector WORK.
-      !       M:       The number of columns of data in the explanatory variable.
-      !       MAXIT:   The maximum number of iterations allowed.
-      !       MSG:     The variable designating which message is to be printed as
-      !       a result of the comparison with the cray YMP or x86 (Linux)
-      !       results.
-      !       N:       The number of observations.
-      !       NDIGIT:  The number of accurate digits in the function results, as
-      !       supplied by the user.
-      !       NP:      The number of function parameters.
-      !       NTEST:   The number of tests to be run.
-      !       NTESTS:  The number of different tests available.
-      !       ONE:     The value 1.0E0_wp.
-      !       PASSED:  The variable designating whether the results of all of the
-      !       demonstration runs agreed with those from the cray YMP
-      !       using REAL (wp) (PASSED=TRUE), or whether some of
-      !       the results disagreed (PASSED=FALSE).
-      !       P01:     The value 0.01E0_wp.
-      !       P2:      The value 0.2E0_wp.
-      !       PARTOL:  The parameter convergence stopping criteria.
-      !       SCLB:    The scaling values for BETA.
-      !       SCLD:    The scaling values for DELTA.
-      !       SETNO:   The number of the data set being analyzed.
-      !       SHORT:   The variable designating whether ODRPACK95 is invoked by the
-      !       short-call (SHORT=.TRUE.) or the long-call (SHORT=.FALSE.).
-      !       SSTOL:   The sum-of-squares convergence stopping tolerance.
-      !       TAUFAC:  The factor used to compute the initial trust region
-      !       diameter.
-      !       THREE:   The value 3.0E0_wp.
-      !       TITLE:   The reference for the data set being analyzed.
-      !       TSTFAC:  The user-supplied factor for scaling the test tolerances
-      !       used to check for agreement between computed results and
-      !       results obtained using REAL (wp) version on cray
-      !       YMP.
-      !       TSTTOL:  The test tolerance used in checking computed values for
-      !       purposes of determining proper installation.
-      !       TWO:     The value 2.0E0_wp.
-      !       WD:      The DELTA weights.
-      !       WE:      The EPSILON weights.
-      !       WORK:    The REAL (wp) work space.
-      !       WRK:     The REAL (wp) work space for computing test results.
-      !       WSS:     The sum of the squared weighted errors.
-      !       WSSDEL:  The sum of the squared weighted errors in X.
-      !       WSSEPS:  The sum of the squared weighted errors in Y.
-      !       X:       The explanatory variable.
-      !       Y:       The response variable.
-      !       ZERO:    The value 0.0E0_wp.
+      ! Variable definitions (alphabetically)
+      !  BASE:    The base of floating point numbers on the current machine
+      !  BETA:    The function parameters.
+      !  BNRM:    The norm of BETA.
+      !  DELTA:   The error in the X data.
+      !  DPYMP:   The floating point results from a cray YMP using REAL (wp).
+      !  EPSMAC:  The value of machine precision.
+      !  EWRT:    A temporary variable for the denominator of the relative error
+      !           calculations (error with respect to).
+      !  EWRT2:   A temporary variable for the denominator of the relative error
+      !           calculations (error with respect to).
+      !  FAILED:  The variable designating whether the results of all of the
+      !           demonstration runs agreed with those from the cray YMP
+      !           using REAL (wp) (FAILED=FALSE) or whether some of
+      !           the tests disagreed (FAILED=TRUE).
+      !  FAILS:   The variable designating whether the results of an
+      !           individual demonstration run agreed with those from the
+      !           cray YMP using REAL (wp) (FAILS=FALSE) or disagree (FAILS=TRUE).
+      !  I:       An index variable.
+      !  IDPYMP:  The integer results from a cray YMP using REAL (wp).
+      !  IFIXB:   The values designating whether the elements of BETA are
+      !           fixed at their input values or not.
+      !  IFIXX:   The values designating whether the elements of DELTA are
+      !           fixed at their input values or not.
+      !  INFO:    The variable designating why the computations stopped.
+      !  IPRINT:  The print control variable.
+      !  ISODR:   The variable designating whether the solution is by odr
+      !           (ISODR=TRUE) or by ols (ISODR=FALSE).
+      !  ITEST:   The number of the current test being run.
+      !  IWORK:   The integer work space.
+      !  J:       An index variable.
+      !  JOB:     The variable controlling problem initialization and computational method.
+      !  LDIFX:   The leading dimension of array IFIXX.
+      !  LDSCLD:  The leading dimension of array SCLD.
+      !  LDWD:    The leading dimension of array WD.
+      !  LDWD1:   The leading dimension of array WD as passed to ODRPACK95.
+      !  LDWE:    The leading dimension of array WE.
+      !  LDWE1:   The leading dimension of array WE as passed to ODRPACK95.
+      !  LDX:     The leading dimension of array X.
+      !  LDY:     The leading dimension of array Y.
+      !  LD2WD:   The second dimension of array WD.
+      !  LD2WD1:  The second dimension of array WD as passed to ODRPACK95.
+      !  LD2WE:   The second dimension of array WE.
+      !  LD2WE1:  The second dimension of array WE as passed to ODRPACK95.
+      !  LIWKMN:  The minimum acceptable length of array IWORK.
+      !  LIWMIN:  The minimum length of vector IWORK for a given problem.
+      !  LIWORK:  The length of vector IWORK.
+      !  LUN:     The logical unit number currently being used.
+      !  LUNERR:  The logical unit number used for error messages.
+      !  LUNRPT:  The logical unit number used for computation reports.
+      !  LUNSUM:  The logical unit number used for a summary report.
+      !  LWKMN:   The minimum acceptable length of array WORK.
+      !  LWMIN:   The minimum length of vector WORK for a given problem.
+      !  LWORK:   The length of vector WORK.
+      !  M:       The number of columns of data in the explanatory variable.
+      !  MAXIT:   The maximum number of iterations allowed.
+      !  MSG:     The variable designating which message is to be printed as
+      !           a result of the comparison with the cray YMP or x86 (Linux) results.
+      !  N:       The number of observations.
+      !  NDIGIT:  The number of accurate digits in the function results, as supplied by the user.
+      !  NP:      The number of function parameters.
+      !  NTEST:   The number of tests to be run.
+      !  NTESTS:  The number of different tests available.
+      !  PASSED:  The variable designating whether the results of all of the
+      !           demonstration runs agreed with those from the cray YMP
+      !           using REAL (wp) (PASSED=TRUE), or whether some of
+      !           the results disagreed (PASSED=FALSE).
+      !  PARTOL:  The parameter convergence stopping criteria.
+      !  SCLB:    The scaling values for BETA.
+      !  SCLD:    The scaling values for DELTA.
+      !  SETNO:   The number of the data set being analyzed.
+      !  SHORT:   The variable designating whether ODRPACK95 is invoked by the
+      !           short-call (SHORT=.TRUE.) or the long-call (SHORT=.FALSE.).
+      !  SSTOL:   The sum-of-squares convergence stopping tolerance.
+      !  TAUFAC:  The factor used to compute the initial trust region diameter.
+      !  TITLE:   The reference for the data set being analyzed.
+      !  TSTFAC:  The user-supplied factor for scaling the test tolerances
+      !           used to check for agreement between computed results and
+      !           results obtained using REAL (wp) version on cray YMP.
+      !  TSTTOL:  The test tolerance used in checking computed values for
+      !           purposes of determining proper installation.
+      !  WD:      The DELTA weights.
+      !  WE:      The EPSILON weights.
+      !  WORK:    The REAL (wp) work space.
+      !  WRK:     The REAL (wp) work space for computing test results.
+      !  WSS:     The sum of the squared weighted errors.
+      !  WSSDEL:  The sum of the squared weighted errors in X.
+      !  WSSEPS:  The sum of the squared weighted errors in Y.
+      !  X:       The explanatory variable.
+      !  Y:       The response variable.
 
       ! Allocate work arrays and DELTA
       allocate (delta(maxn, maxm), iwork(liwork), work(lwork))
@@ -2014,31 +1999,27 @@ contains
          ydata(4, 1, 10), xdata(4, 1, 10) &
          /403.4287934927353_wp, 6.0_wp/
 
-      !...Variable definitions (alphabetically)
-      !       BDATA:   The function parameter for each data set.
-      !       BETA:    The function parameters.
-      !       I:       An indexing variable.
-      !       J:       An indexing variable.
-      !       L:       An indexing variable.
-      !       LDX:     The leading dimension of array X.
-      !       M:       The number of columns of data in the explanatory variable.
-      !       MDATA:   The number of columns of data in the explanatory variable
-      !       in each data set.
-      !       N:       The number of observations.
-      !       NDATA:   The number of observations per data set.
-      !       NP:      The number of function parameters.
-      !       NPDATA:  The number of function parameters in each data set.
-      !       NQDATA:  The number of responses per observation in each data set.
-      !       SETNO:   The number of the data set being analyzed.
-      !       TDATA:   The reference for the each of the data sets.
-      !       TITLE:   The reference for the data set being analyzed.
-      !       X:       The explanatory variables.
-      !       XDATA:   The explanatory variables for each data set.
-      !       Y:       The response variable.
-      !       YDATA:   The response variables for each data set.
-      !
-      !
-      !***First executable statement  odrxd
+      ! Variable definitions (alphabetically)
+      !  BDATA:   The function parameter for each data set.
+      !  BETA:    The function parameters.
+      !  I:       An indexing variable.
+      !  J:       An indexing variable.
+      !  L:       An indexing variable.
+      !  LDX:     The leading dimension of array X.
+      !  M:       The number of columns of data in the explanatory variable.
+      !  MDATA:   The number of columns of data in the explanatory variable in each data set.
+      !  N:       The number of observations.
+      !  NDATA:   The number of observations per data set.
+      !  NP:      The number of function parameters.
+      !  NPDATA:  The number of function parameters in each data set.
+      !  NQDATA:  The number of responses per observation in each data set.
+      !  SETNO:   The number of the data set being analyzed.
+      !  TDATA:   The reference for the each of the data sets.
+      !  TITLE:   The reference for the data set being analyzed.
+      !  X:       The explanatory variables.
+      !  XDATA:   The explanatory variables for each data set.
+      !  Y:       The response variable.
+      !  YDATA:   The response variables for each data set.
 
       title = tdata(setno)
 
@@ -2092,38 +2073,35 @@ contains
       real(wp) :: ctheta, fac1, fac2, fac3, fac4, freq, omega, phi, pi, r, stheta, theta
       integer :: i, j, k
 
-      !...Variable definitions (alphabetically)
-      !       BETA:    Current values of parameters
-      !       F:       Predicted function values
-      !       FAC1:    A factors or terms used in computing the jacobians.
-      !       FAC2:    A factors or terms used in computing the jacobians.
-      !       FAC3:    A factors or terms used in computing the jacobians.
-      !       FAC4:    A factors or terms used in computing the jacobians.
-      !       FJACB:   Jacobian with respect to BETA
-      !       FJACD:   Jacobian with respect to errors DELTA
-      !       IDEVAL:  Indicator for selecting computation to be performed
-      !       IFIXB:   Indicators for "fixing" parameters (BETA)
-      !       IFIXX:   Indicators for "fixing" explanatory variable (X)
-      !       LDIFX:   Leading dimension of array IFIXX
-      !       ISTOP:   Stopping condition, where
-      !       0 means current BETA and X+DELTA were
-      !       acceptable and values were computed successfully
-      !       1 means current BETA and X+DELTA are
-      !       not acceptable;  ODRPACK95 should select
-      !       values closer to most recently used values
-      !       -1 means current BETA and X+DELTA are
-      !       not acceptable;  ODRPACK95 should stop
-      !       LDN:     Leading dimension declarator equal or exceeding N
-      !       LDM:     Leading dimension declarator equal or exceeding M
-      !       LDNP:    Leading dimension declarator equal or exceeding NP
-      !       M:       The number of columns of data in the explanatory variable.
-      !       N:       The number of observations.
-      !       NP:      The number of function parameters.
-      !       NQ:      The number of responses per observation.
-      !       ONE:     The value 1.0E0_wp.
-      !       SETNO:   The number of the data set being analyzed.
-      !       XPLUSD:  Current value of explanatory variable, i.e., X + DELTA
-      !       zero:    The value 0.0E0_wp.
+      ! Variable definitions (alphabetically)
+      !  BETA:    Current values of parameters
+      !  F:       Predicted function values
+      !  FAC1:    A factors or terms used in computing the jacobians.
+      !  FAC2:    A factors or terms used in computing the jacobians.
+      !  FAC3:    A factors or terms used in computing the jacobians.
+      !  FAC4:    A factors or terms used in computing the jacobians.
+      !  FJACB:   Jacobian with respect to BETA
+      !  FJACD:   Jacobian with respect to errors DELTA
+      !  IDEVAL:  Indicator for selecting computation to be performed
+      !  IFIXB:   Indicators for "fixing" parameters (BETA)
+      !  IFIXX:   Indicators for "fixing" explanatory variable (X)
+      !  LDIFX:   Leading dimension of array IFIXX
+      !  ISTOP:   Stopping condition, where
+      !           0 means current BETA and X+DELTA were
+      !           acceptable and values were computed successfully
+      !           1 means current BETA and X+DELTA are
+      !           not acceptable;  ODRPACK95 should select
+      !           values closer to most recently used values
+      !           -1 means current BETA and X+DELTA are not acceptable; ODRPACK95 should stop
+      !  LDN:     Leading dimension declarator equal or exceeding N
+      !  LDM:     Leading dimension declarator equal or exceeding M
+      !  LDNP:    Leading dimension declarator equal or exceeding NP
+      !  M:       The number of columns of data in the explanatory variable.
+      !  N:       The number of observations.
+      !  NP:      The number of function parameters.
+      !  NQ:      The number of responses per observation.
+      !  SETNO:   The number of the data set being analyzed.
+      !  XPLUSD:  Current value of explanatory variable, i.e., X + DELTA
 
       !  Check for BETA outside bounds.  Return with error if BETA outside bounds.
 
@@ -2461,17 +2439,17 @@ contains
       integer, intent(out) :: liwmin
       integer, intent(out) :: lwmin
 
-      !...Variable definitions (alphabetically)
-      !       ISODR:   The variable designating whether the solution is by odr
-      !       (ISODR=TRUE) or by ols (ISODR=FALSE).
-      !       LDWE:    The leading dimension of array WE.
-      !       LD2WE:   The second dimension of array WE.
-      !       LIWMIN:  The minimum length of vector IWORK for a given problem.
-      !       LWMIN:   The minimum length of vector WORK for a given problem.
-      !       MAXM:    The number of columns in the explanatory variable.
-      !       MAXN:    The number of observations.
-      !       MAXNP:   The number of function parameters.
-      !       MAXNQ:   The number of responses per observation.
+      ! Variable definitions (alphabetically)
+      !  ISODR:   The variable designating whether the solution is by odr
+      !           (ISODR=TRUE) or by ols (ISODR=FALSE).
+      !  LDWE:    The leading dimension of array WE.
+      !  LD2WE:   The second dimension of array WE.
+      !  LIWMIN:  The minimum length of vector IWORK for a given problem.
+      !  LWMIN:   The minimum length of vector WORK for a given problem.
+      !  MAXM:    The number of columns in the explanatory variable.
+      !  MAXN:    The number of observations.
+      !  MAXNP:   The number of function parameters.
+      !  MAXNQ:   The number of responses per observation.
 
       liwmin = 20 + maxnp + maxnq*(maxnp + maxm)
       if (isodr) then
@@ -2501,25 +2479,20 @@ program test_solution
    integer :: ntest, lunerr, lunrpt, lunsum
    logical :: passed
 
-!***Variable declarations (alphabetically)
-!
-!       LUNERR:  The logical unit number used for error messages.
-!       LUNRPT:  The logical unit number used for computation reports.
-!       LUNSUM:  The logical unit number used for a summary report listing
-!       only the test comparisons and not the odrpack generated
-!       reports.
-!       NTEST:   The number of tests to be run.
-!       PASSED:  The variable designating whether the results of all of the
-!       tests agree with those from the cray ymp using double
-!       precision (PASSED=TRUE), or whether some of the results
-!       disagreed (PASSED=FALSE).
-!       TSTFAC:  The user-supplied factor for scaling the test tolerances
-!       used to check for agreement between computed results and
-!       results obtained using REAL (wp) version on cray
-!       YMP.  Values of TSTFAC greater than one increase the
-!       test tolerances, making the tests easier to pass and
-!       allowing small discrepancies between the computed and
-!       expected results to be automatically discounted.
+   ! Variable declarations (alphabetically)
+   !  LUNERR:  The logical unit number used for error messages.
+   !  LUNRPT:  The logical unit number used for computation reports.
+   !  LUNSUM:  The logical unit number used for a summary report listing
+   !           only the test comparisons and not the odrpack generated reports.
+   !  NTEST:   The number of tests to be run.
+   !  PASSED:  The variable designating whether the results of all of the tests agree with
+   !           those from the cray ymp using double precision (PASSED=TRUE), or whether some
+   !           of the results disagreed (PASSED=FALSE).
+   !  TSTFAC:  The user-supplied factor for scaling the test tolerances used to check for
+   !           agreement between computed results and results obtained using REAL (wp) version
+   !           on cray YMP. Values of TSTFAC greater than one increase the test tolerances,
+   !           making the tests easier to pass and allowing small discrepancies between the
+   !           computed and expected results to be automatically discounted.
 
    ! Set up necessary files
    open (newunit=lunrpt, file='./test/test_solution_report.txt')
