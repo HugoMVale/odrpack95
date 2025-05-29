@@ -1,4 +1,4 @@
-module test_m
+module test_solution_m
 
    use odrpack_kinds, only: wp
    implicit none
@@ -2466,13 +2466,13 @@ contains
 
    end subroutine odrxw
 
-end module test_m
+end module test_solution_m
 
 program test_solution
 !! Solution tests for [[odrpack]].
 
    use odrpack_kinds, only: wp, one
-   use test_m, only: odrx
+   use test_solution_m, only: odrx
    implicit none
 
    ! Local scalars
