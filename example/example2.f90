@@ -47,26 +47,25 @@ program example2
    implicit none
 
    ! Variable declarations
-   integer :: i, info, j, job, lunerr, lunrpt, m, n, np, nq
+   integer :: i, info, j, job, lundata, lunrpt, m, n, np, nq
    real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :)
 
    ! Set up report files
    open (newunit=lunrpt, file='./example/report2.dat')
-   lunerr = lunrpt
 
    ! Read problem dimensions
-   open (unit=5, file='./example/data2.dat')
-   read (5, fmt=*) n, m, np, nq
+   open (newunit=lundata, file='./example/data2.dat')
+   read (lundata, fmt=*) n, m, np, nq
 
    ! Allocate arrays
    allocate (beta(np), x(n, m), y(n, nq))
 
    ! Read problem data
-   read (5, fmt=*) (beta(i), i=1, np)
+   read (lundata, fmt=*) (beta(i), i=1, np)
    do i = 1, n
-      read (5, fmt=*) (x(i, j), j=1, m)
+      read (lundata, fmt=*) (x(i, j), j=1, m)
    end do
-   close (5)
+   close (lundata)
 
    ! Specify task: Implicit orthogonal distance regression
    !       With forward finite difference derivatives
@@ -81,7 +80,9 @@ program example2
             beta=beta, &
             y=y, x=x, &
             job=job, &
-            lunerr=lunerr, lunrpt=lunrpt, &
+            lunerr=lunrpt, lunrpt=lunrpt, &
             info=info)
+
+   close (lunrpt)
 
 end program example2

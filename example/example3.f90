@@ -59,28 +59,27 @@ program example3
    implicit none
 
    ! Variable declarations
-   integer :: i, info, iprint, j, job, lunerr, lunrpt, m, n, np, nq
+   integer :: i, info, iprint, j, job, lundata, lunrpt, m, n, np, nq
    integer, allocatable :: ifixx(:, :)
    real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :), wd(:, :, :), we(:, :, :), &
                                  delta(:, :)
 
    ! Set up report files
    open (newunit=lunrpt, file='./example/report3.dat')
-   lunerr = lunrpt
 
    ! Read problem dimensions
-   open (unit=5, file='./example/data3.dat')
-   read (5, fmt=*) n, m, np, nq
+   open (newunit=lundata, file='./example/data3.dat')
+   read (lundata, fmt=*) n, m, np, nq
 
    ! Allocate arrays
    allocate (beta(np), x(n, m), y(n, nq), delta(n, m), we(n, nq, nq), wd(n, m, m), ifixx(n, m))
 
    ! Read problem data
-   read (5, fmt=*) (beta(i), i=1, np)
+   read (lundata, fmt=*) (beta(i), i=1, np)
    do i = 1, n
-      read (5, fmt=*) (x(i, j), j=1, m), (y(i, j), j=1, nq)
+      read (lundata, fmt=*) (x(i, j), j=1, m), (y(i, j), j=1, nq)
    end do
-   close (5)
+   close (lundata)
 
    ! Specify task as explicit orthogonal distance regression
    !       With central difference derivatives
@@ -141,7 +140,9 @@ program example3
             we=we, wd=wd, &
             ifixx=ifixx, &
             job=job, &
-            iprint=iprint, lunerr=lunerr, lunrpt=lunrpt, &
+            iprint=iprint, lunerr=lunrpt, lunrpt=lunrpt, &
             info=info)
+
+   close (lunrpt)
 
 end program example3

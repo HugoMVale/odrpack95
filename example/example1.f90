@@ -61,32 +61,31 @@ program example1
    implicit none
 
    ! Variable declarations
-   integer :: i, info, iprint, j, job, lunerr, lunrpt, m, n, np, nq
+   integer :: i, info, iprint, j, job, lundata, lunrpt, m, n, np, nq
    integer, allocatable :: ifixx(:, :)
    real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :)
 
    ! Set up report files
    open (newunit=lunrpt, file='./example/report1.dat')
-   lunerr = lunrpt
 
    ! Read problem dimensions
-   open (unit=5, file='./example/data1.dat')
-   read (5, *) n, m, np, nq
+   open (newunit=lundata, file='./example/data1.dat')
+   read (lundata, *) n, m, np, nq
 
    ! Allocate arrays
    allocate (beta(np), x(n, m), y(n, nq), ifixx(n, m))
 
    ! Read problem data and set nondefault value for argument 'ifixx'
-   read (5, *) (beta(i), i=1, np)
+   read (lundata, *) (beta(i), i=1, np)
    do i = 1, n
-      read (5, *) (x(i, j), j=1, m), (y(i, j), j=1, nq)
+      read (lundata, *) (x(i, j), j=1, m), (y(i, j), j=1, nq)
       if (x(i, 1) .eq. 0.0E0_wp .or. x(i, 1) .eq. 100.0E0_wp) then
          ifixx(i, 1) = 0
       else
          ifixx(i, 1) = 1
       end if
    end do
-   close (5)
+   close (lundata)
 
    ! Specify task: Explicit orthogonal distance regression
    !       With user supplied derivatives (checked)
@@ -106,8 +105,10 @@ program example1
             y=y, x=x, &
             ifixx=ifixx, &
             job=job, &
-            iprint=iprint, lunerr=lunerr, lunrpt=lunrpt, &
+            iprint=iprint, lunerr=lunrpt, lunrpt=lunrpt, &
             info=info)
+
+   close (lunrpt)
 
 end program example1
 

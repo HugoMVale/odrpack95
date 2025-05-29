@@ -126,7 +126,7 @@ program example4
             lunrpt=lunrpt, &
             maxit=20)
 
-   close (9)
+   close (lunrpt)
 
    ! The following code will reproduce the plot in Figure 2 of Zwolak et al. 2001.
    !    DO I = 0, 100
