@@ -17,5 +17,5 @@ library = false
 
 [fortran]
 implicit-typing = false
-implicit-external = true # only in tests
+implicit-external = false
 source-form = "default"
