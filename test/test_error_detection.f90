@@ -1,27 +1,93 @@
+module test_error_detection_m
+
+   use odrpack_kinds, only: wp, zero, one
+   implicit none
+
+   real(wp), dimension(2) :: lower, upper
+
+contains
+
+   subroutine fcn &
+      (n, m, np, nq, &
+      ldn, ldm, ldnp, &
+      beta, xplusd, &
+      ifixb, ifixx, ldifx, &
+      ideval, f, fjacb, fjacd, &
+      istop)
+
+      integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
+      integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
+      real(kind=wp), intent(in) :: beta(np), xplusd(ldn, m)
+      real(kind=wp), intent(out) :: f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq)
+      integer, intent(out) :: istop
+
+      integer :: i
+
+      ! Do something with FJACD, FJACB, IFIXB and IFIXX to avoid warnings that they
+      ! are not being used.  This is simply not to worry users that the example
+      ! program is failing.
+      if (ifixb(1) > 0 .and. ifixx(1, 1) > 0 .and. fjacb(1, 1, 1) > zero &
+         .and. fjacd(1, 1, 1) > zero) then
+         ! Do nothing.
+      end if
+
+      if (any(lower > beta)) then
+         write (0, *) "LOWER BOUNDS VIOLATED"
+         do i = 1, np
+            if (lower(i) > beta(i)) then
+               write (0, *) "   IN THE ", i, " POSITION WITH ", beta(i), &
+                  "<", lower(i)
+            end if
+         end do
+      end if
+
+      if (any(upper < beta)) then
+         write (0, *) "UPPER BOUNDS VIOLATED"
+         do i = 1, np
+            if (upper(i) < beta(i)) then
+               write (0, *) "   IN THE ", i, " POSITION WITH ", beta(i), &
+                  ">", upper(i)
+            end if
+         end do
+      end if
+
+      istop = 0
+
+      if (mod(ideval, 10) /= 0) then
+         do i = 1, n
+            f(i, 1) = beta(1)*exp(beta(2)*xplusd(i, 1))
+         end do
+      end if
+
+      if (mod(ideval/10, 10) /= 0) then
+         do i = 1, n
+            fjacb(i, 1, 1) = exp(beta(2)*xplusd(i, 1))
+            fjacb(i, 2, 1) = beta(1)*xplusd(i, 1)*exp(beta(2)*xplusd(i, 1))
+         end do
+      end if
+
+      if (mod(ideval/100, 10) /= 0) then
+         do i = 1, n
+            fjacd(i, 1, 1) = beta(1)*beta(2)*exp(beta(2)*xplusd(i, 1))
+         end do
+      end if
+
+   end subroutine fcn
+
+end module test_error_detection_m
+
 program test_error_detection
    !! Error detection tests for [[odrpack]].
 
-   ! USED MODULES
    use odrpack_kinds, only: wp
    use odrpack, only: odr
+   use test_error_detection_m, only: fcn, lower, upper
    implicit none
 
-   ! LOCAL SCALARS
    integer :: n, m, nq, np, info, lunerr, lunrpt
+   real(wp), allocatable :: beta(:), y(:, :), x(:, :)
    logical :: passed
 
-   ! LOCAL ARRAYS
-   real(wp), allocatable :: beta(:), y(:, :), x(:, :)
-
-   ! ARRAYS IN COMMON
-   real(wp) :: upper(2), lower(2)
-
-   ! EXTERNAL SUBPROGRAMS
-   external :: fcn
-
-   common/bounds/upper, lower
-
-   ! FIRST EXECUTABLE STATEMENT  TESTER
    passed = .true.
 
    open (newunit=lunrpt, file="./test/test_error_detection_report.txt")
@@ -145,84 +211,3 @@ program test_error_detection
    end if
 
 end program test_error_detection
-
-subroutine fcn &
-   (n, m, np, nq, &
-    ldn, ldm, ldnp, &
-    beta, xplusd, &
-    ifixb, ifixx, ldifx, &
-    ideval, f, fjacb, fjacd, &
-    istop)
-
-   ! USED MODULES
-   use odrpack_kinds, only: wp, zero
-   implicit none
-
-   ! SCALAR ARGUMENTS
-   integer :: ideval, istop, ldifx, ldm, ldn, ldnp, m, n, np, nq
-
-   ! ARRAY ARGUMENTS
-   real(wp) :: beta(np), f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq), &
-               xplusd(ldn, m)
-   integer :: ifixb(np), ifixx(ldifx, m)
-
-   ! ARRAYS IN COMMON
-   real(wp) :: lower(2), upper(2)
-
-   ! LOCAL SCALARS
-   integer :: i
-
-   common/bounds/upper, lower
-
-   ! FIRST EXECUTABLE STATEMENT
-
-   ! Do something with FJACD, FJACB, IFIXB and IFIXX to avoid warnings that they
-   ! are not being used.  This is simply not to worry users that the example
-   ! program is failing.
-   if (ifixb(1) > 0 .and. ifixx(1, 1) > 0 .and. fjacb(1, 1, 1) > zero &
-       .and. fjacd(1, 1, 1) > zero) then
-      ! Do nothing.
-   end if
-
-   if (any(lower > beta)) then
-      write (0, *) "LOWER BOUNDS VIOLATED"
-      do i = 1, np
-         if (lower(i) > beta(i)) then
-            write (0, *) "   IN THE ", i, " POSITION WITH ", beta(i), &
-               "<", lower(i)
-         end if
-      end do
-   end if
-
-   if (any(upper < beta)) then
-      write (0, *) "UPPER BOUNDS VIOLATED"
-      do i = 1, np
-         if (upper(i) < beta(i)) then
-            write (0, *) "   IN THE ", i, " POSITION WITH ", beta(i), &
-               ">", upper(i)
-         end if
-      end do
-   end if
-
-   istop = 0
-
-   if (mod(ideval, 10) /= 0) then
-      do i = 1, n
-         f(i, 1) = beta(1)*exp(beta(2)*xplusd(i, 1))
-      end do
-   end if
-
-   if (mod(ideval/10, 10) /= 0) then
-      do i = 1, n
-         fjacb(i, 1, 1) = exp(beta(2)*xplusd(i, 1))
-         fjacb(i, 2, 1) = beta(1)*xplusd(i, 1)*exp(beta(2)*xplusd(i, 1))
-      end do
-   end if
-
-   if (mod(ideval/100, 10) /= 0) then
-      do i = 1, n
-         fjacd(i, 1, 1) = beta(1)*beta(2)*exp(beta(2)*xplusd(i, 1))
-      end do
-   end if
-
-end subroutine fcn
