@@ -1,6 +1,6 @@
 module test_m
 
-   use odrpack_kinds, only: wp, zero, one
+   use odrpack_kinds, only: wp
    implicit none
 
    integer, parameter :: maxn = 50, maxm = 3, maxnq = 2, maxnp = 10
@@ -24,7 +24,7 @@ contains
       integer, intent(in) :: lunsum
 
       ! Parameters
-      real(wp), parameter :: base = radix(one)
+      real(wp), parameter :: base = radix(1.0_wp)
       integer, parameter :: ntests = 23, &
                             ldwe = maxn, ld2we = maxnq, ldwd = maxn, ld2wd = maxm, &
                             lwork = 18 + 11*maxnp + maxnp**2 + maxm + maxm**2 + &
@@ -2051,6 +2051,8 @@ contains
       ideval, f, fjacb, fjacd, istop)
    !! Compute model function and jacobian for odrpack exerciser.
 
+      use odrpack_kinds, only: zero, one
+
       integer, intent(in) :: n
       integer, intent(in) :: m
       integer, intent(in) :: np
@@ -2130,7 +2132,7 @@ contains
 
             if (mod(ideval/10, 10) /= 0) then
                do i = 1, n
-                  fjacb(i, 1, 1) = one/(xplusd(i, 1) - beta(2))
+                  fjacb(i, 1, 1) = 1/(xplusd(i, 1) - beta(2))
                   fjacb(i, 2, 1) = beta(1)*(xplusd(i, 1) - beta(2))**(-2)
                end do
             end if
@@ -2159,7 +2161,7 @@ contains
             end if
 
             if (mod(ideval/10, 10) /= 0) then
-               fjacb(i, 1, 1) = one/fac1
+               fjacb(i, 1, 1) = 1/fac1
                fjacb(i, 2, 1) = -beta(1)*(fac1**(-2))*xplusd(i, 1)
                fjacb(i, 3, 1) = -beta(1)*(fac1**(-2))*xplusd(i, 2)
             end if
@@ -2190,7 +2192,7 @@ contains
             do i = 1, n
                fjacb(i, 5, 1) = one
                do k = 1, 4
-                  fjacb(i, k, 1) = one/(xplusd(i, 1) + beta(k + 5))
+                  fjacb(i, k, 1) = 1/(xplusd(i, 1) + beta(k + 5))
                   fjacb(i, k + 5, 1) = -beta(k)*(xplusd(i, 1) + beta(k + 5))**(-2)
                end do
             end do
@@ -2242,13 +2244,13 @@ contains
          if (mod(ideval, 10) /= 0) then
             do i = 1, n
                f(i, 1) = exp(-beta(1)*xplusd(i, 1)* &
-                             exp(-beta(2)*(one/xplusd(i, 2) - one/620.0E0_wp)))
+                             exp(-beta(2)*(1/xplusd(i, 2) - 1/620.0E0_wp)))
             end do
          end if
 
          if (mod(ideval/10, 10) /= 0) then
             do i = 1, n
-               fac1 = one/xplusd(i, 2) - one/620.0E0_wp
+               fac1 = 1/xplusd(i, 2) - 1/620.0E0_wp
                fac2 = exp(-beta(2)*fac1)
                fac3 = beta(1)*xplusd(i, 1)
                fac4 = exp(-fac3*fac2)
@@ -2273,8 +2275,7 @@ contains
 
          if (mod(ideval, 10) /= 0) then
             do i = 1, n
-               f(i, 1) = beta(1)* &
-                         (one + beta(3)*xplusd(i, 1)/beta(2))**(-one/beta(3))
+               f(i, 1) = beta(1)*(one + beta(3)*xplusd(i, 1)/beta(2))**(-1/beta(3))
             end do
          end if
 
