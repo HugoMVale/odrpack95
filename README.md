@@ -101,6 +101,27 @@ To run the tests, do:
 meson test -C builddir
 ```
 
+### With CMake
+
+First, setup the build:
+
+```sh
+cmake -S . -B builddir -DBUILD_TESTS=ON
+```
+
+To build the libraries, do:
+
+```sh
+cmake --build builddir
+```
+
+To run the tests, do:
+
+```sh
+ctest --test-dir builddir
+```
+
+
 ## Licence
 
 * The original ODERPACK95 code is [public domain](https://github.com/scipy/scipy/issues/7107#issuecomment-307378785).
