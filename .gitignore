@@ -4,9 +4,8 @@
 *gcov.sh
 _site
 notes.md
-test/*.txt
+test/test*.txt
 build
 _build
 local-scripts
-example/*.f90_
-example/*.txt
+example/example*.txt
