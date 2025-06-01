@@ -3,7 +3,8 @@ name: Build and test pkg
 on: [push, pull_request]
 
 env:
-  FLAGS: "-Wno-compare-reals"
+  FLAGS: "-Wno-compare-reals -Wno-unused-dummy-argument"
+  FLAGSCOV: "--coverage -fprofile-abs-path"
 
 jobs:
   linux-gcc-build:
@@ -21,7 +22,7 @@ jobs:
         uses: fortran-lang/setup-fortran@v1
         with:
           compiler: gcc
-          version: 11 
+          version: 14 
         
       - name: Install OpenBLAS
         if: contains(matrix.os, 'ubuntu')
@@ -30,10 +31,10 @@ jobs:
           sudo apt-get install libopenblas-dev
 
       - name: Install fpm
-        uses: fortran-lang/setup-fpm@v5
+        uses: fortran-lang/setup-fpm@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          fpm-version: "v0.10.1"
+          fpm-version: "latest"
 
       - name: Build and test
         run: |
@@ -44,9 +45,11 @@ jobs:
       - name: Generate coverage report
         run: |
           gfortran --version
+          gcov --version
+          pip install gcovr
           rm -rf ./build/gfortran*
-          fpm test --profile debug --flag "$FLAGS --coverage"
-          gcov ./build/gfortran*/odrpack95/src*.gcda -r ./src/ -b -w
+          fpm test --profile debug --flag "$FLAGS $FLAGSCOV"
+          gcovr --filter src --cobertura-pretty --output coverage.xml
           
       - name: Run examples
         run: |
