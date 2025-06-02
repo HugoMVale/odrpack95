@@ -64,7 +64,7 @@ jobs:
 
   msys2-gcc-build:
     runs-on: windows-latest
-    continue-on-error: true # there is a bug with gfortran 15.1.0 on Windows
+    continue-on-error: false
     defaults:
       run:
         shell: msys2 {0}
