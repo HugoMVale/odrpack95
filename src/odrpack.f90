@@ -72,7 +72,7 @@ contains
 
       use odrpack_kinds, only: negone, zero
       use odrpack_core, only: fcn_t
-      use odrpack_reports, only: dodphd, dodpe1
+      use odrpack_reports, only: odphd, odpe1
 
       procedure(fcn_t) :: fcn
          !! User-supplied subroutine for evaluating the model.
@@ -235,8 +235,8 @@ contains
       if (info5_ /= 0) then
          info_ = 10000*info5_ + 1000*info4_ + 100*info3_ + 10*info2_ + info1_
          if (lunerr_ /= 0 .and. iprint_ /= 0) then
-            call dodphd(head, lunrpt_)
-            call dodpe1( &
+            call odphd(head, lunrpt_)
+            call odpe1( &
                lunerr_, info_, info5_, info4_, info3_, info2_, info1_, &
                n, m, nq, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
@@ -274,8 +274,8 @@ contains
       if (info5_ /= 0) then
          info_ = 10000*info5_ + 1000*info4_ + 100*info3_ + 10*info2_ + info1_
          if (lunerr_ /= 0 .and. iprint_ /= 0) then
-            call dodphd(head, lunrpt_)
-            call dodpe1( &
+            call odphd(head, lunrpt_)
+            call odpe1( &
                lunerr_, info_, info5_, info4_, info3_, info2_, info1_, &
                n, m, nq, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
@@ -313,8 +313,8 @@ contains
          info_ = 10000*mod(info5_, 10) + 1000*mod(info4_, 10) + &
                  100*mod(info3_, 10) + 10*mod(info2_, 10) + mod(info1_, 10)
          if (lunerr_ /= 0 .and. iprint_ /= 0) then
-            call dodphd(head, lunrpt_)
-            call dodpe1( &
+            call odphd(head, lunrpt_)
+            call odpe1( &
                lunerr_, info_, info5_, info4_, info3_, info2_, info1_, &
                n, m, nq, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
@@ -559,8 +559,8 @@ contains
          info_ = 100000 + info1_
          info1_ = 0
          if (lunerr_ /= 0 .and. iprint_ /= 0) then
-            call dodphd(head, lunrpt_)
-            call dodpe1( &
+            call odphd(head, lunrpt_)
+            call odpe1( &
                lunerr_, info_, info5_, info4_, info3_, info2_, info1_, &
                n, m, nq, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
@@ -927,7 +927,7 @@ contains
       use odrpack_kinds, only: zero, one, ten, p5 => half
       use odrpack_core, only: fcn_t, detaf, dfctrw, dflags, diniwk, diwinf, djck, dodchk, &
                               dpack, dsetn, dunpac, dwght, dwinf, derstep, mbfb
-      use odrpack_reports, only: dodper
+      use odrpack_reports, only: odper
       use blas_interfaces, only: ddot, dnrm2, dcopy
 
       logical, intent(inout) :: head
@@ -1513,7 +1513,7 @@ contains
 50       if ((info /= 0) .or. &
              (iwork(msgb) /= -1)) then
             if (lunerr /= 0 .and. iprint /= 0) then
-               call dodper &
+               call odper &
                   (info, lunerr, &
                    n, m, np, nq, &
                    ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
@@ -1592,7 +1592,7 @@ contains
       use odrpack_kinds, only: zero, one
       use odrpack_core, only: fcn_t, dacces, devjac, dflags, dunpac, dwght, dpack, dodvcv, &
                               dodlm
-      use odrpack_reports, only: dodpcr
+      use odrpack_reports, only: odpcr
       use blas_interfaces, only: ddot, dnrm2, dcopy
 
       logical, intent(inout) :: head
@@ -1948,7 +1948,7 @@ contains
          end if
          lunr = lunrpt
          do i = 1, npr
-            call dodpcr(ipr, lunr, &
+            call odpcr(ipr, lunr, &
                         head, prtpen, fstitr, didvcv, iflag, &
                         n, m, np, nq, npp, nnzw, &
                         msgb, msgd, beta, y, ldy, x, ldx, delta, &
@@ -2272,7 +2272,7 @@ contains
                end if
                lunr = lunrpt
                do i = 1, npr
-                  call dodpcr(ipr, lunr, &
+                  call odpcr(ipr, lunr, &
                               head, prtpen, fstitr, didvcv, iflag, &
                               n, m, np, nq, npp, nnzw, &
                               msgb, msgd, beta, y, ldy, x, ldx, delta, &
@@ -2476,7 +2476,7 @@ contains
          end if
          lunr = lunrpt
          do i = 1, npr
-            call dodpcr(ipr, lunr, &
+            call odpcr(ipr, lunr, &
                         head, prtpen, fstitr, didvcv, iflag, &
                         n, m, np, nq, npp, nnzw, &
                         msgb, msgd, beta, y, ldy, x, ldx, delta, &

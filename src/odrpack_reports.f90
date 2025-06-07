@@ -6,7 +6,7 @@ module odrpack_reports
 
 contains
 
-   impure subroutine dodpc1 &
+   impure subroutine odpc1 &
       (ipr, lunrpt, &
        anajac, cdjac, chkjac, initd, restrt, isodr, implct, dovcv, redoj, &
        msgb1, msgb, msgd1, msgd, &
@@ -15,9 +15,6 @@ contains
        , y, ldy, we, ldwe, ld2we, pnlty, beta, ifixb, ssf, stpb, lower, &
        upper, job, neta, taufac, sstol, partol, maxit, wss, wssdel, wsseps)
    !! Generate initial summary report.
-      ! Routines Called  DHSTEP
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero
       use odrpack_core, only: dhstep
@@ -715,16 +712,13 @@ contains
          (8X, A2, I2, 1P, 2E12.3, 4X, A5, 2E10.2, 1X, E13.5)
 6000  format &
          (' ')
-   end subroutine dodpc1
+   end subroutine odpc1
 
-   impure subroutine dodpc2 &
+   impure subroutine odpc2 &
       (ipr, lunrpt, fstitr, implct, prtpen, &
        pnlty, &
        niter, nfev, wss, actred, prered, alpha, tau, pnorm, np, beta)
    !! Generate iteration reports.
-      ! Routines Called  (NONE)
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
 
       use odrpack_kinds, only: zero
 
@@ -898,9 +892,9 @@ contains
 1152  format &
          (70X, I3, ' To', I3, 1P, 3E16.8)
 
-   end subroutine dodpc2
+   end subroutine odpc2
 
-   impure subroutine dodpc3 &
+   impure subroutine odpc3 &
       (ipr, lunrpt, &
        isodr, implct, didvcv, dovcv, redoj, anajac, &
        n, m, np, nq, npp, &
@@ -909,9 +903,6 @@ contains
        beta, sdbeta, ifixb2, f, delta, &
        lower, upper)
    !! Generate final summary report.
-      ! Routines Called  DPPT
-      ! Date Written   860529   (YYMMDD)
-      ! REvision Date  920619   (YYMMDD)
 
       use odrpack_core, only: dppt
 
@@ -1481,9 +1472,9 @@ contains
          ('(/''         I'',', &
           I2, '(''    EPSILON(I,'',I1,'')'')/)')
 
-   end subroutine dodpc3
+   end subroutine odpc3
 
-   impure subroutine dodpcr &
+   impure subroutine odpcr &
       (ipr, lunrpt, &
        head, prtpen, fstitr, didvcv, iflag, &
        n, m, np, nq, npp, nnzw, &
@@ -1497,9 +1488,6 @@ contains
        niter, nfev, njev, actred, prered, &
        tau, pnorm, alpha, f, rcond, irank, info, istop)
    !! Generate computation reports.
-      ! Routines Called  DFLAGS, DODPC1, DODPC2, DODPC3, DODPHD
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_core, only: dflags
 
@@ -1740,7 +1728,7 @@ contains
       pnlty = abs(we(1, 1, 1))
 
       if (head) then
-         call dodphd(head, lunrpt)
+         call odphd(head, lunrpt)
       end if
       if (isodr) then
          typ = 'ODR'
@@ -1751,7 +1739,7 @@ contains
       ! Print initial summary
       if (iflag == 1) then
          write (lunrpt, 1200) typ
-         call dodpc1 &
+         call odpc1 &
             (ipr, lunrpt, &
              anajac, cdjac, chkjac, initd, restrt, isodr, implct, dovcv, redoj, &
              msgb(1), msgb(2), msgd(1), msgd(2), n, m, np, nq, npp, nnzw, x, &
@@ -1766,7 +1754,7 @@ contains
          if (fstitr) then
             write (lunrpt, 1300) typ
          end if
-         call dodpc2 &
+         call odpc2 &
             (ipr, lunrpt, fstitr, implct, prtpen, &
              pnlty, &
              niter, nfev, wss(1), actred, prered, alpha, tau, pnorm, np, beta)
@@ -1775,7 +1763,7 @@ contains
       elseif (iflag == 3) then
 
          write (lunrpt, 1400) typ
-         call dodpc3 &
+         call odpc3 &
             (ipr, lunrpt, &
              isodr, implct, didvcv, dovcv, redoj, anajac, &
              n, m, np, nq, npp, &
@@ -1793,17 +1781,14 @@ contains
 1400  format &
          (/' *** Final summary for fit by method of ', A3, ' ***')
 
-   end subroutine dodpcr
+   end subroutine odpcr
 
-   impure subroutine dodpe1 &
+   impure subroutine odpe1 &
       (lunerr, info, d1, d2, d3, d4, d5, &
        n, m, nq, &
        ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
        lwkmn, liwkmn)
    !! Print error reports.
-      ! Routines Called  (NONE)
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       integer, intent(in) :: lunerr
          !! The logical unit number used for error messages.
@@ -2328,18 +2313,15 @@ contains
 8015  format &
          (/' ERROR :  LOWER has incorrect size. ')
 
-   end subroutine dodpe1
+   end subroutine odpe1
 
-   impure subroutine dodpe2 &
+   impure subroutine odpe2 &
       (lunerr, &
        n, m, np, nq, &
        fjacb, fjacd, &
        diff, msgb1, msgb, isodr, msgd1, msgd, &
        xplusd, nrow, neta, ntol)
    !! Generate the derivative checking report.
-      ! Routines Called  (NONE)
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       integer, intent(in) :: lunerr
          !! The logical unit number used for error messages.
@@ -2625,14 +2607,11 @@ contains
 8110  format &
          (10X, 'X(', I2, ',', I2, ')', 1X, 1P, 3E16.8)
 
-   end subroutine dodpe2
+   end subroutine odpe2
 
-   impure subroutine dodpe3(lunerr, d2, d3)
+   impure subroutine odpe3(lunerr, d2, d3)
    !! Print error reports indicating that computations were stopped in user-supplied
    !! subroutine `fcn`.
-      ! Routines Called  (NONE)
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       integer :: lunerr
          !! The logical unit number used for error messages.
@@ -2704,9 +2683,9 @@ contains
            ' of subroutine FCN before the regression procedure can '/ &
            ' continue.')
 
-   end subroutine dodpe3
+   end subroutine odpe3
 
-   impure subroutine dodper &
+   impure subroutine odper &
       (info, lunerr, &
        n, m, np, nq, &
        ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
@@ -2715,9 +2694,6 @@ contains
        diff, msgb, isodr, msgd, &
        xplusd, nrow, neta, ntol)
    !! Controlling routine for printing error reports.
-      ! Routines Called  DODPE1, DODPE2, DODPE3, DODPHD
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       integer, intent(inout) :: info
          !! The variable designating why the computations were stopped.
@@ -2815,7 +2791,7 @@ contains
 
       ! Print heading
       head = .true.
-      call dodphd(head, lunerr)
+      call odphd(head, lunerr)
 
       ! Extract individual digits from variable INFO
       d1 = mod(info, 100000)/10000
@@ -2832,7 +2808,7 @@ contains
          !         dimension specification parameters
          !         number of good digits in X
          !         weights
-         call dodpe1(lunerr, info, d1, d2, d3, d4, d5, &
+         call odpe1(lunerr, info, d1, d2, d3, d4, d5, &
                      n, m, nq, &
                      ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
                      lwkmn, liwkmn)
@@ -2840,7 +2816,7 @@ contains
       elseif ((d1 == 4) .or. (msgb(1) >= 0)) then
 
          ! Print appropriate messages for derivative checking
-         call dodpe2(lunerr, &
+         call odpe2(lunerr, &
                      n, m, np, nq, &
                      fjacb, fjacd, &
                      diff, msgb(1), msgb(2), isodr, msgd(1), msgd(2), &
@@ -2849,7 +2825,7 @@ contains
       elseif (d1 == 5) then
 
          ! Print appropriate error message for user invoked stop from FCN
-         call dodpe3(lunerr, d2, d3)
+         call odpe3(lunerr, d2, d3)
 
       end if
 
@@ -2882,13 +2858,10 @@ contains
            '      +     lower*, upper*)'/ &
            ' * optional argument')
 
-   end subroutine dodper
+   end subroutine odper
 
-   impure subroutine dodphd(head, lunit)
+   impure subroutine odphd(head, lunit)
    !! Print report heading.
-      ! Routines Called  (NONE)
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       logical, intent(inout) :: head
          !! The variable designating whether the heading is to be printed (`head = .true.`)
@@ -2914,6 +2887,6 @@ contains
          ' ********************************************************* '/ &
          )
 
-   end subroutine dodphd
+   end subroutine odphd
 
 end module odrpack_reports
