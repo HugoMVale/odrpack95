@@ -2427,13 +2427,13 @@ contains
 
    end subroutine odrxf
 
-   pure subroutine odrxw(maxn, maxm, maxnp, maxnq, ldwe, ld2we, isodr, liwmin, lwmin)
+   pure subroutine odrxw(n, m, np, nq, ldwe, ld2we, isodr, liwmin, lwmin)
    !! Compute minimum lengths for work vectors.
 
-      integer, intent(in) :: maxn
-      integer, intent(in) :: maxm
-      integer, intent(in) :: maxnp
-      integer, intent(in) :: maxnq
+      integer, intent(in) :: n
+      integer, intent(in) :: m
+      integer, intent(in) :: np
+      integer, intent(in) :: nq
       integer, intent(in) :: ldwe
       integer, intent(in) :: ld2we
       logical, intent(in) :: isodr
@@ -2447,21 +2447,21 @@ contains
       !  LD2WE:   The second dimension of array WE.
       !  LIWMIN:  The minimum length of vector IWORK for a given problem.
       !  LWMIN:   The minimum length of vector WORK for a given problem.
-      !  MAXM:    The number of columns in the explanatory variable.
-      !  MAXN:    The number of observations.
-      !  MAXNP:   The number of function parameters.
-      !  MAXNQ:   The number of responses per observation.
+      !  M:       The number of columns in the explanatory variable.
+      !  N:       The number of observations.
+      !  NP:      The number of function parameters.
+      !  NQ:      The number of responses per observation.
 
-      liwmin = 20 + maxnp + maxnq*(maxnp + maxm)
+      liwmin = 20 + np + nq*(np + m)
       if (isodr) then
-         lwmin = 18 + 11*maxnp + maxnp**2 + maxm + maxm**2 + &
-                 4*maxn*maxnq + 6*maxn*maxm + 2*maxn*maxnq*maxnp + &
-                 2*maxn*maxnq*maxm + maxnq**2 + &
-                 5*maxnq + maxnq*(maxnp + maxm) + ldwe*ld2we*maxnq
+         lwmin = 18 + 11*np + np**2 + m + m**2 + &
+                 4*n*nq + 6*n*m + 2*n*nq*np + &
+                 2*n*nq*m + nq**2 + &
+                 5*nq + nq*(np + m) + ldwe*ld2we*nq
       else
-         lwmin = 18 + 11*maxnp + maxnp**2 + maxm + maxm**2 + &
-                 4*maxn*maxnq + 2*maxn*maxm + 2*maxn*maxnq*maxnp + &
-                 5*maxnq + maxnq*(maxnp + maxm) + ldwe*ld2we*maxnq
+         lwmin = 18 + 11*np + np**2 + m + m**2 + &
+                 4*n*nq + 2*n*m + 2*n*nq*np + &
+                 5*nq + nq*(np + m) + ldwe*ld2we*nq
       end if
 
    end subroutine odrxw
