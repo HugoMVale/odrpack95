@@ -26,13 +26,6 @@ contains
        lower, upper)
    !! Driver routine for finding the weighted explicit or implicit orthogonal distance
    !! regression (ODR) or ordinary linear or nonlinear least squares (OLS) solution.
-      ! Date Written:   860529   (YYMMDD)
-      ! Revision Date:  20040301 (YYYYMMDD)
-      ! Category No.:  G2E,I1B1
-      ! Keywords:  Orthogonal distance regression,
-      !   Nonlinear least squares,
-      !   Measurement error models,
-      !   Errors in variables
       ! Authors:
       !   Boggs, Paul T.
       !     Applied and Computational Mathematics Division
@@ -574,7 +567,7 @@ contains
       end if
 
       if (wd_(1, 1, 1) /= 0) then
-         call dodcnt &
+         call odcnt &
             (fcn, &
              n, m, np, nq, &
              beta(1:np), &
@@ -592,7 +585,7 @@ contains
              lower_, upper_)
       else
          wd1(1, 1, 1) = negone
-         call dodcnt &
+         call odcnt &
             (fcn, &
              n, m, np, nq, &
              beta(1:np), &
@@ -620,7 +613,7 @@ contains
 
    end subroutine odr
 
-   impure subroutine dodcnt &
+   impure subroutine odcnt &
       (fcn, n, m, np, nq, beta, y, ldy, x, ldx, &
        we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
        job, ndigit, taufac, sstol, partol, maxit, iprint, lunerr, lunrpt, &
@@ -630,9 +623,6 @@ contains
        lower, upper)
    !! Driver routine for finding the weighted explicit or implicit orthogonal distance
    !! regression (ODR) or ordinary linear or nonlinear least squares (OLS) solution.
-      ! Routines Called  DODDRV
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
 
       use odrpack_kinds, only: zero, one, three
       use odrpack_core, only: fcn_t
@@ -860,7 +850,7 @@ contains
          prtpen = .true.
 
          do while (.true.)
-            call doddrv &
+            call oddrv &
                (head, fstitr, prtpen, &
                 fcn, n, m, np, nq, beta, y, ldy, x, ldx, &
                 pnlty, 1, 1, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
@@ -895,7 +885,7 @@ contains
          end do
       else
          ! Explicit problem
-         call doddrv &
+         call oddrv &
             (head, fstitr, prtpen, &
              fcn, n, m, np, nq, beta, y, ldy, x, ldx, &
              we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
@@ -906,9 +896,9 @@ contains
              maxit1, tstimp, info, lower, upper)
       end if
 
-   end subroutine dodcnt
+   end subroutine odcnt
 
-   impure subroutine doddrv &
+   impure subroutine oddrv &
       (head, fstitr, prtpen, &
        fcn, n, m, np, nq, beta, y, ldy, x, ldx, &
        we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
@@ -919,11 +909,6 @@ contains
        maxit1, tstimp, info, lower, upper)
    !! Perform error checking and initialization, and begin procedure for performing orthogonal
    !! distance regression (ODR) or ordinary linear or nonlinear least squares (OLS).
-      ! Routines Called  FCN, DCOPY, DDOT, DETAF, DFCTRW, DFLAGS,
-      !                  DINIWK, DIWINF, DJCK, DNRM2, DODCHK, DODMN,
-      !                  DODPER, DPACK, DSETN, DUNPAC, DWGHT, DWINF, DERSTEP
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero, one, ten, p5 => half
       use odrpack_core, only: fcn_t, etaf, fctrw, flags, iniwk, iwinf, jck, odchk, &
@@ -1549,7 +1534,7 @@ contains
       ! Find least squares solution
       call dcopy(n*nq, work(fni), 1, work(fsi), 1)
       ldtt = iwork(ldtti)
-      call dodmn(head, fstitr, prtpen, &
+      call odmn(head, fstitr, prtpen, &
                  fcn, n, m, np, nq, job, beta, y, ldy, x, ldx, &
                  we, work(we1i), ldwe, ld2we, wd, ldwd, ld2wd, &
                  ifixb, ifixx, ldifx, &
@@ -1573,9 +1558,9 @@ contains
          end if
       end do
 
-   end subroutine doddrv
+   end subroutine oddrv
 
-   impure subroutine dodmn &
+   impure subroutine odmn &
       (head, fstitr, prtpen, &
        fcn, n, m, np, nq, job, beta, y, ldy, x, ldx, &
        we, we1, ldwe, ld2we, wd, ldwd, ld2wd, &
@@ -1587,8 +1572,6 @@ contains
        xplusd, wrk, lwrk, work, lwork, tempret, iwork, liwork, info, &
        bound)
    !! Iteratively compute least squares solution.
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero, one
       use odrpack_core, only: fcn_t, acces, evjac, flags, unpack, wght, pack, odvcv, &
@@ -2498,10 +2481,11 @@ contains
          end do
       end if
 
-   end subroutine dodmn
+   end subroutine odmn
 
    pure subroutine workspace_dimensions(n, m, np, nq, isodr, lwork, liwork)
    !! Calculate the dimensions of the workspace arrays.
+
       integer, intent(in) :: n
          !! Number of observations.
       integer, intent(in) :: m
