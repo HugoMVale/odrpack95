@@ -5878,7 +5878,6 @@ contains
       ! @note: This is one of the most time-consuming subroutines in ODRPACK (~25% of total).
 
       use odrpack_kinds, only: zero
-      use blas_interfaces, only: daxpy, ddot
 
       integer, intent(in) :: n
          !! The number of rows and columns of data in array `t`.
@@ -5886,7 +5885,7 @@ contains
          !! The upper or lower tridiagonal system.
       integer, intent(in) :: ldt
          !! The leading dimension of array `t`.
-      real(wp), intent(inout) :: b(n)
+      real(wp), intent(inout) :: b(:)
          !! On input: the right hand side; On exit: the solution.
       integer, intent(in) :: job
          !! What kind of system is to be solved:
@@ -5934,12 +5933,13 @@ contains
          end if
       end do
 
-      if (job == 1) then
+      select case (job)
+      case (1)
          ! Solve T*X=B for T lower triangular
          b(j1) = b(j1)/t(j1, j1)
          do j = j1 + 1, jn
             temp = -b(j - 1)
-            call daxpy(jn - j + 1, temp, t(j, j - 1), 1, b(j), 1)
+            b(j:jn) = b(j:jn) + temp*t(j:jn, j - 1)
             if (t(j, j) /= zero) then
                b(j) = b(j)/t(j, j)
             else
@@ -5947,12 +5947,12 @@ contains
             end if
          end do
 
-      elseif (job == 2) then
+      case (2)
          ! Solve T*X=B for T upper triangular.
          b(jn) = b(jn)/t(jn, jn)
          do j = jn - 1, j1, -1
             temp = -b(j + 1)
-            call daxpy(j, temp, t(1, j + 1), 1, b(1), 1)
+            b(1:j) = b(1:j) + temp*t(1:j, j + 1)
             if (t(j, j) /= zero) then
                b(j) = b(j)/t(j, j)
             else
@@ -5960,11 +5960,11 @@ contains
             end if
          end do
 
-      elseif (job == 3) then
+      case (3)
          ! Solve trans(T)*X=B for T lower triangular.
          b(jn) = b(jn)/t(jn, jn)
          do j = jn - 1, j1, -1
-            b(j) = b(j) - ddot(jn - j + 1, t(j + 1, j), 1, b(j + 1), 1)
+            b(j) = b(j) - dot_product(t(j+1:jn+1, j), b(j+1:jn+1))
             if (t(j, j) /= zero) then
                b(j) = b(j)/t(j, j)
             else
@@ -5972,18 +5972,20 @@ contains
             end if
          end do
 
-      elseif (job == 4) then
+      case (4)
          ! Solve trans(T)*X=B for T upper triangular
          b(j1) = b(j1)/t(j1, j1)
          do j = j1 + 1, jn
-            b(j) = b(j) - ddot(j - 1, t(1, j), 1, b(1), 1)
+             b(j) = b(j) - dot_product(t(1:j-1, j), b(1:j-1))
             if (t(j, j) /= zero) then
                b(j) = b(j)/t(j, j)
             else
                b(j) = zero
             end if
          end do
-      end if
+      case default
+         error stop "Invalid value of JOB."
+      end select
 
    end subroutine solve
 
