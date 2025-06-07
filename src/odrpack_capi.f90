@@ -3,7 +3,7 @@ module odrpack_capi
 
    use, intrinsic :: iso_c_binding, only: c_bool, c_char, c_double, c_f_pointer, c_int, c_ptr
    use odrpack, only: odr, workspace_dimensions
-   use odrpack_core, only: diwinf, dwinf
+   use odrpack_core, only: iwinf, winf
    implicit none
 
    abstract interface
@@ -150,6 +150,7 @@ contains
       lower, upper, &
       job) bind(C)
    !! "Short-call" wrapper for the `odr` routine including very few optional arguments.
+
       procedure(fcn_tc) :: fcn
          !! User-supplied subroutine for evaluating the model.
       integer(c_int), intent(in) :: n
@@ -195,6 +196,7 @@ contains
       lower, upper, &
       job, iprint, lunerr, lunrpt, info) bind(C)
    !! "Medium-call" wrapper for the `odr` routine including most commonly used optional arguments.
+
       procedure(fcn_tc) :: fcn
          !! User-supplied subroutine for evaluating the model.
       integer(c_int), intent(in) :: n
@@ -284,6 +286,7 @@ contains
       iprint, lunerr, lunrpt, &
       info) bind(C)
    !! "Long-call" wrapper for the `odr` routine including all optional arguments.
+
       procedure(fcn_tc) :: fcn
          !! User-supplied subroutine for evaluating the model.
       integer(c_int), intent(in) :: n
@@ -389,6 +392,7 @@ contains
 
    subroutine open_file(filename_cptr, lun, ierr) bind(C)
    !! Open a new file associated with a specified logical unit number.
+
       type(c_ptr), intent(in), value :: filename_cptr
          !! C-string containing the file name.
       integer(c_int), intent(inout) :: lun
@@ -425,6 +429,7 @@ contains
 
    subroutine close_file(lun, ierr) bind(C)
    !! Close a file associated with a specified logical unit number.
+
       integer(c_int), intent(in) :: lun
          !! Logical unit number.
       integer(c_int), intent(out) :: ierr
@@ -434,8 +439,9 @@ contains
 
    end subroutine close_file
 
-   pure subroutine diwinf_c(m, np, nq, iworkidx) bind(C)
+   pure subroutine iwinf_c(m, np, nq, iworkidx) bind(C)
    !! Get storage locations within integer work space.
+
       integer(c_int), intent(in) :: m
          !! The number of columns of data in the independent variable.
       integer(c_int), intent(in) :: np
@@ -449,7 +455,7 @@ contains
                  lunrpi, nrowi, ntoli, netai, maxiti, niteri, nfevi, njevi, int2i, iranki, &
                  ldtti, boundi, liwkmn
 
-      call diwinf(m, np, nq, &
+      call iwinf(m, np, nq, &
                   msgbi, msgdi, ifix2i, istopi, &
                   nnzwi, nppi, idfi, &
                   jobi, iprini, luneri, lunrpi, &
@@ -482,10 +488,11 @@ contains
       iworkidx%bound = boundi - 1
       iworkidx%liwkmn = liwkmn
 
-   end subroutine diwinf_c
+   end subroutine iwinf_c
 
-   pure subroutine dwinf_c(n, m, np, nq, ldwe, ld2we, isodr, workidx) bind(C)
+   pure subroutine winf_c(n, m, np, nq, ldwe, ld2we, isodr, workidx) bind(C)
    !! Get storage locations within real work space.
+
       integer(c_int), intent(in) :: n
          !! Number of observations.
       integer(c_int), intent(in) :: m
@@ -511,7 +518,7 @@ contains
                  fjacdi, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, loweri, upperi, &
                  lwkmn
 
-      call dwinf(n, m, np, nq, ldwe, ld2we, logical(isodr, kind=kind(.true.)), &
+      call winf(n, m, np, nq, ldwe, ld2we, logical(isodr, kind=kind(.true.)), &
                  deltai, epsi, xplusi, fni, sdi, vcvi, &
                  rvari, wssi, wssdei, wssepi, rcondi, etai, &
                  olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
@@ -576,10 +583,11 @@ contains
       workidx%upper = upperi - 1
       workidx%lwkmn = lwkmn
 
-   end subroutine dwinf_c
+   end subroutine winf_c
 
    pure subroutine workspace_dimensions_c(n, m, np, nq, isodr, lwork, liwork) bind(C)
    !! Calculate the dimensions of the workspace arrays.
+   
       integer(c_int), intent(in) :: n
          !! Number of observations.
       integer(c_int), intent(in) :: m

@@ -17,7 +17,7 @@ contains
    !! Generate initial summary report.
 
       use odrpack_kinds, only: zero
-      use odrpack_core, only: dhstep
+      use odrpack_core, only: hstep
 
       integer, intent(in) :: ipr
          !! The value indicating the report to be printed.
@@ -368,9 +368,9 @@ contains
                   upper(j), tempc2
             else
                if (cdjac) then
-                  temp2 = dhstep(1, neta, 1, j, stpb, 1)
+                  temp2 = hstep(1, neta, 1, j, stpb, 1)
                else
-                  temp2 = dhstep(0, neta, 1, j, stpb, 1)
+                  temp2 = hstep(0, neta, 1, j, stpb, 1)
                end if
                write (lunrpt, 4320) j, beta(j), tempc1, temp1, &
                   lower(j), upper(j), temp2
@@ -475,9 +475,9 @@ contains
                   else
                      tempc2 = '             '
                      if (cdjac) then
-                        temp3 = dhstep(1, neta, i, j, stpd, ldstpd)
+                        temp3 = hstep(1, neta, i, j, stpd, ldstpd)
                      else
-                        temp3 = dhstep(0, neta, i, j, stpd, ldstpd)
+                        temp3 = hstep(0, neta, i, j, stpd, ldstpd)
                      end if
                      if (m <= 9) then
                         write (lunrpt, 5210) &
@@ -904,7 +904,7 @@ contains
        lower, upper)
    !! Generate final summary report.
 
-      use odrpack_core, only: dppt
+      use odrpack_core, only: ppt
 
       integer, intent(in) :: ipr
          !! The variable indicating what is to be printed.
@@ -1133,7 +1133,7 @@ contains
       write (lunrpt, 3000)
       if (didvcv) then
          write (lunrpt, 7300)
-         tval = dppt(0.975E0_wp, idf)
+         tval = ppt(0.975E0_wp, idf)
          do j = 1, np
             if (ifixb2(j) >= 1) then
                write (lunrpt, 8400) j, beta(j), &
@@ -1489,7 +1489,7 @@ contains
        tau, pnorm, alpha, f, rcond, irank, info, istop)
    !! Generate computation reports.
 
-      use odrpack_core, only: dflags
+      use odrpack_core, only: flags
 
       integer, intent(in) :: ipr
          !! The variable indicating what is to be printed.
@@ -1724,7 +1724,7 @@ contains
       !  X:       The explanatory variable.
       !  Y:       The dependent variable.  Unused when the model is implicit.
 
-      call dflags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
+      call flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
       pnlty = abs(we(1, 1, 1))
 
       if (head) then

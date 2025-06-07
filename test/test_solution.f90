@@ -13,7 +13,7 @@ contains
    !! Exercise features of [[odrpack]].
 
       use odrpack, only: odr
-      use odrpack_core, only: dwght
+      use odrpack_core, only: wght
       use blas_interfaces, only: ddot, dnrm2
 
       integer, intent(in) :: ntest
@@ -952,13 +952,13 @@ contains
          ! Linux using REAL(wp) version of ODRPACK95
 
          bnrm = dnrm2(np, beta, 1)
-         call dwght(n, m, wd, ldwd1, ld2wd1, reshape(work(1:n*m), [n, m]), &
-                    tempretl(1:n, 1:m))
+         call wght(n, m, wd, ldwd1, ld2wd1, reshape(work(1:n*m), [n, m]), &
+                   tempretl(1:n, 1:m))
          wrk(1:n*m) = reshape(tempretl(1:n, 1:m), [n*m])
          wssdel = ddot(n*m, work(1:n*m), 1, wrk(1), 1)
-         call dwght(n, nq, we, ldwe1, ld2we1, &
-                    reshape(work(n*m + 1:n*m + 1 + n*nq - 1), [n, nq]), &
-                    tempretl(1:n, 1:nq))
+         call wght(n, nq, we, ldwe1, ld2we1, &
+                   reshape(work(n*m + 1:n*m + 1 + n*nq - 1), [n, nq]), &
+                   tempretl(1:n, 1:nq))
          wrk(n*m + 1:n*m + 1 + n*nq - 1) = reshape(tempretl(1:n, 1:nq), [n*nq])
          wsseps = ddot(n*nq, work(n*m + 1:n*m + 1 + n*nq - 1), 1, &
                        wrk(n*m + 1:n*m + 1 + n*nq - 1), 1)

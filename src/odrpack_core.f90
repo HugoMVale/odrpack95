@@ -53,7 +53,7 @@ module odrpack_core
 
 contains
 
-   subroutine dodlm &
+   subroutine odlm &
       (n, m, np, nq, npp, &
        f, fjacb, fjacd, &
        wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
@@ -63,9 +63,6 @@ contains
        wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, tempret, istopc)
    !! Compute Levenberg-Marquardt parameter and steps `s` and `t` using analog of the
    !! trust-region Levenberg-Marquardt algorithm.
-      ! Routines Called  DDOT, DNRM2, DODSTP, DSCALE, DWGHT
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero
       use blas_interfaces, only: ddot, dnrm2
@@ -220,7 +217,7 @@ contains
 
       ! Compute full Gauss-Newton step (ALPHA=0)
       alpha1 = zero
-      call dodstp(n, m, np, nq, npp, &
+      call odstp(n, m, np, nq, npp, &
                   f, fjacb, fjacd, &
                   wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
                   alpha1, epsfcn, isodr, &
@@ -253,10 +250,10 @@ contains
          tfjacb(1:n, 1:nq, k) = fjacb(1:n, k, 1:nq)
          wrk(k) = ddot(n*nq, tfjacb(1, 1, k), 1, f(1, 1), 1)
       end do
-      call dscale(npp, 1, ss, npp, wrk, npp, wrk, npp) ! work is input (as t) and output (as sclt)
+      call scalet(npp, 1, ss, npp, wrk, npp, wrk, npp) ! work is input (as t) and output (as sclt)
 
       if (isodr) then
-         call dwght(n, m, wd, ldwd, ld2wd, delta, tempret(1:n, 1:m))
+         call wght(n, m, wd, ldwd, ld2wd, delta, tempret(1:n, 1:m))
          wrk(npp + 1:npp + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), (/n*m/))
          iwrk = npp
          do j = 1, m
@@ -265,7 +262,7 @@ contains
                wrk(iwrk) = wrk(iwrk) + ddot(nq, fjacd(i, j, 1), n*m, f(i, 1), n)
             end do
          end do
-         call dscale(n, m, tt, ldtt, wrk(npp + 1), n, wrk(npp + 1), n)
+         call scalet(n, m, tt, ldtt, wrk(npp + 1), n, wrk(npp + 1), n)
          top = dnrm2(npp + n*m, wrk, 1)/tau
       else
          top = dnrm2(npp, wrk, 1)/tau
@@ -280,7 +277,7 @@ contains
       do i = 1, 10
 
          ! Compute locally constrained steps S and T and PHI(ALPHA) for current value of ALPHA
-         call dodstp(n, m, np, nq, npp, &
+         call odstp(n, m, np, nq, npp, &
                      f, fjacb, fjacd, &
                      wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
                      alpha2, epsfcn, isodr, &
@@ -332,9 +329,9 @@ contains
       ! Set NLMS to indicate an optimal step could not be found in 10 trys
       nlms = 12
 
-   end subroutine dodlm
+   end subroutine odlm
 
-   pure subroutine dacces &
+   pure subroutine acces &
       (n, m, np, nq, ldwe, ld2we, &
        work, lwork, iwork, liwork, &
        access, isodr, &
@@ -346,9 +343,6 @@ contains
        tau, alpha, niter, nfev, njev, int2, olmavg, &
        rcond, irank, actrs, pnorm, prers, rnorms, istop)
    !! Access or store values in the work arrays.
-      ! Routines Called  DIWINF, DWINF
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       integer, intent(in) :: n
          !! The number of observations.
@@ -622,7 +616,7 @@ contains
       !  XPLUSI:  The starting location in array WORK of array XPLUSD.
 
       ! Find starting locations within integer workspace
-      call diwinf(m, np, nq, &
+      call iwinf(m, np, nq, &
                   msgb, msgd, jpvti, istopi, &
                   nnzwi, nppi, idfi, &
                   jobi, iprini, luneri, lunrpi, &
@@ -632,7 +626,7 @@ contains
                   liwkmn)
 
       ! Find starting locations within REAL work space
-      call dwinf(n, m, np, nq, ldwe, ld2we, isodr, &
+      call winf(n, m, np, nq, ldwe, ld2we, isodr, &
                  deltai, epsi, xplusi, fni, sdi, vcvi, &
                  rvari, wssi, wssdei, wssepi, rcondi, etai, &
                  olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
@@ -722,13 +716,10 @@ contains
          iwork(int2i) = int2
       end if
 
-   end subroutine dacces
+   end subroutine acces
 
-   real(wp) pure function derstep(itype, k, betak, ssf, stpb, neta) result(derstepr)
+   real(wp) pure function erstep(itype, k, betak, ssf, stpb, neta) result(res)
    !! Compute step size for center and forward difference calculations.
-      ! Routines Called  DHSTEP
-      ! Date Written   20040616   (YYYYMMDD)
-      ! Revision Date  20040616   (YYYYMMDD)
 
       use odrpack_kinds, only: zero, one
 
@@ -769,15 +760,12 @@ contains
       else
          typj = abs(betak)
       end if
-      derstepr = sign(one, betak)*typj*dhstep(itype, neta, 1, k, stpb, 1)
+      res = sign(one, betak)*typj*hstep(itype, neta, 1, k, stpb, 1)
 
-   end function derstep
+   end function erstep
 
-   pure subroutine desubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, e)
+   pure subroutine esubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, e)
    !! Compute `e = wd + alpha*tt**2`.
-      ! Routines Called (NONE)
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
 
       use odrpack_kinds, only: zero
 
@@ -911,9 +899,9 @@ contains
          end if
       end if
 
-   end subroutine desubi
+   end subroutine esubi
 
-   subroutine detaf &
+   subroutine etaf &
       (fcn, &
        n, m, np, nq, &
        xplusd, beta, epsmac, nrow, &
@@ -925,9 +913,6 @@ contains
        lower, upper)
    !! Compute noise and number of good digits in function results.
       ! Adapted from STARPAC subroutine ETAFUN.
-      ! Routines Called  FCN
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero, one, two, hundred
 
@@ -1127,9 +1112,9 @@ contains
       end do
       neta = int(max(two, p5 - log10(eta)))
 
-   end subroutine detaf
+   end subroutine etaf
 
-   subroutine devjac &
+   subroutine evjac &
       (fcn, &
        anajac, cdjac, &
        n, m, np, nq, &
@@ -1142,9 +1127,6 @@ contains
        njev, nfev, istop, info, &
        lower, upper)
    !! Compute the weighted Jacobians wrt `beta` and `delta`.
-      ! Routines Called  FCN, DDOT, DIFIX, DJACCD, DJACFD, DWGHT, DUNPAC
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
 
       use odrpack_kinds, only: zero
       use blas_interfaces, only: ddot
@@ -1294,7 +1276,7 @@ contains
       !  XPLUSD:  The values of X + DELTA.
 
       ! Insert current unfixed BETA estimates into BETA
-      call dunpac(np, betac, beta, ifixb)
+      call unpack(np, betac, beta, ifixb)
 
       ! Compute XPLUSD = X + DELTA
       xplusd = x(1:n, :) + delta
@@ -1321,11 +1303,11 @@ contains
          ! Make sure fixed elements of FJACD are zero
          if (isodr) then
             do l = 1, nq
-               call difix(n, m, ifixx, ldifx, fjacd(1, 1, l), n, fjacd(1, 1, l), n)
+               call setifix(n, m, ifixx, ldifx, fjacd(1, 1, l), n, fjacd(1, 1, l), n)
             end do
          end if
       elseif (cdjac) then
-         call djaccd(fcn, &
+         call jaccd(fcn, &
                      n, m, np, nq, &
                      beta, x, ldx, delta, xplusd, ifixb, ifixx, ldifx, &
                      stpb, stpd, ldstpd, &
@@ -1333,7 +1315,7 @@ contains
                      fjacb, isodr, fjacd, nfev, istop, info, &
                      lower, upper)
       else
-         call djacfd(fcn, &
+         call jacfd(fcn, &
                      n, m, np, nq, &
                      beta, x, ldx, delta, xplusd, ifixb, ifixx, ldifx, &
                      stpb, stpd, ldstpd, &
@@ -1355,7 +1337,7 @@ contains
       ! Weight the Jacobian wrt the estimated BETAS
       if (ifixb(1) < 0) then
          do k = 1, np
-            call dwght(n, nq, we1, ldwe, ld2we, fjacb(1:n, k, 1:nq), tempret(1:n, 1:nq))
+            call wght(n, nq, we1, ldwe, ld2we, fjacb(1:n, k, 1:nq), tempret(1:n, 1:nq))
             fjacb(1:n, k, 1:nq) = tempret(1:n, 1:nq)
          end do
       else
@@ -1363,7 +1345,7 @@ contains
          do k = 1, np
             if (ifixb(k) >= 1) then
                k1 = k1 + 1
-               call dwght(n, nq, we1, ldwe, ld2we, fjacb(1:n, k, 1:nq), tempret(1:n, 1:nq))
+               call wght(n, nq, we1, ldwe, ld2we, fjacb(1:n, k, 1:nq), tempret(1:n, 1:nq))
                fjacb(1:n, k1, 1:nq) = tempret(1:n, 1:nq)
             end if
          end do
@@ -1372,20 +1354,16 @@ contains
       ! Weight the Jacobian's wrt DELTA as appropriate
       if (isodr) then
          do j = 1, m
-            call dwght(n, nq, we1, ldwe, ld2we, fjacd(1:n, j, 1:nq), tempret(1:n, 1:nq))
+            call wght(n, nq, we1, ldwe, ld2we, fjacd(1:n, j, 1:nq), tempret(1:n, 1:nq))
             fjacd(1:n, j, 1:nq) = tempret(1:n, 1:nq)
          end do
       end if
 
-   end subroutine devjac
+   end subroutine evjac
 
-   pure subroutine dfctr(oksemi, a, lda, n, info)
+   pure subroutine fctr(oksemi, a, lda, n, info)
    !! Factor the positive (semi)definite matrix `a` using a modified Cholesky factorization.
       ! Adapted from LINPACK subroutine DPOFA.
-      ! Routines Called  DDOT
-      ! Date Written   910706   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
-      ! References  Dongarra J.J., Bunch J.R., Moler C.B., Stewart G.W., *LINPACK Users Guide*, SIAM, 1979.
 
       use odrpack_kinds, only: zero, ten
       use blas_interfaces, only: ddot
@@ -1467,9 +1445,9 @@ contains
          end do
       end do
 
-   end subroutine dfctr
+   end subroutine fctr
 
-   pure subroutine dfctrw &
+   pure subroutine fctrw &
       (n, m, nq, npp, &
        isodr, &
        we, ldwe, ld2we, wd, ldwd, ld2wd, &
@@ -1477,9 +1455,6 @@ contains
        we1, nnzw, info)
    !! Check input parameters, indicating errors found using nonzero values of argument `info` as
    !! described in the ODRPACK95 reference guide.
-      ! Routines Called  DFCTR
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero
 
@@ -1580,7 +1555,7 @@ contains
                      wrk0(l1, l2) = we(1, l1, l2)
                   end do
                end do
-               call dfctr(.true., wrk0, nq, nq, inf)
+               call fctr(.true., wrk0, nq, nq, inf)
                if (inf /= 0) then
                   info = 30010
                   exited = .true.
@@ -1623,7 +1598,7 @@ contains
                         wrk0(l1, l2) = we(i, l1, l2)
                      end do
                   end do
-                  call dfctr(.true., wrk0, nq, nq, inf)
+                  call fctr(.true., wrk0, nq, nq, inf)
                   if (inf /= 0) then
                      info = 30010
                      exited = .true.
@@ -1673,7 +1648,7 @@ contains
                      wrk4(j1, j2) = wd(1, j1, j2)
                   end do
                end do
-               call dfctr(.false., wrk4, m, m, inf)
+               call fctr(.false., wrk4, m, m, inf)
                if (inf /= 0) then
                   info = max(30001, info + 1)
                   return
@@ -1698,7 +1673,7 @@ contains
                         wrk4(j1, j2) = wd(i, j1, j2)
                      end do
                   end do
-                  call dfctr(.false., wrk4, m, m, inf)
+                  call fctr(.false., wrk4, m, m, inf)
                   if (inf /= 0) then
                      info = max(30001, info + 1)
                      return
@@ -1708,13 +1683,10 @@ contains
          end if
       end if
 
-   end subroutine dfctrw
+   end subroutine fctrw
 
-   pure subroutine dflags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
+   pure subroutine flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
    !! Set flags indicating conditions specified by `job`.
-      ! Routines Called  (NONE)
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
 
       integer, intent(in) :: job
          !! The variable controlling problem initialization and computational method.
@@ -1833,13 +1805,10 @@ contains
 
       end if
 
-   end subroutine dflags
+   end subroutine flags
 
-   real(wp) pure function dhstep(itype, neta, i, j, stp, ldstp) result(dhstepr)
+   real(wp) pure function hstep(itype, neta, i, j, stp, ldstp) result(res)
    !! Set relative step size for finite difference derivatives.
-      ! Routines Called  (NONE)
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
 
       use odrpack_kinds, only: zero, two, three, ten
 
@@ -1870,25 +1839,22 @@ contains
       if (stp(1, 1) <= zero) then
          if (itype == 0) then
             ! Use default forward finite difference step size
-            dhstepr = ten**(-abs(neta)/two - two)
+            res = ten**(-abs(neta)/two - two)
          else
             ! Use default central finite difference step size
-            dhstepr = ten**(-abs(neta)/three)
+            res = ten**(-abs(neta)/three)
          end if
 
       elseif (ldstp == 1) then
-         dhstepr = stp(1, j)
+         res = stp(1, j)
       else
-         dhstepr = stp(i, j)
+         res = stp(i, j)
       end if
 
-   end function dhstep
+   end function hstep
 
-   pure subroutine difix(n, m, ifix, ldifix, t, ldt, tfix, ldtfix)
+   pure subroutine setifix(n, m, ifix, ldifix, t, ldt, tfix, ldtfix)
    !! Set elements of `t` to zero according to `ifix`.
-      ! Routines Called  (NONE)
-      ! Date Written   910612   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
 
       use odrpack_kinds, only: zero
 
@@ -1952,9 +1918,9 @@ contains
          end if
       end if
 
-   end subroutine difix
+   end subroutine setifix
 
-   pure subroutine diwinf &
+   pure subroutine iwinf &
       (m, np, nq, &
        msgbi, msgdi, ifix2i, istopi, &
        nnzwi, nppi, idfi, &
@@ -1964,9 +1930,6 @@ contains
        boundi, &
        liwkmn)
    !! Get storage locations within integer work space.
-      ! Routines Called  (NONE)
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
 
       integer, intent(in) :: m
          !! The number of columns of data in the independent variable.
@@ -2098,9 +2061,9 @@ contains
          liwkmn = 1
       end if
 
-   end subroutine diwinf
+   end subroutine iwinf
 
-   pure subroutine diniwk &
+   pure subroutine iniwk &
       (n, m, np, work, lwork, iwork, liwork, &
        x, ldx, ifixx, ldifx, scld, ldscld, &
        beta, sclb, &
@@ -2112,9 +2075,6 @@ contains
        ssfi, tti, ldtti, deltai, &
        loweri, upperi, boundi)
    !! Initialize work vectors as necessary.
-      ! Routines Called  DFLAGS, DSCLB, DSCLD, DCOPY
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
 
       use odrpack_kinds, only: zero, one, two, three
       use blas_interfaces, only: dcopy
@@ -2264,7 +2224,7 @@ contains
       !  WORK:    The REAL (wp) work space.
       !  X:       The independent variable.
 
-      call dflags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
+      call flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
 
       ! Store value of machine precision in work vector
       work(epsmai) = epsilon(zero)
@@ -2321,14 +2281,14 @@ contains
 
       ! Compute scaling for BETA's and DELTA's
       if (sclb(1) <= zero) then
-         call dsclb(np, beta, work(ssfi))
+         call scaleb(np, beta, work(ssfi))
       else
          call dcopy(np, sclb, 1, work(ssfi), 1)
       end if
       if (isodr) then
          if (scld(1, 1) <= zero) then
             iwork(ldtti) = n
-            call dscld(n, m, x, ldx, work(tti), iwork(ldtti))
+            call scaled(n, m, x, ldx, work(tti), iwork(ldtti))
          else
             if (ldscld == 1) then
                iwork(ldtti) = 1
@@ -2379,9 +2339,9 @@ contains
       ! Initialize parameters on bounds in IWORK
       iwork(boundi:boundi + np - 1) = 0
 
-   end subroutine diniwk
+   end subroutine iniwk
 
-   subroutine djaccd &
+   subroutine jaccd &
       (fcn, &
        n, m, np, nq, &
        beta, x, ldx, delta, xplusd, ifixb, ifixx, ldifx, &
@@ -2391,9 +2351,6 @@ contains
        lower, upper)
    !! Compute central difference approximations to the Jacobian wrt the estimated `beta`s and
    !! wrt the `delta`s.
-      ! Routines Called  FCN, DHSTEP
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero, one
 
@@ -2539,7 +2496,7 @@ contains
             fjacb(1:n, k, 1:nq) = zero
          else
             betak = beta(k)
-            wrk3(k) = betak + derstep(1, k, betak, ssf, stpb, neta)
+            wrk3(k) = betak + erstep(1, k, betak, ssf, stpb, neta)
             wrk3(k) = wrk3(k) - betak
 
             beta(k) = betak + wrk3(k)
@@ -2651,7 +2608,7 @@ contains
                   else
                      typj = abs(xplusd(i, j))
                   end if
-                  stp(i) = xplusd(i, j) + sign(one, xplusd(i, j))*typj*dhstep(1, neta, i, j, stpd, ldstpd)
+                  stp(i) = xplusd(i, j) + sign(one, xplusd(i, j))*typj*hstep(1, neta, i, j, stpd, ldstpd)
                   stp(i) = stp(i) - xplusd(i, j)
                   xplusd(i, j) = xplusd(i, j) + stp(i)
                end do
@@ -2707,9 +2664,9 @@ contains
          end do
       end if
 
-   end subroutine djaccd
+   end subroutine jaccd
 
-   subroutine djacfd &
+   subroutine jacfd &
       (fcn, &
        n, m, np, nq, &
        beta, x, ldx, delta, xplusd, ifixb, ifixx, ldifx, &
@@ -2719,9 +2676,6 @@ contains
        lower, upper)
    !! Compute forward difference approximations to the Jacobian wrt the estimated `beta`s and
    !! wrt the `delta`s.
-      ! Routines Called  FCN, DHSTEP, DERSTEP
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero, one
 
@@ -2866,7 +2820,7 @@ contains
             end do
          else
             betak = beta(k)
-            step = derstep(0, k, betak, ssf, stpb, neta)
+            step = erstep(0, k, betak, ssf, stpb, neta)
             wrk3(k) = betak + step
             wrk3(k) = wrk3(k) - betak
             beta(k) = betak + wrk3(k)
@@ -2951,7 +2905,7 @@ contains
 
                   stp(i) = xplusd(i, j) &
                            + sign(one, xplusd(i, j)) &
-                           *typj*dhstep(0, neta, i, j, stpd, ldstpd)
+                           *typj*hstep(0, neta, i, j, stpd, ldstpd)
                   stp(i) = stp(i) - xplusd(i, j)
                   xplusd(i, j) = xplusd(i, j) + stp(i)
                end do
@@ -3002,9 +2956,9 @@ contains
          end do
       end if
 
-   end subroutine djacfd
+   end subroutine jacfd
 
-   subroutine djck &
+   subroutine jck &
       (fcn, &
        n, m, np, nq, &
        beta, betaj, xplusd, &
@@ -3017,9 +2971,6 @@ contains
        interval)
    !! Driver routine for the derivative checking process.
       ! Adapted from STARPAC subroutine DCKCNT.
-      ! Routines Called  FCN, DHSTEP, DJCKM
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero, one, p5 => half
 
@@ -3247,12 +3198,12 @@ contains
                   typj = abs(beta(j))
                end if
 
-               h0 = dhstep(0, neta, 1, j, stpb, 1)
+               h0 = hstep(0, neta, 1, j, stpb, 1)
                hc0 = h0
 
                ! Check derivative wrt the J-th parameter at the NROW-th row
                if (interval(j) >= 1) then
-                  call djckm(fcn, &
+                  call jckm(fcn, &
                              n, m, np, nq, &
                              betaj, xplusd, &
                              ifixb, ifixx, ldifx, &
@@ -3305,11 +3256,11 @@ contains
                      typj = abs(xplusd(nrow, j))
                   end if
 
-                  h0 = dhstep(0, neta, nrow, j, stpd, ldstpd)
-                  hc0 = dhstep(1, neta, nrow, j, stpd, ldstpd)
+                  h0 = hstep(0, neta, nrow, j, stpd, ldstpd)
+                  hc0 = hstep(1, neta, nrow, j, stpd, ldstpd)
 
                   ! Check derivative wrt the J-th column of DELTA at row NROW
-                  call djckm(fcn, &
+                  call jckm(fcn, &
                              n, m, np, nq, &
                              betaj, xplusd, &
                              ifixb, ifixx, ldifx, &
@@ -3332,9 +3283,9 @@ contains
       msgb(1) = msgb1
       msgd(1) = msgd1
 
-   end subroutine djck
+   end subroutine jck
 
-   subroutine djckc &
+   subroutine jckc &
       (fcn, &
        n, m, np, nq, &
        beta, xplusd, ifixb, ifixx, ldifx, &
@@ -3346,9 +3297,6 @@ contains
    !! Check whether high curvature could be the cause of the disagreement between the numerical
    !! and analytic derviatives.
       ! Adapted from STARPAC subroutine DCKCRV.
-      ! Routines Called  DJCKF, DPVB, DPVD
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: one, two, ten
 
@@ -3475,7 +3423,7 @@ contains
 
          ! Perform central difference computations for derivatives wrt BETA
          stpcrv = (hc*typj*sign(one, beta(j)) + beta(j)) - beta(j)
-         call dpvb(fcn, &
+         call fpvb(fcn, &
                    n, m, np, nq, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, stpcrv, &
@@ -3484,7 +3432,7 @@ contains
          if (istop /= 0) then
             return
          end if
-         call dpvb(fcn, &
+         call fpvb(fcn, &
                    n, m, np, nq, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, -stpcrv, &
@@ -3497,7 +3445,7 @@ contains
 
          ! Perform central difference computations for derivatives wrt DELTA
          stpcrv = (hc*typj*sign(one, xplusd(nrow, j)) + xplusd(nrow, j)) - xplusd(nrow, j)
-         call dpvd(fcn, &
+         call fpvd(fcn, &
                    n, m, np, nq, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, stpcrv, &
@@ -3506,7 +3454,7 @@ contains
          if (istop /= 0) then
             return
          end if
-         call dpvd(fcn, &
+         call fpvd(fcn, &
                    n, m, np, nq, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, -stpcrv, &
@@ -3522,7 +3470,7 @@ contains
       curve = curve + eta*(abs(pvpcrv) + abs(pvmcrv) + two*abs(pv))/(stpcrv**2)
 
       ! Check if finite precision arithmetic could be the culprit.
-      call djckf(fcn, &
+      call jckf(fcn, &
                  n, m, np, nq, &
                  beta, xplusd, ifixb, ifixx, ldifx, &
                  eta, tol, nrow, j, lq, iswrtb, &
@@ -3545,7 +3493,7 @@ contains
       if (iswrtb) then
          ! Perform computations for derivatives wrt BETA
          stp = (stp*sign(one, beta(j)) + beta(j)) - beta(j)
-         call dpvb(fcn, &
+         call fpvb(fcn, &
                    n, m, np, nq, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, stp, &
@@ -3558,7 +3506,7 @@ contains
 
          ! Perform computations for derivatives wrt DELTA
          stp = (stp*sign(one, xplusd(nrow, j)) + xplusd(nrow, j)) - xplusd(nrow, j)
-         call dpvd(fcn, &
+         call fpvd(fcn, &
                    n, m, np, nq, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, stp, &
@@ -3583,9 +3531,9 @@ contains
          msg(lq, j) = 5
       end if
 
-   end subroutine djckc
+   end subroutine jckc
 
-   subroutine djckf &
+   subroutine jckf &
       (fcn, &
        n, m, np, nq, &
        beta, xplusd, ifixb, ifixx, ldifx, &
@@ -3596,9 +3544,6 @@ contains
    !! Check whether finite precision arithmetic could be the cause of the disagreement between
    !! the derivatives.
       ! Adapted from STARPAC subroutine DCKFPA.
-      ! Routines Called  DPVB, DPVD
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: one, two, hundred
 
@@ -3730,7 +3675,7 @@ contains
       if (iswrtb) then
          ! Perform computations for derivatives wrt BETA
          stp = (stp*sign(one, beta(j)) + beta(j)) - beta(j)
-         call dpvb(fcn, &
+         call fpvb(fcn, &
                    n, m, np, nq, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, stp, &
@@ -3739,7 +3684,7 @@ contains
       else
          ! Perform computations for derivatives wrt DELTA
          stp = (stp*sign(one, xplusd(nrow, j)) + xplusd(nrow, j)) - xplusd(nrow, j)
-         call dpvd(fcn, &
+         call fpvd(fcn, &
                    n, m, np, nq, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, stp, &
@@ -3767,9 +3712,9 @@ contains
          end if
       end if
 
-   end subroutine djckf
+   end subroutine jckf
 
-   subroutine djckm &
+   subroutine jckm &
       (fcn, &
        n, m, np, nq, &
        beta, xplusd, ifixb, ifixx, ldifx, &
@@ -3779,9 +3724,6 @@ contains
        wrk1, wrk2, wrk6, interval)
    !! Check user supplied analytic derivatives against numerical derivatives.
       ! Adapted from STARPAC subroutine DCKMN.
-      ! Routines Called  DJCKC, DJCKZ, DPVB, DPVD
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero, one, two, three, ten, hundred
 
@@ -3937,7 +3879,7 @@ contains
          if (iswrtb) then
             ! Perform computations for derivatives wrt BETA
             stp0 = (h*typj*sign(one, beta(j)) + beta(j)) - beta(j)
-            call dpvb(fcn, &
+            call fpvb(fcn, &
                       n, m, np, nq, &
                       beta, xplusd, ifixb, ifixx, ldifx, &
                       nrow, j, lq, stp0, &
@@ -3946,7 +3888,7 @@ contains
          else
             ! Perform computations for derivatives wrt DELTA
             stp0 = (h*typj*sign(one, xplusd(nrow, j)) + xplusd(nrow, j)) - xplusd(nrow, j)
-            call dpvd(fcn, &
+            call fpvd(fcn, &
                       n, m, np, nq, &
                       beta, xplusd, ifixb, ifixx, ldifx, &
                       nrow, j, lq, stp0, &
@@ -3985,7 +3927,7 @@ contains
             ! Numerical and analytic derivatives disagree.  Check why
             if ((d == zero) .or. (fd == zero)) then
                if (interval(j) >= 10 .or. .not. iswrtb) then
-                  call djckz(fcn, &
+                  call jckz(fcn, &
                              n, m, np, nq, &
                              beta, xplusd, ifixb, ifixx, ldifx, &
                              nrow, epsmac, j, lq, iswrtb, &
@@ -3997,7 +3939,7 @@ contains
                end if
             else
                if (interval(j) >= 100 .or. .not. iswrtb) then
-                  call djckc(fcn, &
+                  call jckc(fcn, &
                              n, m, np, nq, &
                              beta, xplusd, ifixb, ifixx, ldifx, &
                              eta, tol, nrow, epsmac, j, lq, hc, iswrtb, &
@@ -4026,9 +3968,9 @@ contains
          msg1 = 2
       end if
 
-   end subroutine djckm
+   end subroutine jckm
 
-   subroutine djckz &
+   subroutine jckz &
       (fcn, &
        n, m, np, nq, &
        beta, xplusd, ifixb, ifixx, ldifx, &
@@ -4039,9 +3981,6 @@ contains
    !! Recheck the derivatives in the case where the finite difference derivative disagrees with
    !! the analytic derivative and the analytic derivative is zero.
       ! Adapted from STARPAC subroutine DCKZRO.
-      ! Routines Called  DPVB, DPVD
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero, one, two, three
 
@@ -4155,7 +4094,7 @@ contains
       ! Recalculate numerical derivative using central difference and step size of 2*STP0
       if (iswrtb) then
          ! Perform computations for derivatives wrt BETA
-         call dpvb(fcn, &
+         call fpvb(fcn, &
                    n, m, np, nq, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, -stp0, &
@@ -4163,7 +4102,7 @@ contains
                    wrk1, wrk2, wrk6)
       else
          ! Perform computations for derivatives wrt DELTA
-         call dpvd(fcn, &
+         call fpvd(fcn, &
                    n, m, np, nq, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, -stp0, &
@@ -4194,9 +4133,9 @@ contains
          msg(lq, j) = 3
       end if
 
-   end subroutine djckz
+   end subroutine jckz
 
-   pure subroutine dodchk &
+   pure subroutine odchk &
       (n, m, np, nq, &
        isodr, anajac, implct, &
        beta, ifixb, &
@@ -4207,9 +4146,6 @@ contains
        info, &
        lower, upper)
    !! Check input parameters, indicating errors found using nonzero values of argument `info`.
-      ! Routines Called  (None)
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero
 
@@ -4462,9 +4398,9 @@ contains
          end if
       end if
 
-   end subroutine dodchk
+   end subroutine odchk
 
-   subroutine dodstp &
+   subroutine odstp &
       (n, m, np, nq, npp, &
        f, fjacb, fjacd, &
        wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
@@ -4474,10 +4410,6 @@ contains
        wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, tempret, istopc)
    !! Compute locally constrained steps `s` and `t`, and `phi(alpha)`. 
       ! @note: This is one of the most time-consuming subroutines in ODRPACK (~25% of total).
-      ! Routines Called  IDAMAX, DCHEX, DESUBI, DFCTR, DNRM2, DQRDC, DQRSL, DROT,
-      !                  DROTG, DSOLVE, DTRCO, DTRSL, DVEVTR, DWGHT
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero, one
       use linpack, only: dchex, dqrdc, dqrsl, dtrco, dtrsl
@@ -4654,12 +4586,12 @@ contains
 
       if (isodr) then
          ! T = WD * DELTA = D*G2
-         call dwght(n, m, wd, ldwd, ld2wd, delta, t)
+         call wght(n, m, wd, ldwd, ld2wd, delta, t)
 
          do i = 1, n
             !  Compute WRK4, such that TRANS(WRK4)*WRK4 = E = (D**2 + ALPHA*TT**2)
-            call desubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, wrk4)
-            call dfctr(.false., wrk4, m, m, inf)
+            call esubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, wrk4)
+            call fctr(.false., wrk4, m, m, inf)
             if (inf /= 0) then
                istopc = 60000
                return
@@ -4667,11 +4599,11 @@ contains
             ! Compute OMEGA, such that
             ! trans(OMEGA)*OMEGA = I+FJACD*inv(E)*trans(FJACD)
             ! inv(trans(OMEGA)*OMEGA) = I-FJACD*inv(P)*trans(FJACD)
-            call dvevtr(m, nq, i, fjacd, n, m, wrk4, m, wrk1, n, nq, omega, nq, wrk5)
+            call vevtr(m, nq, i, fjacd, n, m, wrk4, m, wrk1, n, nq, omega, nq, wrk5)
             do l = 1, nq
                omega(l, l) = one + omega(l, l)
             end do
-            call dfctr(.false., omega, nq, nq, inf)
+            call fctr(.false., omega, nq, nq, inf)
             if (inf /= 0) then
                istopc = 60000
                return
@@ -4682,23 +4614,23 @@ contains
                do l = 1, nq
                   wrk1(i, l, j) = fjacd(i, j, l)
                end do
-               call dsolve(nq, omega, nq, wrk1(i, 1:nq, j), 4)
-               call dsolve(nq, omega, nq, wrk1(i, 1:nq, j), 2)
+               call solve(nq, omega, nq, wrk1(i, 1:nq, j), 4)
+               call solve(nq, omega, nq, wrk1(i, 1:nq, j), 2)
             end do
 
             ! Compute WRK5 = inv(E)*D*G2
             do j = 1, m
                wrk5(j) = t(i, j)
             end do
-            call dsolve(m, wrk4, m, wrk5, 4)
-            call dsolve(m, wrk4, m, wrk5, 2)
+            call solve(m, wrk4, m, wrk5, 4)
+            call solve(m, wrk4, m, wrk5, 2)
 
             ! Compute TFJACB = inv(trans(OMEGA))*FJACB
             do k = 1, kp
                do l = 1, nq
                   tfjacb(i, l, k) = fjacb(i, kpvt(k), l)
                end do
-               call dsolve(nq, omega, nq, tfjacb(i, 1:nq, k), 4)
+               call solve(nq, omega, nq, tfjacb(i, 1:nq, k), 4)
                do l = 1, nq
                   if (ss(1) > zero) then
                      tfjacb(i, l, k) = tfjacb(i, l, k)/ss(kpvt(k))
@@ -4717,7 +4649,7 @@ contains
             end do
 
             ! Compute WRK2 = inv(trans(OMEGA))*(V*inv(E)*D**2*G2 - G1)
-            call dsolve(nq, omega, nq, wrk2(i, 1:nq), 4)
+            call solve(nq, omega, nq, wrk2(i, 1:nq), 4)
          end do
 
       else
@@ -4828,8 +4760,8 @@ contains
          !          WRK1 = trans(FJACD)*(I-FJACD*inv(P)*trans(JFACD))
          do i = 1, n
             ! Compute WRK4, such that trans(WRK4)*WRK4 = E = (D**2 + ALPHA*TT**2)
-            call desubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, wrk4)
-            call dfctr(.false., wrk4, m, m, inf)
+            call esubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, wrk4)
+            call fctr(.false., wrk4, m, m, inf)
             if (inf /= 0) then
                istopc = 60000
                return
@@ -4839,8 +4771,8 @@ contains
             do j = 1, m
                wrk5(j) = t(i, j)
             end do
-            call dsolve(m, wrk4, m, wrk5, 4)
-            call dsolve(m, wrk4, m, wrk5, 2)
+            call solve(m, wrk4, m, wrk5, 4)
+            call solve(m, wrk4, m, wrk5, 2)
 
             do l = 1, nq
                wrk2(i, l) = f(i, l)
@@ -4859,26 +4791,26 @@ contains
                end do
                t(i, j) = -(wrk5(j) + t(i, j))
             end do
-            call dsolve(m, wrk4, m, t(i, 1:m), 4)
-            call dsolve(m, wrk4, m, t(i, 1:m), 2)
+            call solve(m, wrk4, m, t(i, 1:m), 4)
+            call solve(m, wrk4, m, t(i, 1:m), 2)
          end do
 
       end if
 
       ! Compute PHI(ALPHA) from scaled S and T
-      call dwght(npp, 1, reshape(ss, [npp, 1, 1]), npp, 1, reshape(s, [npp, 1]), tempret(1:npp, 1:1))
+      call wght(npp, 1, reshape(ss, [npp, 1, 1]), npp, 1, reshape(s, [npp, 1]), tempret(1:npp, 1:1))
       wrk(1:npp) = tempret(1:npp, 1)
       if (isodr) then
-         call dwght(n, m, reshape(tt, [ldtt, 1, m]), ldtt, 1, t, tempret(1:n, 1:m))
+         call wght(n, m, reshape(tt, [ldtt, 1, m]), ldtt, 1, t, tempret(1:n, 1:m))
          wrk(npp + 1:npp + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
          phi = dnrm2(npp + n*m, wrk, 1)
       else
          phi = dnrm2(npp, wrk, 1)
       end if
 
-   end subroutine dodstp
+   end subroutine odstp
 
-   subroutine dodvcv &
+   subroutine odvcv &
       (n, m, np, nq, npp, &
        f, fjacb, fjacd, &
        wd, ldwd, ld2wd, ssf, ss, tt, ldtt, delta, &
@@ -4888,9 +4820,6 @@ contains
        s, t, irank, rcond, rss, idf, rvar, ifixb, &
        wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, tempret, istopc)
    !! Compute covariance matrix of estimated parameters.
-      ! Routines Called  DPODI, DODSTP
-      ! Date Written   901207   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero
       use linpack, only: dpodi
@@ -5052,7 +4981,7 @@ contains
       forvcv = .true.
       istopc = 0
 
-      call dodstp(n, m, np, nq, npp, &
+      call odstp(n, m, np, nq, npp, &
                   f, fjacb, fjacd, &
                   wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
                   zero, epsfcn, isodr, &
@@ -5167,15 +5096,10 @@ contains
          end do
       end do
 
-   end subroutine dodvcv
+   end subroutine odvcv
 
-   pure subroutine dpack(n2, n1, v1, v2, ifix)
+   pure subroutine pack(n2, n1, v1, v2, ifix)
    !! Select the unfixed elements of `v2` and return them in `v1`.
-      ! Routines Called  DCOPY
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
-
-      use blas_interfaces, only: dcopy
 
       integer, intent(in) :: n2
          !! The number of items in `v2`.
@@ -5211,12 +5135,12 @@ contains
          end do
       else
          n1 = n2
-         call dcopy(n2, v2, 1, v1, 1)
+         v1 = v2
       end if
 
-   end subroutine dpack
+   end subroutine pack
 
-   real(wp) pure function dppnml(p) result(dppnmlr)
+   real(wp) pure function ppnml(p) result(res)
    !! Compute the percent point function value for the normal (Gaussian) distribution with
    !!  mean 0 and standard deviation 1, and with probability density function:
    !!
@@ -5224,9 +5148,6 @@ contains
    !!
       ! Adapted from DATAPAC subroutine TPPF, with modifications to facilitate conversion to
       ! real(wp) automatically.
-      ! Routines Called  (NONE)
-      ! Date Written   901207   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
       !***Author  Filliben, James J.,
       !       Statistical Engineering Division
       !       National Bureau of Standards
@@ -5306,27 +5227,24 @@ contains
       !  T:       A value used in the approximation.
 
       if (p == half) then
-         dppnmlr = zero
+         res = zero
       else
          r = p
          if (p > half) r = one - r
          t = sqrt(-two*log(r))
          anum = ((((t*p4 + p3)*t + p2)*t + p1)*t + p0)
          aden = ((((t*q4 + q3)*t + q2)*t + q1)*t + q0)
-         dppnmlr = t + (anum/aden)
-         if (p < half) dppnmlr = -dppnmlr
+         res = t + (anum/aden)
+         if (p < half) res = -res
       end if
 
-   end function dppnml
+   end function ppnml
 
-   real(wp) pure function dppt(p, idf) result(dpptr)
+   real(wp) pure function ppt(p, idf) result(res)
    !! Compute the percent point function value for the student's T distribution with `idf`
    !! degrees of freedom.
       ! Adapted from DATAPAC subroutine TPPF, with modifications to facilitate conversion to
       ! real(wp) automatically.
-      ! Routines Called  DPPNML
-      ! Date Written   901207   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
       !***Author  Filliben, James J.,
       !       Statistical Engineering Division
       !       National Bureau of Standards
@@ -5425,23 +5343,23 @@ contains
 
       if (idf <= 0) then
          !Treat the IDF < 1 case
-         dpptr = zero
+         res = zero
 
       elseif (idf == 1) then
          !Treat the IDF = 1 (Cauchy) case
          arg = pi*p
-         dpptr = -cos(arg)/sin(arg)
+         res = -cos(arg)/sin(arg)
 
       elseif (idf == 2) then
          !  Treat the IDF = 2 case
          term1 = sqrt(two)/two
          term2 = two*p - one
          term3 = sqrt(p*(one - p))
-         dpptr = term1*term2/term3
+         res = term1*term2/term3
 
       elseif (idf >= 3) then
          ! Treat the IDF greater than or equal to 3 case
-         ppfn = dppnml(p)
+         ppfn = ppnml(p)
          d1 = ppfn
          d3 = ppfn**3
          d5 = ppfn**5
@@ -5452,36 +5370,36 @@ contains
          term3 = (one/b31)*(b32*d5 + b33*d3 + b34*d1)/(df**2)
          term4 = (one/b41)*(b42*d7 + b43*d5 + b44*d3 + b45*d1)/(df**3)
          term5 = (one/b51)*(b52*d9 + b53*d7 + b54*d5 + b55*d3 + b56*d1)/(df**4)
-         dpptr = term1 + term2 + term3 + term4 + term5
+         res = term1 + term2 + term3 + term4 + term5
 
          if (idf == 3) then
             ! Augment the results for the IDF = 3 case
             con = pi*(p - half)
-            arg = dpptr/sqrt(df)
+            arg = res/sqrt(df)
             z = atan(arg)
             do ipass = 1, maxit
                s = sin(z)
                c = cos(z)
                z = z - (z + s*c - con)/(two*c**2)
             end do
-            dpptr = sqrt(df)*s/c
+            res = sqrt(df)*s/c
 
          elseif (idf == 4) then
             ! Augment the results for the IDF = 4 case
             con = two*(p - half)
-            arg = dpptr/sqrt(df)
+            arg = res/sqrt(df)
             z = atan(arg)
             do ipass = 1, maxit
                s = sin(z)
                c = cos(z)
                z = z - ((one + half*c**2)*s - con)/((one + half)*c**3)
             end do
-            dpptr = sqrt(df)*s/c
+            res = sqrt(df)*s/c
 
          elseif (idf == 5) then
             ! Augment the results for the IDF = 5 case
             con = pi*(p - half)
-            arg = dpptr/sqrt(df)
+            arg = res/sqrt(df)
             z = atan(arg)
             do ipass = 1, maxit
                s = sin(z)
@@ -5489,12 +5407,12 @@ contains
                z = z - (z + (c + (two/three)*c**3)*s - con)/ &
                    ((eight/three)*c**4)
             end do
-            dpptr = sqrt(df)*s/c
+            res = sqrt(df)*s/c
 
          elseif (idf == 6) then
             !  Augment the results for the IDF = 6 case
             con = two*(p - half)
-            arg = dpptr/sqrt(df)
+            arg = res/sqrt(df)
             z = atan(arg)
             do ipass = 1, maxit
                s = sin(z)
@@ -5502,13 +5420,13 @@ contains
                z = z - ((one + half*c**2 + (three/eight)*c**4)*s - con)/ &
                    ((fiftn/eight)*c**5)
             end do
-            dpptr = sqrt(df)*s/c
+            res = sqrt(df)*s/c
          end if
       end if
 
-   end function dppt
+   end function ppt
 
-   subroutine dpvb &
+   subroutine fpvb &
       (fcn, &
        n, m, np, nq, &
        beta, xplusd, ifixb, ifixx, ldifx, &
@@ -5516,9 +5434,6 @@ contains
        istop, nfev, pvb, &
        wrk1, wrk2, wrk6)
    !! Compute the `nrow`-th function value using `beta(j) + stp`.
-      ! Routines Called  FCN
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
 
       procedure(fcn_t) :: fcn
          !! The user-supplied subroutine for evaluating the model.
@@ -5607,9 +5522,9 @@ contains
 
       pvb = wrk2(nrow, lq)
 
-   end subroutine dpvb
+   end subroutine fpvb
 
-   subroutine dpvd &
+   subroutine fpvd &
       (fcn, &
        n, m, np, nq, &
        beta, xplusd, ifixb, ifixx, ldifx, &
@@ -5617,9 +5532,6 @@ contains
        istop, nfev, pvd, &
        wrk1, wrk2, wrk6)
    !! Compute `nrow`-th function value using `x(nrow, j) + delta(nrow, j) + stp`.
-      ! Routines Called FCN
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
 
       procedure(fcn_t) :: fcn
          !! The user-supplied subroutine for evaluating the model.
@@ -5706,13 +5618,10 @@ contains
 
       pvd = wrk2(nrow, lq)
 
-   end subroutine dpvd
+   end subroutine fpvd
 
-   pure subroutine dscale(n, m, scl, ldscl, t, ldt, sclt, ldsclt)
+   pure subroutine scalet(n, m, scl, ldscl, t, ldt, sclt, ldsclt)
    !! Scale `t` by the inverse of `scl`, i.e., compute `t/scl`.
-      ! Routines Called (NONE)
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
 
       use odrpack_kinds, only: zero, one
 
@@ -5776,14 +5685,11 @@ contains
          end do
       end if
 
-   end subroutine dscale
+   end subroutine scalet
 
-   pure subroutine dsclb(np, beta, ssf)
+   pure subroutine scaleb(np, beta, ssf)
    !! Select scaling values for `beta` according to the algorithm given in the ODRPACK95
    !! reference guide.
-      ! Routines Called (NONE)
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
 
       use odrpack_kinds, only: zero, one, ten
 
@@ -5840,14 +5746,11 @@ contains
 
       end if
 
-   end subroutine dsclb
+   end subroutine scaleb
 
-   pure subroutine dscld(n, m, x, ldx, tt, ldtt)
+   pure subroutine scaled(n, m, x, ldx, tt, ldtt)
    !! Select scaling values for `delta` according to the algorithm given in the ODRPACK95
    !! reference guide.
-      ! Routines Called (NONE)
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
 
       use odrpack_kinds, only: zero, one, ten
 
@@ -5917,13 +5820,10 @@ contains
          end if
       end do
 
-   end subroutine dscld
+   end subroutine scaled
 
-   pure subroutine dsetn(n, m, x, ldx, nrow)
+   pure subroutine setrow(n, m, x, ldx, nrow)
    !! Select the row at which the derivative will be checked.
-      ! Routines Called  (None)
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
 
       use odrpack_kinds, only: zero
 
@@ -5962,9 +5862,9 @@ contains
          end if
       end do
 
-   end subroutine dsetn
+   end subroutine setrow
 
-   pure subroutine dsolve(n, t, ldt, b, job)
+   pure subroutine solve(n, t, ldt, b, job)
    !! Solve systems of the form:
    !!
    !!  `t * x = b  or  trans(t) * x = b`
@@ -5976,9 +5876,6 @@ contains
    !! References:
    !! * Dongarra J.J., Bunch J.R., Moler C.B., Stewart G.W., *LINPACK Users Guide*, SIAM, 1979.
       ! @note: This is one of the most time-consuming subroutines in ODRPACK (~25% of total).
-      ! Routines Called  DAXPY, DDOT
-      ! Date Written   920220   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero
       use blas_interfaces, only: daxpy, ddot
@@ -6088,15 +5985,10 @@ contains
          end do
       end if
 
-   end subroutine dsolve
+   end subroutine solve
 
-   pure subroutine dunpac(n2, v1, v2, ifix)
+   pure subroutine unpack(n2, v1, v2, ifix)
    !! Copy the elements of `v1` into the locations of `v2` which are unfixed.
-      ! Routines Called  DCOPY
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
-
-      use blas_interfaces, only: dcopy
 
       integer, intent(in) :: n2
          !! The number of items in `v2`.
@@ -6106,7 +5998,8 @@ contains
          !! The vector of the fixed and unfixed items into which the elements of `v1` are to
          !! be inserted.
       integer, intent(in) :: ifix(n2)
-         !! The values designating whether the elements of `v2` are fixed at their input values or not.
+         !! The values designating whether the elements of `v2` are fixed at their input values
+         !! or not.
 
       ! Local scalars
       integer :: i, n1
@@ -6131,19 +6024,16 @@ contains
          end do
       else
          n1 = n2
-         call dcopy(n2, v1, 1, v2, 1)
+         v2 = v1
       end if
 
-   end subroutine dunpac
+   end subroutine unpack
 
-   pure subroutine dvevtr &
+   pure subroutine vevtr &
       (m, nq, indx, &
        v, ldv, ld2v, e, lde, ve, ldve, ld2ve, vev, ldvev, &
        wrk5)
    !! Compute `v*e*trans(v)` for the (`indx`)th `m` by `nq` array in `v`.
-      ! Routines Called  DSOLVE
-      ! Date Written   910613   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
 
       use odrpack_kinds, only: zero
 
@@ -6203,7 +6093,7 @@ contains
          do j = 1, m
             wrk5(j) = v(indx, j, l1)
          end do
-         call dsolve(m, e, lde, wrk5, 4)
+         call solve(m, e, lde, wrk5, 4)
          do j = 1, m
             ve(indx, l1, j) = wrk5(j)
          end do
@@ -6219,13 +6109,10 @@ contains
          end do
       end do
 
-   end subroutine dvevtr
+   end subroutine vevtr
 
-   pure subroutine dwght(n, m, wt, ldwt, ld2wt, t, wtt)
+   pure subroutine wght(n, m, wt, ldwt, ld2wt, t, wtt)
    !! Scale matrix `t` using `wt`, i.e., compute `wtt = wt*t`.
-      ! Routines Called  (NONE)
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920304   (YYMMDD)
 
       use odrpack_kinds, only: zero
 
@@ -6316,9 +6203,9 @@ contains
          end do
       end if
 
-   end subroutine dwght
+   end subroutine wght
 
-   pure subroutine dwinf &
+   pure subroutine winf &
       (n, m, np, nq, ldwe, ld2we, isodr, &
        deltai, epsi, xplusi, fni, sdi, vcvi, &
        rvari, wssi, wssdei, wssepi, rcondi, etai, &
@@ -6330,10 +6217,8 @@ contains
        wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
        loweri, upperi, &
        lwkmn)
-   !! Get storage locations within REAL (wp) work space.
-      ! Routines Called  (NONE)
-      ! Date Written   860529   (YYMMDD)
-      ! Revision Date  920619   (YYMMDD)
+   !! Get storage locations within real work space.
+
       integer, intent(in) :: n
          !! The number of observations.
       integer, intent(in) :: m
@@ -6650,14 +6535,11 @@ contains
          lwkmn = 1
       end if
 
-   end subroutine dwinf
+   end subroutine winf
 
    pure subroutine mbfb(np, beta, lower, upper, ssf, stpb, neta, eta, interval)
    !! Ensure range of bounds is large enough for derivative checking.
    !! Move beta away from bounds so that derivatives can be calculated.
-      ! ROUTINES CALLED  DHSTEP
-      ! DATE WRITTEN   20040624   (YYYYMMDD)
-      ! REVISION DATE  20040624   (YYYYMMDD)
 
       use odrpack_kinds, only: zero, one, three, ten, hundred
 
@@ -6707,7 +6589,7 @@ contains
 
       interval(:) = 111
       do k = 1, np
-         h0 = dhstep(0, neta, 1, k, stpb, 1)
+         h0 = hstep(0, neta, 1, k, stpb, 1)
          hc0 = h0
          h1 = sqrt(eta)
          hc1 = eta**(one/three)

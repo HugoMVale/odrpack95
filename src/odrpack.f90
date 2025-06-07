@@ -1,6 +1,7 @@
 module odrpack
 !! Main driver routines for finding the weighted explicit or implicit orthogonal distance
 !! regression (ODR) or ordinary linear or nonlinear least squares (OLS) solution.
+    
    use odrpack_kinds, only: wp
    use, intrinsic :: iso_fortran_env, only: error_unit, output_unit
    implicit none
@@ -925,8 +926,8 @@ contains
       ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero, one, ten, p5 => half
-      use odrpack_core, only: fcn_t, detaf, dfctrw, dflags, diniwk, diwinf, djck, dodchk, &
-                              dpack, dsetn, dunpac, dwght, dwinf, derstep, mbfb
+      use odrpack_core, only: fcn_t, etaf, fctrw, flags, iniwk, iwinf, jck, odchk, &
+                              pack, setrow, unpack, wght, winf, erstep, mbfb
       use odrpack_reports, only: odper
       use blas_interfaces, only: ddot, dnrm2, dcopy
 
@@ -1212,11 +1213,11 @@ contains
       !  Y:        The dependent variable.  Unused when the model is implicit.
 
       ! Initialize necessary variables
-      call dflags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
+      call flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
 
       ! Set starting locations within integer workspace
       ! (invalid values of M, NP and/or NQ are handled reasonably by DIWINF)
-      call diwinf(m, np, nq, &
+      call iwinf(m, np, nq, &
                   msgb, msgd, jpvti, istopi, &
                   nnzwi, nppi, idfi, &
                   jobi, iprini, luneri, lunrpi, &
@@ -1228,7 +1229,7 @@ contains
       ! Set starting locations within REAL (wp) work space
       ! (invalid values of N, M, NP, NQ, LDWE and/or LD2WE
       ! are handled reasonably by DWINF)
-      call dwinf(n, m, np, nq, ldwe, ld2we, isodr, &
+      call winf(n, m, np, nq, ldwe, ld2we, isodr, &
                  deltai, fi, xplusi, fni, sdi, vcvi, &
                  rvari, wssi, wssdei, wssepi, rcondi, etai, &
                  olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
@@ -1281,7 +1282,7 @@ contains
             work(fi:fi + (n*nq - 1)) = &
                work(fni:fni + (n*nq - 1)) - reshape(y(1:n, :), shape=[n*nq])
          end if
-         call dwght(n, nq, &
+         call wght(n, nq, &
                     reshape(work(we1i:we1i + ldwe*ld2we*nq - 1), [ldwe, ld2we, nq]), &
                     ldwe, ld2we, &
                     reshape(work(fi:fi + n*nq - 1), [n, nq]), tempret(1:n, 1:nq))
@@ -1293,7 +1294,7 @@ contains
 
          ! Perform error checking
          info = 0
-         call dodchk(n, m, np, nq, &
+         call odchk(n, m, np, nq, &
                      isodr, anajac, implct, &
                      beta, ifixb, &
                      ldx, ldifx, ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
@@ -1314,7 +1315,7 @@ contains
             iwork(i) = 0
          end do
 
-         call diniwk(n, m, np, &
+         call iniwk(n, m, np, &
                      work, lwork, iwork, liwork, &
                      x, ldx, ifixx, ldifx, scld, ldscld, &
                      beta, sclb, &
@@ -1333,13 +1334,13 @@ contains
          ! Set up for parameter estimation -
          ! Pull BETA's to be estimated and corresponding scale values
          ! and store in WORK(BETACI) and WORK(SSI), respectively
-         call dpack(np, iwork(nppi), work(betaci), beta, ifixb)
-         call dpack(np, iwork(nppi), work(ssi), work(ssfi), ifixb)
+         call pack(np, iwork(nppi), work(betaci), beta, ifixb)
+         call pack(np, iwork(nppi), work(ssi), work(ssfi), ifixb)
          npp = iwork(nppi)
 
          ! Check that WD is positive definite and WE is positive semidefinite,
          ! saving factorization of WE, and counting number of nonzero weights
-         call dfctrw(n, m, nq, npp, &
+         call fctrw(n, m, nq, npp, &
                      isodr, &
                      we, ldwe, ld2we, wd, ldwd, ld2wd, &
                      work(wrk2i), work(wrk4i), &
@@ -1351,7 +1352,7 @@ contains
          end if
 
          ! Evaluate the predicted values and weighted EPSILONS at the starting point
-         call dunpac(np, work(betaci), beta, ifixb)
+         call unpack(np, work(betaci), beta, ifixb)
          work(xplusi:xplusi + (n*m - 1)) = &
             work(deltai:deltai + (n*m - 1)) + reshape(x(1:n, :), shape=[n*m])
          istop = 0
@@ -1370,7 +1371,7 @@ contains
                work(fi:fi + (n*nq - 1)) = &
                   work(fni:fni + (n*nq - 1)) - reshape(y(1:n, :), shape=[n*nq])
             end if
-            call dwght(n, nq, &
+            call wght(n, nq, &
                        reshape(work(we1i:we1i + ldwe*ld2we*nq - 1), [ldwe, ld2we, nq]), &
                        ldwe, ld2we, &
                        reshape(work(fi:fi + n*nq - 1), [n, nq]), tempret(1:n, 1:nq))
@@ -1381,13 +1382,13 @@ contains
          end if
 
          ! Compute norm of the initial estimates
-         call dwght(npp, 1, &
+         call wght(npp, 1, &
                     reshape(work(ssi:ssi + npp - 1), [npp, 1, 1]), &
                     npp, 1, &
                     reshape(work(betaci:betaci + npp - 1), [npp, 1]), tempret(1:npp, 1:1))
          work(wrk:wrk + npp - 1) = tempret(1:npp, 1)
          if (isodr) then
-            call dwght(n, m, &
+            call wght(n, m, &
                        reshape(work(tti:tti + iwork(ldtti)*1*m - 1), [iwork(ldtti), 1, m]), &
                        iwork(ldtti), 1, &
                        reshape(work(deltai:deltai + n*m - 1), [n, m]), tempret(1:n, 1:m))
@@ -1400,7 +1401,7 @@ contains
          ! Compute sum of squares of the weighted EPSILONS and weighted DELTAS
          work(wssepi) = ddot(n*nq, work(fi), 1, work(fi), 1)
          if (isodr) then
-            call dwght(n, m, wd, ldwd, ld2wd, &
+            call wght(n, m, wd, ldwd, ld2wd, &
                        reshape(work(deltai:deltai + n*m), [n, m]), &
                        tempret(1:n, 1:m))
             work(wrk:wrk + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
@@ -1412,7 +1413,7 @@ contains
 
          ! Select first row of X + DELTA that contains no zeros
          nrow = -1
-         call dsetn(n, m, work(xplusi), n, nrow)
+         call setrow(n, m, work(xplusi), n, nrow)
          iwork(nrowi) = nrow
 
          ! Set number of good digits in function results
@@ -1420,7 +1421,7 @@ contains
          if (ndigit < 2) then
             iwork(netai) = -1
             nfev = iwork(nfevi)
-            call detaf(fcn, &
+            call etaf(fcn, &
                        n, m, np, nq, &
                        work(xplusi), beta, epsmac, nrow, &
                        work(betani), work(fni), &
@@ -1451,7 +1452,7 @@ contains
          if (.not. anajac .or. chkjac) then
             if (cdjac) then
                do k = 1, np
-                  if (upper(k) - abs(2*derstep(1, k, upper(k), work(ssfi), stpb, neta)) &
+                  if (upper(k) - abs(2*erstep(1, k, upper(k), work(ssfi), stpb, neta)) &
                       < lower(k)) then
                      info = 90020
                      goto 50
@@ -1459,7 +1460,7 @@ contains
                end do
             else
                do k = 1, np
-                  if (upper(k) - abs(2*derstep(0, k, upper(k), work(ssfi), stpb, neta)) &
+                  if (upper(k) - abs(2*erstep(0, k, upper(k), work(ssfi), stpb, neta)) &
                       < lower(k)) then
                      info = 90020
                      goto 50
@@ -1483,7 +1484,7 @@ contains
             call mbfb(np, betaj, lower, upper, work(ssfi), stpb, neta, eta, interval)
 
             ! Check the derivatives
-            call djck(fcn, &
+            call jck(fcn, &
                       n, m, np, nq, &
                       beta, betaj, work(xplusi), &
                       ifixb, ifixx, ldifx, stpb, stpd, ldstpd, &
@@ -1590,8 +1591,8 @@ contains
       ! Revision Date  920619   (YYMMDD)
 
       use odrpack_kinds, only: zero, one
-      use odrpack_core, only: fcn_t, dacces, devjac, dflags, dunpac, dwght, dpack, dodvcv, &
-                              dodlm
+      use odrpack_core, only: fcn_t, acces, evjac, flags, unpack, wght, pack, odvcv, &
+                              odlm
       use odrpack_reports, only: odpcr
       use blas_interfaces, only: ddot, dnrm2, dcopy
 
@@ -1911,12 +1912,12 @@ contains
       !  Y:       The dependent variable. Unused when the model is implicit.
 
       ! Initialize necessary variables
-      call dpack(np, npu, loweru, lower, ifixb)
-      call dpack(np, npu, upperu, upper, ifixb)
-      call dflags(job, restrt, initd, dovcv, redoj, &
+      call pack(np, npu, loweru, lower, ifixb)
+      call pack(np, npu, upperu, upper, ifixb)
+      call flags(job, restrt, initd, dovcv, redoj, &
                   anajac, cdjac, chkjac, isodr, implct)
       access = .true.
-      call dacces(n, m, np, nq, ldwe, ld2we, &
+      call acces(n, m, np, nq, ldwe, ld2we, &
                   work, lwork, iwork, liwork, &
                   access, isodr, &
                   jpvt, omega, u, qraux, sd, vcv, &
@@ -2000,7 +2001,7 @@ contains
           (anajac .and. chkjac)) then
          istop = 0
       else
-         call devjac(fcn, &
+         call evjac(fcn, &
                      anajac, cdjac, &
                      n, m, np, nq, &
                      betac, beta, stpb, &
@@ -2028,7 +2029,7 @@ contains
          goto 200
       else
          looped = looped + 1
-         call dodlm(n, m, np, nq, npp, &
+         call odlm(n, m, np, nq, npp, &
                     f, fjacb, fjacd, &
                     wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
                     alpha, tau, eta, isodr, &
@@ -2069,11 +2070,11 @@ contains
       end do
 
       ! Compute norm of scaled steps S and T (TSNORM)
-      call dwght(npp, 1, reshape(ss, [npp, 1, 1]), npp, 1, &
+      call wght(npp, 1, reshape(ss, [npp, 1, 1]), npp, 1, &
                  reshape(s, [npp, 1]), tempret(1:npp, 1:1))
       wrk(1:npp) = tempret(1:npp, 1)
       if (isodr) then
-         call dwght(n, m, reshape(tt, [ldtt, 1, m]), ldtt, 1, t, tempret(1:n, 1:m))
+         call wght(n, m, reshape(tt, [ldtt, 1, m]), ldtt, 1, t, tempret(1:n, 1:m))
          wrk(npp + 1:npp + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
          tsnorm = dnrm2(npp + n*m, wrk, 1)
       else
@@ -2090,7 +2091,7 @@ contains
          end do
       end do
       if (isodr) then
-         call dwght(n, m, wd, ldwd, ld2wd, t, tempret(1:n, 1:m))
+         call wght(n, m, wd, ldwd, ld2wd, t, tempret(1:n, 1:m))
          wrk(n*nq + 1:n*nq + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
          temp1 = ddot(n*nq, wrk, 1, wrk, 1) + ddot(n*m, t, 1, wrk(n*nq + 1), 1)
          temp1 = sqrt(temp1)/rnorm
@@ -2103,7 +2104,7 @@ contains
       dirder = -(temp1**2 + temp2**2)
 
       ! Evaluate predicted values at new point
-      call dunpac(np, betan, beta, ifixb)
+      call unpack(np, betan, beta, ifixb)
       xplusd = x(1:n, :) + deltan
       istop = 0
       call fcn(n, m, np, nq, &
@@ -2131,11 +2132,11 @@ contains
             !call dxmy( n, nq, fn, n, y, ldy, wrk, n)
             wrk(1:n*nq) = reshape(fn - y(1:n, :), [n*nq])
          end if
-         call dwght(n, nq, we1, ldwe, ld2we, reshape(wrk, [n, nq]), &
+         call wght(n, nq, we1, ldwe, ld2we, reshape(wrk, [n, nq]), &
                     tempret(1:n, 1:nq))
          wrk(1:n*nq) = reshape(tempret(1:n, 1:nq), [n*nq])
          if (isodr) then
-            call dwght(n, m, wd, ldwd, ld2wd, deltan, tempret(1:n, 1:m))
+            call wght(n, m, wd, ldwd, ld2wd, deltan, tempret(1:n, 1:m))
             wrk(n*nq + 1:n*nq + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
             rnormn = sqrt(ddot(n*nq, wrk, 1, wrk, 1) + &
                           ddot(n*m, deltan, 1, wrk(n*nq + 1), 1))
@@ -2221,16 +2222,16 @@ contains
             !call dxmy( n, nq, fs, n, y, ldy, f, n)
             f = fs - y(1:n, :)
          end if
-         call dwght(n, nq, we1, ldwe, ld2we, f, tempret(1:n, 1:nq))
+         call wght(n, nq, we1, ldwe, ld2we, f, tempret(1:n, 1:nq))
          f(1:n, 1:nq) = tempret(1:n, 1:nq)
          call dcopy(npp, betan, 1, betac, 1)
          call dcopy(n*m, deltan, 1, delta, 1)
          rnorm = rnormn
-         call dwght(npp, 1, reshape(ss, [npp, 1, 1]), npp, 1, &
+         call wght(npp, 1, reshape(ss, [npp, 1, 1]), npp, 1, &
                     reshape(betac, [npp, 1]), tempret(1:npp, 1:1))
          wrk(1:npp) = tempret(1:npp, 1)
          if (isodr) then
-            call dwght(n, m, reshape(tt, [ldtt, 1, m]), ldtt, 1, delta, tempret(1:n, 1:m))
+            call wght(n, m, reshape(tt, [ldtt, 1, m]), ldtt, 1, delta, tempret(1:n, 1:m))
             wrk(npp + 1:npp + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
             pnorm = dnrm2(npp + n*m, wrk, 1)
          else
@@ -2258,7 +2259,7 @@ contains
          if (ipr2 /= 0 .and. ipr2f /= 0 .and. lunrpt /= 0) then
             if (ipr2f == 1 .or. mod(niter, ipr2f) == 1) then
                iflag = 2
-               call dunpac(np, betac, beta, ifixb)
+               call unpack(np, betac, beta, ifixb)
                wss(1) = rnorm*rnorm
                if (ipr2 >= 3 .and. lunrpt /= ludflt) then
                   npr = 2
@@ -2325,7 +2326,7 @@ contains
          !call dxmy( n, nq, fs, n, y, ldy, f, n)
          f = fs - y(1:n, :)
       end if
-      call dunpac(np, betac, beta, ifixb)
+      call unpack(np, betac, beta, ifixb)
       xplusd = x(1:n, :) + delta
 
       ! Compute covariance matrix of estimated parameters in upper NP by NP portion
@@ -2336,7 +2337,7 @@ contains
          ! Otherwise, Jacobian from beginning of last iteration will be used
          ! to compute covariance matrix
          if (redoj) then
-            call devjac(fcn, &
+            call evjac(fcn, &
                         anajac, cdjac, &
                         n, m, np, nq, &
                         betac, beta, stpb, &
@@ -2357,14 +2358,14 @@ contains
          end if
 
          if (implct) then
-            call dwght(n, m, wd, ldwd, ld2wd, delta, tempret(1:n, 1:m))
+            call wght(n, m, wd, ldwd, ld2wd, delta, tempret(1:n, 1:m))
             wrk(n*nq + 1:n*nq + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
             rss = ddot(n*m, delta, 1, wrk(n*nq + 1), 1)
          else
             rss = rnorm*rnorm
          end if
          if (redoj .or. niter >= 1) then
-            call dodvcv(n, m, np, nq, npp, &
+            call odvcv(n, m, np, nq, npp, &
                         f, fjacb, fjacd, &
                         wd, ldwd, ld2wd, ssf, ss, tt, ldtt, delta, &
                         eta, isodr, &
@@ -2418,11 +2419,11 @@ contains
       end if
 
       ! Compute weighted sums of squares for return to user
-      call dwght(n, nq, we1, ldwe, ld2we, f, tempret(1:n, 1:nq))
+      call wght(n, nq, we1, ldwe, ld2we, f, tempret(1:n, 1:nq))
       wrk(1:n*nq) = reshape(tempret(1:n, 1:nq), [n*nq])
       wss(3) = ddot(n*nq, wrk, 1, wrk, 1)
       if (isodr) then
-         call dwght(n, m, wd, ldwd, ld2wd, delta, tempret(1:n, 1:m))
+         call wght(n, m, wd, ldwd, ld2wd, delta, tempret(1:n, 1:m))
          wrk(n*nq + 1:n*nq + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
          wss(2) = ddot(n*m, delta, 1, wrk(n*nq + 1), 1)
       else
@@ -2431,7 +2432,7 @@ contains
       wss(1) = wss(2) + wss(3)
 
       access = .false.
-      call dacces(n, m, np, nq, ldwe, ld2we, &
+      call acces(n, m, np, nq, ldwe, ld2we, &
                   work, lwork, iwork, liwork, &
                   access, isodr, &
                   jpvt, omega, u, qraux, sd, vcv, &
