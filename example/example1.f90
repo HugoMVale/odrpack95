@@ -20,7 +20,7 @@ contains
       integer :: i
 
       ! Check for unacceptable values for this problem
-      if (beta(1) .lt. zero) then
+      if (beta(1) < zero) then
          istop = 1
          return
       else
@@ -28,14 +28,14 @@ contains
       end if
 
       ! Compute predicted values
-      if (mod(ideval, 10) .ge. 1) then
+      if (mod(ideval, 10) >= 1) then
       do i = 1, nq
          f(:, i) = beta(1) + beta(2)*(exp(beta(3)*xplusd(:, 1)) - one)**2
       end do
       end if
 
       ! Compute derivatives with respect to 'beta'
-      if (mod(ideval/10, 10) .ge. 1) then
+      if (mod(ideval/10, 10) >= 1) then
       do i = 1, nq
          fjacb(:, 1, i) = one
          fjacb(:, 2, i) = (exp(beta(3)*xplusd(:, 1)) - one)**2
@@ -44,7 +44,7 @@ contains
       end if
 
       ! Compute derivatives with respect to 'delta'
-      if (mod(ideval/100, 10) .ge. 1) then
+      if (mod(ideval/100, 10) >= 1) then
       do i = 1, nq
          fjacd(:, 1, i) = beta(2)*2*(exp(beta(3)*xplusd(:, 1)) - one)*exp(beta(3)*xplusd(:, 1))*beta(3)
       end do
@@ -81,7 +81,7 @@ program example1
    read (lundata, *) (beta(i), i=1, np)
    do i = 1, n
       read (lundata, *) (x(i, j), j=1, m), (y(i, j), j=1, nq)
-      if (x(i, 1) .eq. 0.0E0_wp .or. x(i, 1) .eq. 100.0E0_wp) then
+      if (x(i, 1) == 0.0E0_wp .or. x(i, 1) == 100.0E0_wp) then
          ifixx(i, 1) = 0
       else
          ifixx(i, 1) = 1

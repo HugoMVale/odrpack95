@@ -20,7 +20,7 @@ contains
       integer :: i
 
       ! Check for unacceptable values for this problem
-      if (beta(1) .gt. zero) then
+      if (beta(1) > zero) then
          istop = 1
          return
       else
@@ -28,7 +28,7 @@ contains
       end if
 
       ! Compute predicted values
-      if (mod(ideval, 10) .ge. 1) then
+      if (mod(ideval, 10) >= 1) then
          do i = 1, nq
             f(:, i) = beta(3)*(xplusd(:, 1) - beta(1))**2 + &
                       2*beta(4)*(xplusd(:, 1) - beta(1))*(xplusd(:, 2) - beta(2)) + &

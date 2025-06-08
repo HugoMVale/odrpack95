@@ -23,13 +23,14 @@ contains
       istop = 0
       fjacb(:, :, :) = zero
       fjacd(:, :, :) = zero
-      if (mod(ideval, 10) .ge. 1) then
+      if (mod(ideval, 10) >= 1) then
          do i = 1, n
             f(i, 1) = 1440.0_wp
             call mpf(mout, xplusd(i, 1), &
                      beta(1), beta(2), beta(3), zero, f(i, 1), xplusd(i, 1)/2)
          end do
       end if
+      
    end subroutine fcn
 
    pure subroutine mpf(m, c, kwee, k25, k25p, print_every, tout, root)
@@ -58,11 +59,11 @@ contains
       t = zero
 
       last_print = zero
-      if (print_every .gt. zero) then
+      if (print_every > zero) then
          !write (*, *) t, m
       end if
 
-      do while (t .lt. tout)
+      do while (t < tout)
          last_t = t
          last_m = m
          k1 = h*dmdt(m, c, kwee, k25, k25p)
@@ -71,13 +72,13 @@ contains
          k4 = h*dmdt(m + k3, c, kwee, k25, k25p)
          m = m + (k1 + 2*k2 + 2*k3 + k4)/6
          t = t + h
-         if (t .ge. print_every + last_print .and. print_every .gt. zero) &
+         if (t >= print_every + last_print .and. print_every > zero) &
             then
             !write (*, *) t, m
             last_print = t
          end if
-         if (root .gt. zero) then
-            if (last_m .le. root .and. root .lt. m) then
+         if (root > zero) then
+            if (last_m <= root .and. root < m) then
                tout = (t - last_t)/(m - last_m)*(root - last_m) + last_t
                return
             end if

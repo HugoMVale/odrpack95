@@ -23,7 +23,7 @@ contains
 
       ! Check for unacceptable values for this problem
       do i = 1, n
-         if (xplusd(i, 1) .lt. zero) then
+         if (xplusd(i, 1) < zero) then
             istop = 1
             return
          end if
@@ -35,7 +35,7 @@ contains
       stheta = sin(theta)
 
       ! Compute predicted values
-      if (mod(ideval, 10) .ge. 1) then
+      if (mod(ideval, 10) >= 1) then
          do i = 1, n
             freq = xplusd(i, 1)
             omega = (2.0E0_wp*pi*freq*exp(-beta(3)))**beta(4)
@@ -95,19 +95,19 @@ program example3
 
    ! Initialize `delta`, and specify first decade of frequencies as fixed
    do i = 1, n
-      if (x(i, 1) .lt. 100.0E0_wp) then
+      if (x(i, 1) < 100.0E0_wp) then
          delta(i, 1) = 0.0E0_wp
          ifixx(i, 1) = 0
-      elseif (x(i, 1) .le. 150.0E0_wp) then
+      elseif (x(i, 1) <= 150.0E0_wp) then
          delta(i, 1) = 0.0E0_wp
          ifixx(i, 1) = 1
-      elseif (x(i, 1) .le. 1000.0E0_wp) then
+      elseif (x(i, 1) <= 1000.0E0_wp) then
          delta(i, 1) = 25.0E0_wp
          ifixx(i, 1) = 1
-      elseif (x(i, 1) .le. 10000.0E0_wp) then
+      elseif (x(i, 1) <= 10000.0E0_wp) then
          delta(i, 1) = 560.0E0_wp
          ifixx(i, 1) = 1
-      elseif (x(i, 1) .le. 100000.0E0_wp) then
+      elseif (x(i, 1) <= 100000.0E0_wp) then
          delta(i, 1) = 9500.0E0_wp
          ifixx(i, 1) = 1
       else
@@ -118,7 +118,7 @@ program example3
 
    ! Set weights
    do i = 1, n
-      if (x(i, 1) .eq. 100.0E0_wp .or. x(i, 1) .eq. 150.0E0_wp) then
+      if (x(i, 1) == 100.0E0_wp .or. x(i, 1) == 150.0E0_wp) then
          we(i, 1, 1) = 0.0E0_wp
          we(i, 1, 2) = 0.0E0_wp
          we(i, 2, 1) = 0.0E0_wp
