@@ -443,11 +443,11 @@ contains
    !! Get storage locations within integer work space.
 
       integer(c_int), intent(in) :: m
-         !! The number of columns of data in the independent variable.
+         !! Number of columns of data in the independent variable.
       integer(c_int), intent(in) :: np
-         !! The number of function parameters.
+         !! Number of function parameters.
       integer(c_int), intent(in) :: nq
-         !! The number of responses per observation.
+         !! Number of responses per observation.
       type(iworkidx_t), intent(out) :: iworkidx
          !! 0-based indexes of integer work array.
 
@@ -456,13 +456,13 @@ contains
                  ldtti, boundi, liwkmn
 
       call iwinf(m, np, nq, &
-                  msgbi, msgdi, ifix2i, istopi, &
-                  nnzwi, nppi, idfi, &
-                  jobi, iprini, luneri, lunrpi, &
-                  nrowi, ntoli, netai, &
-                  maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
-                  boundi, &
-                  liwkmn)
+                 msgbi, msgdi, ifix2i, istopi, &
+                 nnzwi, nppi, idfi, &
+                 jobi, iprini, luneri, lunrpi, &
+                 nrowi, ntoli, netai, &
+                 maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
+                 boundi, &
+                 liwkmn)
 
       iworkidx%msgb = msgbi - 1
       iworkidx%msgd = msgdi - 1
@@ -519,16 +519,16 @@ contains
                  lwkmn
 
       call winf(n, m, np, nq, ldwe, ld2we, logical(isodr, kind=kind(.true.)), &
-                 deltai, epsi, xplusi, fni, sdi, vcvi, &
-                 rvari, wssi, wssdei, wssepi, rcondi, etai, &
-                 olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
-                 partli, sstoli, taufci, epsmai, &
-                 beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
-                 fsi, fjacbi, we1i, diffi, &
-                 deltsi, deltni, ti, tti, omegai, fjacdi, &
-                 wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
-                 loweri, upperi, &
-                 lwkmn)
+                deltai, epsi, xplusi, fni, sdi, vcvi, &
+                rvari, wssi, wssdei, wssepi, rcondi, etai, &
+                olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
+                partli, sstoli, taufci, epsmai, &
+                beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
+                fsi, fjacbi, we1i, diffi, &
+                deltsi, deltni, ti, tti, omegai, fjacdi, &
+                wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
+                loweri, upperi, &
+                lwkmn)
 
       workidx%delta = deltai - 1
       workidx%eps = epsi - 1
@@ -597,7 +597,7 @@ contains
       integer(c_int), intent(in) :: nq
          !! Number of responses per observation.
       logical(c_bool), intent(in) :: isodr
-         !! The variable designating whether the solution is by ODR (`isodr = .true.`)
+         !! Variable designating whether the solution is by ODR (`isodr = .true.`)
          !! or by OLS (`isodr = .false.`).
       integer(c_int), intent(out) :: lwork
          !! Length of real `work` array.
