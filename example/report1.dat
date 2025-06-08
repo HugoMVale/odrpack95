@@ -62,7 +62,7 @@
        PARTOL =     3.67E-11   (parameter stopping tolerance)
         MAXIT =    50          (maximum number of iterations)
 
- --- Initial Weighted Sum of Squares        =                    6.63720354E+05
+ --- Initial Weighted Sum of Squares        =   6.63720354E+05
          Sum of Squared Weighted Deltas     =   0.00000000E+00
          Sum of Squared Weighted Epsilons   =   6.63720354E+05
 
@@ -93,11 +93,11 @@
         RCOND =     6.12E-03   (inverse condition number)
         ISTOP =     0          (returned by user from subroutine FCN)
 
- --- Final Weighted Sums of Squares       =                     2.14455017E+01
+ --- Final Weighted Sums of Squares       =    2.14455017E+01
          Sum of Squared Weighted Deltas   =    7.78974669E+00
          Sum of Squared Weighted Epsilons =    1.36557550E+01
 
- --- Residual Standard Deviation          =                     1.54364294E+00
+ --- Residual Standard Deviation          =    1.54364294E+00
          Degrees of Freedom               =    9
 
  --- Estimated BETA(J), J = 1, ..., NP:

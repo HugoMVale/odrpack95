@@ -630,8 +630,7 @@ contains
           '                 Penalty Term               =', 1P, E17.8/ &
           '                 Penalty Parameter          =', 1P, E10.1)
 1600  format &
-         (/' --- Initial Weighted Sum of Squares        =', &
-           17X, 1P, E17.8)
+         (/' --- Initial Weighted Sum of Squares        =', 1P, E17.8)
 1610  format &
          ('         Sum of Squared Weighted Deltas     =', 1P, E17.8/ &
           '         Sum of Squared Weighted Epsilons   =', 1P, E17.8)
@@ -1381,13 +1380,12 @@ contains
           '               Penalty Term               = ', 1P, E17.8/ &
           '               Penalty Parameter          = ', 1P, E10.1)
 2100  format &
-         (/' --- Final Weighted Sums of Squares       = ', 17X, 1P, E17.8)
+         (/' --- Final Weighted Sums of Squares       = ', 1P, E17.8)
 2110  format &
          ('         Sum of Squared Weighted Deltas   = ', 1P, E17.8/ &
           '         Sum of Squared Weighted Epsilons = ', 1P, E17.8)
 2200  format &
-         (/' --- Residual Standard Deviation          = ', &
-           17X, 1P, E17.8/ &
+         (/' --- Residual Standard Deviation          = ', 1P, E17.8/ &
            '         Degrees of Freedom               =', I5)
 3000  format &
          (/' --- Estimated BETA(J), J = 1, ..., NP:')
