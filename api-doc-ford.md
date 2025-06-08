@@ -17,7 +17,14 @@ coloured_edges: true
 print_creation_date: true
 creation_date: %Y-%m-%d %H:%M %z
 project_github: https://github.com/HugoMVale/odrpack95
-author: HugoMVale
+author: H. M. Vale
+        P. T. Boggs
+        J. R. Donaldson
+        R. h. Byrd
+        R. B. Schnabel
+        J. W. Zwolak
+        L. T. Watson
+
 github: https://github.com/HugoMVale/
 email: 57530119+HugoMVale@users.noreply.github.com
 dbg: true
