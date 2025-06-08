@@ -9,6 +9,7 @@ contains
    pure subroutine fcn(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, &
                        ldifx, ideval, f, fjacb, fjacd, istop)
    !! User-supplied subroutine for evaluating the model.
+                       
       integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
       integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
       real(kind=wp), intent(in) :: beta(np), xplusd(ldn, m)

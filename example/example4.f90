@@ -103,6 +103,7 @@ program example4
 !! used the call statement here to solve their problem.
 !!   Curious users are encouraged to remove the bounds in the call statement,
 !! run the code, and compare the results to the current call statement.
+    
    use odrpack_kinds, only: wp
    use odrpack, only: odr
    use example4_model, only: fcn
