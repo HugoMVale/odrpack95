@@ -7,8 +7,8 @@ module odrpack_capi
    implicit none
 
    abstract interface
-      subroutine fcn_tc(n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, ldifx, &
-                        ideval, f, fjacb, fjacd, istop) bind(C)
+      subroutine fcn_tc( &
+         n, m, np, nq, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop) bind(C)
       !! User-supplied subroutine for evaluating the model.
          import :: c_int, c_double
          implicit none
@@ -20,15 +20,9 @@ module odrpack_capi
             !! Number of function parameters.
          integer(c_int), intent(in) :: nq
             !! Number of responses per observation.
-         integer(c_int), intent(in) :: ldn
-            !! Leading dimension declarator equal or exceeding `n`.
-         integer(c_int), intent(in) :: ldm
-            !! Leading dimension declarator equal or exceeding `m`.
-         integer(c_int), intent(in) :: ldnp
-            !! Leading dimension declarator equal or exceeding `np`.
          real(c_double), intent(in) :: beta(np)
             !! Current values of parameters.
-         real(c_double), intent(in) :: xplusd(ldn, m)
+         real(c_double), intent(in) :: xplusd(n, m)
             !! Current value of explanatory variable, i.e., `x + delta`.
          integer(c_int), intent(in) :: ifixb(np)
             !! Indicators for "fixing" parameters (`beta`).
@@ -38,11 +32,11 @@ module odrpack_capi
             !! Leading dimension of array `ifixx`.
          integer(c_int), intent(in) :: ideval
             !! Indicator for selecting computation to be performed.
-         real(c_double), intent(out) :: f(ldn, nq)
+         real(c_double), intent(out) :: f(n, nq)
             !! Predicted function values.
-         real(c_double), intent(out) :: fjacb(ldn, ldnp, nq)
+         real(c_double), intent(out) :: fjacb(n, np, nq)
             !! Jacobian with respect to `beta`.
-         real(c_double), intent(out) :: fjacd(ldn, ldm, nq)
+         real(c_double), intent(out) :: fjacd(n, m, nq)
             !! Jacobian with respect to errors `delta`.
          integer(c_int), intent(out) :: istop
             !! Stopping condition.

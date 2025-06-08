@@ -7,18 +7,14 @@ module test_error_detection_m
 
 contains
 
-   subroutine fcn &
-      (n, m, np, nq, &
-      ldn, ldm, ldnp, &
-      beta, xplusd, &
-      ifixb, ifixx, ldifx, &
-      ideval, f, fjacb, fjacd, &
-      istop)
+   subroutine fcn( &
+      n, m, np, nq, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+   !! User-supplied subroutine for evaluating the model.
 
-      integer, intent(in) :: ideval, ldifx, ldm, ldn, ldnp, m, n, np, nq
+      integer, intent(in) :: ideval, ldifx, m, n, np, nq
       integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
-      real(kind=wp), intent(in) :: beta(np), xplusd(ldn, m)
-      real(kind=wp), intent(out) :: f(ldn, nq), fjacb(ldn, ldnp, nq), fjacd(ldn, ldm, nq)
+      real(kind=wp), intent(in) :: beta(np), xplusd(n, m)
+      real(kind=wp), intent(out) :: f(n, nq), fjacb(n, np, nq), fjacd(n, m, nq)
       integer, intent(out) :: istop
 
       integer :: i
@@ -99,9 +95,9 @@ program test_error_detection
    nq = 0
    np = 0
    allocate (beta(np), y(n, nq), x(n, m))
-   y(:, :) = 0.0_wp
-   x(:, :) = 0.0_wp
-   beta(:) = 0.0_wp
+   y = 0.0_wp
+   x = 0.0_wp
+   beta = 0.0_wp
 
    call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, &
             lunrpt=lunrpt, lunerr=lunerr)
@@ -117,9 +113,9 @@ program test_error_detection
    np = 1
    deallocate (beta, y, x)
    allocate (beta(np), y(n, nq), x(n, m))
-   y(:, :) = 0.0_wp
-   x(:, :) = 0.0_wp
-   beta(:) = 0.0_wp
+   y = 0.0_wp
+   x = 0.0_wp
+   beta = 0.0_wp
 
    call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, job=10000, &
             lunrpt=lunrpt, lunerr=lunerr)
@@ -135,9 +131,9 @@ program test_error_detection
    np = 1
    deallocate (beta, y, x)
    allocate (beta(np), y(n, nq), x(n, m))
-   y(:, :) = 0.0_wp
-   x(:, :) = 0.0_wp
-   beta(:) = 0.0_wp
+   y = 0.0_wp
+   x = 0.0_wp
+   beta = 0.0_wp
 
    call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, job=1000, &
             lunrpt=lunrpt, lunerr=lunerr)
@@ -153,9 +149,9 @@ program test_error_detection
    np = 2
    deallocate (beta, y, x)
    allocate (beta(np), y(n, nq), x(n, m))
-   beta(:) = [-200.0_wp, -5.0_wp]
-   upper(1:2) = [-200.0_wp, 0.0_wp]
-   lower(1:2) = [-200.000029802322_wp, -5.0_wp]
+   beta = [-200.0_wp, -5.0_wp]
+   upper = [-200.0_wp, 0.0_wp]
+   lower = [-200.000029802322_wp, -5.0_wp]
    y(:, 1) = [2.718281828459045_wp, 7.389056098930650_wp, &
               148.4131591025766_wp, 403.4287934927353_wp]
    x(:, 1) = [1.0_wp, 2.0_wp, 5.0_wp, 6.0_wp]

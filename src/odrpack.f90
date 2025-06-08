@@ -1008,7 +1008,7 @@ contains
       ! Local scalars
       real(wp) :: epsmac, eta
       integer :: actrsi, alphai, betaci, betani, betasi, beta0i, boundi, deltai, &
-                 deltni, deltsi, diffi, epsmai, etai, fi, fjacbi, fjacdi, fni, fsi, i, &
+                 deltni, deltsi, diffi, epsmai, etai, fi, fjacbi, fjacdi, fni, fsi, &
                  idfi, int2i, iprini, iranki, istop, istopi, jobi, jpvti, k, ldtt, &
                  ldtti, liwkmn, loweri, luneri, lunrpi, lwkmn, lwrk, maxiti, msgb, &
                  msgd, neta, netai, nfev, nfevi, niteri, njev, njevi, nnzw, nnzwi, &
@@ -1056,7 +1056,6 @@ contains
       !            or not (FSTITR=FALSE).
       !  HEAD:     The variable designating whether the heading is to be printed (HEAD=TRUE)
       !            or not (HEAD=FALSE).
-      !  I:        An index variable.
       !  IDFI:     The location in array iwork of variable IDF.
       !  IFIXB:    The values designating whether the elements of BETA are fixed at their input
       !            values or not.
@@ -1281,16 +1280,16 @@ contains
          work(n*m + n*nq + 1:lwork) = zero
          iwork = 0
          call iniwork(n, m, np, &
-                     work, lwork, iwork, liwork, &
-                     x, ifixx, ldifx, scld, ldscld, &
-                     beta, sclb, &
-                     sstol, partol, maxit, taufac, &
-                     job, iprint, lunerr, lunrpt, &
-                     lower, upper, &
-                     epsmai, sstoli, partli, maxiti, taufci, &
-                     jobi, iprini, luneri, lunrpi, &
-                     ssfi, tti, ldtti, deltai, &
-                     loweri, upperi, boundi)
+                      work, lwork, iwork, liwork, &
+                      x, ifixx, ldifx, scld, ldscld, &
+                      beta, sclb, &
+                      sstol, partol, maxit, taufac, &
+                      job, iprint, lunerr, lunrpt, &
+                      lower, upper, &
+                      epsmai, sstoli, partli, maxiti, taufci, &
+                      jobi, iprini, luneri, lunrpi, &
+                      ssfi, tti, ldtti, deltai, &
+                      loweri, upperi, boundi)
 
          iwork(msgb) = -1
          iwork(msgd) = -1
@@ -1321,9 +1320,8 @@ contains
          work(xplusi:xplusi + (n*m - 1)) = &
               work(deltai:deltai + (n*m - 1)) + reshape(x, shape=[n*m])
          istop = 0
-         call fcn(n, m, np, nq, n, m, np, &
-                  beta, work(xplusi), ifixb, ifixx, ldifx, &
-                  2, work(fni), work(wrk6i), work(wrk1i), istop)
+         call fcn(n, m, np, nq, beta, work(xplusi), &
+                  ifixb, ifixx, ldifx, 002, work(fni), work(wrk6i), work(wrk1i), istop)
          iwork(istopi) = istop
          
          if (istop == 0) then
@@ -2062,8 +2060,8 @@ contains
       call unpack_vec(np, betan, beta, ifixb)
       xplusd = x + deltan
       istop = 0
-      call fcn(n, m, np, nq, n, m, np, beta, xplusd, &
-               ifixb, ifixx, ldifx, 2, fn, work(wrk6), work(wrk1), istop)
+      call fcn(n, m, np, nq, beta, xplusd, &
+               ifixb, ifixx, ldifx, 002, fn, work(wrk6), work(wrk1), istop)
       if (istop == 0) then
          nfev = nfev + 1
       end if

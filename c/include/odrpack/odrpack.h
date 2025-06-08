@@ -38,18 +38,15 @@ ODRPACK_EXTERN void close_file(
  * @param m       `==>` Number of columns of data in the independent variable.
  * @param np      `==>` Number of function parameters.
  * @param nq      `==>` Number of responses per observation.
- * @param ldn     `==>` Leading dimension declarator for `n`, `ldn >= n`.
- * @param ldm     `==>` Leading dimension declarator for `m`, `ldm >= m`.
- * @param ldnp    `==>` Leading dimension declarator for `np`, `ldnp >= np`.
  * @param beta    `==>` Array [np] of current parameter values.
  * @param xplusd  `==>` Array [m][ldn] of current explanatory variable values, i.e., `x + delta`.
  * @param ifixb   `==>` Array [np] of indicators for fixing parameters `beta`.
  * @param ifixx   `==>` Array [m][ldifx] of indicators for fixing explanatory variable `x`.
  * @param ldifx   `==>` Leading dimension of array `ifixx`, `ifixx ∈ {1, n}`
  * @param ideval  `==>` Indicator for selecting computation to be performed.
- * @param f       `<==` Array [nq][ldn] for predicted function values.
- * @param fjacb   `<==` Array [nq][ldnp][ldn] for Jacobian with respect to `beta`.
- * @param fjacd   `<==` Array [nq][ldm][ldn] for Jacobian with respect to errors `delta`.
+ * @param f       `<==` Array [nq][n] for predicted function values.
+ * @param fjacb   `<==` Array [nq][np][n] for Jacobian with respect to `beta`.
+ * @param fjacd   `<==` Array [nq][m][n] for Jacobian with respect to errors `delta`.
  * @param istop   `<==` Integer for stopping condition. Values:
  *                0 - current `beta` and `x + delta` were acceptable and values were computed successfully,
  *                1 - current `beta` and `x + delta` are not acceptable; ODRPACK95 should select values closer to most recently used values if possible,
@@ -60,9 +57,6 @@ typedef void (*odrpack_fcn_t)(
     const int *m,
     const int *np,
     const int *nq,
-    const int *ldn,
-    const int *ldm,
-    const int *ldnp,
     const double beta[],
     const double xplusd[],
     const int ifixb[],

@@ -10,7 +10,6 @@ This is a translation of example 3 from the ODRPACK95 documentation.
 
 // User-supplied function for evaluating the model
 void fcn(const int *n, const int *m, const int *np, const int *nq,
-         const int *ldn, const int *ldm, const int *ldnp,
          const double beta[], const double xplusd[],
          const int ifixb[], const int ifixx[], const int *ldifx, const int *ideval,
          double f[], double fjacb[], double fjacd[], int *istop) {

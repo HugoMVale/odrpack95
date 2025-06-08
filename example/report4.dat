@@ -69,14 +69,14 @@
 
     1      18  7.46451E+03   5.2789E-02   6.8844E-03  3.477E-01    NO
     3      34  6.01777E+03   1.2988E-01   6.6700E-02  1.288E-02    NO
-    5      51  3.50759E+02   8.3663E-01   5.3435E-01  9.039E-04    NO
-    7      69  4.60647E+00   9.8125E-01   1.0000E+00  6.908E-02    NO
-    9      80  1.85640E-02   2.3840E-01   9.6622E-01  3.066E-02    NO
-   11      91  1.68549E-03   1.2088E-01   5.7099E-01  1.447E-02    NO
-   13     102  8.78230E-04   5.4439E-03   6.8933E-02  7.035E-03    NO
-   15     113  8.24698E-04   1.3816E-04   3.3976E-03  3.255E-03    NO
-   17     124  8.22081E-04   4.3236E-05   2.1764E-04  1.563E-03    NO
-   19     135  8.21910E-04   2.3152E-05   3.3539E-05  1.560E-03    NO
+    5      51  3.50750E+02   8.3664E-01   5.3435E-01  9.039E-04    NO
+    7      69  4.60391E+00   9.8126E-01   1.0000E+00  6.903E-02    NO
+    9      80  1.78569E-02   2.6500E-01   9.6611E-01  6.131E-02    NO
+   11      92  1.57192E-03   9.0875E-02   5.2427E-01  1.385E-02    NO
+   13     103  8.52895E-04   4.7373E-03   4.0495E-02  6.138E-03    NO
+   15     114  8.23623E-04   1.9354E-04   2.0255E-03  2.845E-03    NO
+   17     125  8.22135E-04   4.3839E-05   1.4837E-04  2.766E-03    NO
+   19     135  8.22067E-04   3.6076E-05   1.3701E-04  2.751E-03    NO
 
  *** Final summary for fit by method of ODR ***
 
@@ -85,14 +85,14 @@
         NITER =    20          (number of iterations)
          NFEV =   144          (number of function evaluations)
         IRANK =     0          (rank deficiency)
-        RCOND =     1.29E-06   (inverse condition number)
+        RCOND =     1.31E-06   (inverse condition number)
         ISTOP =     0          (returned by user from subroutine FCN)
 
- --- Final Weighted Sums of Squares       =                     8.21891614E-04
-         Sum of Squared Weighted Deltas   =    8.21792452E-04
-         Sum of Squared Weighted Epsilons =    9.91621230E-08
+ --- Final Weighted Sums of Squares       =                     8.22031194E-04
+         Sum of Squared Weighted Deltas   =    8.21859957E-04
+         Sum of Squared Weighted Epsilons =    1.71237511E-07
 
- --- Residual Standard Deviation          =                     2.02717983E-02
+ --- Residual Standard Deviation          =                     2.02735196E-02
          Degrees of Freedom               =    2
 
  --- Estimated BETA(J), J = 1, ..., NP:
@@ -100,16 +100,16 @@
                      BETA      LOWER     UPPER      S.D.  ___ 95% Confidence ___
                                                     BETA         Interval
 
-       1   1.36747495E-02   0.00E+00  1.00E+03  6.66E-02  -2.73E-01 to  3.00E-01
-       2   2.03971980E-03   0.00E+00  1.00E+03  1.75E-02  -7.33E-02 to  7.74E-02
-       3   1.15937353E+01   0.00E+00  1.00E+03  9.15E+01  -3.82E+02 to  4.05E+02
+       1   1.36271564E-02   0.00E+00  1.00E+03  6.68E-02  -2.74E-01 to  3.01E-01
+       2   2.05253596E-03   0.00E+00  1.00E+03  1.76E-02  -7.36E-02 to  7.77E-02
+       3   1.15269505E+01   0.00E+00  1.00E+03  9.08E+01  -3.79E+02 to  4.02E+02
 
  --- Estimated EPSILON(I) and DELTA(I,*), I = 1, ..., N:
 
          I    EPSILON(I,1)      DELTA(I,1)
 
-         1  7.12205385E-05  4.89646342E-03
-         2  4.74925382E-05  1.21880818E-04
-         3 -8.80049837E-05 -1.95232781E-02
-         4  2.69866852E-04  1.97340816E-02
-         5 -1.06118904E-04 -5.21630880E-03
+         1  1.79786754E-04  4.88624225E-03
+         2  1.42784430E-04  1.23039797E-04
+         3 -3.01363225E-06 -1.95180021E-02
+         4  3.39840451E-04  1.97422669E-02
+         5 -5.50111479E-05 -5.22110584E-03

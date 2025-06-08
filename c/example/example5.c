@@ -2,52 +2,44 @@
 This is an adaptation of example 5 from the ODRPACK95 documentation.
 */
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <string.h>
+
 #include "../include/odrpack/odrpack.h"
 
 // User-supplied function for evaluating the model and its partial derivatives
 void fcn(const int *n, const int *m, const int *np, const int *nq,
-         const int *ldn, const int *ldm, const int *ldnp,
          const double beta[], const double xplusd[],
          const int ifixb[], const int ifixx[], const int *ldifx, const int *ideval,
-         double f[], double fjacb[], double fjacd[], int *istop)
-{
+         double f[], double fjacb[], double fjacd[], int *istop) {
     *istop = 0;
 
     // Model function
-    if (*ideval % 10 != 0)
-    {
-        for (int i = 0; i < *n; i++)
-        {
+    if (*ideval % 10 != 0) {
+        for (int i = 0; i < *n; i++) {
             f[i] = beta[0] * exp(beta[1] * xplusd[i]);
         }
     }
 
     // Model partial derivatives wrt `beta`
-    if ((*ideval / 10) % 10 != 0)
-    {
-        for (int i = 0; i < *n; i++)
-        {
+    if ((*ideval / 10) % 10 != 0) {
+        for (int i = 0; i < *n; i++) {
             fjacb[i] = exp(beta[1] * xplusd[i]);
             fjacb[*n + i] = beta[0] * xplusd[i] * exp(beta[1] * xplusd[i]);
         }
     }
 
     // Model partial derivatives wrt `delta`
-    if ((*ideval / 100) % 10 != 0)
-    {
-        for (int i = 0; i < *n; i++)
-        {
+    if ((*ideval / 100) % 10 != 0) {
+        for (int i = 0; i < *n; i++) {
             fjacd[i] = beta[0] * beta[1] * exp(beta[1] * xplusd[i]);
         }
     }
 }
 
-int main()
-{
+int main() {
 #define NP 2
 #define N 4
 #define M 1
@@ -102,15 +94,13 @@ int main()
 
     // Allocate memory for array `work`
     double *work = (double *)malloc(lwork * sizeof(double));
-    if (work == NULL)
-    {
+    if (work == NULL) {
         fprintf(stderr, "Failed to allocate memory for 'work' array\n");
     }
 
     // Allocate memory for array `iwork`
     int *iwork = (int *)malloc(liwork * sizeof(int));
-    if (iwork == NULL)
-    {
+    if (iwork == NULL) {
         fprintf(stderr, "Failed to allocate memory for 'iwork' array\n");
     }
 
@@ -147,21 +137,18 @@ int main()
     // Get the variable locations within the integer and real work space
     iworkidx_t iworkidx;
     workidx_t workidx;
-    diwinf_c(&m, &np, &nq, &iworkidx);
-    dwinf_c(&n, &m, &np, &nq, &ldwe, &ld2we, &isodr, &workidx);
+    iwinfo_c(&m, &np, &nq, &iworkidx);
+    rwinfo_c(&n, &m, &np, &nq, &ldwe, &ld2we, &isodr, &workidx);
 
     // Print some outputs
     printf("info: %d\n", info);
 
-    for (int i = 0; i < NP; i++)
-    {
+    for (int i = 0; i < NP; i++) {
         printf("beta[%d] = %f\n", i, beta[i]);
     }
 
-    for (int i = 0; i < M; i++)
-    {
-        for (int j = 0; j < N; j++)
-        {
+    for (int i = 0; i < M; i++) {
+        for (int j = 0; j < N; j++) {
             printf("delta[%d][%d] = %f\n", i, j, delta[i][j]);
         }
     }
@@ -170,13 +157,11 @@ int main()
     printf("rcond : %f\n", work[workidx.rcond]);
 
     printf("\n");
-    for (int i = 0; i < liwork; i++)
-    {
+    for (int i = 0; i < liwork; i++) {
         printf("iwork[%d] = %d\n", i, iwork[i]);
     }
     printf("\n");
-    for (int i = 0; i < lwork; i++)
-    {
+    for (int i = 0; i < lwork; i++) {
         printf("work[%d] = %f\n", i, work[i]);
     }
 

@@ -2047,8 +2047,7 @@ contains
    end subroutine odrxd
 
    pure subroutine odrxf( &
-      n, m, np, nq, ldn, ldm, ldnp, beta, xplusd, ifixb, ifixx, ldifx, &
-      ideval, f, fjacb, fjacd, istop)
+      n, m, np, nq, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
    !! Compute model function and jacobian for odrpack exerciser.
 
       use odrpack_kinds, only: zero, one
@@ -2057,18 +2056,15 @@ contains
       integer, intent(in) :: m
       integer, intent(in) :: np
       integer, intent(in) :: nq
-      integer, intent(in) :: ldn
-      integer, intent(in) :: ldm
-      integer, intent(in) :: ldnp
       real(wp), intent(in) :: beta(np)
-      real(wp), intent(in) :: xplusd(ldn, m)
+      real(wp), intent(in) :: xplusd(n, m)
       integer, intent(in) :: ifixb(np)
       integer, intent(in) :: ifixx(ldifx, m)
       integer, intent(in) :: ldifx
       integer, intent(in) :: ideval
-      real(wp), intent(out) :: f(ldn, nq)
-      real(wp), intent(out) :: fjacb(ldn, ldnp, nq)
-      real(wp), intent(out) :: fjacd(ldn, ldm, nq)
+      real(wp), intent(out) :: f(n, nq)
+      real(wp), intent(out) :: fjacb(n, np, nq)
+      real(wp), intent(out) :: fjacd(n, m, nq)
       integer, intent(out) :: istop
 
       ! Local scalars
