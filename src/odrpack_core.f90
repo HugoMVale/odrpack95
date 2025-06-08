@@ -712,7 +712,7 @@ contains
 
    end subroutine access_workspace
 
-   real(wp) pure function erstep(itype, k, betak, ssf, stpb, neta) result(res)
+   real(wp) pure function derstep(itype, k, betak, ssf, stpb, neta) result(res)
    !! Compute step size for center and forward difference calculations.
 
       use odrpack_kinds, only: zero, one
@@ -756,7 +756,7 @@ contains
       end if
       res = sign(one, betak)*typj*hstep(itype, neta, 1, k, stpb, 1)
 
-   end function erstep
+   end function derstep
 
    pure subroutine esubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, e)
    !! Compute `e = wd + alpha*tt**2`.
@@ -2806,7 +2806,7 @@ contains
             fjacb(1:n, k, 1:nq) = zero
          else
             betak = beta(k)
-            wrk3(k) = betak + erstep(1, k, betak, ssf, stpb, neta)
+            wrk3(k) = betak + derstep(1, k, betak, ssf, stpb, neta)
             wrk3(k) = wrk3(k) - betak
 
             beta(k) = betak + wrk3(k)
@@ -3111,7 +3111,7 @@ contains
             end do
          else
             betak = beta(k)
-            step = erstep(0, k, betak, ssf, stpb, neta)
+            step = derstep(0, k, betak, ssf, stpb, neta)
             wrk3(k) = betak + step
             wrk3(k) = wrk3(k) - betak
             beta(k) = betak + wrk3(k)

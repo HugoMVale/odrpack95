@@ -905,7 +905,7 @@ contains
 
       use odrpack_kinds, only: zero, one, ten, p5 => half
       use odrpack_core, only: fcn_t, etaf, fctrw, set_flags, iniwork, iwinfo, jck, odcheck, &
-                              pack_vec, select_row, unpack_vec, weight, rwinfo, erstep, mbfb
+                              pack_vec, select_row, unpack_vec, weight, rwinfo, derstep, mbfb
       use odrpack_reports, only: odper
       use blas_interfaces, only: ddot, dnrm2, dcopy
 
@@ -1413,7 +1413,7 @@ contains
          if (.not. anajac .or. chkjac) then
             if (cdjac) then
                do k = 1, np
-                  if (upper(k) - abs(2*erstep(1, k, upper(k), work(ssfi), stpb, neta)) &
+                  if (upper(k) - abs(2*derstep(1, k, upper(k), work(ssfi), stpb, neta)) &
                       < lower(k)) then
                      info = 90020
                      goto 50
@@ -1421,7 +1421,7 @@ contains
                end do
             else
                do k = 1, np
-                  if (upper(k) - abs(2*erstep(0, k, upper(k), work(ssfi), stpb, neta)) &
+                  if (upper(k) - abs(2*derstep(0, k, upper(k), work(ssfi), stpb, neta)) &
                       < lower(k)) then
                      info = 90020
                      goto 50
