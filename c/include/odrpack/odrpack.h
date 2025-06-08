@@ -346,7 +346,7 @@ typedef struct
  * @param nq       `==>` Number of responses per observation.
  * @param iworkidx `<==` 0-based indexes of integer work array.
  */
-ODRPACK_EXTERN void diwinf_c(
+ODRPACK_EXTERN void iwinfo_c(
     const int *m,
     const int *np,
     const int *nq,
@@ -364,7 +364,7 @@ ODRPACK_EXTERN void diwinf_c(
  * @param isodr   `==>` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
  * @param workidx `<==` 0-based indexes of real work array.
  */
-ODRPACK_EXTERN void dwinf_c(
+ODRPACK_EXTERN void rwinfo_c(
     const int *n,
     const int *m,
     const int *np,
