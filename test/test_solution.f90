@@ -308,8 +308,8 @@ contains
          scld(1, 1) = -one
          ldscld = 1
 
-         upper(:) = huge(one)
-         lower(:) = -huge(one)
+         upper = huge(one)
+         lower = -huge(one)
 
          if (itest == 1) then
 
