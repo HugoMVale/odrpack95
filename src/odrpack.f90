@@ -571,15 +571,15 @@ contains
             (fcn, &
              n, m, np, nq, &
              beta(1:np), &
-             y(1:n, 1:nq), x(1:n, 1:m), &
-             we_(1:ldwe, 1:ld2we, 1:nq), ldwe, ld2we, &
-             wd_(1:ldwd, 1:ld2wd, 1:m), ldwd, ld2wd, &
-             ifixb_, ifixx_(1:ldifx, 1:m), ldifx, &
+             y(1:n, :), x(1:n, :), &
+             we_(1:ldwe, 1:ld2we, :), ldwe, ld2we, &
+             wd_(1:ldwd, 1:ld2wd, :), ldwd, ld2wd, &
+             ifixb_, ifixx_(1:ldifx, :), ldifx, &
              job_, ndigit_, taufac_, &
              sstol_, partol_, maxit_, &
              iprint_, lunerr_, lunrpt_, &
-             stpb_, stpd_(1:ldstpd, 1:m), ldstpd, &
-             sclb_, scld_(1:ldscld, 1:m), ldscld, &
+             stpb_, stpd_(1:ldstpd, :), ldstpd, &
+             sclb_, scld_(1:ldscld, :), ldscld, &
              work_, lwork, tempret, iwork_, liwork, &
              info_, &
              lower_, upper_)
@@ -589,15 +589,15 @@ contains
             (fcn, &
              n, m, np, nq, &
              beta(1:np), &
-             y(1:n, 1:nq), x(1:n, 1:m), &
-             we_(1:ldwe, 1:ld2we, 1:nq), ldwe, ld2we, &
+             y(1:n, :), x(1:n, :), &
+             we_(1:ldwe, 1:ld2we, :), ldwe, ld2we, &
              wd1, 1, 1, &
-             ifixb_, ifixx_(1:ldifx, 1:m), ldifx, &
+             ifixb_, ifixx_(1:ldifx, :), ldifx, &
              job_, ndigit_, taufac_, &
              sstol_, partol_, maxit_, &
              iprint_, lunerr_, lunrpt_, &
-             stpb_, stpd_(1:ldstpd, 1:m), ldstpd, &
-             sclb_, scld_(1:ldscld, 1:m), ldscld, &
+             stpb_, stpd_(1:ldstpd, :), ldstpd, &
+             sclb_, scld_(1:ldscld, :), ldscld, &
              work_, lwork, tempret, iwork_, liwork, &
              info_, &
              lower_, upper_)
