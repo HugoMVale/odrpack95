@@ -1018,7 +1018,7 @@ contains
       ! Create points to use in calculating FCN for ETA and NETA
       do j = -2, 2
          if (j == 0) then
-            parpts(0, :) = beta(:)
+            parpts(0, :) = beta
          else
             do k = 1, np
                if (ifixb(1) < 0) then
@@ -1061,7 +1061,7 @@ contains
 
       ! Evaluate FCN for all points in PARPTS
       do j = -2, 2
-         if (all(parpts(j, :) == beta(:))) then
+         if (all(parpts(j, :) == beta)) then
             do l = 1, nq
                wrk7(j, l) = pv0(nrow, l)
             end do
@@ -6495,7 +6495,7 @@ contains
       !  STPR:     Maximum step to the right of BETA (+) the derivative checker will use.
       !  TYPJ:     The typical size of the J-th unkonwn BETA.
 
-      interval(:) = 111
+      interval = 111
       do k = 1, np
          h0 = hstep(0, neta, 1, k, stpb, 1)
          hc0 = h0
