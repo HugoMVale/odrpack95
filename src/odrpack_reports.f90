@@ -11,8 +11,8 @@ contains
        anajac, cdjac, chkjac, initd, restrt, isodr, implct, dovcv, redoj, &
        msgb1, msgb, msgd1, msgd, &
        n, m, np, nq, npp, nnzw, &
-       x, ldx, ifixx, ldifx, delta, wd, ldwd, ld2wd, tt, ldtt, stpd, ldstpd &
-       , y, ldy, we, ldwe, ld2we, pnlty, beta, ifixb, ssf, stpb, lower, &
+       x, ifixx, ldifx, delta, wd, ldwd, ld2wd, tt, ldtt, stpd, ldstpd, &
+       y, we, ldwe, ld2we, pnlty, beta, ifixb, ssf, stpb, lower, &
        upper, job, neta, taufac, sstol, partol, maxit, wss, wssdel, wsseps)
    !! Generate initial summary report.
 
@@ -70,10 +70,8 @@ contains
          !! The number of function parameters being estimated.
       integer, intent(in) :: nnzw
          !! The number of nonzero observational error weights.
-      real(wp), intent(in) :: x(ldx, m)
+      real(wp), intent(in) :: x(n, m)
          !! The explanatory variable.
-      integer, intent(in) :: ldx
-         !! The leading dimension of array `x`.
       integer, intent(in) :: ifixx(ldifx, m)
          !! The values designating whether the elements of `x` are fixed at their input values or not.
       integer, intent(in) :: ldifx
@@ -94,10 +92,8 @@ contains
          !! The relative step used for computing finite difference derivatives with respect to `delta`.
       integer, intent(in) :: ldstpd
          !! The leading dimension of array `stpd`.
-      real(wp), intent(in) :: y(ldy, nq)
+      real(wp), intent(in) :: y(n, nq)
          !! The response variable. Unused when the model is implicit.
-      integer, intent(in) :: ldy
-         !! The leading dimension of array `y`.
       real(wp), intent(in) :: we(ldwe, ld2we, nq)
          !! The `epsilon` weights.
       integer, intent(in) :: ldwe
@@ -185,8 +181,6 @@ contains
       !  LDTT:    The leading dimension of array TT.
       !  LDWD:    The leading dimension of array WD.
       !  LDWE:    The leading dimension of array WE.
-      !  LDX:     The leading dimension of array X.
-      !  LDY:     The leading dimension of array Y.
       !  LD2WD:   The second dimension of array WD.
       !  LD2WE:   The second dimension of array WE.
       !  LUNRPT:  The logical unit number for the computation reports.
@@ -1478,7 +1472,7 @@ contains
       (ipr, lunrpt, &
        head, prtpen, fstitr, didvcv, iflag, &
        n, m, np, nq, npp, nnzw, &
-       msgb, msgd, beta, y, ldy, x, ldx, delta, &
+       msgb, msgd, beta, y, x, delta, &
        we, ldwe, ld2we, wd, ldwd, ld2wd, &
        ifixb, ifixx, ldifx, &
        lower, upper, &
@@ -1527,14 +1521,10 @@ contains
          !! The error checking results for the Jacobian with respect to `delta`.
       real(wp), intent(in) :: beta(np)
          !! The function parameters.
-      real(wp), intent(in) :: y(ldy, nq)
+      real(wp), intent(in) :: y(n, nq)
          !! The response variable. Unused when the model is implicit.
-      integer, intent(in) :: ldy
-         !! The leading dimension of array `y`.
-      real(wp), intent(in) :: x(ldx, m)
+      real(wp), intent(in) :: x(n, m)
          !! The explanatory variable.
-      integer, intent(in) :: ldx
-         !! The leading dimension of array `x`.
       real(wp), intent(in) :: delta(n, m)
          !! The estimated errors in the explanatory variables.
       real(wp), intent(in) :: we(ldwe, ld2we, nq)
@@ -1674,8 +1664,6 @@ contains
       !  LDTT:    The leading dimension of array TT.
       !  LDWD:    The leading dimension of array WD.
       !  LDWE:    The leading dimension of array WE.
-      !  LDX:     The leading dimension of array X.
-      !  LDY:     The leading dimension of array Y.
       !  LD2WD:   The second dimension of array WD.
       !  LD2WE:   The second dimension of array WE.
       !  LOWER:   Lower bound on BETA.
@@ -1743,8 +1731,8 @@ contains
             (ipr, lunrpt, &
              anajac, cdjac, chkjac, initd, restrt, isodr, implct, dovcv, redoj, &
              msgb(1), msgb(2), msgd(1), msgd(2), n, m, np, nq, npp, nnzw, x, &
-             ldx, ifixx, ldifx, delta, wd, ldwd, ld2wd, tt, ldtt, stpd, ldstpd, &
-             y, ldy, we, ldwe, ld2we, pnlty, beta, ifixb, ssf, stpb, lower, &
+             ifixx, ldifx, delta, wd, ldwd, ld2wd, tt, ldtt, stpd, ldstpd, &
+             y, we, ldwe, ld2we, pnlty, beta, ifixb, ssf, stpb, lower, &
              upper, job, neta, taufac, sstol, partol, maxit, wss(1), wss(2), &
              wss(3))
 
@@ -2118,9 +2106,9 @@ contains
 1400  format &
          (/' ERROR :  NQ is less than one.')
 2110  format &
-         (/' ERROR :  LDX is less than N.')
+         (/' ERROR :  SIZE(X, 1) is different from N.')
 2120  format &
-         (/' ERROR :  LDY is less than N.')
+         (/' ERROR :  SIZE(Y, 1) is different from N.')
 2210  format &
          (/' ERROR :  LDIFX is less than N'/ &
            '          and LDIFX is not equal to one.')
