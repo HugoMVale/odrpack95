@@ -21,8 +21,8 @@ contains
       integer :: i
 
       istop = 0
-      fjacb(:, :, :) = zero
-      fjacd(:, :, :) = zero
+      fjacb = zero
+      fjacd = zero
       if (mod(ideval, 10) >= 1) then
          do i = 1, n
             f(i, 1) = 1440.0_wp
