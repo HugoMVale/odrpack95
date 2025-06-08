@@ -1483,7 +1483,7 @@ contains
        tau, pnorm, alpha, f, rcond, irank, info, istop)
    !! Generate computation reports.
 
-      use odrpack_core, only: flags
+      use odrpack_core, only: set_flags
 
       integer, intent(in) :: ipr
          !! The variable indicating what is to be printed.
@@ -1712,7 +1712,7 @@ contains
       !  X:       The explanatory variable.
       !  Y:       The dependent variable.  Unused when the model is implicit.
 
-      call flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
+      call set_flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
       pnlty = abs(we(1, 1, 1))
 
       if (head) then

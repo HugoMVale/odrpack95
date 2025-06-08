@@ -217,7 +217,7 @@ contains
 
       ! Compute full Gauss-Newton step (ALPHA=0)
       alpha1 = zero
-      call odstp(n, m, np, nq, npp, &
+      call odstep(n, m, np, nq, npp, &
                   f, fjacb, fjacd, &
                   wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
                   alpha1, epsfcn, isodr, &
@@ -250,10 +250,10 @@ contains
          tfjacb(1:n, 1:nq, k) = fjacb(1:n, k, 1:nq)
          wrk(k) = ddot(n*nq, tfjacb(1, 1, k), 1, f(1, 1), 1)
       end do
-      call scalet(npp, 1, ss, npp, wrk, npp, wrk, npp) ! work is input (as t) and output (as sclt)
+      call scale_vec(npp, 1, ss, npp, wrk, npp, wrk, npp) ! work is input (as t) and output (as sclt)
 
       if (isodr) then
-         call wght(n, m, wd, ldwd, ld2wd, delta, tempret(1:n, 1:m))
+         call weight(n, m, wd, ldwd, ld2wd, delta, tempret(1:n, 1:m))
          wrk(npp + 1:npp + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), (/n*m/))
          iwrk = npp
          do j = 1, m
@@ -262,7 +262,7 @@ contains
                wrk(iwrk) = wrk(iwrk) + ddot(nq, fjacd(i, j, 1), n*m, f(i, 1), n)
             end do
          end do
-         call scalet(n, m, tt, ldtt, wrk(npp + 1), n, wrk(npp + 1), n)
+         call scale_vec(n, m, tt, ldtt, wrk(npp + 1), n, wrk(npp + 1), n)
          top = dnrm2(npp + n*m, wrk, 1)/tau
       else
          top = dnrm2(npp, wrk, 1)/tau
@@ -277,7 +277,7 @@ contains
       do i = 1, 10
 
          ! Compute locally constrained steps S and T and PHI(ALPHA) for current value of ALPHA
-         call odstp(n, m, np, nq, npp, &
+         call odstep(n, m, np, nq, npp, &
                      f, fjacb, fjacd, &
                      wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
                      alpha2, epsfcn, isodr, &
@@ -331,7 +331,7 @@ contains
 
    end subroutine odlm
 
-   pure subroutine acces &
+   pure subroutine access_workspace &
       (n, m, np, nq, ldwe, ld2we, &
        work, lwork, iwork, liwork, &
        access, isodr, &
@@ -616,7 +616,7 @@ contains
       !  XPLUSI:  The starting location in array WORK of array XPLUSD.
 
       ! Find starting locations within integer workspace
-      call iwinf(m, np, nq, &
+      call iwinfo(m, np, nq, &
                   msgb, msgd, jpvti, istopi, &
                   nnzwi, nppi, idfi, &
                   jobi, iprini, luneri, lunrpi, &
@@ -626,10 +626,10 @@ contains
                   liwkmn)
 
       ! Find starting locations within REAL work space
-      call winf(n, m, np, nq, ldwe, ld2we, isodr, &
-                 deltai, epsi, xplusi, fni, sdi, vcvi, &
-                 rvari, wssi, wssdei, wssepi, rcondi, etai, &
-                 olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
+      call rwinfo(n, m, np, nq, ldwe, ld2we, isodr, &
+                  deltai, epsi, xplusi, fni, sdi, vcvi, &
+                  rvari, wssi, wssdei, wssepi, rcondi, etai, &
+                  olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
                  partli, sstoli, taufci, epsmai, &
                  beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
                  fsi, fjacbi, we1i, diffi, &
@@ -716,7 +716,7 @@ contains
          iwork(int2i) = int2
       end if
 
-   end subroutine acces
+   end subroutine access_workspace
 
    real(wp) pure function erstep(itype, k, betak, ssf, stpb, neta) result(res)
    !! Compute step size for center and forward difference calculations.
@@ -1120,7 +1120,7 @@ contains
        n, m, np, nq, &
        betac, beta, stpb, &
        ifixb, ifixx, ldifx, &
-       x, ldx, delta, xplusd, stpd, ldstpd, &
+       x, delta, xplusd, stpd, ldstpd, &
        ssf, tt, ldtt, neta, fn, &
        stp, wrk1, wrk2, wrk3, wrk6, tempret, &
        fjacb, isodr, fjacd, we1, ldwe, ld2we, &
@@ -1159,10 +1159,8 @@ contains
          !! The values designating whether the elements of `delta` are fixed at their input values or not.
       integer, intent(in) :: ldifx
          !! The leading dimension of array `ifixx`.
-      real(wp), intent(in) :: x(ldx, m)
+      real(wp), intent(in) :: x(n, m)
          !! The independent variable.
-      integer, intent(in) :: ldx
-         !! The leading dimension of array `x`.
       real(wp), intent(in) :: delta(n, m)
          !! The estimated values of `delta`.
       real(wp), intent(out) :: xplusd(n, m)
@@ -1253,7 +1251,6 @@ contains
       !  LDSTPD:  The leading dimension of array STPD.
       !  LDTT:    The leading dimension of array TT.
       !  LDWE:    The leading dimension of arrays WE and WE1.
-      !  LDX:     The leading dimension of array X.
       !  LD2WE:   The second dimension of arrays WE and WE1.
       !  M:       The number of columns of data in the independent variable.
       !  N:       The number of observations.
@@ -1276,10 +1273,10 @@ contains
       !  XPLUSD:  The values of X + DELTA.
 
       ! Insert current unfixed BETA estimates into BETA
-      call unpack(np, betac, beta, ifixb)
+      call unpack_vec(np, betac, beta, ifixb)
 
       ! Compute XPLUSD = X + DELTA
-      xplusd = x(1:n, :) + delta
+      xplusd = x + delta
 
       ! Compute the Jacobian wrt the estimated BETAS (FJACB) and the Jacobian wrt DELTA (FJACD)
       istop = 0
@@ -1308,20 +1305,20 @@ contains
          end if
       elseif (cdjac) then
          call jaccd(fcn, &
-                     n, m, np, nq, &
-                     beta, x, ldx, delta, xplusd, ifixb, ifixx, ldifx, &
-                     stpb, stpd, ldstpd, &
-                     ssf, tt, ldtt, neta, fn, stp, wrk1, wrk2, wrk3, wrk6, &
-                     fjacb, isodr, fjacd, nfev, istop, info, &
-                     lower, upper)
+                    n, m, np, nq, &
+                    beta, x, delta, xplusd, ifixb, ifixx, ldifx, &
+                    stpb, stpd, ldstpd, &
+                    ssf, tt, ldtt, neta, fn, stp, wrk1, wrk2, wrk3, wrk6, &
+                    fjacb, isodr, fjacd, nfev, istop, info, &
+                    lower, upper)
       else
          call jacfd(fcn, &
-                     n, m, np, nq, &
-                     beta, x, ldx, delta, xplusd, ifixb, ifixx, ldifx, &
-                     stpb, stpd, ldstpd, &
-                     ssf, tt, ldtt, neta, fn, stp, wrk1, wrk2, wrk3, wrk6, &
-                     fjacb, isodr, fjacd, nfev, istop, info, &
-                     lower, upper)
+                    n, m, np, nq, &
+                    beta, x, delta, xplusd, ifixb, ifixx, ldifx, &
+                    stpb, stpd, ldstpd, &
+                    ssf, tt, ldtt, neta, fn, stp, wrk1, wrk2, wrk3, wrk6, &
+                    fjacb, isodr, fjacd, nfev, istop, info, &
+                    lower, upper)
       end if
       if (istop < 0 .or. info >= 10000) then
          return
@@ -1337,7 +1334,7 @@ contains
       ! Weight the Jacobian wrt the estimated BETAS
       if (ifixb(1) < 0) then
          do k = 1, np
-            call wght(n, nq, we1, ldwe, ld2we, fjacb(1:n, k, 1:nq), tempret(1:n, 1:nq))
+            call weight(n, nq, we1, ldwe, ld2we, fjacb(1:n, k, 1:nq), tempret(1:n, 1:nq))
             fjacb(1:n, k, 1:nq) = tempret(1:n, 1:nq)
          end do
       else
@@ -1345,7 +1342,7 @@ contains
          do k = 1, np
             if (ifixb(k) >= 1) then
                k1 = k1 + 1
-               call wght(n, nq, we1, ldwe, ld2we, fjacb(1:n, k, 1:nq), tempret(1:n, 1:nq))
+               call weight(n, nq, we1, ldwe, ld2we, fjacb(1:n, k, 1:nq), tempret(1:n, 1:nq))
                fjacb(1:n, k1, 1:nq) = tempret(1:n, 1:nq)
             end if
          end do
@@ -1354,7 +1351,7 @@ contains
       ! Weight the Jacobian's wrt DELTA as appropriate
       if (isodr) then
          do j = 1, m
-            call wght(n, nq, we1, ldwe, ld2we, fjacd(1:n, j, 1:nq), tempret(1:n, 1:nq))
+            call weight(n, nq, we1, ldwe, ld2we, fjacd(1:n, j, 1:nq), tempret(1:n, 1:nq))
             fjacd(1:n, j, 1:nq) = tempret(1:n, 1:nq)
          end do
       end if
@@ -1685,7 +1682,8 @@ contains
 
    end subroutine fctrw
 
-   pure subroutine flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
+   pure subroutine set_flags( &
+      job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
    !! Set flags indicating conditions specified by `job`.
 
       integer, intent(in) :: job
@@ -1805,7 +1803,7 @@ contains
 
       end if
 
-   end subroutine flags
+   end subroutine set_flags
 
    real(wp) pure function hstep(itype, neta, i, j, stp, ldstp) result(res)
    !! Set relative step size for finite difference derivatives.
@@ -1920,7 +1918,7 @@ contains
 
    end subroutine setifix
 
-   pure subroutine iwinf &
+   pure subroutine iwinfo &
       (m, np, nq, &
        msgbi, msgdi, ifix2i, istopi, &
        nnzwi, nppi, idfi, &
@@ -2061,11 +2059,343 @@ contains
          liwkmn = 1
       end if
 
-   end subroutine iwinf
+   end subroutine iwinfo
 
-   pure subroutine iniwk &
+   pure subroutine rwinfo &
+      (n, m, np, nq, ldwe, ld2we, isodr, &
+       deltai, epsi, xplusi, fni, sdi, vcvi, &
+       rvari, wssi, wssdei, wssepi, rcondi, etai, &
+       olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
+       partli, sstoli, taufci, epsmai, &
+       beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
+       fsi, fjacbi, we1i, diffi, &
+       deltsi, deltni, ti, tti, omegai, fjacdi, &
+       wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
+       loweri, upperi, &
+       lwkmn)
+   !! Get storage locations within real work space.
+
+      integer, intent(in) :: n
+         !! The number of observations.
+      integer, intent(in) :: m
+         !! The number of columns of data in the explanatory variable.
+      integer, intent(in) :: np
+         !! The number of function parameters.
+      integer, intent(in) :: nq
+         !! The number of responses per observation.
+      integer, intent(in) :: ldwe
+         !! The leading dimension of array `we`.
+      integer, intent(in) :: ld2we
+         !! The second dimension of array `we`.
+      logical, intent(in) :: isodr
+         !! The variable designating whether the solution is by ODR (`isodr`=.true.) or by OLS (`isodr`=.false.).
+      integer, intent(out) :: deltai
+         !! The starting location in array `work` of array `delta`.
+      integer, intent(out) :: epsi
+         !! The starting location in array `work` of array `eps`.
+      integer, intent(out) :: xplusi
+         !! The starting location in array `work` of array `xplusd`.
+      integer, intent(out) :: fni
+         !! The starting location in array `work` of array `fn`.
+      integer, intent(out) :: sdi
+         !! The starting location in array `work` of array `sd`.
+      integer, intent(out) :: vcvi
+         !! The starting location in array `work` of array `vcv`.
+      integer, intent(out) :: rvari
+         !! The location in array `work` of variable `rvar`.
+      integer, intent(out) :: wssi
+         !! The location in array `work` of variable `wss`.
+      integer, intent(out) :: wssdei
+         !! The location in array `work` of variable `wssdel`.
+      integer, intent(out) :: wssepi
+         !! The location in array `work` of variable `wsseps`.
+      integer, intent(out) :: rcondi
+         !! The location in array `work` of variable `rcondi`.
+      integer, intent(out) :: etai
+         !! The location in array `work` of variable `eta`.
+      integer, intent(out) :: olmavi
+         !! The location in array `work` of variable `olmavg`.
+      integer, intent(out) :: taui
+         !! The location in array `work` of variable `tau`.
+      integer, intent(out) :: alphai
+         !! The location in array `work` of variable `alpha`.
+      integer, intent(out) :: actrsi
+         !! The location in array `work` of variable `actrs`.
+      integer, intent(out) :: pnormi
+         !! The location in array `work` of variable `pnorm`.
+      integer, intent(out) :: rnorsi
+         !! The location in array `work` of variable `rnorms`.
+      integer, intent(out) :: prersi
+         !! The location in array `work` of variable `prers`.
+      integer, intent(out) :: partli
+         !! The location in array `work` of variable `partol`.
+      integer, intent(out) :: sstoli
+         !! The location in array `work` of variable `sstol`.
+      integer, intent(out) :: taufci
+         !! The location in array `work` of variable `taufac`.
+      integer, intent(out) :: epsmai
+         !! The location in array `work` of variable `epsmac`.
+      integer, intent(out) :: beta0i
+         !! The starting location in array `work` of array `beta0`.
+      integer, intent(out) :: betaci
+         !! The starting location in array `work` of array `betac`.
+      integer, intent(out) :: betasi
+         !! The starting location in array `work` of array `betas`.
+      integer, intent(out) :: betani
+         !! The starting location in array `work` of array `betan`.
+      integer, intent(out) :: si
+         !! The starting location in array `work` of array `s`.
+      integer, intent(out) :: ssi
+         !! The starting location in array `work` of array `ss`.
+      integer, intent(out) :: ssfi
+         !! The starting location in array `work` of array `ssf`.
+      integer, intent(out) :: qrauxi
+         !! The starting location in array `work` of array `qraux`.
+      integer, intent(out) :: ui
+         !! The starting location in array `work` of array `u`.
+      integer, intent(out) :: fsi
+         !! The starting location in array `work` of array `fs`.
+      integer, intent(out) :: fjacbi
+         !! The starting location in array `work` of array `fjacb`.
+      integer, intent(out) :: we1i
+         !! The starting location in array `work` of array `we1`.
+      integer, intent(out) :: diffi
+         !! The starting location in array `work` of array `diff`.
+      integer, intent(out) :: deltsi
+         !! The starting location in array `work` of array `deltas`.
+      integer, intent(out) :: deltni
+         !! The starting location in array `work` of array `deltan`.
+      integer, intent(out) :: ti
+         !! The starting location in array `work` of array `t`.
+      integer, intent(out) :: tti
+         !! The starting location in array `work` of array `tt`.
+      integer, intent(out) :: omegai
+         !! The starting location in array `work` of array `omega`.
+      integer, intent(out) :: fjacdi
+         !! The starting location in array `work` of array `fjacd`.
+      integer, intent(out) :: wrk1i
+         !! The starting location in array `work` of array `wrk1`.
+      integer, intent(out) :: wrk2i
+         !! The starting location in array `work` of array `wrk2`.
+      integer, intent(out) :: wrk3i
+         !! The starting location in array `work` of array `wrk3`.
+      integer, intent(out) :: wrk4i
+         !! The starting location in array `work` of array `wrk4`.
+      integer, intent(out) :: wrk5i
+         !! The starting location in array `work` of array `wrk5`.
+      integer, intent(out) :: wrk6i
+         !! The starting location in array `work` of array `wrk6`.
+      integer, intent(out) :: wrk7i
+         !! The starting location in array `work` of array `wrk7`.
+      integer, intent(out) :: loweri
+         !! The starting location in array `work` of array `lower`.
+      integer, intent(out) :: upperi
+         !! The starting location in array `work` of array `upper`.
+      integer, intent(out) :: lwkmn
+         !! The minimum acceptable length of vector `work`.
+
+      ! Local scalars
+      integer :: next
+
+      ! Variable Definitions (alphabetically)
+      !  ACTRSI:  The location in array WORK of variable ACTRS.
+      !  ALPHAI:  The location in array WORK of variable ALPHA.
+      !  BETACI:  The starting location in array WORK of array BETAC.
+      !  BETANI:  The starting location in array WORK of array BETAN.
+      !  BETASI:  The starting location in array WORK of array BETAS.
+      !  BETA0I:  The starting location in array WORK of array BETA0.
+      !  DELTAI:  The starting location in array WORK of array DELTA.
+      !  DELTNI:  The starting location in array WORK of array DELTAN.
+      !  DELTSI:  The starting location in array WORK of array DELTAS.
+      !  DIFFI:   The starting location in array WORK of array DIFF.
+      !  EPSI:    The starting location in array WORK of array EPS.
+      !  EPSMAI:  The location in array WORK of variable EPSMAC.
+      !  ETAI:    The location in array WORK of variable ETA.
+      !  FJACBI:  The starting location in array WORK of array FJACB.
+      !  FJACDI:  The starting location in array WORK of array FJACD.
+      !  FNI:     The starting location in array WORK of array FN.
+      !  FSI:     The starting location in array WORK of array FS.
+      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or
+      !           by OLS (ISODR=FALSE).
+      !  LDWE:    The leading dimension of array WE.
+      !  LD2WE:   The second dimension of array WE.
+      !  LWKMN:   The minimum acceptable length of vector work.
+      !  M:       The number of columns of data in the explanatory variable.
+      !  N:       The number of observations.
+      !  NEXT:    The next available location with WORK.
+      !  NP:      The number of function parameters.
+      !  NQ:      The number of responses per observation.
+      !  OLMAVI:  The location in array WORK of variable OLMAVG.
+      !  OMEGAI:  The starting location in array WORK of array OMEGA.
+      !  PARTLI:  The location in array WORK of variable PARTOL.
+      !  PNORMI:  The location in array WORK of variable PNORM.
+      !  PRERSI:  The location in array WORK of variable PRERS.
+      !  QRAUXI:  The starting location in array WORK of array QRAUX.
+      !  RCONDI:  The location in array WORK of variable RCONDI.
+      !  RNORSI:  The location in array WORK of variable RNORMS.
+      !  RVARI:   The location in array WORK of variable RVAR.
+      !  SDI:     The starting location in array WORK of array SD.
+      !  SI:      The starting location in array WORK of array S.
+      !  SSFI:    The starting location in array WORK of array SSF.
+      !  SSI:     The starting location in array WORK of array SS.
+      !  SSTOLI:  The location in array WORK of variable SSTOL.
+      !  TAUFCI:  The location in array WORK of variable TAUFAC.
+      !  TAUI:    The location in array WORK of variable TAU.
+      !  TI:      The starting location in array WORK of array T.
+      !  TTI:     The starting location in array WORK of array TT.
+      !  UI:      The starting location in array WORK of array U.
+      !  VCVI:    The starting location in array WORK of array VCV.
+      !  WE1I:    The starting location in array WORK of array WE1.
+      !  WRK1I:   The starting location in array WORK of array WRK1.
+      !  WRK2I:   The starting location in array WORK of array WRK2.
+      !  WRK3I:   The starting location in array WORK of array WRK3.
+      !  WRK4I:   The starting location in array WORK of array WRK4.
+      !  WRK5I:   The starting location in array WORK of array WRK5.
+      !  WRK6I:   The starting location in array WORK of array WRK6.
+      !  WRK7I:   The starting location in array WORK of array WRK7.
+      !  WSSI:    The location in array WORK of variable WSS.
+      !  WSSDEI:  The location in array WORK of variable WSSDEL.
+      !  WSSEPI:  The location in array work of variable WSSEPS.
+      !  XPLUSI:  The starting location in array WORK of array XPLUSD.
+
+      if (n >= 1 .and. m >= 1 .and. np >= 1 .and. nq >= 1 .and. &
+          ldwe >= 1 .and. ld2we >= 1) then
+
+         deltai = 1
+         epsi = deltai + n*m
+         xplusi = epsi + n*nq
+         fni = xplusi + n*m
+         sdi = fni + n*nq
+         vcvi = sdi + np
+         rvari = vcvi + np*np
+
+         wssi = rvari + 1
+         wssdei = wssi + 1
+         wssepi = wssdei + 1
+         rcondi = wssepi + 1
+         etai = rcondi + 1
+         olmavi = etai + 1
+
+         taui = olmavi + 1
+         alphai = taui + 1
+         actrsi = alphai + 1
+         pnormi = actrsi + 1
+         rnorsi = pnormi + 1
+         prersi = rnorsi + 1
+         partli = prersi + 1
+         sstoli = partli + 1
+         taufci = sstoli + 1
+         epsmai = taufci + 1
+         beta0i = epsmai + 1
+
+         betaci = beta0i + np
+         betasi = betaci + np
+         betani = betasi + np
+         si = betani + np
+         ssi = si + np
+         ssfi = ssi + np
+         qrauxi = ssfi + np
+         ui = qrauxi + np
+         fsi = ui + np
+
+         fjacbi = fsi + n*nq
+
+         we1i = fjacbi + n*np*nq
+
+         diffi = we1i + ldwe*ld2we*nq
+
+         next = diffi + nq*(np + m)
+
+         if (isodr) then
+            deltsi = next
+            deltni = deltsi + n*m
+            ti = deltni + n*m
+            tti = ti + n*m
+            omegai = tti + n*m
+            fjacdi = omegai + nq*nq
+            wrk1i = fjacdi + n*m*nq
+            next = wrk1i + n*m*nq
+         else
+            deltsi = deltai
+            deltni = deltai
+            ti = deltai
+            tti = deltai
+            omegai = deltai
+            fjacdi = deltai
+            wrk1i = deltai
+         end if
+
+         wrk2i = next
+         wrk3i = wrk2i + n*nq
+         wrk4i = wrk3i + np
+         wrk5i = wrk4i + m*m
+         wrk6i = wrk5i + m
+         wrk7i = wrk6i + n*nq*np
+         loweri = wrk7i + 5*nq
+         upperi = loweri + np
+         next = upperi + np
+
+         lwkmn = next
+      else
+         deltai = 1
+         epsi = 1
+         xplusi = 1
+         fni = 1
+         sdi = 1
+         vcvi = 1
+         rvari = 1
+         wssi = 1
+         wssdei = 1
+         wssepi = 1
+         rcondi = 1
+         etai = 1
+         olmavi = 1
+         taui = 1
+         alphai = 1
+         actrsi = 1
+         pnormi = 1
+         rnorsi = 1
+         prersi = 1
+         partli = 1
+         sstoli = 1
+         taufci = 1
+         epsmai = 1
+         beta0i = 1
+         betaci = 1
+         betasi = 1
+         betani = 1
+         si = 1
+         ssi = 1
+         ssfi = 1
+         qrauxi = 1
+         fsi = 1
+         ui = 1
+         fjacbi = 1
+         we1i = 1
+         diffi = 1
+         deltsi = 1
+         deltni = 1
+         ti = 1
+         tti = 1
+         fjacdi = 1
+         omegai = 1
+         wrk1i = 1
+         wrk2i = 1
+         wrk3i = 1
+         wrk4i = 1
+         wrk5i = 1
+         wrk6i = 1
+         wrk7i = 1
+         loweri = 1
+         upperi = 1
+         lwkmn = 1
+      end if
+
+   end subroutine rwinfo
+
+   pure subroutine iniwork &
       (n, m, np, work, lwork, iwork, liwork, &
-       x, ldx, ifixx, ldifx, scld, ldscld, &
+       x, ifixx, ldifx, scld, ldscld, &
        beta, sclb, &
        sstol, partol, maxit, taufac, &
        job, iprint, lunerr, lunrpt, &
@@ -2077,7 +2407,6 @@ contains
    !! Initialize work vectors as necessary.
 
       use odrpack_kinds, only: zero, one, two, three
-      use blas_interfaces, only: dcopy
 
       integer, intent(in) :: n
          !! The number of observations.
@@ -2093,10 +2422,8 @@ contains
          !! The integer work space.
       integer, intent(in) :: liwork
          !! The length of vector `iwork`.
-      real(wp), intent(in) :: x(ldx, m)
+      real(wp), intent(in) :: x(n, m)
          !! The independent variable.
-      integer, intent(in) :: ldx
-         !! The leading dimension of array `x`.
       integer, intent(in) :: ifixx(ldifx, m)
          !! The values designating whether the elements of `x` are fixed at their input values or not.
       integer, intent(in) :: ldifx
@@ -2195,7 +2522,6 @@ contains
       !  LDIFX:   The leading dimension of array IFIXX.
       !  LDSCLD:  The leading dimension of array SCLD.
       !  LDTTI:   The leading dimension of array TT.
-      !  LDX:     The leading dimension of array X.
       !  LIWORK:  The length of vector IWORK.
       !  LUNERI:  The location in array IWORK of variable LUNERR.
       !  LUNERR:  The logical unit number used for error messages.
@@ -2224,7 +2550,7 @@ contains
       !  WORK:    The REAL (wp) work space.
       !  X:       The independent variable.
 
-      call flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
+      call set_flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
 
       ! Store value of machine precision in work vector
       work(epsmai) = epsilon(zero)
@@ -2281,22 +2607,24 @@ contains
 
       ! Compute scaling for BETA's and DELTA's
       if (sclb(1) <= zero) then
-         call scaleb(np, beta, work(ssfi))
+         call scale_beta(np, beta, work(ssfi))
       else
-         call dcopy(np, sclb, 1, work(ssfi), 1)
+         work(ssfi:ssfi + (np - 1)) = sclb
       end if
+
       if (isodr) then
          if (scld(1, 1) <= zero) then
             iwork(ldtti) = n
-            call scaled(n, m, x, ldx, work(tti), iwork(ldtti))
+            call scale_delta(n, m, x, work(tti), iwork(ldtti))
          else
             if (ldscld == 1) then
                iwork(ldtti) = 1
-               call dcopy(m, scld(1, 1), 1, work(tti), 1)
+               work(tti:tti + (m - 1)) = scld(1:m, 1)
             else
                iwork(ldtti) = n
                do j = 1, m
-                  call dcopy(n, scld(1, j), 1, work(tti + (j - 1)*iwork(ldtti)), 1)
+                  istart = tti + (j - 1)*iwork(ldtti)
+                  work(istart:istart + (n - 1)) = scld(1:n, j)
                end do
             end if
          end if
@@ -2305,7 +2633,6 @@ contains
       ! Initialize DELTA's as necessary
       if (isodr) then
          if (initd) then
-            !call dzero( n, m, work( deltai), n)
             work(deltai:deltai + (n*m - 1)) = zero
          else
             if (ifixx(1, 1) >= 0) then
@@ -2328,23 +2655,22 @@ contains
             end if
          end if
       else
-         !call dzero( n, m, work( deltai), n)
          work(deltai:deltai + (n*m - 1)) = zero
       end if
 
       ! Copy bounds into WORK
-      work(loweri:loweri + np - 1) = lower(1:np)
-      work(upperi:upperi + np - 1) = upper(1:np)
+      work(loweri:loweri + np - 1) = lower
+      work(upperi:upperi + np - 1) = upper
 
       ! Initialize parameters on bounds in IWORK
       iwork(boundi:boundi + np - 1) = 0
 
-   end subroutine iniwk
+   end subroutine iniwork
 
    subroutine jaccd &
       (fcn, &
        n, m, np, nq, &
-       beta, x, ldx, delta, xplusd, ifixb, ifixx, ldifx, &
+       beta, x, delta, xplusd, ifixb, ifixx, ldifx, &
        stpb, stpd, ldstpd, &
        ssf, tt, ldtt, neta, fn, stp, wrk1, wrk2, wrk3, wrk6, &
        fjacb, isodr, fjacd, nfev, istop, info, &
@@ -2366,10 +2692,8 @@ contains
          !! The number of responses per observation.
       real(wp), intent(inout) :: beta(np)
          !! The function parameters.
-      real(wp), intent(in) :: x(ldx, m)
+      real(wp), intent(in) :: x(n, m)
          !! The explanatory variable.
-      integer, intent(in) :: ldx
-         !! The leading dimension of array `x`.
       real(wp), intent(in) :: delta(n, m)
          !! The estimated errors in the explanatory variables.
       real(wp), intent(inout) :: xplusd(n, m)
@@ -2456,7 +2780,6 @@ contains
       !  LDIFX:   The leading dimension of array IFIXX.
       !  LDSTPD:  The leading dimension of array STPD.
       !  LDTT:    The leading dimension of array TT.
-      !  LDX:     The leading dimension of array X.
       !  LOWER:   The lower bound on BETA.
       !  M:       The number of columns of data in the explanatory variable.
       !  N:       The number of observations.
@@ -2669,7 +2992,7 @@ contains
    subroutine jacfd &
       (fcn, &
        n, m, np, nq, &
-       beta, x, ldx, delta, xplusd, ifixb, ifixx, ldifx, &
+       beta, x, delta, xplusd, ifixb, ifixx, ldifx, &
        stpb, stpd, ldstpd, &
        ssf, tt, ldtt, neta, fn, stp, wrk1, wrk2, wrk3, wrk6, &
        fjacb, isodr, fjacd, nfev, istop, info, &
@@ -2691,10 +3014,8 @@ contains
          !! The number of responses per observation.
       real(wp), intent(inout) :: beta(np)
          !! The function parameters.
-      real(wp), intent(in) :: x(ldx, m)
+      real(wp), intent(in) :: x(n, m)
          !! The explanatory variable.
-      integer, intent(in) :: ldx
-         !! The leading dimension of array `x`.
       real(wp), intent(in) :: delta(n, m)
          !! The estimated errors in the explanatory variables.
       real(wp), intent(inout) :: xplusd(n, m)
@@ -2780,7 +3101,6 @@ contains
       !  LDIFX:   The leading dimension of array IFIXX.
       !  LDSTPD:  The leading dimension of array STPD.
       !  LDTT:    The leading dimension of array TT.
-      !  LDX:     The leading dimension of array X.
       !  M:       The number of columns of data in the explanatory variable.
       !  N:       The number of observations.
       !  NETA:    The number of good digits in the function results.
@@ -4135,12 +4455,11 @@ contains
 
    end subroutine jckz
 
-   pure subroutine odchk &
+   pure subroutine odcheck &
       (n, m, np, nq, &
-       isodr, anajac, implct, &
+       isodr, anajac, &
        beta, ifixb, &
-       ldx, ldifx, ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-       ldy, &
+       ldifx, ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
        lwork, lwkmn, liwork, liwkmn, &
        sclb, scld, stpb, stpd, &
        info, &
@@ -4163,15 +4482,10 @@ contains
       logical, intent(in) :: anajac
          !! The variable designating whether the Jacobians are computed by finite differences
          !! (`anajac = .false.`) or not (`anajac = .true.`).
-      logical, intent(in) :: implct
-         !! The variable designating whether the solution is by implicit ODR (`implct = .true.`)
-         !! or explicit ODR (`implct = .false.`).
       real(wp), intent(in) :: beta(np)
          !! The function parameters.
       integer, intent(in) :: ifixb(np)
          !! The values designating whether the elements of `beta` are fixed at their input values or not.
-      integer, intent(in) :: ldx
-         !! The leading dimension of array `x`.
       integer, intent(in) :: ldifx
          !! The leading dimension of array `ifixx`.
       integer, intent(in) :: ldscld
@@ -4186,8 +4500,6 @@ contains
          !! The leading dimension of array `wd`.
       integer, intent(in) :: ld2wd
          !! The second dimension of array `wd`.
-      integer, intent(in) :: ldy
-         !! The leading dimension of array `y`.
       integer, intent(in) :: lwork
          !! The length of vector `work`.
       integer, intent(in) :: lwkmn
@@ -4233,8 +4545,6 @@ contains
       !  LDSTPD:  The leading dimension of array STPD.
       !  LDWD:    The leading dimension of array WD.
       !  LDWE:    The leading dimension of array WE.
-      !  LDX:     The leading dimension of array X.
-      !  LDY:     The leading dimension of array X.
       !  LD2WD:   The second dimension of array WD.
       !  LD2WE:   The second dimension of array WE.
       !  LIWKMN:  The minimum acceptable length of array IWORK.
@@ -4255,7 +4565,7 @@ contains
       if ((np <= 0) .or. (ifixb(1) < 0)) then
          npp = np
       else
-         npp = count(ifixb(1:np) /= 0)
+         npp = count(ifixb /= 0)
       end if
 
       ! Check problem specification parameters
@@ -4277,9 +4587,7 @@ contains
       end if
 
       ! Check dimension specification parameters
-      if ((.not. implct .and. (ldy < n)) .or. &
-          (ldx < n) .or. &
-          ((ldwe /= 1) .and. (ldwe < n)) .or. &
+      if (((ldwe /= 1) .and. (ldwe < n)) .or. &
           ((ld2we /= 1) .and. (ld2we < nq)) .or. &
           (isodr .and. ((ldwd /= 1) .and. (ldwd < n))) .or. &
           (isodr .and. ((ld2wd /= 1) .and. (ld2wd < m))) .or. &
@@ -4290,14 +4598,6 @@ contains
           (liwork < liwkmn)) then
 
          info = 20000
-
-         if (.not. implct .and. ldy < n) then
-            info = info + 1000
-         end if
-
-         if (ldx < n) then
-            info = info + 2000
-         end if
 
          if ((ldwe /= 1 .and. ldwe < n) .or. (ld2we /= 1 .and. ld2we < nq)) then
             info = info + 100
@@ -4345,7 +4645,7 @@ contains
 
       ! Check BETA scaling
       if (sclb(1) > zero) then
-         if (any(sclb(1:np) <= zero)) then
+         if (any(sclb <= zero)) then
             if (info == 0) then
                info = 30100
             else
@@ -4361,7 +4661,7 @@ contains
          else
             last = 1
          end if
-         if (any(stpd(1:last, 1:m) <= zero)) then
+         if (any(stpd(1:last, :) <= zero)) then
             if (info == 0) then
                info = 32000
             else
@@ -4372,7 +4672,7 @@ contains
 
       ! Check BETA finite difference step sizes
       if (anajac .and. stpb(1) > zero) then
-         if (any(stpb(1:np) <= zero)) then
+         if (any(stpb <= zero)) then
             if (info == 0) then
                info = 31000
             else
@@ -4382,15 +4682,15 @@ contains
       end if
 
       !  Check bounds
-      if (any(upper(1:np) < lower(1:np))) then
+      if (any(upper < lower)) then
          if (info == 0) then
             info = 91000
          end if
       end if
 
       if (any( &
-          ((upper(1:np) < beta(1:np)) .or. (lower(1:np) > beta(1:np))) &
-          .and. .not. (upper(1:np) < lower(1:np)))) then
+          ((upper < beta) .or. (lower > beta)) &
+          .and. .not. (upper < lower))) then
          if (info >= 90000) then
             info = info + 100
          else
@@ -4398,9 +4698,9 @@ contains
          end if
       end if
 
-   end subroutine odchk
+   end subroutine odcheck
 
-   subroutine odstp &
+   subroutine odstep &
       (n, m, np, nq, npp, &
        f, fjacb, fjacd, &
        wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
@@ -4586,7 +4886,7 @@ contains
 
       if (isodr) then
          ! T = WD * DELTA = D*G2
-         call wght(n, m, wd, ldwd, ld2wd, delta, t)
+         call weight(n, m, wd, ldwd, ld2wd, delta, t)
 
          do i = 1, n
             !  Compute WRK4, such that TRANS(WRK4)*WRK4 = E = (D**2 + ALPHA*TT**2)
@@ -4798,17 +5098,17 @@ contains
       end if
 
       ! Compute PHI(ALPHA) from scaled S and T
-      call wght(npp, 1, reshape(ss, [npp, 1, 1]), npp, 1, reshape(s, [npp, 1]), tempret(1:npp, 1:1))
+      call weight(npp, 1, reshape(ss, [npp, 1, 1]), npp, 1, reshape(s, [npp, 1]), tempret(1:npp, 1:1))
       wrk(1:npp) = tempret(1:npp, 1)
       if (isodr) then
-         call wght(n, m, reshape(tt, [ldtt, 1, m]), ldtt, 1, t, tempret(1:n, 1:m))
+         call weight(n, m, reshape(tt, [ldtt, 1, m]), ldtt, 1, t, tempret(1:n, 1:m))
          wrk(npp + 1:npp + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
          phi = dnrm2(npp + n*m, wrk, 1)
       else
          phi = dnrm2(npp, wrk, 1)
       end if
 
-   end subroutine odstp
+   end subroutine odstep
 
    subroutine odvcv &
       (n, m, np, nq, npp, &
@@ -4981,7 +5281,7 @@ contains
       forvcv = .true.
       istopc = 0
 
-      call odstp(n, m, np, nq, npp, &
+      call odstep(n, m, np, nq, npp, &
                   f, fjacb, fjacd, &
                   wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
                   zero, epsfcn, isodr, &
@@ -5098,7 +5398,7 @@ contains
 
    end subroutine odvcv
 
-   pure subroutine pack(n2, n1, v1, v2, ifix)
+   pure subroutine pack_vec(n2, n1, v1, v2, ifix)
    !! Select the unfixed elements of `v2` and return them in `v1`.
 
       integer, intent(in) :: n2
@@ -5138,7 +5438,49 @@ contains
          v1 = v2
       end if
 
-   end subroutine pack
+   end subroutine pack_vec
+
+   pure subroutine unpack_vec(n2, v1, v2, ifix)
+   !! Copy the elements of `v1` into the locations of `v2` which are unfixed.
+
+      integer, intent(in) :: n2
+         !! The number of items in `v2`.
+      real(wp), intent(in) :: v1(n2)
+         !! The vector of the unfixed items.
+      real(wp), intent(out) :: v2(n2)
+         !! The vector of the fixed and unfixed items into which the elements of `v1` are to
+         !! be inserted.
+      integer, intent(in) :: ifix(n2)
+         !! The values designating whether the elements of `v2` are fixed at their input values
+         !! or not.
+
+      ! Local scalars
+      integer :: i, n1
+
+      ! Variable Definitions (alphabetically)
+      !  I:       An indexing variable.
+      !  IFIX:    The values designating whether the elements of V2 are fixed at their input
+      !           values or not.
+      !  N1:      The number of items in V1.
+      !  N2:      The number of items in V2.
+      !  V1:      The vector of the unfixed items.
+      !  V2:      The vector of the fixed and unfixed items into which the elements of V1 are
+      !           to be inserted.
+
+      n1 = 0
+      if (ifix(1) >= 0) then
+         do i = 1, n2
+            if (ifix(i) /= 0) then
+               n1 = n1 + 1
+               v2(i) = v1(n1)
+            end if
+         end do
+      else
+         n1 = n2
+         v2 = v1
+      end if
+
+   end subroutine unpack_vec
 
    real(wp) pure function ppnml(p) result(res)
    !! Compute the percent point function value for the normal (Gaussian) distribution with
@@ -5620,7 +5962,7 @@ contains
 
    end subroutine fpvd
 
-   pure subroutine scalet(n, m, scl, ldscl, t, ldt, sclt, ldsclt)
+   pure subroutine scale_vec(n, m, scl, ldscl, t, ldt, sclt, ldsclt)
    !! Scale `t` by the inverse of `scl`, i.e., compute `t/scl`.
 
       use odrpack_kinds, only: zero, one
@@ -5685,9 +6027,9 @@ contains
          end do
       end if
 
-   end subroutine scalet
+   end subroutine scale_vec
 
-   pure subroutine scaleb(np, beta, ssf)
+   pure subroutine scale_beta(np, beta, ssf)
    !! Select scaling values for `beta` according to the algorithm given in the ODRPACK95
    !! reference guide.
 
@@ -5746,9 +6088,9 @@ contains
 
       end if
 
-   end subroutine scaleb
+   end subroutine scale_beta
 
-   pure subroutine scaled(n, m, x, ldx, tt, ldtt)
+   pure subroutine scale_delta(n, m, x, tt, ldtt)
    !! Select scaling values for `delta` according to the algorithm given in the ODRPACK95
    !! reference guide.
 
@@ -5758,10 +6100,8 @@ contains
          !! The number of observations.
       integer, intent(in) :: m
          !! The number of columns of data in the independent variable.
-      real(wp), intent(in) :: x(ldx, m)
+      real(wp), intent(in) :: x(n, m)
          !! The independent variable.
-      integer, intent(in) :: ldx
-         !! The leading dimension of array `x`.
       real(wp), intent(out) :: tt(ldtt, m)
          !! The scaling values for `delta`.
       integer, intent(in) :: ldtt
@@ -5779,7 +6119,6 @@ contains
       !  I:       An indexing variable.
       !  J:       An indexing variable.
       !  LDTT:    The leading dimension of array TT.
-      !  LDX:     The leading dimension of array X.
       !  M:       The number of columns of data in the independent variable.
       !  N:       The number of observations.
       !  TT:      THE SCALING VALUES FOR DELTA.
@@ -5820,9 +6159,9 @@ contains
          end if
       end do
 
-   end subroutine scaled
+   end subroutine scale_delta
 
-   pure subroutine setrow(n, m, x, ldx, nrow)
+   pure subroutine select_row(n, m, x, nrow)
    !! Select the row at which the derivative will be checked.
 
       use odrpack_kinds, only: zero
@@ -5831,10 +6170,8 @@ contains
          !! The number of observations.
       integer, intent(in) :: m
          !! The number of columns of data in the independent variable.
-      real(wp), intent(in) :: x(ldx, m)
+      real(wp), intent(in) :: x(n, m)
          !! The independent variable.
-      integer, intent(in) :: ldx
-         !! The leading dimension of array `x`.
       integer, intent(inout) :: nrow
          !! The selected row number of the independent variable.
 
@@ -5844,7 +6181,6 @@ contains
       ! Variable Definitions (alphabetically)
       !  I:       An index variable.
       !  J:       An index variable.
-      !  LDX:     The leading dimension of array X.
       !  M:       The number of columns of data in the independent variable.
       !  N:       The number of observations.
       !  NROW:    The selected row number of the independent variable.
@@ -5862,7 +6198,7 @@ contains
          end if
       end do
 
-   end subroutine setrow
+   end subroutine select_row
 
    pure subroutine solve(n, t, ldt, b, job)
    !! Solve systems of the form:
@@ -5871,10 +6207,7 @@ contains
    !!
    !! where `t` is an upper or lower triangular matrix of order `n`, and the solution `x`
    !! overwrites the RHS `b`.
-   !! Adapted from LINPACK subroutine DTRSL.
-   !!
-   !! References:
-   !! * Dongarra J.J., Bunch J.R., Moler C.B., Stewart G.W., *LINPACK Users Guide*, SIAM, 1979.
+      ! Adapted from LINPACK subroutine DTRSL.
       ! @note: This is one of the most time-consuming subroutines in ODRPACK (~25% of total).
 
       use odrpack_kinds, only: zero
@@ -5989,48 +6322,6 @@ contains
 
    end subroutine solve
 
-   pure subroutine unpack(n2, v1, v2, ifix)
-   !! Copy the elements of `v1` into the locations of `v2` which are unfixed.
-
-      integer, intent(in) :: n2
-         !! The number of items in `v2`.
-      real(wp), intent(in) :: v1(n2)
-         !! The vector of the unfixed items.
-      real(wp), intent(out) :: v2(n2)
-         !! The vector of the fixed and unfixed items into which the elements of `v1` are to
-         !! be inserted.
-      integer, intent(in) :: ifix(n2)
-         !! The values designating whether the elements of `v2` are fixed at their input values
-         !! or not.
-
-      ! Local scalars
-      integer :: i, n1
-
-      ! Variable Definitions (alphabetically)
-      !  I:       An indexing variable.
-      !  IFIX:    The values designating whether the elements of V2 are fixed at their input
-      !           values or not.
-      !  N1:      The number of items in V1.
-      !  N2:      The number of items in V2.
-      !  V1:      The vector of the unfixed items.
-      !  V2:      The vector of the fixed and unfixed items into which the elements of V1 are
-      !           to be inserted.
-
-      n1 = 0
-      if (ifix(1) >= 0) then
-         do i = 1, n2
-            if (ifix(i) /= 0) then
-               n1 = n1 + 1
-               v2(i) = v1(n1)
-            end if
-         end do
-      else
-         n1 = n2
-         v2 = v1
-      end if
-
-   end subroutine unpack
-
    pure subroutine vevtr &
       (m, nq, indx, &
        v, ldv, ld2v, e, lde, ve, ldve, ld2ve, vev, ldvev, &
@@ -6113,7 +6404,7 @@ contains
 
    end subroutine vevtr
 
-   pure subroutine wght(n, m, wt, ldwt, ld2wt, t, wtt)
+   pure subroutine weight(n, m, wt, ldwt, ld2wt, t, wtt)
    !! Scale matrix `t` using `wt`, i.e., compute `wtt = wt*t`.
 
       use odrpack_kinds, only: zero
@@ -6205,339 +6496,7 @@ contains
          end do
       end if
 
-   end subroutine wght
-
-   pure subroutine winf &
-      (n, m, np, nq, ldwe, ld2we, isodr, &
-       deltai, epsi, xplusi, fni, sdi, vcvi, &
-       rvari, wssi, wssdei, wssepi, rcondi, etai, &
-       olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
-       partli, sstoli, taufci, epsmai, &
-       beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
-       fsi, fjacbi, we1i, diffi, &
-       deltsi, deltni, ti, tti, omegai, fjacdi, &
-       wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
-       loweri, upperi, &
-       lwkmn)
-   !! Get storage locations within real work space.
-
-      integer, intent(in) :: n
-         !! The number of observations.
-      integer, intent(in) :: m
-         !! The number of columns of data in the explanatory variable.
-      integer, intent(in) :: np
-         !! The number of function parameters.
-      integer, intent(in) :: nq
-         !! The number of responses per observation.
-      integer, intent(in) :: ldwe
-         !! The leading dimension of array `we`.
-      integer, intent(in) :: ld2we
-         !! The second dimension of array `we`.
-      logical, intent(in) :: isodr
-         !! The variable designating whether the solution is by ODR (`isodr`=.true.) or by OLS (`isodr`=.false.).
-      integer, intent(out) :: deltai
-         !! The starting location in array `work` of array `delta`.
-      integer, intent(out) :: epsi
-         !! The starting location in array `work` of array `eps`.
-      integer, intent(out) :: xplusi
-         !! The starting location in array `work` of array `xplusd`.
-      integer, intent(out) :: fni
-         !! The starting location in array `work` of array `fn`.
-      integer, intent(out) :: sdi
-         !! The starting location in array `work` of array `sd`.
-      integer, intent(out) :: vcvi
-         !! The starting location in array `work` of array `vcv`.
-      integer, intent(out) :: rvari
-         !! The location in array `work` of variable `rvar`.
-      integer, intent(out) :: wssi
-         !! The location in array `work` of variable `wss`.
-      integer, intent(out) :: wssdei
-         !! The location in array `work` of variable `wssdel`.
-      integer, intent(out) :: wssepi
-         !! The location in array `work` of variable `wsseps`.
-      integer, intent(out) :: rcondi
-         !! The location in array `work` of variable `rcondi`.
-      integer, intent(out) :: etai
-         !! The location in array `work` of variable `eta`.
-      integer, intent(out) :: olmavi
-         !! The location in array `work` of variable `olmavg`.
-      integer, intent(out) :: taui
-         !! The location in array `work` of variable `tau`.
-      integer, intent(out) :: alphai
-         !! The location in array `work` of variable `alpha`.
-      integer, intent(out) :: actrsi
-         !! The location in array `work` of variable `actrs`.
-      integer, intent(out) :: pnormi
-         !! The location in array `work` of variable `pnorm`.
-      integer, intent(out) :: rnorsi
-         !! The location in array `work` of variable `rnorms`.
-      integer, intent(out) :: prersi
-         !! The location in array `work` of variable `prers`.
-      integer, intent(out) :: partli
-         !! The location in array `work` of variable `partol`.
-      integer, intent(out) :: sstoli
-         !! The location in array `work` of variable `sstol`.
-      integer, intent(out) :: taufci
-         !! The location in array `work` of variable `taufac`.
-      integer, intent(out) :: epsmai
-         !! The location in array `work` of variable `epsmac`.
-      integer, intent(out) :: beta0i
-         !! The starting location in array `work` of array `beta0`.
-      integer, intent(out) :: betaci
-         !! The starting location in array `work` of array `betac`.
-      integer, intent(out) :: betasi
-         !! The starting location in array `work` of array `betas`.
-      integer, intent(out) :: betani
-         !! The starting location in array `work` of array `betan`.
-      integer, intent(out) :: si
-         !! The starting location in array `work` of array `s`.
-      integer, intent(out) :: ssi
-         !! The starting location in array `work` of array `ss`.
-      integer, intent(out) :: ssfi
-         !! The starting location in array `work` of array `ssf`.
-      integer, intent(out) :: qrauxi
-         !! The starting location in array `work` of array `qraux`.
-      integer, intent(out) :: ui
-         !! The starting location in array `work` of array `u`.
-      integer, intent(out) :: fsi
-         !! The starting location in array `work` of array `fs`.
-      integer, intent(out) :: fjacbi
-         !! The starting location in array `work` of array `fjacb`.
-      integer, intent(out) :: we1i
-         !! The starting location in array `work` of array `we1`.
-      integer, intent(out) :: diffi
-         !! The starting location in array `work` of array `diff`.
-      integer, intent(out) :: deltsi
-         !! The starting location in array `work` of array `deltas`.
-      integer, intent(out) :: deltni
-         !! The starting location in array `work` of array `deltan`.
-      integer, intent(out) :: ti
-         !! The starting location in array `work` of array `t`.
-      integer, intent(out) :: tti
-         !! The starting location in array `work` of array `tt`.
-      integer, intent(out) :: omegai
-         !! The starting location in array `work` of array `omega`.
-      integer, intent(out) :: fjacdi
-         !! The starting location in array `work` of array `fjacd`.
-      integer, intent(out) :: wrk1i
-         !! The starting location in array `work` of array `wrk1`.
-      integer, intent(out) :: wrk2i
-         !! The starting location in array `work` of array `wrk2`.
-      integer, intent(out) :: wrk3i
-         !! The starting location in array `work` of array `wrk3`.
-      integer, intent(out) :: wrk4i
-         !! The starting location in array `work` of array `wrk4`.
-      integer, intent(out) :: wrk5i
-         !! The starting location in array `work` of array `wrk5`.
-      integer, intent(out) :: wrk6i
-         !! The starting location in array `work` of array `wrk6`.
-      integer, intent(out) :: wrk7i
-         !! The starting location in array `work` of array `wrk7`.
-      integer, intent(out) :: loweri
-         !! The starting location in array `work` of array `lower`.
-      integer, intent(out) :: upperi
-         !! The starting location in array `work` of array `upper`.
-      integer, intent(out) :: lwkmn
-         !! The minimum acceptable length of vector `work`.
-
-      ! Local scalars
-      integer :: next
-
-      ! Variable Definitions (alphabetically)
-      !  ACTRSI:  The location in array WORK of variable ACTRS.
-      !  ALPHAI:  The location in array WORK of variable ALPHA.
-      !  BETACI:  The starting location in array WORK of array BETAC.
-      !  BETANI:  The starting location in array WORK of array BETAN.
-      !  BETASI:  The starting location in array WORK of array BETAS.
-      !  BETA0I:  The starting location in array WORK of array BETA0.
-      !  DELTAI:  The starting location in array WORK of array DELTA.
-      !  DELTNI:  The starting location in array WORK of array DELTAN.
-      !  DELTSI:  The starting location in array WORK of array DELTAS.
-      !  DIFFI:   The starting location in array WORK of array DIFF.
-      !  EPSI:    The starting location in array WORK of array EPS.
-      !  EPSMAI:  The location in array WORK of variable EPSMAC.
-      !  ETAI:    The location in array WORK of variable ETA.
-      !  FJACBI:  The starting location in array WORK of array FJACB.
-      !  FJACDI:  The starting location in array WORK of array FJACD.
-      !  FNI:     The starting location in array WORK of array FN.
-      !  FSI:     The starting location in array WORK of array FS.
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or
-      !           by OLS (ISODR=FALSE).
-      !  LDWE:    The leading dimension of array WE.
-      !  LD2WE:   The second dimension of array WE.
-      !  LWKMN:   The minimum acceptable length of vector work.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  N:       The number of observations.
-      !  NEXT:    The next available location with WORK.
-      !  NP:      The number of function parameters.
-      !  NQ:      The number of responses per observation.
-      !  OLMAVI:  The location in array WORK of variable OLMAVG.
-      !  OMEGAI:  The starting location in array WORK of array OMEGA.
-      !  PARTLI:  The location in array WORK of variable PARTOL.
-      !  PNORMI:  The location in array WORK of variable PNORM.
-      !  PRERSI:  The location in array WORK of variable PRERS.
-      !  QRAUXI:  The starting location in array WORK of array QRAUX.
-      !  RCONDI:  The location in array WORK of variable RCONDI.
-      !  RNORSI:  The location in array WORK of variable RNORMS.
-      !  RVARI:   The location in array WORK of variable RVAR.
-      !  SDI:     The starting location in array WORK of array SD.
-      !  SI:      The starting location in array WORK of array S.
-      !  SSFI:    The starting location in array WORK of array SSF.
-      !  SSI:     The starting location in array WORK of array SS.
-      !  SSTOLI:  The location in array WORK of variable SSTOL.
-      !  TAUFCI:  The location in array WORK of variable TAUFAC.
-      !  TAUI:    The location in array WORK of variable TAU.
-      !  TI:      The starting location in array WORK of array T.
-      !  TTI:     The starting location in array WORK of array TT.
-      !  UI:      The starting location in array WORK of array U.
-      !  VCVI:    The starting location in array WORK of array VCV.
-      !  WE1I:    The starting location in array WORK of array WE1.
-      !  WRK1I:   The starting location in array WORK of array WRK1.
-      !  WRK2I:   The starting location in array WORK of array WRK2.
-      !  WRK3I:   The starting location in array WORK of array WRK3.
-      !  WRK4I:   The starting location in array WORK of array WRK4.
-      !  WRK5I:   The starting location in array WORK of array WRK5.
-      !  WRK6I:   The starting location in array WORK of array WRK6.
-      !  WRK7I:   The starting location in array WORK of array WRK7.
-      !  WSSI:    The location in array WORK of variable WSS.
-      !  WSSDEI:  The location in array WORK of variable WSSDEL.
-      !  WSSEPI:  The location in array work of variable WSSEPS.
-      !  XPLUSI:  The starting location in array WORK of array XPLUSD.
-
-      if (n >= 1 .and. m >= 1 .and. np >= 1 .and. nq >= 1 .and. &
-          ldwe >= 1 .and. ld2we >= 1) then
-
-         deltai = 1
-         epsi = deltai + n*m
-         xplusi = epsi + n*nq
-         fni = xplusi + n*m
-         sdi = fni + n*nq
-         vcvi = sdi + np
-         rvari = vcvi + np*np
-
-         wssi = rvari + 1
-         wssdei = wssi + 1
-         wssepi = wssdei + 1
-         rcondi = wssepi + 1
-         etai = rcondi + 1
-         olmavi = etai + 1
-
-         taui = olmavi + 1
-         alphai = taui + 1
-         actrsi = alphai + 1
-         pnormi = actrsi + 1
-         rnorsi = pnormi + 1
-         prersi = rnorsi + 1
-         partli = prersi + 1
-         sstoli = partli + 1
-         taufci = sstoli + 1
-         epsmai = taufci + 1
-         beta0i = epsmai + 1
-
-         betaci = beta0i + np
-         betasi = betaci + np
-         betani = betasi + np
-         si = betani + np
-         ssi = si + np
-         ssfi = ssi + np
-         qrauxi = ssfi + np
-         ui = qrauxi + np
-         fsi = ui + np
-
-         fjacbi = fsi + n*nq
-
-         we1i = fjacbi + n*np*nq
-
-         diffi = we1i + ldwe*ld2we*nq
-
-         next = diffi + nq*(np + m)
-
-         if (isodr) then
-            deltsi = next
-            deltni = deltsi + n*m
-            ti = deltni + n*m
-            tti = ti + n*m
-            omegai = tti + n*m
-            fjacdi = omegai + nq*nq
-            wrk1i = fjacdi + n*m*nq
-            next = wrk1i + n*m*nq
-         else
-            deltsi = deltai
-            deltni = deltai
-            ti = deltai
-            tti = deltai
-            omegai = deltai
-            fjacdi = deltai
-            wrk1i = deltai
-         end if
-
-         wrk2i = next
-         wrk3i = wrk2i + n*nq
-         wrk4i = wrk3i + np
-         wrk5i = wrk4i + m*m
-         wrk6i = wrk5i + m
-         wrk7i = wrk6i + n*nq*np
-         loweri = wrk7i + 5*nq
-         upperi = loweri + np
-         next = upperi + np
-
-         lwkmn = next
-      else
-         deltai = 1
-         epsi = 1
-         xplusi = 1
-         fni = 1
-         sdi = 1
-         vcvi = 1
-         rvari = 1
-         wssi = 1
-         wssdei = 1
-         wssepi = 1
-         rcondi = 1
-         etai = 1
-         olmavi = 1
-         taui = 1
-         alphai = 1
-         actrsi = 1
-         pnormi = 1
-         rnorsi = 1
-         prersi = 1
-         partli = 1
-         sstoli = 1
-         taufci = 1
-         epsmai = 1
-         beta0i = 1
-         betaci = 1
-         betasi = 1
-         betani = 1
-         si = 1
-         ssi = 1
-         ssfi = 1
-         qrauxi = 1
-         fsi = 1
-         ui = 1
-         fjacbi = 1
-         we1i = 1
-         diffi = 1
-         deltsi = 1
-         deltni = 1
-         ti = 1
-         tti = 1
-         fjacdi = 1
-         omegai = 1
-         wrk1i = 1
-         wrk2i = 1
-         wrk3i = 1
-         wrk4i = 1
-         wrk5i = 1
-         wrk6i = 1
-         wrk7i = 1
-         loweri = 1
-         upperi = 1
-         lwkmn = 1
-      end if
-
-   end subroutine winf
+   end subroutine weight
 
    pure subroutine mbfb(np, beta, lower, upper, ssf, stpb, neta, eta, interval)
    !! Ensure range of bounds is large enough for derivative checking.
