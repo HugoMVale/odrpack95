@@ -248,7 +248,7 @@ contains
 
       if (isodr) then
          call weight(n, m, wd, ldwd, ld2wd, delta, tempret(1:n, 1:m))
-         wrk(npp + 1:npp + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), (/n*m/))
+         wrk(npp + 1:npp + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
          iwrk = npp
          do j = 1, m
             do i = 1, n
