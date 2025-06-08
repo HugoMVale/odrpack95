@@ -264,6 +264,8 @@ contains
       epsmac = base**(1 - digits(base))
 
       ! Initialize leading dimension of X
+      ! In these tests, X and Y are taller than necessary. This is what triggers a copy in the
+      ! call to `odcnt`.
       ldx = maxn
       ldy = maxn
 
