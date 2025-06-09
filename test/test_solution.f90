@@ -35,8 +35,7 @@ contains
 
       ! Local scalars
       integer :: i, info, iprint, itest, job, l, ldifx, ldscld, ldstpd, ldwd1, ldwe1, &
-                 ldx, ldy, ld2wd1, ld2we1, liwmin, lun, lwmin, &
-                 m, maxit, msg, n, ndigit, np, nq
+                 ldx, ldy, ld2wd1, ld2we1, lun, m, maxit, msg, n, ndigit, np, nq
       real(wp) :: bnrm, epsmac, ewrt, ewrt2, hundrd, one, p01, p2, partol, sstol, &
                   taufac, three, tsttol, two, wss, wssdel, wsseps, zero
       logical :: failed, fails, isodr, short
@@ -950,6 +949,7 @@ contains
 
          ! Compare results with those obtained on the cray ymp or the intel xeon running
          ! Linux using REAL(8) version of ODRPACK95
+         print *, itest, info
 
          bnrm = dnrm2(np, beta, 1)
          call weight(n, m, wd, ldwd1, ld2wd1, reshape(work(1:n*m), [n, m]), &
