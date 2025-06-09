@@ -43,37 +43,40 @@ program example5
 !! arrays.
 
    use odrpack_kinds, only: wp
-   use odrpack, only: odr
+   use odrpack, only: odr, workspace_dimensions
    use example5_model, only: fcn
    implicit none
 
-   real(kind=wp), allocatable :: beta(:), lower(:), upper(:), x(:, :), y(:, :)
-   real(kind=wp), pointer :: work(:)
-   integer, pointer :: iwork(:)
+   real(kind=wp), allocatable :: beta(:), lower(:), upper(:), x(:, :), y(:, :), work(:)
+   integer, allocatable :: iwork(:)
    integer :: np, n, m, nq, job
-   !integer :: i
+   integer :: i, lwork, liwork
+
+   job = 20
 
    np = 2
    n = 4
    m = 1
    nq = 1
 
-   nullify (iwork, work)
-
    allocate (beta(np), lower(np), upper(np), x(n, m), y(n, nq))
-
+   
    beta(1:2) = [2.0_wp, 0.5_wp]
    lower(1:2) = [0.0_wp, 0.0_wp]
    upper(1:2) = [10.0_wp, 0.9_wp]
    x(1:4, 1) = [0.982_wp, 1.998_wp, 4.978_wp, 6.01_wp]
    y(1:4, 1) = [2.7_wp, 7.4_wp, 148.0_wp, 403.0_wp]
 
-   job = 20
-
+   ! Manual allocation of work arrays
+   ! Not required! Just to show it can be done if so desired
+   call workspace_dimensions(np, n, m, nq, .true., lwork, liwork)
+   allocate (iwork(liwork))
+   allocate (work(lwork)) 
+   
    call odr(fcn, n, m, np, nq, beta, y, x, job=job, iwork=iwork, work=work, &
             lower=lower, upper=upper)
 
-   ! print *
+   ! Remove the comments to print out 'iwork'
    ! print *, "iwork"
    ! do i=1, size(iwork)
    !    print *, i, iwork(i)
