@@ -9,7 +9,7 @@ module test_solution_m
 
 contains
 
-   impure subroutine odrx(ntest, tstfac, passed, lunrpt, lunerr, lunsum)
+   impure subroutine odrx_main(ntest, tstfac, passed, lunrpt, lunerr, lunsum)
    !! Exercise features of [[odrpack]].
 
       use odrpack, only: odr
@@ -323,7 +323,7 @@ contains
                lun = lunsum
             end do
             setno = 5
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 00020
@@ -342,7 +342,7 @@ contains
                lun = lunsum
             end do
             setno = 5
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 00002
@@ -363,7 +363,7 @@ contains
                lun = lunsum
             end do
             setno = 3
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             ifixb(1) = 1
@@ -433,7 +433,7 @@ contains
                lun = lunsum
             end do
             setno = 1
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 01020
@@ -465,7 +465,7 @@ contains
                lun = lunsum
             end do
             setno = 4
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 00020
@@ -507,7 +507,7 @@ contains
                lun = lunsum
             end do
             setno = 6
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 00210
@@ -529,7 +529,7 @@ contains
                lun = lunsum
             end do
             setno = 7
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 00001
@@ -552,7 +552,7 @@ contains
                lun = lunsum
             end do
             setno = 8
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
 
@@ -613,7 +613,7 @@ contains
                lun = lunsum
             end do
             setno = 6
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 00022
@@ -632,7 +632,7 @@ contains
                lun = lunsum
             end do
             setno = 6
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 00020
@@ -652,7 +652,7 @@ contains
                lun = lunsum
             end do
             setno = 9
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 00000
@@ -675,7 +675,7 @@ contains
                lun = lunsum
             end do
             setno = 9
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 00000
@@ -696,7 +696,7 @@ contains
                lun = lunsum
             end do
             setno = 9
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 00000
@@ -720,7 +720,7 @@ contains
                lun = lunsum
             end do
             setno = 9
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 00000
@@ -743,7 +743,7 @@ contains
                lun = lunsum
             end do
             setno = 9
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 00000
@@ -767,7 +767,7 @@ contains
                lun = lunsum
             end do
             setno = 9
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 00010
@@ -791,7 +791,7 @@ contains
                lun = lunsum
             end do
             setno = 9
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 00010
@@ -821,7 +821,7 @@ contains
                lun = lunsum
             end do
             setno = 9
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 00000
@@ -847,7 +847,7 @@ contains
                lun = lunsum
             end do
             setno = 9
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 00000
@@ -875,7 +875,7 @@ contains
                lun = lunsum
             end do
             setno = 10
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 00010
@@ -899,7 +899,7 @@ contains
                lun = lunsum
             end do
             setno = 10
-            call odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
+            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
             work = zero
             delta = zero
             job = 00010
@@ -913,14 +913,12 @@ contains
 
          end if
 
-         call odrxw(n, m, np, nq, ldwe1, ld2we1, isodr, liwmin, lwmin)
-
          ! Compute solution
 
          write (lunrpt, 2200) title
          write (lunsum, 2200) title
          if (short) then
-            call odr(fcn=odrxf, &
+            call odr(fcn=odrx_fcn, &
                      n=n, m=m, np=np, nq=nq, &
                      beta=beta, &
                      y=y, x=x, &
@@ -932,7 +930,7 @@ contains
                      work=work, iwork=iwork, &
                      info=info)
          else
-            call odr(fcn=odrxf, &
+            call odr(fcn=odrx_fcn, &
                      n=n, m=m, np=np, nq=nq, &
                      beta=beta, &
                      y=y, x=x, &
@@ -951,7 +949,7 @@ contains
          end if
 
          ! Compare results with those obtained on the cray ymp or the intel xeon running
-         ! Linux using REAL(wp) version of ODRPACK95
+         ! Linux using REAL(8) version of ODRPACK95
 
          bnrm = dnrm2(np, beta, 1)
          call weight(n, m, wd, ldwd1, ld2wd1, reshape(work(1:n*m), [n, m]), &
@@ -1159,10 +1157,10 @@ contains
            ' *** Summary:', &
            ' all tests agree with expected results. ***')
 
-   end subroutine odrx
+   end subroutine odrx_main
 
-   impure subroutine odrxd(title, n, m, np, nq, ldx, x, ldy, y, beta)
-   !! Set up data for odrpack exerciser.
+   impure subroutine odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
+   !! Set up input data for odrpack exerciser.
 
       character(len=80), intent(out) :: title
       integer, intent(out) :: n
@@ -1179,7 +1177,7 @@ contains
       integer, parameter :: maxset = 16
 
       ! Local scalars
-      integer :: i, j, k, l
+      integer :: i, k, l
 
       ! Local arrays
       real(wp) :: bdata(maxnp, maxset), xdata(maxn, maxm, maxset), ydata(maxn, maxnq, maxset)
@@ -2036,19 +2034,13 @@ contains
          end do
       end do
 
-      do j = 1, m
-         do i = 1, n
-            x(i, j) = xdata(i, j, setno)
-         end do
-      end do
+      x(1:n, 1:m) = xdata(1:n, 1:m, setno)
 
-      do k = 1, np
-         beta(k) = bdata(k, setno)
-      end do
+      beta(1:np) = bdata(1:np, setno)
 
-   end subroutine odrxd
+   end subroutine odrx_inputs
 
-   pure subroutine odrxf( &
+   pure subroutine odrx_fcn( &
       n, m, np, nq, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
    !! Compute model function and jacobian for odrpack exerciser.
 
@@ -2423,46 +2415,7 @@ contains
 
       end if
 
-   end subroutine odrxf
-
-   pure subroutine odrxw(n, m, np, nq, ldwe, ld2we, isodr, liwmin, lwmin)
-   !! Compute minimum lengths for work vectors.
-
-      integer, intent(in) :: n
-      integer, intent(in) :: m
-      integer, intent(in) :: np
-      integer, intent(in) :: nq
-      integer, intent(in) :: ldwe
-      integer, intent(in) :: ld2we
-      logical, intent(in) :: isodr
-      integer, intent(out) :: liwmin
-      integer, intent(out) :: lwmin
-
-      ! Variable definitions (alphabetically)
-      !  ISODR:   The variable designating whether the solution is by odr
-      !           (ISODR=TRUE) or by ols (ISODR=FALSE).
-      !  LDWE:    The leading dimension of array WE.
-      !  LD2WE:   The second dimension of array WE.
-      !  LIWMIN:  The minimum length of vector IWORK for a given problem.
-      !  LWMIN:   The minimum length of vector WORK for a given problem.
-      !  M:       The number of columns in the explanatory variable.
-      !  N:       The number of observations.
-      !  NP:      The number of function parameters.
-      !  NQ:      The number of responses per observation.
-
-      liwmin = 20 + np + nq*(np + m)
-      if (isodr) then
-         lwmin = 18 + 11*np + np**2 + m + m**2 + &
-                 4*n*nq + 6*n*m + 2*n*nq*np + &
-                 2*n*nq*m + nq**2 + &
-                 5*nq + nq*(np + m) + ldwe*ld2we*nq
-      else
-         lwmin = 18 + 11*np + np**2 + m + m**2 + &
-                 4*n*nq + 2*n*m + 2*n*nq*np + &
-                 5*nq + nq*(np + m) + ldwe*ld2we*nq
-      end if
-
-   end subroutine odrxw
+   end subroutine odrx_fcn
 
 end module test_solution_m
 
@@ -2470,7 +2423,7 @@ program test_solution
 !! Solution tests for [[odrpack]].
 
    use odrpack_kinds, only: wp, one
-   use test_solution_m, only: odrx
+   use test_solution_m, only: odrx_main
    implicit none
 
    ! Local scalars
@@ -2502,7 +2455,7 @@ program test_solution
    tstfac = one
    ntest = 23
    passed = .false.
-   call odrx(ntest, tstfac, passed, lunrpt, lunerr, lunsum)
+   call odrx_main(ntest, tstfac, passed, lunrpt, lunerr, lunsum)
 
    if (passed) then
       stop "Solution tests passed. See report."
