@@ -4,17 +4,15 @@ module test_solution_m
    implicit none
 
    integer, parameter :: maxn = 50, maxm = 3, maxnq = 2, maxnp = 10
+   real(wp), allocatable :: lower(:), upper(:)
    integer :: setno
-   real(wp) :: lower(maxnp), upper(maxnp)
 
 contains
 
    impure subroutine odrx_main(ntest, tstfac, passed, lunrpt, lunerr, lunsum)
    !! Exercise features of [[odrpack]].
 
-      use odrpack, only: odr
-      use odrpack_core, only: weight
-      use blas_interfaces, only: ddot, dnrm2
+      use odrpack, only: odr, workspace_dimensions
 
       integer, intent(in) :: ntest
       real(wp), intent(in) :: tstfac
@@ -25,33 +23,23 @@ contains
 
       ! Parameters
       real(wp), parameter :: base = radix(1.0_wp)
-      integer, parameter :: ntests = 23, &
-                            ldwe = maxn, ld2we = maxnq, ldwd = maxn, ld2wd = maxm, &
-                            lwork = 18 + 11*maxnp + maxnp**2 + maxm + maxm**2 + &
-                            4*maxn*maxnq + 6*maxn*maxm + 2*maxn*maxnq*maxnp + &
-                            2*maxn*maxnq*maxm + maxnq**2 + &
-                            5*maxnq + maxnq*(maxnp + maxm) + ldwe*ld2we*maxnq, &
-                            liwork = 20 + maxnp + maxnq*(maxnp + maxm)
+      integer, parameter :: ntests = 23
 
       ! Local scalars
-      integer :: i, info, iprint, itest, job, l, ldifx, ldscld, ldstpd, ldwd1, ldwe1, &
-                 ldx, ldy, ld2wd1, ld2we1, lun, m, maxit, msg, n, ndigit, np, nq
+      integer :: i, info, iprint, itest, job, l, ldstpd, lun, m, maxit, msg, n, ndigit, &
+                 np, nq, ldwd, ld2wd, ldwe, ld2we, lwork, liwork, wssi, wssdei, wssepi
       real(wp) :: bnrm, epsmac, ewrt, ewrt2, hundrd, one, p01, p2, partol, sstol, &
                   taufac, three, tsttol, two, wss, wssdel, wsseps, zero
-      logical :: failed, fails, isodr, short
+      logical :: failed, fails, isodr, short, wflat
       character(len=80) :: title
 
       ! Local arrays
-      real(wp) :: beta(maxnp), dpymp(2, ntests), &
-                  sclb(maxnp), scld(maxn, maxm), &
-                  stpb(maxnp), stpd(maxn, maxm), &
-                  we(maxn, maxnq, maxnq), wd(maxn, maxm, maxm), &
-                  wrk(maxn*maxm + maxn*maxnq), x(maxn, maxm), y(maxn, maxnq), &
-                  tempretl(maxn, maxm)
-      real(wp), pointer :: work(:)
-      real(wp), allocatable :: delta(:, :)
-      integer :: idpymp(ntests), ifixb(maxnp), ifixx(maxn, maxm)
-      integer, pointer :: iwork(:)
+      integer :: idpymp(ntests)
+      integer, allocatable :: ifixb(:), ifixx(:,:), iwork(:)
+      real(wp) :: dpymp(2, ntests), wrk(maxn*maxm + maxn*maxnq), tempretl(maxn, maxm)
+      real(wp), allocatable :: delta(:, :), beta(:), x(:,:), y(:,:), sclb(:), scld(:,:), &
+                               stpb(:), stpd(:, :), we(:,:,:), wd(:,:,:), beta_last(:), &
+                               work(:)
 
       ! Data statements
       data &
@@ -190,27 +178,15 @@ contains
       !  IWORK:   The integer work space.
       !  J:       An index variable.
       !  JOB:     The variable controlling problem initialization and computational method.
-      !  LDIFX:   The leading dimension of array IFIXX.
-      !  LDSCLD:  The leading dimension of array SCLD.
       !  LDWD:    The leading dimension of array WD.
-      !  LDWD1:   The leading dimension of array WD as passed to ODRPACK95.
       !  LDWE:    The leading dimension of array WE.
-      !  LDWE1:   The leading dimension of array WE as passed to ODRPACK95.
-      !  LDX:     The leading dimension of array X.
-      !  LDY:     The leading dimension of array Y.
       !  LD2WD:   The second dimension of array WD.
-      !  LD2WD1:  The second dimension of array WD as passed to ODRPACK95.
       !  LD2WE:   The second dimension of array WE.
-      !  LD2WE1:  The second dimension of array WE as passed to ODRPACK95.
-      !  LIWKMN:  The minimum acceptable length of array IWORK.
-      !  LIWMIN:  The minimum length of vector IWORK for a given problem.
       !  LIWORK:  The length of vector IWORK.
       !  LUN:     The logical unit number currently being used.
       !  LUNERR:  The logical unit number used for error messages.
       !  LUNRPT:  The logical unit number used for computation reports.
       !  LUNSUM:  The logical unit number used for a summary report.
-      !  LWKMN:   The minimum acceptable length of array WORK.
-      !  LWMIN:   The minimum length of vector WORK for a given problem.
       !  LWORK:   The length of vector WORK.
       !  M:       The number of columns of data in the explanatory variable.
       !  MAXIT:   The maximum number of iterations allowed.
@@ -249,9 +225,6 @@ contains
       !  X:       The explanatory variable.
       !  Y:       The response variable.
 
-      ! Allocate work arrays and DELTA
-      allocate (delta(maxn, maxm), iwork(liwork), work(lwork))
-
       ! Initialize test tolerance
       if (tstfac > one) then
          tsttol = tstfac
@@ -262,58 +235,28 @@ contains
       ! Initialize machine precision
       epsmac = base**(1 - digits(base))
 
-      ! Initialize leading dimension of X
-      ! In these tests, X and Y are taller than necessary. This is what triggers a copy in the
-      ! call to `odcnt`.
-      ldx = maxn
-      ldy = maxn
-
       ! Initialize miscellaneous variables used in the exercise procedure
       failed = .false.
-      short = .true.
-      isodr = .true.
-      n = 0
 
       ! Begin exercising ODRPACK95
       test: do itest = 1, ntest
 
          ! Set control values to invoke default values
-         we(1, 1, 1) = -one
-         ldwe1 = ldwe
-         ld2we1 = ld2we
-         wd(1, 1, 1) = -one
-         ldwd1 = ldwd
-         ld2wd1 = ld2wd
-
-         ifixb(1) = -1
-         ifixx(1, 1) = -1
-         ldifx = maxn
-
          ndigit = -1
          taufac = -one
-
          sstol = -one
          partol = -one
          maxit = -1
-
+         wflat = .true.
+         short = .false.
+         isodr = .true.
          iprint = 2112
          ! iprint = 6616
 
-         stpb(1) = -one
-         stpd(1, 1) = -one
-         ldstpd = 1
-
-         sclb(1) = -one
-         scld(1, 1) = -one
-         ldscld = 1
-
-         upper = huge(one)
-         lower = -huge(one)
-
          if (itest == 1) then
 
-            ! Test simple odr problem with analytic derivatives.
-
+            ! Test simple ODR problem with analytic derivatives.
+            
             lun = lunrpt
             write (lun, 1000)
             do i = 1, 2
@@ -321,17 +264,18 @@ contains
                write (lun, 1010)
                lun = lunsum
             end do
+
             setno = 5
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00020
             short = .true.
-            isodr = .true.
 
          elseif (itest == 2) then
 
-            ! Test simple ols problem with forward difference derivatives.
+            ! Test simple OLS problem with forward difference derivatives.
 
             lun = lunrpt
             write (lun, 1000)
@@ -340,19 +284,20 @@ contains
                write (lun, 1020)
                lun = lunsum
             end do
+
             setno = 5
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00002
             short = .true.
             isodr = .false.
 
          elseif (itest == 3) then
 
-            !  Test parameter fixing capabilities for poorly scaled ols problem
-            !  with analytic derivatives.
-            !  (derivative checking turned off.)
+            ! Test parameter fixing capabilities for poorly scaled OLS problem
+            ! with analytic derivatives. (derivative checking turned off.)
 
             lun = lunrpt
             write (lun, 1000)
@@ -361,30 +306,22 @@ contains
                write (lun, 1030)
                lun = lunsum
             end do
+
             setno = 3
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
-            ifixb(1) = 1
-            ifixb(2) = 1
-            ifixb(3) = 1
-            ifixb(4) = 0
-            ifixb(5) = 1
-            ifixb(6) = 0
-            ifixb(7) = 0
-            ifixb(8) = 0
-            ifixb(9) = 0
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
+            ifixb = [1, 1, 1, 0, 1, 0, 0, 0, 0]
             job = 00042
-            short = .false.
             isodr = .false.
 
          elseif (itest == 4) then
 
-            !  Test weighting capabilities for odr problem with
-            !  analytic derivatives.
-            !  Also shows solution of poorly scaled odr problem.
-            !  (derivative checking turned off.)
-            !  N.B., this run continues from where test 3 left off.
+            ! Test weighting capabilities for odr problem with analytic derivatives.
+            ! Also shows solution of poorly scaled odr problem.
+            ! (derivative checking turned off.)
+            ! N.B., this run continues from where test 3 left off.
 
             lun = lunrpt
             write (lun, 1000)
@@ -393,36 +330,29 @@ contains
                write (lun, 1040)
                lun = lunsum
             end do
+
             setno = 3
-            work = zero
-            delta = zero
-            ldwd1 = ldwd
-            ldwe1 = ldwe
-            ld2wd1 = ld2wd
-            ld2we1 = ld2we
+            wflat = .false.
+            beta_last = beta
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
+            beta = beta_last
             do i = 1, n
                wd(i, 1, 1) = (p01/abs(x(i, 1)))**2
                we(i, 1, 1) = one
             end do
             we(28, 1, 1) = zero
-            ifixb(1) = 1
-            ifixb(2) = 1
-            ifixb(3) = 1
-            ifixb(4) = 0
-            ifixb(5) = 1
-            ifixb(6) = 1
-            ifixb(7) = 1
-            ifixb(8) = 0
-            ifixb(9) = 0
+            ifixb = [1, 1, 1, 0, 1, 1, 1, 0, 0]
             job = 00030
             iprint = 2232
-            short = .false.
-            isodr = .true.
 
          elseif (itest == 5) then
 
-            !  Test DELTA initialization capabilities and user-supplied scaling
-            !  and use of istop to restrict parameter values for odr problem with analytic derivatives.
+            ! Test DELTA initialization capabilities and user-supplied scaling
+            ! and use of istop to restrict parameter values for ODR problem with analytic
+            ! derivatives.
 
             lun = lunrpt
             write (lun, 1000)
@@ -431,30 +361,23 @@ contains
                write (lun, 1050)
                lun = lunsum
             end do
+
             setno = 1
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 01020
-            ldscld = 1
-            scld(1, 1) = two
-            sclb(1) = p2
-            sclb(2) = one
-            ldwe1 = 1
-            ld2we1 = 1
-            we(1, 1, 1) = -one
-            ldwd1 = 1
-            ld2wd1 = 1
-            wd(1, 1, 1) = -one
+            scld(:, 1) = two
+            sclb = [p2, one]
             do i = 20, 21
                delta(i, 1) = beta(1)/y(i, 1) + beta(2) - x(i, 1)
             end do
-            short = .false.
-            isodr = .true.
 
          elseif (itest == 6) then
 
-            ! Test stiff stopping conditions for unscaled odr problem  with analytic derivatives.
+            ! Test stiff stopping conditions for unscaled ODR problem  with analytic
+            ! derivatives.
 
             lun = lunrpt
             write (lun, 1000)
@@ -463,21 +386,21 @@ contains
                write (lun, 1060)
                lun = lunsum
             end do
+
             setno = 4
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00020
             sstol = hundrd*epsmac
             partol = epsmac
             maxit = 2
-            short = .false.
-            isodr = .true.
 
          elseif (itest == 7) then
 
-            ! Test restart for unscaled odr problem with analytic derivatives.
-
+            ! Test restart for unscaled ODR problem with analytic derivatives.
+            
             lun = lunrpt
             write (lun, 1000)
             do i = 1, 2
@@ -485,18 +408,17 @@ contains
                write (lun, 1070)
                lun = lunsum
             end do
+            
             setno = 4
             job = 20220
             sstol = hundrd*epsmac
             partol = epsmac
             maxit = 50
-            short = .false.
-            isodr = .true.
 
          elseif (itest == 8) then
 
             ! Test use of TAUFAC to restrict first step
-            ! for odr problem with central difference derivatives.
+            ! for ODR problem with central difference derivatives.
 
             lun = lunrpt
             write (lun, 1000)
@@ -505,18 +427,18 @@ contains
                write (lun, 1080)
                lun = lunsum
             end do
+
             setno = 6
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00210
             taufac = p01
-            short = .false.
-            isodr = .true.
 
          elseif (itest == 9) then
 
-            ! Test implicit odr problem
+            ! Test implicit ODR problem
             ! with forward finite difference derivatives
             ! and covariance matrix constructed with recomputed derivatives.
 
@@ -527,18 +449,18 @@ contains
                write (lun, 1090)
                lun = lunsum
             end do
+
             setno = 7
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00001
             partol = epsmac**(one/three)
-            short = .true.
-            isodr = .true.
 
          elseif (itest == 10) then
 
-            ! Test multiresponse odr problem
+            ! Test multiresponse ODR problem
             ! with central difference derivatives ,
             ! DELTA initialized to nonzero values,
             ! variable fixing, and weighting.
@@ -551,14 +473,11 @@ contains
                lun = lunsum
             end do
             setno = 8
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
-
-            ldwd1 = ldwd
-            ldwe1 = ldwe
-            ld2wd1 = ld2wd
-            ld2we1 = ld2we
+            wflat = .false.
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
 
             do i = 1, n
                ! Initialize DELTA, and specify first decade of frequencies as fixed
@@ -597,8 +516,6 @@ contains
                wd(i, 1, 1) = (1.0E-4_wp)/(x(i, 1)**2)
             end do
             job = 00210
-            short = .false.
-            isodr = .true.
 
          elseif (itest == 11) then
 
@@ -611,13 +528,13 @@ contains
                write (lun, 1110)
                lun = lunsum
             end do
+
             setno = 6
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00022
-            short = .false.
-            isodr = .false.
 
          elseif (itest == 12) then
 
@@ -630,17 +547,17 @@ contains
                write (lun, 1120)
                lun = lunsum
             end do
+
             setno = 6
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00020
-            short = .false.
-            isodr = .true.
 
          elseif (itest == 13) then
 
-            ! Test bounded odr problem where
+            ! Test bounded ODR problem where
             ! parameters start on bound, move away, hit bound, move away, find minimum.
 
             lun = lunrpt
@@ -650,21 +567,21 @@ contains
                write (lun, 1010)
                lun = lunsum
             end do
+
             setno = 9
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00000
-            short = .false.
-            isodr = .true.
             maxit = 100
-            beta(1:2) = [200.0_wp, 5.0_wp]
-            lower(1:2) = [0.1_wp, 0.0_wp]
-            upper(1:2) = [200.0_wp, 5.0_wp]
+            beta = [200.0_wp, 5.0_wp]
+            lower = [0.1_wp, 0.0_wp]
+            upper = [200.0_wp, 5.0_wp]
 
          elseif (itest == 14) then
 
-            ! Test bounded odr problem where bounds are never hit.
+            ! Test bounded ODR problem where bounds are never hit.
 
             lun = lunrpt
             write (lun, 1000)
@@ -673,20 +590,21 @@ contains
                write (lun, 1010)
                lun = lunsum
             end do
+
             setno = 9
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00000
-            short = .false.
-            isodr = .true.
             maxit = 100
-            lower(1:2) = [0.0_wp, 0.0_wp]
-            upper(1:2) = [400.0_wp, 6.0_wp]
+            lower = [0.0_wp, 0.0_wp]
+            upper = [400.0_wp, 6.0_wp]
 
          elseif (itest == 15) then
 
-            ! Test bounded odr problem where minimum is on boundary.
+            ! Test bounded ODR problem where minimum is on boundary.
+
             lun = lunrpt
             write (lun, 1000)
             do i = 1, 2
@@ -694,22 +612,22 @@ contains
                write (lun, 1010)
                lun = lunsum
             end do
+
             setno = 9
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00000
-            short = .false.
-            isodr = .true.
             maxit = 1000
-            beta(1:2) = [200.0_wp, 3.0_wp]
-            lower(1:2) = [1.1_wp, 0.0_wp]
-            upper(1:2) = [400.0_wp, 6.0_wp]
+            beta = [200.0_wp, 3.0_wp]
+            lower = [1.1_wp, 0.0_wp]
+            upper = [400.0_wp, 6.0_wp]
             tsttol = 500.0_wp
 
          elseif (itest == 16) then
 
-            ! Test bounded odr problem where initial BETA is outside bounds.
+            ! Test bounded ODR problem where initial BETA is outside bounds.
 
             lun = lunrpt
             write (lun, 1000)
@@ -718,21 +636,21 @@ contains
                write (lun, 1010)
                lun = lunsum
             end do
+
             setno = 9
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00000
-            short = .false.
-            isodr = .true.
             maxit = 1000
-            beta(1:2) = [200.0_wp, 7.0_wp]
-            lower(1:2) = [1.1_wp, 0.0_wp]
-            upper(1:2) = [200.0_wp, 5.0_wp]
+            beta = [200.0_wp, 7.0_wp]
+            lower = [1.1_wp, 0.0_wp]
+            upper = [200.0_wp, 5.0_wp]
 
          elseif (itest == 17) then
 
-            ! Test bounded odr problem where bounds are ill defined.
+            ! Test bounded ODR problem where bounds are ill defined.
 
             lun = lunrpt
             write (lun, 1000)
@@ -741,21 +659,21 @@ contains
                write (lun, 1010)
                lun = lunsum
             end do
+
             setno = 9
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00000
-            short = .false.
-            isodr = .true.
             maxit = 1000
-            beta(1:2) = [200.0_wp, 2.0_wp]
-            lower(1:2) = [10.0_wp, 0.0_wp]
-            upper(1:2) = [2.0_wp, 5.0_wp]
+            beta = [200.0_wp, 2.0_wp]
+            lower = [10.0_wp, 0.0_wp]
+            upper = [2.0_wp, 5.0_wp]
 
          elseif (itest == 18) then
 
-            ! Test bounded odr problem using centered differences where
+            ! Test bounded ODR problem using centered differences where
             ! parameters start on bound, move away, hit bound, move away, find minimum.
 
             lun = lunrpt
@@ -765,21 +683,21 @@ contains
                write (lun, 1010)
                lun = lunsum
             end do
+
             setno = 9
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00010
-            short = .false.
-            isodr = .true.
             maxit = 100
-            beta(1:2) = [200.0_wp, 5.0_wp]
-            lower(1:2) = [0.1_wp, 0.0_wp]
-            upper(1:2) = [200.0_wp, 5.0_wp]
+            beta = [200.0_wp, 5.0_wp]
+            lower = [0.1_wp, 0.0_wp]
+            upper = [200.0_wp, 5.0_wp]
 
          elseif (itest == 19) then
 
-            ! Test bounded odr problem when bounds are too small.
+            ! Test bounded ODR problem when bounds are too small.
             ! Parameters start on bound.
 
             lun = lunrpt
@@ -789,26 +707,23 @@ contains
                write (lun, 1010)
                lun = lunsum
             end do
+
             setno = 9
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00010
-            short = .false.
-            isodr = .true.
             maxit = 100
-            beta(1:2) = [200.0_wp, 5.0_wp]
+            beta = [200.0_wp, 5.0_wp]
             upper(1) = 200.0_wp
             lower(2) = 5.0_wp
-            lower(1) = upper(1) - 400*upper(1)*epsmac &
-                       + upper(1)*epsmac
-
-            upper(2) = lower(2) + 400*lower(2)*epsmac &
-                       - lower(2)*epsmac
+            lower(1) = upper(1) - 400*upper(1)*epsmac + upper(1)*epsmac
+            upper(2) = lower(2) + 400*lower(2)*epsmac - lower(2)*epsmac
 
          elseif (itest == 20) then
 
-            ! Test bounded odr problem when bounds are just big enough for ndigit
+            ! Test bounded ODR problem when bounds are just big enough for ndigit
             ! calculation but too small for difference calculation.
             ! Parameters start on bound.
 
@@ -819,15 +734,15 @@ contains
                write (lun, 1010)
                lun = lunsum
             end do
+
             setno = 9
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00000
-            short = .false.
-            isodr = .true.
             maxit = 100
-            beta(1:2) = [-200.0_wp, -5.0_wp]
+            beta = [-200.0_wp, -5.0_wp]
             upper(1) = -200.0_wp
             lower(2) = -5.0_wp
             lower(1) = upper(1) + 400*upper(1)*epsmac
@@ -835,7 +750,7 @@ contains
 
          elseif (itest == 21) then
 
-            ! Test bounded odr problem when bounds are too small for derivative
+            ! Test bounded ODR problem when bounds are too small for derivative
             ! step sizes using forward differences. Parameters start on bound.
 
             lun = lunrpt
@@ -845,15 +760,15 @@ contains
                write (lun, 1010)
                lun = lunsum
             end do
+
             setno = 9
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00000
-            short = .false.
-            isodr = .true.
             maxit = 100
-            beta(1:2) = [-200.0_wp, -5.0_wp]
+            beta = [-200.0_wp, -5.0_wp]
             upper(1) = -200.0_wp
             lower(2) = -5.0_wp
             lower(1) = upper(1) + upper(1)*epsmac
@@ -861,9 +776,9 @@ contains
 
          elseif (itest == 22) then
 
-            ! Test bounded odr problem when first parameter is fixed and second is bounded.
+            ! Test bounded ODR problem when first parameter is fixed and second is bounded.
             ! However, set the bounds on the first parameter to exclude the correct value
-            ! of the second parameter.  This will exercise the packing and unpacking of
+            ! of the second parameter. This will exercise the packing and unpacking of
             ! parameters and ensure that bounds and fixed parameters can be mixed.
 
             lun = lunrpt
@@ -873,18 +788,18 @@ contains
                write (lun, 1010)
                lun = lunsum
             end do
+
             setno = 10
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00010
-            short = .false.
-            isodr = .true.
             maxit = 100
-            beta(1:2) = [2.5_wp, 1.5_wp]
-            lower(1:2) = [2.5_wp, 1.1_wp]
-            upper(1:2) = [10.0_wp, 5.0_wp]
-            ifixb(1:2) = [0, 1]
+            beta = [2.5_wp, 1.5_wp]
+            lower = [2.5_wp, 1.1_wp]
+            upper = [10.0_wp, 5.0_wp]
+            ifixb = [0, 1]
 
          elseif (itest == 23) then
 
@@ -897,33 +812,38 @@ contains
                write (lun, 1010)
                lun = lunsum
             end do
-            setno = 10
-            call odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
-            work = zero
-            delta = zero
-            job = 00010
-            short = .false.
-            isodr = .true.
-            maxit = 100
-            beta(1:2) = [2.5_wp, 1.5_wp]
-            lower(1:2) = -huge(1.0_wp)
-            upper(1:2) = huge(1.0_wp)
-            ifixb(1:2) = [0, 1]
 
+            setno = 10
+            call odrx_inputs( &
+               wflat, &
+               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
+            job = 00010
+            maxit = 100
+            beta = [2.5_wp, 1.5_wp]
+            ifixb = [0, 1]
+
+         end if
+
+         ! Allocate work arrays
+         if (job < 10000) then
+            if (allocated(iwork)) deallocate(iwork)
+            if (allocated(work)) deallocate(work)
+            call workspace_dimensions(n, m, np, nq, isodr, lwork, liwork)
+            allocate (iwork(liwork), work(lwork))
          end if
 
          ! Compute solution
 
          write (lunrpt, 2200) title
          write (lunsum, 2200) title
+
          if (short) then
             call odr(fcn=odrx_fcn, &
                      n=n, m=m, np=np, nq=nq, &
                      beta=beta, &
                      y=y, x=x, &
                      delta=delta, &
-                     we=we(1:ldwe1, 1:ld2we1, :), &
-                     wd=wd(1:ldwd1, 1:ld2wd1, :), &
                      job=job, &
                      iprint=iprint, lunerr=lunerr, lunrpt=lunrpt, &
                      work=work, iwork=iwork, &
@@ -934,35 +854,28 @@ contains
                      beta=beta, &
                      y=y, x=x, &
                      delta=delta, &
-                     we=we(1:ldwe1, 1:ld2we1, :), &
-                     wd=wd(1:ldwd1, 1:ld2wd1, :), &
-                     ifixb=ifixb, ifixx=ifixx(1:ldifx, :), &
+                     we=we, wd=wd, &
+                     ifixb=ifixb, ifixx=ifixx, &
                      job=job, ndigit=ndigit, taufac=taufac, &
                      sstol=sstol, partol=partol, maxit=maxit, &
                      iprint=iprint, lunerr=lunerr, lunrpt=lunrpt, &
-                     stpb=stpb, stpd=stpd(1:ldstpd, :), &
-                     sclb=sclb, scld=scld(1:ldscld, :), &
+                     stpb=stpb, stpd=stpd, &
+                     sclb=sclb, scld=scld, &
                      work=work, iwork=iwork, &
-                     lower=lower(1:np), upper=upper(1:np), &
+                     lower=lower, upper=upper, &
                      info=info)
          end if
 
-         ! Compare results with those obtained on the cray ymp or the intel xeon running
+         ! Compare results with those obtained on the CRAY YMP or the Intel Xeon running
          ! Linux using REAL(8) version of ODRPACK95
-         print *, itest, info
+        
+         call loc_wsse(n, m, np, nq, ldwe, ld2we, isodr, wssi, wssdei, wssepi)
+         
+         wssdel = work(wssdei)
+         wsseps = work(wssepi)
+         wss = work(wssi)
 
-         bnrm = dnrm2(np, beta, 1)
-         call weight(n, m, wd, ldwd1, ld2wd1, reshape(work(1:n*m), [n, m]), &
-                     tempretl(1:n, 1:m))
-         wrk(1:n*m) = reshape(tempretl(1:n, 1:m), [n*m])
-         wssdel = ddot(n*m, work(1:n*m), 1, wrk(1), 1)
-         call weight(n, nq, we, ldwe1, ld2we1, &
-                     reshape(work(n*m + 1:n*m + 1 + n*nq - 1), [n, nq]), &
-                     tempretl(1:n, 1:nq))
-         wrk(n*m + 1:n*m + 1 + n*nq - 1) = reshape(tempretl(1:n, 1:nq), [n*nq])
-         wsseps = ddot(n*nq, work(n*m + 1:n*m + 1 + n*nq - 1), 1, &
-                       wrk(n*m + 1:n*m + 1 + n*nq - 1), 1)
-         wss = wsseps + wssdel
+         bnrm = norm2(beta)
 
          if (sstol < zero) then
             sstol = sqrt(epsmac)
@@ -1159,25 +1072,44 @@ contains
 
    end subroutine odrx_main
 
-   impure subroutine odrx_inputs(title, n, m, np, nq, ldx, x, ldy, y, beta)
+   impure subroutine odrx_inputs( &
+      wflat, &
+      title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+      x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
    !! Set up input data for odrpack exerciser.
-
+   
+      logical, intent(in) :: wflat
       character(len=80), intent(out) :: title
       integer, intent(out) :: n
       integer, intent(out) :: m
       integer, intent(out) :: np
       integer, intent(out) :: nq
-      integer, intent(in) :: ldx
-      real(wp), intent(out) :: x(ldx, *)
-      integer, intent(in) :: ldy
-      real(wp), intent(out) :: y(ldy, *)
-      real(wp), intent(out) :: beta(*)
+      integer, intent(out) :: ldwd
+      integer, intent(out) :: ld2wd
+      integer, intent(out) :: ldwe
+      integer, intent(out) :: ld2we
+      integer, intent(out) :: ldstpd
+      real(wp), intent(out), allocatable :: x(:,:)
+      real(wp), intent(out), allocatable :: y(:,:)
+      real(wp), intent(out), allocatable :: beta(:)
+      real(wp), intent(out), allocatable :: lower(:)
+      real(wp), intent(out), allocatable :: upper(:)
+      real(wp), intent(out), allocatable :: delta(:,:)
+      integer, intent(out), allocatable :: ifixb(:)
+      integer, intent(out), allocatable :: ifixx(:,:)
+      real(wp), intent(out), allocatable :: wd(:,:,:)
+      real(wp), intent(out), allocatable :: we(:,:,:)
+      real(wp), intent(out), allocatable :: sclb(:)
+      real(wp), intent(out), allocatable :: scld(:,:)
+      real(wp), intent(out), allocatable :: stpb(:)
+      real(wp), intent(out), allocatable :: stpd(:,:)
+
 
       ! Parameters
       integer, parameter :: maxset = 16
 
       ! Local scalars
-      integer :: i, k, l
+      integer :: k
 
       ! Local arrays
       real(wp) :: bdata(maxnp, maxset), xdata(maxn, maxm, maxset), ydata(maxn, maxnq, maxset)
@@ -2028,15 +1960,53 @@ contains
       np = npdata(setno)
       nq = nqdata(setno)
 
-      do l = 1, nq
-         do i = 1, n
-            y(i, l) = ydata(i, l, setno)
-         end do
-      end do
+      if (wflat) then
+         ldstpd = 1
+         ldwd = 1
+         ld2wd = 1
+         ldwe = 1
+         ld2we = 1
+      else
+         ldstpd = n
+         ldwd = n
+         ld2wd = m
+         ldwe = n
+         ld2we = nq
+      end if
 
-      x(1:n, 1:m) = xdata(1:n, 1:m, setno)
+      if (allocated(x)) deallocate (x)
+      if (allocated(y)) deallocate (y)
+      if (allocated(beta)) deallocate (beta)
+      if (allocated(lower)) deallocate (lower)
+      if (allocated(upper)) deallocate (upper)
+      if (allocated(delta)) deallocate (delta)
+      if (allocated(ifixb)) deallocate (ifixb)
+      if (allocated(ifixx)) deallocate (ifixx)
+      if (allocated(wd)) deallocate (wd)
+      if (allocated(we)) deallocate (we)
+      if (allocated(sclb)) deallocate (sclb)
+      if (allocated(scld)) deallocate (scld)
+      if (allocated(stpb)) deallocate (stpb)
+      if (allocated(stpd)) deallocate (stpd)
 
-      beta(1:np) = bdata(1:np, setno)
+      allocate (x(n, m), y(n, nq), beta(np), lower(np), upper(np), delta(n, m), &
+                ifixb(np), ifixx(n, m), wd(ldwd, ld2wd, m), we(ldwe, ld2we, nq), &
+                sclb(np), scld(n, m), stpb(np), stpd(ldstpd, m))
+
+      x = xdata(1:n, 1:m, setno)
+      y = ydata(1:n, 1:nq, setno) 
+      beta = bdata(1:np, setno)
+      lower = -huge(1.0_wp)
+      upper = huge(1.0_wp)
+      delta = 0.0_wp
+      ifixb = -1
+      ifixx = -1
+      sclb = -1.0_wp
+      scld = -1.0_wp
+      stpb = -1.0_wp
+      stpd = -1.0_wp
+      we = -1.0_wp
+      wd = -1.0_wp
 
    end subroutine odrx_inputs
 
@@ -2097,12 +2067,12 @@ contains
 
       !  Check for BETA outside bounds.  Return with error if BETA outside bounds.
 
-      if (any(lower(1:np) > beta(1:np))) then
+      if (any(lower > beta)) then
          istop = -1
          return
       end if
 
-      if (any(upper(1:np) < beta(1:np))) then
+      if (any(upper < beta)) then
          istop = -2
          return
       end if
@@ -2416,6 +2386,36 @@ contains
       end if
 
    end subroutine odrx_fcn
+
+   subroutine loc_wsse(n, m, np, nq, ldwe, ld2we, isodr, wssi, wssdei, wssepi)
+   !! Locations of the weighted sum of squares results in the `work` array.
+
+      use odrpack_core, only: rwinfo
+
+      integer, intent(in) :: n, m, np, nq, ldwe, ld2we
+      logical, intent(in) :: isodr
+      integer, intent(out) :: wssi, wssdei, wssepi
+
+      integer :: deltai, epsi, xplusi, fni, sdi, vcvi, rvari, &
+                 rcondi, etai, olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, partli, &
+                 sstoli, taufci, epsmai, beta0i, betaci, betasi, betani, si, ssi, ssfi, &
+                 qrauxi, ui, fsi, fjacbi, we1i, diffi, deltsi, deltni, ti, tti, omegai, &
+                 fjacdi, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, loweri, upperi, &
+                 lwkmn
+
+      call rwinfo(n, m, np, nq, ldwe, ld2we, isodr, &
+                  deltai, epsi, xplusi, fni, sdi, vcvi, &
+                  rvari, wssi, wssdei, wssepi, rcondi, etai, &
+                  olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
+                  partli, sstoli, taufci, epsmai, &
+                  beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
+                  fsi, fjacbi, we1i, diffi, &
+                  deltsi, deltni, ti, tti, omegai, fjacdi, &
+                  wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
+                  loweri, upperi, &
+                  lwkmn)
+
+   end subroutine loc_wsse   
 
 end module test_solution_m
 
