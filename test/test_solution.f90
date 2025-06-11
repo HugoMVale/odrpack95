@@ -36,7 +36,7 @@ contains
       ! Local arrays
       integer :: idpymp(ntests)
       integer, allocatable :: ifixb(:), ifixx(:,:), iwork(:)
-      real(wp) :: dpymp(2, ntests), wrk(maxn*maxm + maxn*maxnq), tempretl(maxn, maxm)
+      real(wp) :: dpymp(2, ntests)
       real(wp), allocatable :: delta(:, :), beta(:), x(:,:), y(:,:), sclb(:), scld(:,:), &
                                stpb(:), stpd(:, :), we(:,:,:), wd(:,:,:), beta_last(:), &
                                work(:)
