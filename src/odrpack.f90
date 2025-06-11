@@ -87,14 +87,14 @@ contains
       real(wp), intent(inout), optional :: delta(:, :)
          !! Error in the `x` data. `Shape: (n, m)`. Initial guess on input and estimated value
          !! on output.
-      real(wp), intent(in), optional :: we(:, :, :)
+      real(wp), intent(in), optional, target :: we(:, :, :)
          !! `epsilon` weights. `Shape: ({1,n}, {1,nq}, nq)`. See p. 25.
-      real(wp), intent(in), optional :: wd(:, :, :)
+      real(wp), intent(in), optional, target :: wd(:, :, :)
          !! `delta` weights. `Shape: ({1,n}, {1,m}, m)`. See p. 26.
-      integer, intent(in), optional :: ifixb(:)
+      integer, intent(in), optional, target :: ifixb(:)
          !! Values designating whether the elements of `beta` are fixed at their input values
          !! or not. `Shape: (np)`.
-      integer, intent(in), optional :: ifixx(:, :)
+      integer, intent(in), optional, target :: ifixx(:, :)
          !! Values designating whether the elements of `x` are fixed at their input values
          !! or not. `Shape: ({1,n}, m)`. See p. 27.
       integer, intent(in), optional :: job
@@ -121,15 +121,15 @@ contains
          !!   0 => no output.
          !!   6 => output to standard error (default).
          !!   other => output to logical unit number `lunrpt`.
-      real(wp), intent(in), optional :: stpb(:)
+      real(wp), intent(in), optional, target :: stpb(:)
          !! Relative step for computing finite difference derivatives with respect to `beta`.
          !! `Shape: (np)`.
-      real(wp), intent(in), optional :: stpd(:, :)
+      real(wp), intent(in), optional, target :: stpd(:, :)
          !! Relative step for computing finite difference derivatives with respect to `delta`.
          !! `Shape: ({1,n}, m)`. See p. 31.
-      real(wp), intent(in), optional :: sclb(:)
+      real(wp), intent(in), optional, target :: sclb(:)
       !! Scaling values for `beta`. `Shape: (np)`.
-      real(wp), intent(in), optional :: scld(:, :)
+      real(wp), intent(in), optional, target :: scld(:, :)
          !! Scaling values for `delta`. `Shape: ({1,n}, m)`. See p. 32.
       real(wp), intent(inout), optional, target :: work(:)
          !! Real work space.
@@ -137,67 +137,54 @@ contains
          !! Integer work space.
       integer, intent(out), optional :: info
          !! Variable designating why the computations were stopped.
-      real(wp), intent(in), optional :: lower(:)
+      real(wp), intent(in), optional, target :: lower(:)
          !! Lower bound on `beta`. `Shape: (np)`.
-      real(wp), intent(in), optional :: upper(:)
+      real(wp), intent(in), optional, target :: upper(:)
          !! Upper bound on `beta`. `Shape: (np)`.
 
       ! Local variables
       integer :: ldwe, ld2we, ldwd, ld2wd, ldifx, ldscld, ldstpd, job_, ndigit_, maxit_, &
                  iprint_, lunerr_, lunrpt_, info_, lwork, liwork, info1_, info2_, info3_, &
                  info4_, info5_
-      integer :: ifixb_(np), ifixx_(n, m)
-      real(wp) :: taufac_, sstol_, partol_
-      real(wp) :: lower_(np), we_(n, nq, nq), wd_(n, m, m), stpb_(np), stpd_(n, m), &
-                  sclb_(np), scld_(n, m), upper_(np), wd1(1, 1, 1)
-      real(wp), allocatable :: tempret(:, :)
+      integer, allocatable, target :: ifixb_local(:), ifixx_local(:,:), iwork_local(:)
+      integer, pointer :: ifixb_(:), ifixx_(:, :), iwork_(:) 
 
-      real(wp), allocatable, target :: work_local(:)
-      real(wp), pointer :: work_(:)
-      integer, allocatable, target :: iwork_local(:)
-      integer, pointer :: iwork_(:)
+      real(wp) :: taufac_, sstol_, partol_
+      real(wp) :: wd1(1, 1, 1)
+      real(wp), allocatable :: tempret(:, :)
+      real(wp), allocatable, target :: work_local(:), lower_local(:), upper_local(:), &
+                                       sclb_local(:), scld_local(:,:), stpb_local(:), &
+                                       stpd_local(:,:), we_local(:,:,:), wd_local(:,:,:)
+      real(wp), pointer :: work_(:), lower_(:), upper_(:), sclb_(:), scld_(:,:), stpb_(:), &
+                           stpd_(:,:), we_(:,:,:), wd_(:,:,:)
 
       logical :: head, isodr, restart
 
-      ! Set LINFO to zero indicating no errors have been found thus far
+      ! Set INFO_ to zero indicating no errors have been found thus far
       info_ = 0
       info1_ = 0
       info2_ = 0
       info3_ = 0
       info4_ = 0
       info5_ = 0
-
-      ! Set all scalar variable defaults except JOB
-      ldwe = 1
-      ld2we = 1
-      ldwd = 1
-      ld2wd = 1
-      ldifx = 1
-      ldscld = 1
-      ldstpd = 1
-      iprint_ = -1
-      lunerr_ = 6
-      lunrpt_ = 6
-      maxit_ = -1
-      ndigit_ = -1
-      partol_ = negone
-      sstol_ = negone
-      taufac_ = negone
       head = .true.
 
       !  Check for the option arguments for printing (so error messages can be
-      !  printed appropriately from here on out
+      !  printed appropriately from here on out     
+      iprint_ = -1
       if (present(iprint)) then
          iprint_ = iprint
       end if
 
+      lunrpt_ = 6
       if (present(lunrpt)) then
          lunrpt_ = lunrpt
       end if
       if (lunrpt_ == 6) then
          lunrpt_ = output_unit
       end if
-
+      
+      lunerr_ = 6
       if (present(lunerr)) then
          lunerr_ = lunerr
       end if
@@ -206,22 +193,22 @@ contains
       end if
 
       ! Ensure the problem size is valid
-      if (n <= 0) then
+      if (n < 1) then
          info5_ = 1
          info4_ = 1
       end if
 
-      if (m <= 0) then
+      if (m < 1) then
          info5_ = 1
          info3_ = 1
       end if
 
-      if (np <= 0) then
+      if (np < 1) then
          info5_ = 1
          info2_ = 1
       end if
 
-      if (nq <= 0) then
+      if (nq < 1) then
          info5_ = 1
          info1_ = 1
       end if
@@ -319,203 +306,18 @@ contains
          end if
          return
       end if
-
-      ! Set internal array variable defaults except IWORK and WORK
-      ifixb_(1) = -1
-      ifixx_(1, 1) = -1
-      lower_(1:np) = -huge(zero)
-      sclb_(1) = negone
-      scld_(1, 1) = negone
-      stpb_(1) = negone
-      stpd_(1, 1) = negone
-      upper_(1:np) = huge(zero)
-      we_(1, 1, 1) = negone
-      wd_(1, 1, 1) = negone
-
-      ! Check the size of required arguments and return errors if they are too small
-      if (size(beta) < np) then
-         info1_ = info1_ + 1
-      end if
-
-      if (any(size(y) < [n, nq])) then
-         info1_ = info1_ + 2
-      end if
-
-      if (any(size(x) < [n, m])) then
-         info1_ = info1_ + 4
-      end if
-
-      ! Check the presence of optional arguments and copy their values internally or
-      ! report errors as necessary
-      if (present(ifixb)) then
-         if (size(ifixb) < np) then
-            info1_ = info1_ + 64
-         end if
-         if (ifixb(1) < 0) then
-            ifixb_(1) = ifixb(1)
-         else
-            ifixb_(1:np) = ifixb(1:np)
-         end if
-      end if
-
-      if (present(ifixx)) then
-         ldifx = size(ifixx, 1)
-         if (any(size(ifixx) <= [0, 0])) then
-            info1_ = info1_ + 128
-         end if
-         if (.not. (ifixx(1, 1) < 0 .or. ldifx == 1 .or. ldifx >= n) &
-             .or. size(ifixx, 2) < m) then
-            info1_ = info1_ + 128
-         end if
-         if (ldifx > n) then
-            ldifx = n
-         end if
-         if (ifixx(1, 1) < 0) then
-            ifixx_(1, 1) = ifixx(1, 1)
-         else
-            ifixx_(1:ldifx, 1:m) = ifixx(1:ldifx, 1:m)
-         end if
-      end if
-
+      
       if (present(iwork)) then
-         if (size(iwork) >= liwork) then
-            iwork_ => iwork(1:liwork)
+         if (size(iwork) == liwork) then
+            iwork_ => iwork
          else
             info1_ = info1_ + 8192
          end if
       end if
 
-      if (present(maxit)) then
-         maxit_ = maxit
-      end if
-
-      if (present(ndigit)) then
-         ndigit_ = ndigit
-      end if
-
-      if (present(partol)) then
-         partol_ = partol
-      end if
-
-      if (present(sclb)) then
-         if (size(sclb) < np) then
-            info1_ = info1_ + 1024
-         end if
-         if (sclb(1) <= zero) then
-            sclb_(1) = sclb(1)
-         else
-            sclb_(1:np) = sclb(1:np)
-         end if
-      end if
-
-      if (present(scld)) then
-         ldscld = size(scld, 1)
-         if (any(size(scld) <= [0, 0])) then
-            info1_ = info1_ + 2048
-         end if
-         if (.not. (scld(1, 1) <= zero .or. ldscld == 1 .or. ldscld >= n) &
-             .or. size(scld, 2) < m) then
-            info1_ = info1_ + 2048
-         end if
-         if (ldscld > n) then
-            ldscld = n
-         end if
-         if (scld(1, 1) <= zero) then
-            scld_(1, 1) = scld(1, 1)
-         else
-            scld_(1:ldscld, 1:m) = scld(1:ldscld, 1:m)
-         end if
-      end if
-
-      if (present(sstol)) then
-         sstol_ = sstol
-      end if
-
-      if (present(stpb)) then
-         if (size(stpb) < np) then
-            info1_ = info1_ + 256
-         end if
-         if (stpb(1) <= zero) then
-            stpb_(1) = stpb(1)
-         else
-            stpb_(1:np) = stpb(1:np)
-         end if
-      end if
-
-      if (present(stpd)) then
-         ldstpd = size(stpd, 1)
-         if (any(size(stpd) <= [0, 0])) then
-            info1_ = info1_ + 512
-         end if
-         if (.not. (stpd(1, 1) <= zero .or. ldstpd == 1 .or. ldstpd >= n) &
-             .or. size(stpd, 2) < m) then
-            info1_ = info1_ + 512
-         end if
-         if (ldstpd > n) then
-            ldstpd = n
-         end if
-         if (stpd(1, 1) <= zero) then
-            stpd_(1, 1) = stpd(1, 1)
-         else
-            stpd_(1:ldstpd, 1:m) = stpd(1:ldstpd, 1:m)
-         end if
-      end if
-
-      if (present(taufac)) then
-         taufac_ = taufac
-      end if
-
-      if (present(we)) then
-         ldwe = size(we, 1)
-         ld2we = size(we, 2)
-         if (any(size(we) <= [0, 0, 0])) then
-            info1_ = info1_ + 16
-         end if
-         if (.not. (we(1, 1, 1) < zero .or. &
-                    ((ldwe == 1 .or. ldwe >= n) .and. &
-                     (ld2we == 1 .or. ld2we >= nq))) .or. size(we, 3) < nq) then
-            info1_ = info1_ + 16
-         end if
-         if (ldwe > n) then
-            ldwe = n
-         end if
-         if (ld2we > nq) then
-            ld2we = nq
-         end if
-         if (we(1, 1, 1) < zero) then
-            we_(1, 1, 1) = we(1, 1, 1)
-         else
-            we_(1:ldwe, 1:ld2we, 1:nq) = we(1:ldwe, 1:ld2we, 1:nq)
-         end if
-      end if
-
-      if (present(wd)) then
-         ldwd = size(wd, 1)
-         ld2wd = size(wd, 2)
-         if (any(size(wd) <= [0, 0, 0])) then
-            info1_ = info1_ + 32
-         end if
-         if (.not. (wd(1, 1, 1) < zero .or. &
-                    ((ldwd == 1 .or. ldwd >= n) .and. &
-                     (ld2wd == 1 .or. ld2wd >= m))) .or. size(wd, 3) < m) then
-            info1_ = info1_ + 32
-         end if
-         if (ldwd > n) then
-            ldwd = n
-         end if
-         if (ld2wd > m) then
-            ld2wd = m
-         end if
-         if (wd(1, 1, 1) <= zero) then
-            wd_(1, 1, 1) = wd(1, 1, 1)
-         else
-            wd_(1:ldwd, 1:ld2wd, 1:m) = wd(1:ldwd, 1:ld2wd, 1:m)
-         end if
-      end if
-
       if (present(work)) then
-         if (size(work) >= lwork) then
-            work_ => work(1:lwork)
+         if (size(work) == lwork) then
+            work_ => work
          else
             info1_ = info1_ + 4096
          end if
@@ -527,25 +329,168 @@ contains
          iwork_ = 0
       end if
 
-      if (present(delta) .and. (.not. restart)) then
-         if (any(shape(delta) < [n, m])) then
-            info1_ = info1_ + 8
-         end if
-         work_(1:n*m) = reshape(delta(1:n, 1:m), [n*m])
+      ! Check the size of required arguments and return errors if they are too small     
+      if (any(shape(x) /= [n, m])) then
+         info1_ = info1_ + 4
+      end if 
+
+      if (any(shape(y) /= [n, nq])) then
+         info1_ = info1_ + 2
       end if
 
-      if (present(lower)) then
-         if (size(lower) < np) then
-            info1_ = info1_ + 32768
+      if (size(beta) /= np) then
+         info1_ = info1_ + 1
+      end if
+
+      ! Check the presence of optional array arguments
+      ! Arrays are pointed to or allocated if necessary
+      
+      if (present(delta) .and. (.not. restart)) then
+         if (all(shape(delta) == [n, m])) then
+            work_(1:n*m) = reshape(delta, [n*m])
+         else
+            info1_ = info1_ + 8
          end if
-         lower_(1:np) = lower(1:np)
+      end if
+
+      if (present(we)) then
+         ldwe = size(we, 1)
+         ld2we = size(we, 2)
+         if ((ldwe == 1 .or. ldwe == n) .and. &
+             (ld2we == 1 .or. ld2we == nq) .and. &
+             (size(we, 3) == nq)) then
+            we_ => we
+         else
+            info1_ = info1_ + 16
+         end if
+      else
+         ldwe = 1
+         ld2we = 1
+         allocate (we_local(ldwe, ld2we, nq))
+         we_local = negone
+         we_ => we_local
+      end if
+      
+      if (present(wd)) then
+         ldwd = size(wd, 1)
+         ld2wd = size(wd, 2)
+         if ((ldwd == 1 .or. ldwd == n) .and. &
+             (ld2wd == 1 .or. ld2wd == m) .and. &
+             (size(wd, 3) == m)) then
+            wd_ => wd
+         else
+            info1_ = info1_ + 32
+         end if
+      else
+         ldwd = 1
+         ld2wd = 1
+         allocate (wd_local(ldwd, ld2wd, m))
+         wd_local = negone
+         wd_ => wd_local
+      end if
+
+      if (present(ifixb)) then
+         if (size(ifixb) == np) then
+            ifixb_ => ifixb
+         else
+            info1_ = info1_ + 64
+         end if
+      else
+         allocate (ifixb_local(np))
+         ifixb_local = 1
+         ifixb_local(1) = -1
+         ifixb_ => ifixb_local
+      end if
+
+      if (present(ifixx)) then
+         ldifx = size(ifixx, 1)
+         if ((ldifx == 1 .or. ldifx == n) .and. (size(ifixx, 2) == m)) then
+            ifixx_ => ifixx
+         else
+            info1_ = info1_ + 128
+         end if
+      else 
+         ldifx = 1
+         allocate (ifixx_local(ldifx, m))
+         ifixx_local = 1
+         ifixx_local(1, 1) = -1
+         ifixx_ => ifixx_local
+      end if
+
+      if (present(stpb)) then
+         if (size(stpb) == np) then
+            stpb_ => stpb
+         else
+            info1_ = info1_ + 256
+         end if
+      else
+         allocate (stpb_local(np))
+         stpb_local = negone
+         stpb_ => stpb_local
+      end if
+      
+      if (present(stpd)) then
+         ldstpd = size(stpd, 1)
+         if ((ldstpd == 1 .or. ldstpd == n) .and. (size(stpd, 2) == m)) then
+            stpd_ => stpd
+         else
+            info1_ = info1_ + 512
+         end if
+      else
+         ldstpd = 1
+         allocate (stpd_local(ldstpd, m))
+         stpd_local = negone
+         stpd_ => stpd_local
+      end if
+
+      if (present(sclb)) then
+         if (size(sclb) == np) then
+            sclb_ => sclb
+         else
+            info1_ = info1_ + 1024
+         end if
+      else
+         allocate (sclb_local(np))
+         sclb_local = negone
+         sclb_ => sclb_local
+      end if
+
+      if (present(scld)) then
+         ldscld = size(scld, 1)
+         if ((ldscld == 1 .or. ldscld == n) .and. (size(scld, 2) == m)) then
+            scld_ => scld
+         else
+            info1_ = info1_ + 2048
+         end if
+      else
+         ldscld = 1
+         allocate (scld_local(ldscld, m))
+         scld_local = negone
+         scld_ => scld_local
       end if
 
       if (present(upper)) then
-         if (size(upper) < np) then
+         if (size(upper) == np) then
+            upper_ => upper
+         else
             info1_ = info1_ + 16384
+         end if 
+      else 
+         allocate (upper_local(np))
+         upper_local = huge(zero)
+         upper_ => upper_local
+      end if
+      
+      if (present(lower)) then
+         if (size(lower) == np) then
+            lower_ => lower
+         else
+            info1_ = info1_ + 32768
          end if
-         upper_(1:np) = upper(1:np)
+      else 
+         allocate (lower_local(np))
+         lower_local = -huge(zero)
+         lower_ => lower_local
       end if
 
       ! Report an error if any of the array sizes didn't match.
@@ -566,45 +511,51 @@ contains
          return
       end if
 
-      if (wd_(1, 1, 1) /= 0) then
-         call odcnt &
-            (fcn, &
-             n, m, np, nq, &
-             beta(1:np), &
-             y(1:n, :), x(1:n, :), &
-             we_(1:ldwe, 1:ld2we, :), ldwe, ld2we, &
-             wd_(1:ldwd, 1:ld2wd, :), ldwd, ld2wd, &
-             ifixb_, ifixx_(1:ldifx, :), ldifx, &
-             job_, ndigit_, taufac_, &
-             sstol_, partol_, maxit_, &
-             iprint_, lunerr_, lunrpt_, &
-             stpb_, stpd_(1:ldstpd, :), ldstpd, &
-             sclb_, scld_(1:ldscld, :), ldscld, &
-             work_, lwork, tempret, iwork_, liwork, &
-             info_, &
-             lower_, upper_)
-      else
-         wd1(1, 1, 1) = negone
-         call odcnt &
-            (fcn, &
-             n, m, np, nq, &
-             beta(1:np), &
-             y(1:n, :), x(1:n, :), &
-             we_(1:ldwe, 1:ld2we, :), ldwe, ld2we, &
-             wd1, 1, 1, &
-             ifixb_, ifixx_(1:ldifx, :), ldifx, &
-             job_, ndigit_, taufac_, &
-             sstol_, partol_, maxit_, &
-             iprint_, lunerr_, lunrpt_, &
-             stpb_, stpd_(1:ldstpd, :), ldstpd, &
-             sclb_, scld_(1:ldscld, :), ldscld, &
-             work_, lwork, tempret, iwork_, liwork, &
-             info_, &
-             lower_, upper_)
+      ! Set default values for optional scalar arguments
+      maxit_ = -1
+      if (present(maxit)) then
+         maxit_ = maxit
       end if
 
+      ndigit_ = -1
+      if (present(ndigit)) then
+         ndigit_ = ndigit
+      end if
+      
+      partol_ = negone
+      if (present(partol)) then
+         partol_ = partol
+      end if
+      
+      sstol_ = negone
+      if (present(sstol)) then
+         sstol_ = sstol
+      end if
+
+      taufac_ = negone
+      if (present(taufac)) then
+         taufac_ = taufac
+      end if
+
+      ! Call the core routine
+      call odcnt ( &
+         fcn, &
+         n, m, np, nq, &
+         beta, y, x, &
+         we_, ldwe, ld2we, &
+         wd_, ldwd, ld2wd, &
+         ifixb_, ifixx_, ldifx, &
+         job_, ndigit_, taufac_, &
+         sstol_, partol_, maxit_, &
+         iprint_, lunerr_, lunrpt_, &
+         stpb_, stpd_, ldstpd, &
+         sclb_, scld_, ldscld, &
+         work_, lwork, tempret, iwork_, liwork, &
+         info_, &
+         lower_, upper_)
+
       if (present(delta)) then
-         delta(1:n, 1:m) = reshape(work_(1:n*m), [n, m])
+         delta = reshape(work_(1:n*m), [n, m])
       end if
 
       if (present(info)) then
@@ -1187,7 +1138,6 @@ contains
       call set_flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
 
       ! Set starting locations within integer workspace
-      ! (invalid values of M, NP and/or NQ are handled reasonably by IWINFO)
       call iwinfo(m, np, nq, &
                   msgb, msgd, jpvti, istopi, &
                   nnzwi, nppi, idfi, &
@@ -1196,8 +1146,7 @@ contains
                   maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
                   boundi, liwkmn)
 
-      ! Set starting locations within REAL (wp) work space
-      ! (invalid values of N, M, NP, NQ, LDWE and/or LD2WE are handled reasonably by IWINFO)
+      ! Set starting locations within REAL work space
       call rwinfo(n, m, np, nq, ldwe, ld2we, isodr, &
                   deltai, fi, xplusi, fni, sdi, vcvi, &
                   rvari, wssi, wssdei, wssepi, rcondi, etai, &
