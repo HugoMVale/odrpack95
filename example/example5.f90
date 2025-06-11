@@ -69,9 +69,9 @@ program example5
 
    ! Manual allocation of work arrays
    ! Not required! Just to show it can be done if so desired
-   call workspace_dimensions(np, n, m, nq, .true., lwork, liwork)
+   call workspace_dimensions(n, m, np, nq, .true., lwork, liwork)
    allocate (iwork(liwork))
-   allocate (work(lwork)) 
+   allocate (work(lwork))
    
    call odr(fcn, n, m, np, nq, beta, y, x, job=job, iwork=iwork, work=work, &
             lower=lower, upper=upper)
