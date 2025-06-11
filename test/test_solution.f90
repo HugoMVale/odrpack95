@@ -249,7 +249,6 @@ contains
          maxit = -1
          wflat = .true.
          short = .false.
-         isodr = .true.
          iprint = 2112
          ! iprint = 6616
 
@@ -292,7 +291,6 @@ contains
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00002
             short = .true.
-            isodr = .false.
 
          elseif (itest == 3) then
 
@@ -314,7 +312,6 @@ contains
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             ifixb = [1, 1, 1, 0, 1, 0, 0, 0, 0]
             job = 00042
-            isodr = .false.
 
          elseif (itest == 4) then
 
@@ -829,6 +826,7 @@ contains
          if (job < 10000) then
             if (allocated(iwork)) deallocate(iwork)
             if (allocated(work)) deallocate(work)
+            isodr = (job < 0 .or. mod(job, 10) <= 1)
             call workspace_dimensions(n, m, np, nq, isodr, lwork, liwork)
             allocate (iwork(liwork), work(lwork))
          end if
