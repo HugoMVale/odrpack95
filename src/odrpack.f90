@@ -3,7 +3,7 @@ module odrpack
 !! regression (ODR) or ordinary linear or nonlinear least squares (OLS) solution.
     
    use odrpack_kinds, only: wp
-   use, intrinsic :: iso_fortran_env, only: error_unit, output_unit
+   use, intrinsic :: iso_fortran_env, only: output_unit
    implicit none
 
 contains
@@ -150,7 +150,6 @@ contains
       integer, pointer :: ifixb_(:), ifixx_(:, :), iwork_(:) 
 
       real(wp) :: taufac_, sstol_, partol_
-      real(wp) :: wd1(1, 1, 1)
       real(wp), allocatable :: tempret(:, :)
       real(wp), allocatable, target :: work_local(:), lower_local(:), upper_local(:), &
                                        sclb_local(:), scld_local(:,:), stpb_local(:), &
@@ -159,6 +158,10 @@ contains
                            stpd_(:,:), we_(:,:,:), wd_(:,:,:)
 
       logical :: head, isodr, restart
+
+      ! Nullify pointers
+      nullify (iwork_, work_, lower_, upper_, ifixb_, ifixx_, sclb_, scld_, stpb_, stpd_, &
+               we_, wd_)
 
       ! Set INFO_ to zero indicating no errors have been found thus far
       info_ = 0
@@ -189,7 +192,7 @@ contains
          lunerr_ = lunerr
       end if
       if (lunerr_ == 6) then
-         lunerr_ = error_unit
+         lunerr_ = output_unit
       end if
 
       ! Ensure the problem size is valid
@@ -323,12 +326,6 @@ contains
          end if
       end if
 
-      restart = (mod(job_/10000, 10) >= 1)
-      if (.not. restart) then
-         work_ = zero
-         iwork_ = 0
-      end if
-
       ! Check the size of required arguments and return errors if they are too small     
       if (any(shape(x) /= [n, m])) then
          info1_ = info1_ + 4
@@ -345,10 +342,8 @@ contains
       ! Check the presence of optional array arguments
       ! Arrays are pointed to or allocated if necessary
       
-      if (present(delta) .and. (.not. restart)) then
-         if (all(shape(delta) == [n, m])) then
-            work_(1:n*m) = reshape(delta, [n*m])
-         else
+      if (present(delta)) then
+         if (any(shape(delta) /= [n, m])) then
             info1_ = info1_ + 8
          end if
       end if
@@ -509,6 +504,17 @@ contains
             info = info_
          end if
          return
+      end if
+
+      ! Now it is safe to use the array pointers
+      restart = (mod(job_/10000, 10) >= 1)
+      if (.not. restart) then
+         work_ = zero
+         iwork_ = 0
+      end if
+      
+      if (present(delta) .and. (.not. restart)) then
+         work_(1:n*m) = reshape(delta, [n*m])
       end if
 
       ! Set default values for optional scalar arguments
