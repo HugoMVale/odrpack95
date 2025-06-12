@@ -542,8 +542,8 @@ contains
          taufac_ = taufac
       end if
 
-      ! Call the core routine
-      call odcnt ( &
+      ! Call the driver routine
+      call odrdrive ( &
          fcn, &
          n, m, np, nq, &
          beta, y, x, &
@@ -569,7 +569,7 @@ contains
 
    end subroutine odr
 
-   impure subroutine odcnt &
+   impure subroutine odrdrive &
       (fcn, n, m, np, nq, beta, y, x, &
        we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
        job, ndigit, taufac, sstol, partol, maxit, iprint, lunerr, lunrpt, &
@@ -799,7 +799,7 @@ contains
          prtpen = .true.
 
          do while (.true.)
-            call oddrive &
+            call odrstart &
                (head, fstitr, prtpen, &
                 fcn, n, m, np, nq, beta, y, x, &
                 pnlty, 1, 1, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
@@ -834,7 +834,7 @@ contains
          end do
       else
          ! Explicit problem
-         call oddrive &
+         call odrstart &
             (head, fstitr, prtpen, &
              fcn, n, m, np, nq, beta, y, x, &
              we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
@@ -845,9 +845,9 @@ contains
              maxit1, tstimp, info, lower, upper)
       end if
 
-   end subroutine odcnt
+   end subroutine odrdrive
 
-   impure subroutine oddrive &
+   impure subroutine odrstart &
       (head, fstitr, prtpen, &
        fcn, n, m, np, nq, beta, y, x, &
        we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
@@ -1464,7 +1464,7 @@ contains
       ! Find least squares solution
       call dcopy(n*nq, work(fni), 1, work(fsi), 1)
       ldtt = iwork(ldtti)
-      call odmain(head, fstitr, prtpen, &
+      call odrsolve(head, fstitr, prtpen, &
                   fcn, n, m, np, nq, job, beta, y, x, &
                   we, work(we1i), ldwe, ld2we, wd, ldwd, ld2wd, &
                   ifixb, ifixx, ldifx, &
@@ -1488,9 +1488,9 @@ contains
          end if
       end do
 
-   end subroutine oddrive
+   end subroutine odrstart
 
-   impure subroutine odmain &
+   impure subroutine odrsolve &
       (head, fstitr, prtpen, &
        fcn, n, m, np, nq, job, beta, y, x, &
        we, we1, ldwe, ld2we, wd, ldwd, ld2wd, &
@@ -2395,7 +2395,7 @@ contains
          end do
       end if
 
-   end subroutine odmain
+   end subroutine odrsolve
 
    pure subroutine workspace_dimensions(n, m, np, nq, isodr, lwork, liwork)
    !! Calculate the dimensions of the workspace arrays.
