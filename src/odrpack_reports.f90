@@ -1849,7 +1849,7 @@ contains
             write (lunerr, 1400)
          end if
 
-         ! Print appropriate messages for errors in dimension specification parameters
+      ! Print appropriate messages for errors in dimension specification parameters
 
       elseif (d1 == 2) then
 
@@ -2090,6 +2090,7 @@ contains
             info = info - 1
             write (lunerr, 8000)
          end if
+         info = info + 100000
       end if
 
       ! Format statements
@@ -2169,7 +2170,7 @@ contains
          (/' ERROR :  STPB(K) is less than or equal to zero'/ &
            '          for some K = 1, ..., NP.'// &
            '          all NP elements of', &
-           ' STPB must be greater than zero.')
+           '          STPB must be greater than zero.')
 3310  format &
          (/' ERROR :  At least one of the (NQ by NQ) arrays starting'/ &
            '          in WE(I,1,1), I = 1, ..., N, is not positive'/ &
@@ -2231,13 +2232,13 @@ contains
            '          have only positive elements.')
 5000  format &
          (/' ERROR :  JOB requires the optional argument DELTA and'/ &
-           '          DELTA is not present or not associated.')
+           '          DELTA is not present.')
 5100  format &
          (/' ERROR :  JOB requires the optional argument WORK and'/ &
-           '          WORK is not present or not associated.')
+           '          WORK is not present.')
 5200  format &
          (/' ERROR :  JOB requires the optional argument IWORK and'/ &
-           '          IWORK is not present or not associated.')
+           '          IWORK is not present.')
 6000  format &
          (/' ERROR :  LOWER(K)>UPPER(K) for some K.  Adjust the'/ &
            '          the bounds so that LOWER(K)<=UPPER(K) holds'/ &
@@ -2269,27 +2270,27 @@ contains
 8000  format &
          (/' ERROR :  BETA has incorrect size. ')
 8001  format &
-         (/' ERROR :  Y has incorrect size. ')
+         (/' ERROR :  Y has incorrect shape. ')
 8002  format &
-         (/' ERROR :  X has incorrect size. ')
+         (/' ERROR :  X has incorrect shape. ')
 8003  format &
-         (/' ERROR :  DELTA has incorrect size. ')
+         (/' ERROR :  DELTA has incorrect shape. ')
 8004  format &
-         (/' ERROR :  WE has incorrect size. ')
+         (/' ERROR :  WE has incorrect shape. ')
 8005  format &
-         (/' ERROR :  WD has incorrect size. ')
+         (/' ERROR :  WD has incorrect shape. ')
 8006  format &
          (/' ERROR :  IFIXB has incorrect size. ')
 8007  format &
-         (/' ERROR :  IFIXX has incorrect size. ')
+         (/' ERROR :  IFIXX has incorrect shape. ')
 8008  format &
          (/' ERROR :  STPB has incorrect size. ')
 8009  format &
-         (/' ERROR :  STPD has incorrect size. ')
+         (/' ERROR :  STPD has incorrect shape. ')
 8010  format &
          (/' ERROR :  SCLB has incorrect size. ')
 8011  format &
-         (/' ERROR :  SCLD has incorrect size. ')
+         (/' ERROR :  SCLD has incorrect shape. ')
 8012  format &
          (/' ERROR :  WORK has incorrect size. ')
 8013  format &

@@ -81,7 +81,8 @@ program test_error_detection
    implicit none
 
    integer :: n, m, nq, np, info, lunerr, lunrpt
-   real(wp), allocatable :: beta(:), y(:, :), x(:, :)
+   integer, allocatable :: iwork(:)
+   real(wp), allocatable :: beta(:), y(:, :), x(:, :), delta(:, :), work(:)
    logical :: passed
 
    passed = .true.
@@ -89,20 +90,115 @@ program test_error_detection
    open (newunit=lunrpt, file="./test/test_error_detection_report.txt")
    open (newunit=lunerr, file="./test/test_error_detection_error.txt")
 
-   ! ERROR IN PROBLEM SIZE
+   ! Invalid dimensions
    n = 0
    m = 0
-   nq = 0
+   nq = -1
    np = 0
    allocate (beta(np), y(n, nq), x(n, m))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, &
-            lunrpt=lunrpt, lunerr=lunerr)
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 11111) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent dimensions of mandatory arrays X, Y, BETA
+   n = 10
+   m = 4
+   nq = 2
+   np = 3
+   deallocate (beta, y, x)
+   allocate (beta(np+1), y(n-1, nq+1), x(n+1, m-1))
+   y = 0.0_wp
+   x = 0.0_wp
+   beta = 0.0_wp
+
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 10**5) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+   
+   ! Inconsistent dimensions of optional WORK, IWORK
+   n = 10
+   m = 4
+   nq = 2
+   np = 3
+   deallocate (beta, y, x)
+   allocate (beta(np), y(n, nq), x(n, m), iwork(42), work(69))
+   y = 0.0_wp
+   x = 0.0_wp
+   beta = 0.0_wp
+
+   call odr(fcn, n, m, np, nq, beta, y, x, iwork=iwork, work=work, &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 10**5) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent dimensions of optional arrays DELTA, IFIXB, SCLB, STPB, IFIXX, SCLD, STPD
+   n = 10
+   m = 4
+   nq = 2
+   np = 3
+   deallocate (beta, y, x)
+   allocate (beta(np), y(n, nq), x(n, m), delta(m, n))
+   y = 0.0_wp
+   x = 0.0_wp
+   beta = 0.0_wp
+
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            delta=delta, ifixb=[1, 0], sclb=[1.0_wp, 1.0_wp], stpb=[1.0_wp, 1.0_wp], &
+            ifixx=reshape([1, 0, 0, 1], [2, 2]), scld=reshape([1.0_wp, 1.0_wp], [2, 1]), &
+            stpd=reshape([1.0_wp, 1.0_wp], [2, 1]), &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 10**5) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent dimensions of optional arrays WE, WD
+   n = 10
+   m = 4
+   nq = 2
+   np = 3
+   deallocate (beta, y, x)
+   allocate (beta(np), y(n, nq), x(n, m))
+   y = 0.0_wp
+   x = 0.0_wp
+   beta = 0.0_wp
+
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            wd=reshape([-1.0_wp], [1, 1, 1]), we=reshape([-1.0_wp], [1, 1, 1]), &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 10**5) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent LOWER and UPPER
+   n = 10
+   m = 4
+   nq = 2
+   np = 3
+   deallocate (beta, y, x)
+   allocate (beta(np), y(n, nq), x(n, m))
+   y = 0.0_wp
+   x = 0.0_wp
+   beta = 0.0_wp
+
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            lower=beta+1e-10_wp, upper=beta-1e-10_wp, &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 91000) passed = .false.
 
    write (lunrpt, *) "INFO = ", info
 

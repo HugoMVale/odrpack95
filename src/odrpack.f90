@@ -205,12 +205,12 @@ contains
          info5_ = 1
          info3_ = 1
       end if
-
-      if (np < 1) then
+      
+      if (np < 1 .or. np > n) then
          info5_ = 1
          info2_ = 1
       end if
-
+      
       if (nq < 1) then
          info5_ = 1
          info1_ = 1
@@ -497,8 +497,7 @@ contains
             call odpe1( &
                lunerr_, info_, info5_, info4_, info3_, info2_, info1_, &
                n, m, nq, &
-               ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-               lwork, liwork)
+               ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, lwork, liwork)
          end if
          if (present(info)) then
             info = info_
