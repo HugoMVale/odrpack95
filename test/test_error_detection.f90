@@ -3,7 +3,7 @@ module test_error_detection_m
    use odrpack_kinds, only: wp, zero, one
    implicit none
 
-   real(wp), dimension(2) :: lower, upper
+   real(wp), allocatable :: lower(:), upper(:)
 
 contains
 
@@ -82,7 +82,8 @@ program test_error_detection
 
    integer :: n, m, nq, np, info, lunerr, lunrpt
    integer, allocatable :: iwork(:)
-   real(wp), allocatable :: beta(:), y(:, :), x(:, :), delta(:, :), work(:)
+   real(wp), allocatable :: beta(:), y(:, :), x(:, :), delta(:, :), work(:), &
+                            we(:,:,:), wd(:,:,:)
    logical :: passed
 
    passed = .true.
@@ -90,7 +91,7 @@ program test_error_detection
    open (newunit=lunrpt, file="./test/test_error_detection_report.txt")
    open (newunit=lunerr, file="./test/test_error_detection_error.txt")
 
-   ! Invalid dimensions
+   ! Invalid problem dimensions
    n = 0
    m = 0
    nq = -1
@@ -183,7 +184,26 @@ program test_error_detection
 
    write (lunrpt, *) "INFO = ", info
 
-   ! Inconsistent LOWER and UPPER
+   ! Inconsistent dimensions of optional arrays LOWER and UPPER
+   n = 10
+   m = 4
+   nq = 2
+   np = 3
+   deallocate (beta, y, x)
+   allocate (beta(np), y(n, nq), x(n, m))
+   y = 0.0_wp
+   x = 0.0_wp
+   beta = 0.0_wp
+
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            lower=[1.0_wp, 1.0_wp], upper=[1.0_wp, 1.0_wp, 1.0_wp, 1.0_wp], &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 10**5) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent values of optional arrays LOWER > UPPER
    n = 10
    m = 4
    nq = 2
@@ -199,6 +219,341 @@ program test_error_detection
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 91000) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+   
+   ! Inconsistent values of optional arrays BETA < LOWER
+   n = 10
+   m = 4
+   nq = 2
+   np = 3
+   deallocate (beta, y, x)
+   allocate (beta(np), y(n, nq), x(n, m))
+   y = 0.0_wp
+   x = 0.0_wp
+   beta = 0.0_wp
+
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            lower=beta+1e-10_wp, upper=beta+1.0_wp, &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 90100) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent values of optional arrays UPPER - LOWER ~ 0
+   n = 10
+   m = 4
+   nq = 2
+   np = 3
+   deallocate (beta, y, x)
+   allocate (beta(np), y(n, nq), x(n, m), lower(np), upper(np))
+   y = 0.0_wp
+   x = 0.0_wp
+   beta = 1.0_wp
+   lower = beta - 1e-100_wp
+   upper = beta + 1e-100_wp
+
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            lower=lower, upper=upper, &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 90010) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent values of optional arrays UPPER - LOWER ~ 0
+
+   lower = beta - 1e-10_wp
+   upper = beta + 1e-10_wp
+
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            lower=lower, upper=upper, stpb=beta*1e-5_wp, &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 90020) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent values of optional array SCLB
+   n = 10
+   m = 1
+   nq = 1
+   np = 3
+   deallocate (beta, y, x)
+   allocate (beta(np), y(n, nq), x(n, m))
+   y = 0.0_wp
+   x = 0.0_wp
+   beta = 0.0_wp
+
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            sclb=[1.0_wp, -1.0_wp, 1.0_wp], &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 30100) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent values of optional array SCLD(n,m)
+   n = 3
+   m = 1
+   nq = 1
+   np = 2
+   deallocate (beta, y, x)
+   allocate (beta(np), y(n, nq), x(n, m))
+   y = 0.0_wp
+   x = 0.0_wp 
+   beta = 0.0_wp
+
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            scld=reshape([1.0_wp, -1.0_wp, 1.0_wp], [n, m]), &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 30200) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent values of optional arrays SCLD(1,m)
+   n = 3
+   m = 2
+   nq = 1
+   np = 2
+   deallocate (beta, y, x)
+   allocate (beta(np), y(n, nq), x(n, m))
+   y = 0.0_wp
+   x = 0.0_wp 
+   beta = 0.0_wp
+
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            scld=reshape([1.0_wp, -1.0_wp], [1, m]), &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 30200) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent values of optional array STPB
+   n = 10
+   m = 1
+   nq = 1
+   np = 3
+   deallocate (beta, y, x)
+   allocate (beta(np), y(n, nq), x(n, m))
+   y = 0.0_wp
+   x = 0.0_wp
+   beta = 0.0_wp
+
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            stpb=[1.0_wp, -1.0_wp, 1.0_wp], &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 31000) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent values of optional array STPD(n,m)
+   n = 3
+   m = 1
+   nq = 1
+   np = 2
+   deallocate (beta, y, x)
+   allocate (beta(np), y(n, nq), x(n, m))
+   y = 0.0_wp
+   x = 0.0_wp 
+   beta = 0.0_wp
+
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            stpd=reshape([1.0_wp, -1.0_wp, 1.0_wp], [n, m]), &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 32000) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent values of optional array STPD(1,m)
+   n = 3
+   m = 2
+   nq = 1
+   np = 2
+   deallocate (beta, y, x)
+   allocate (beta(np), y(n, nq), x(n, m))
+   y = 0.0_wp
+   x = 0.0_wp 
+   beta = 0.0_wp
+
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            stpd=reshape([1.0_wp, -1.0_wp], [1, m]), &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 32000) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+   
+   ! Inconsistent values of optional array WE(1,1,nq)
+   n = 5
+   m = 2
+   nq = 3
+   np = 2
+   deallocate (beta, y, x)
+   allocate (beta(np), y(n, nq), x(n, m), we(1, 1, nq))
+   y = 0.0_wp
+   x = 0.0_wp 
+   beta = 0.0_wp
+   we = -1.0_wp
+   we(1,1,1) = 1.0_wp
+ 
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            we=we, &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 30010) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent values of optional array WE(1,nq,nq)
+   n = 5
+   m = 2
+   nq = 3
+   np = 2
+   deallocate (beta, y, x, we)
+   allocate (beta(np), y(n, nq), x(n, m), we(1, nq, nq))
+   y = 0.0_wp
+   x = 0.0_wp 
+   beta = 0.0_wp
+   we = -1.0_wp
+   we(1,1,1) = 1.0_wp
+ 
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            we=we, &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 30010) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent values of optional array WE(n,1,nq)
+   n = 5
+   m = 2
+   nq = 3
+   np = 2
+   deallocate (beta, y, x, we)
+   allocate (beta(np), y(n, nq), x(n, m), we(n, 1, nq))
+   y = 0.0_wp
+   x = 0.0_wp 
+   beta = 0.0_wp
+   we = -1.0_wp
+   we(1,1,1) = 1.0_wp
+ 
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            we=we, &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 30010) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent values of optional array WE(n,nq,nq)
+   n = 5
+   m = 2
+   nq = 3
+   np = 2
+   deallocate (beta, y, x, we)
+   allocate (beta(np), y(n, nq), x(n, m), we(n, nq, nq))
+   y = 0.0_wp
+   x = 0.0_wp 
+   beta = 0.0_wp
+   we = -1.0_wp
+   we(1,1,1) = 1.0_wp
+ 
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            we=we, &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 30010) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent values of optional array WD(1,1,m)
+   n = 5
+   m = 2
+   nq = 3
+   np = 2
+   deallocate (beta, y, x)
+   allocate (beta(np), y(n, nq), x(n, m), wd(1, 1, m))
+   y = 0.0_wp
+   x = 0.0_wp 
+   beta = 0.0_wp
+   wd = -1.0_wp
+   wd(1,1,1) = 1.0_wp
+ 
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            wd=wd, &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 30001) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent values of optional array WD(1,m,m)
+   n = 5
+   m = 2
+   nq = 3
+   np = 2
+   deallocate (beta, y, x, wd)
+   allocate (beta(np), y(n, nq), x(n, m), wd(1, m, m))
+   y = 0.0_wp
+   x = 0.0_wp 
+   beta = 0.0_wp
+   wd = -1.0_wp
+   wd(1,1,1) = 1.0_wp
+ 
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            wd=wd, &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 30001) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+
+   ! Inconsistent values of optional array WD(n,1,m)
+   n = 5
+   m = 2
+   nq = 3
+   np = 2
+   deallocate (beta, y, x, wd)
+   allocate (beta(np), y(n, nq), x(n, m), wd(n, 1, m))
+   y = 0.0_wp
+   x = 0.0_wp 
+   beta = 0.0_wp
+   wd = -1.0_wp
+   wd(1,1,1) = 1.0_wp
+ 
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            wd=wd, &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 30001) passed = .false.
+
+   write (lunrpt, *) "INFO = ", info
+   
+   ! Inconsistent values of optional array WD(n,m,m)
+   n = 5
+   m = 2
+   nq = 3
+   np = 2
+   deallocate (beta, y, x, wd)
+   allocate (beta(np), y(n, nq), x(n, m), wd(n, m, m))
+   y = 0.0_wp
+   x = 0.0_wp 
+   beta = 0.0_wp
+   wd = -1.0_wp
+   wd(1,1,1) = 1.0_wp
+ 
+   call odr(fcn, n, m, np, nq, beta, y, x, &
+            wd=wd, &
+            iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
+
+   if (info /= 30001) passed = .false.
 
    write (lunrpt, *) "INFO = ", info
 
@@ -243,8 +598,8 @@ program test_error_detection
    m = 1
    nq = 1
    np = 2
-   deallocate (beta, y, x)
-   allocate (beta(np), y(n, nq), x(n, m))
+   deallocate (beta, y, x, lower, upper)
+   allocate (beta(np), y(n, nq), x(n, m), lower(np), upper(np))
    beta = [-200.0_wp, -5.0_wp]
    upper = [-200.0_wp, 0.0_wp]
    lower = [-200.000029802322_wp, -5.0_wp]

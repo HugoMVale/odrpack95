@@ -2100,8 +2100,7 @@ contains
 1200  format &
          (/' ERROR :  M is less than one.')
 1300  format &
-         (/' ERROR :  NP is less than one'/ &
-           '          or NP is greater than N.')
+         (/' ERROR :  NP is less than one or NP is greater than N.')
 1400  format &
          (/' ERROR :  NQ is less than one.')
 2110  format &
@@ -2109,158 +2108,104 @@ contains
 2120  format &
          (/' ERROR :  SIZE(Y, 1) is different from N.')
 2210  format &
-         (/' ERROR :  LDIFX is less than N'/ &
-           '          and LDIFX is not equal to one.')
+         (/' ERROR :  LDIFX is less than N and LDIFX is not equal to one.')
 2220  format &
-         (/' ERROR :  LDSCLD is less than N'/ &
-           '          and LDSCLD is not equal to one.')
+         (/' ERROR :  LDSCLD is less than N and LDSCLD is not equal to one.')
 2230  format &
-         (/' ERROR :  LDSTPD is less than N'/ &
-           '          and LDSTPD is not equal to one.')
+         (/' ERROR :  LDSTPD is less than N and LDSTPD is not equal to one.')
 2310  format &
-         (/' ERROR :  LDWE is less than N'/ &
-           '          and LDWE is not equal to one or'/ &
-           '          or'/ &
-           '          LD2WE is less than NQ'/ &
-           '          and LD2WE is not equal to one.')
+         (/' ERROR :  LDWE is less than N and LDWE is not equal to one or'/ &
+           '          or LD2WE is less than NQ and LD2WE is not equal to one.')
 2320  format &
-         (/' ERROR :  LDWD is less than N'/ &
-           '          and LDWD is not equal to one.')
+         (/' ERROR :  LDWD is less than N and LDWD is not equal to one.')
 2410  format &
          (/' ERROR :  LWORK is less than ', I7, ','/ &
            '          the smallest acceptable dimension of array WORK.')
 2420  format &
          (/' ERROR :  LIWORK is less than ', I7, ','/ &
-           '          the smallest acceptable dimension of array', &
-           ' IWORK.')
+           '          the smallest acceptable dimension of array IWORK.')
 3110  format &
-         (/' ERROR :  SCLD(I,J) is less than or equal to zero'/ &
-           '          for some I = 1, ..., N and J = 1, ..., M.'// &
-           '          when SCLD(1,1) is greater than zero'/ &
-           '          and LDSCLD is greater than or equal to N then'/ &
-           '          each of the N by M elements of'/ &
-           '          SCLD must be greater than zero.')
+         (/' ERROR :  SCLD(I,J) <= 0 for some I = 1, ..., N and J = 1, ..., M.'/ &
+           '          When SCLD(1,1) > 0 and LDSCLD = N then each of'/ &
+           '          the N by M elements of SCLD must be greater than zero.')
 3120  format &
-         (/' ERROR :  SCLD(1,J) is less than or equal to zero'/ &
-           '          for some J = 1, ..., M.'// &
-           '          when SCLD(1,1) is greater than zero'/ &
-           '          and LDSCLD is equal to one then'/ &
-           '          each of the 1 by M elements of'/ &
-           '          SCLD must be greater than zero.')
+         (/' ERROR :  SCLD(1,J) <= 0 for some J = 1, ..., M.'/ &
+           '          When SCLD(1,1) > 0 and LDSCLD = 1 then each of'/ &
+           '          the 1 by M elements of SCLD must be greater than zero.')
 3130  format &
-         (/' ERROR :  SCLB(K) is less than or equal to zero'/ &
-           '          for some K = 1, ..., NP.'// &
-           '          all NP elements of', &
-           '          SCLB must be greater than zero.')
+         (/' ERROR :  SCLB(K) <= 0 for some K = 1, ..., NP.'/ &
+           '          All NP elements of SCLB must be greater than zero.')
 3210  format &
-         (/' ERROR :  STPD(I,J) is less than or equal to zero'/ &
-           '          for some I = 1, ..., N and J = 1, ..., M.'// &
-           '          when STPD(1,1) is greater than zero'/ &
-           '          and LDSTPD is greater than or equal to N then'/ &
-           '          each of the N by M elements of'/ &
-           '          STPD must be greater than zero.')
+         (/' ERROR :  STPD(I,J) < = 0 for some I = 1, ..., N and J = 1, ..., M.'/ &
+           '          When STPD(1,1) > 0 and LDSTPD = N then each of'/ &
+           '          the N by M elements of STPD must be greater than zero.')
 3220  format &
-         (/' ERROR :  STPD(1,J) is less than or equal to zero'/ &
-           '          for some J = 1, ..., M.'// &
-           '          when STPD(1,1) is greater than zero'/ &
-           '          and LDSTPD is equal to one then'/ &
-           '          each of the 1 by M elements of'/ &
-           '          STPD must be greater than zero.')
+         (/' ERROR :  STPD(1,J) <= 0 for some J = 1, ..., M.'/ &
+           '          When STPD(1,1) > 0 and LDSTPD = 1 then each of'/ &
+           '          the 1 by M elements of STPD must be greater than zero.')
 3230  format &
-         (/' ERROR :  STPB(K) is less than or equal to zero'/ &
-           '          for some K = 1, ..., NP.'// &
-           '          all NP elements of', &
-           '          STPB must be greater than zero.')
+         (/' ERROR :  STPB(K) <= 0 for some K = 1, ..., NP.'/ &
+           '          All NP elements of STPB must be greater than zero.')
 3310  format &
          (/' ERROR :  At least one of the (NQ by NQ) arrays starting'/ &
-           '          in WE(I,1,1), I = 1, ..., N, is not positive'/ &
-           '          semidefinite.  When WE(1,1,1) is greater than'/ &
-           '          or equal to zero, and LDWE is greater than or'/ &
-           '          equal to N, and LD2WE is greater than or equal'/ &
-           '          to NQ, then each of the (NQ by NQ) arrays in WE'/ &
-           '          must be positive semidefinite.')
+           '          in WE(I,1,1), I = 1, ..., N, is not positive semidefinite.'/ &
+           '          When WE(1,1,1) >= 0 and LDWE = N and LD2WE = NQ, then each of'/ &
+           '          the (NQ by NQ) arrays in WE must be positive semidefinite.')
 3320  format &
          (/' ERROR :  At least one of the (1 by NQ) arrays starting'/ &
-           '          in WE(I,1,1), I = 1, ..., N, has a negative'/ &
-           '          element.  When WE(1,1,1) is greater than or'/ &
-           '          equal to zero, and LDWE is greater than or equal'/ &
-           '          to N, and LD2WE is equal to 1, then each of the'/ &
-           '          (1 by NQ) arrays in WE must have only non-'/ &
-           '          negative elements.')
+           '          in WE(I,1,1), I = 1, ..., N, has a negative element.'/ &
+           '          When WE(1,1,1) >= 0 and LDWE = N and LD2WE = 1, then each of'/ &
+           '          the (1 by NQ) arrays in WE must have only non-negative elements.')
 3410  format &
-         (/' ERROR :  The (NQ by NQ) array starting in WE(1,1,1) is'/ &
-           '          not positive semidefinite.  When WE(1,1,1) is'/ &
-           '          greater than or equal to zero, and LDWE is equal'/ &
-           '          to 1, and LD2WE is greater than or equal to NQ,'/ &
-           '          then the (NQ by NQ) array in WE must be positive'/ &
-           '          semidefinite.')
+         (/' ERROR :  The (NQ by NQ) array starting in WE(1,1,1) is not positive semidefinite.'/ &
+           '          When WE(1,1,1) >= 0 and LDWE = 1 and LD2WE = NQ, then'/ &
+           '          the (NQ by NQ) array in WE must be positive semidefinite.')
 3420  format &
-         (/' ERROR :  The (1 by NQ) array starting in WE(1,1,1) has'/ &
-           '          a negative element.  When WE(1,1,1) is greater'/ &
-           '          than or equal to zero, and LDWE is equal to 1,'/ &
-           '          and LD2WE is equal to 1, then the (1 by NQ)'/ &
-           '          array in WE must have only nonnegative elements.')
+         (/' ERROR :  The (1 by NQ) array starting in WE(1,1,1) has a negative element.'/ &
+           '          When WE(1,1,1) >= 0 and LDWE = 1 and LD2WE = 1, then'/ &
+           '          the (1 by NQ) array in WE must have only nonnegative elements.')
 3500  format &
-         (/' ERROR :  The number of nonzero arrays in array WE is'/ &
-           '          less than NP.')
+         (/' ERROR :  The number of nonzero arrays in array WE is less than NP.')
 4310  format &
          (/' ERROR :  At least one of the (M by M) arrays starting'/ &
-           '          in WD(I,1,1), I = 1, ..., N, is not positive'/ &
-           '          definite.  When WD(1,1,1) is greater than zero,'/ &
-           '          and LDWD is greater than or equal to N, and'/ &
-           '          LD2WD is greater than or equal to M, then each'/ &
-           '          of the (M by M) arrays in WD must be positive'/ &
-           '          definite.')
+           '          in WD(I,1,1), I = 1, ..., N, is not positive definite.'/ &
+           '          When WD(1,1,1) >= 0 and LDWD = N and LD2WD = M, then each of'/ &
+           '          the (M by M) arrays in WD must be positive definite.')   
 4320  format &
          (/' ERROR :  At least one of the (1 by M) arrays starting'/ &
-           '          in WD(I,1,1), I = 1, ..., N, has a nonpositive'/ &
-           '          element.  When WD(1,1,1) is greater than zero,'/ &
-           '          and LDWD is greater than or equal to N, and'/ &
-           '          LD2WD is equal to 1, then each of the (1 by M)'/ &
-           '          arrays in WD must have only positive elements.')
+           '          in WD(I,1,1), I = 1, ..., N, has a nonpositive element.'/ &
+           '          When WD(1,1,1) >= 0 and LDWD = N and LD2WD = 1, then each of'/ &
+           '          the (1 by M) arrays in WD must have only positive elements.')
 4410  format &
-         (/' ERROR :  The (M by M) array starting in WD(1,1,1) is'/ &
-           '          not positive definite.  When WD(1,1,1) is'/ &
-           '          greater than zero, and LDWD is equal to 1, and'/ &
-           '          LD2WD is greater than or equal to M, then the'/ &
+         (/' ERROR :  The (M by M) array starting in WD(1,1,1) is not positive definite.'/ &
+           '          When WD(1,1,1) >= 0 and LDWD = 1 and LD2WD = M, then the'/ &
            '          (M by M) array in WD must be positive definite.')
 4420  format &
-         (/' ERROR :  The (1 by M) array starting in WD(1,1,1) has a'/ &
-           '          nonpositive element.  When WD(1,1,1) is greater'/ &
-           '          than zero, and LDWD is equal to 1, and LD2WD is'/ &
-           '          equal to 1, then the (1 by M) array in WD must'/ &
-           '          have only positive elements.')
+         (/' ERROR :  The (1 by M) array starting in WD(1,1,1) has a nonpositive element.'/ &
+           '          When WD(1,1,1) >= 0 and LDWD = 1 and LD2WD = 1, then'/ &
+           '          the (1 by M) array in WD must have only positive elements.')
 5000  format &
-         (/' ERROR :  JOB requires the optional argument DELTA and'/ &
-           '          DELTA is not present.')
+         (/' ERROR :  JOB requires the optional argument DELTA and DELTA is not present.')
 5100  format &
-         (/' ERROR :  JOB requires the optional argument WORK and'/ &
-           '          WORK is not present.')
+         (/' ERROR :  JOB requires the optional argument WORK and WORK is not present.')
 5200  format &
-         (/' ERROR :  JOB requires the optional argument IWORK and'/ &
-           '          IWORK is not present.')
+         (/' ERROR :  JOB requires the optional argument IWORK and IWORK is not present.')
 6000  format &
-         (/' ERROR :  LOWER(K)>UPPER(K) for some K.  Adjust the'/ &
-           '          the bounds so that LOWER(K)<=UPPER(K) holds'/ &
-           '          for all K.')
+         (/' ERROR :  LOWER(K) > UPPER(K) for some K.'/ &
+           '          Adjust the bounds so that LOWER(K) <= UPPER(K) holds for all K.')
 6100  format &
-         (/' ERROR :  BETA(K)>UPPER(K) or BETA(K)<LOWER(K) '/ &
-           '          for some K.  Adjust the bounds or BETA so '/ &
-           '          that LOWER(K)<=BETA(K)<=UPPER(K) holds'/ &
-           '          for all K.')
+         (/' ERROR :  BETA(K) > UPPER(K) or BETA(K) < LOWER(K) for some K.'/ &
+           '          Adjust the bounds or BETA so that LOWER(K) <= BETA(K) <= UPPER(K)'/ &
+           '          holds for all K.')
 6210  format &
-         (/' ERROR :  UPPER(K)-LOWER(K) < 400*BETA(K)*EPSMAC  '/ &
-           '          for some K and EPSMAC having the largest '/ &
-           '          value such that 1+EPSMAC/=1.  This '/ &
-           '          constraint on UPPER and LOWER is necessary'/ &
-           '          for the calculation of NDIGIT.  Increase the'/ &
-           '          range of the bounds or specify NDIGIT '/ &
-           '          explicitly.')
+         (/' ERROR :  UPPER(K)-LOWER(K) < 400*BETA(K)*EPSMAC for some K and EPSMAC having'/ &
+           '          the largest value such that 1+EPSMAC/=1.'/ &
+           '          This constraint on UPPER and LOWER is necessary for the calculation'/ &
+           '          of NDIGIT. Widen the bounds or specify NDIGIT explicitly.')
 6220  format &
-         (/' ERROR :  UPPER(K)-LOWER(K) < ABS(STEP) for some'/ &
-           '          K where step is the step size for numeric'/ &
-           '          derivatives.  Increase the bounds or supply'/ &
-           '          an analytic jacobian.')
+         (/' ERROR :  UPPER(K)-LOWER(K) < ABS(STEP) for some K where STEP is the step size'/ &
+           '          for numeric derivatives.'/ &
+           '          Widen the bounds or supply an analytic jacobian.')
 7200  format &
          (/' ERROR :  DELTA could not be allocated. ')
 7300  format &
@@ -2869,9 +2814,9 @@ contains
       ! Format statements
 
 1000  format( &
-         ' ********************************************************* '/ &
-         ' *                      ODRPACK REPORT                   * '/ &
-         ' ********************************************************* '/ &
+         ' ****************************************************************************** '/ &
+         ' *                                ODRPACK REPORT                              * '/ &
+         ' ****************************************************************************** '/ &
          )
 
    end subroutine odphd

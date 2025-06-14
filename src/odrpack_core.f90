@@ -4610,7 +4610,7 @@ contains
       end if
 
       ! Check DELTA finite difference step sizes
-      if (anajac .and. isodr .and. stpd(1, 1) > zero) then
+      if ((.not. anajac) .and. isodr .and. stpd(1, 1) > zero) then
          if (ldstpd >= n) then
             last = n
          else
@@ -4626,7 +4626,7 @@ contains
       end if
 
       ! Check BETA finite difference step sizes
-      if (anajac .and. stpb(1) > zero) then
+      if ((.not. anajac) .and. stpb(1) > zero) then
          if (any(stpb <= zero)) then
             if (info == 0) then
                info = 31000
