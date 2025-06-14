@@ -6373,8 +6373,7 @@ contains
          !! the arrays in `wt` are upper triangular with zeros below the diagonal.
 
       ! Local scalars
-      real(wp) :: temp
-      integer :: i, j, k
+      integer :: i, j
 
       ! Variable Definitions (alphabetically)
       !  I:       An indexing variable.
@@ -6385,7 +6384,6 @@ contains
       !  M:       The number of columns of data in T.
       !  N:       The number of rows of data in T.
       !  T:       The array being scaled by WT.
-      !  TEMP:    A temporary scalar.
       !  WT:      The weights.
       !  WTT:     The results of weighting array T by WT. Array WTT can be the same as T only if
       !           the arrays in WT are upper triangular with zeros below the diagonal.
@@ -6396,51 +6394,35 @@ contains
          if (ldwt >= n) then
             if (ld2wt >= m) then
                ! WT is an N-array of M by M matrices
-               do i = 1, n
-                  do j = 1, m
-                     temp = zero
-                     do k = 1, m
-                        temp = temp + wt(i, j, k)*t(i, k)
-                     end do
-                     wtt(i, j) = temp
+               do j = 1, m
+                  do i = 1, n
+                     wtt(i, j) = dot_product(wt(i, j, :), t(i, :))
                   end do
                end do
             else
                ! WT is an N-array of diagonal matrices
-               do i = 1, n
-                  do j = 1, m
-                     wtt(i, j) = wt(i, 1, j)*t(i, j)
-                  end do
+               do j = 1, m
+                  wtt(:, j) = wt(:, 1, j)*t(:, j)
                end do
             end if
          else
             if (ld2wt >= m) then
                ! WT is an M by M matrix
-               do i = 1, n
-                  do j = 1, m
-                     temp = zero
-                     do k = 1, m
-                        temp = temp + wt(1, j, k)*t(i, k)
-                     end do
-                     wtt(i, j) = temp
+               do j = 1, m
+                  do i = 1, n
+                     wtt(i, j) = dot_product(wt(1, j, :), t(i, :))
                   end do
                end do
             else
-               ! WT is a diagonal matrice
-               do i = 1, n
-                  do j = 1, m
-                     wtt(i, j) = wt(1, 1, j)*t(i, j)
-                  end do
+               ! WT is a diagonal matrix
+               do j = 1, m
+                  wtt(:, j) = wt(1, 1, j)*t(:, j)
                end do
             end if
          end if
       else
          ! WT is a scalar
-         do j = 1, m
-            do i = 1, n
-               wtt(i, j) = abs(wt(1, 1, 1))*t(i, j)
-            end do
-         end do
+         wtt = abs(wt(1, 1, 1))*t
       end if
 
    end subroutine weight
