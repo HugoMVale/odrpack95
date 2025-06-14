@@ -1,0 +1,392 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  us/call  us/call  name    
+ 18.75      0.03     0.03  4444000     0.01     0.01  __odrpack_core_MOD_solve
+ 18.75      0.06     0.03     1000    30.00    30.00  __odrpack_MOD_odmn
+ 18.75      0.09     0.03                             _mcount_private
+ 12.50      0.11     0.02   159000     0.13     0.13  __linpack_MOD_dqrsl
+ 12.50      0.13     0.02   159000     0.13     0.56  __odrpack_core_MOD_odstp
+  6.25      0.14     0.01  1904000     0.01     0.01  __odrpack_core_MOD_fctr
+  6.25      0.15     0.01   159000     0.06     0.06  __linpack_MOD_dqrdc
+  6.25      0.16     0.01                             exp
+  0.00      0.16     0.00  3173000     0.00     0.00  __odrpack_MOD_odr
+  0.00      0.16     0.00  1268000     0.00     0.00  __odrpack_core_MOD_esubi
+  0.00      0.16     0.00   690000     0.00     0.00  __odrpack_core_MOD_wght
+  0.00      0.16     0.00   636000     0.00     0.00  __odrpack_core_MOD_vevtr
+  0.00      0.16     0.00   158000     0.00     0.00  __linpack_MOD_dtrsl
+  0.00      0.16     0.00   144001     0.00     0.00  __example5perf_model_MOD_fcn
+  0.00      0.16     0.00   114000     0.00     0.00  __odrpack_core_MOD_scalet
+  0.00      0.16     0.00    60000     0.00     0.00  __odrpack_core_MOD_unpack
+  0.00      0.16     0.00    59000     0.00     0.00  __linpack_MOD_dtrco
+  0.00      0.16     0.00    58000     0.00     0.00  __odrpack_core_MOD_odlm
+  0.00      0.16     0.00    27000     0.00     0.00  __odrpack_core_MOD_evjac
+  0.00      0.16     0.00    27000     0.00     0.00  __odrpack_core_MOD_jacfd
+  0.00      0.16     0.00     4000     0.00     0.00  __odrpack_core_MOD_pack
+  0.00      0.16     0.00     2000     0.00     0.00  __odrpack_core_MOD_acces
+  0.00      0.16     0.00     2000     0.00     0.00  __odrpack_core_MOD_erstep
+  0.00      0.16     0.00     2000     0.00     0.00  __odrpack_core_MOD_flags
+  0.00      0.16     0.00     1000     0.00     0.00  __linpack_MOD_dpodi
+  0.00      0.16     0.00     1000     0.00     0.00  __odrpack_MOD_odcnt
+  0.00      0.16     0.00     1000     0.00     0.00  __odrpack_MOD_oddrv
+  0.00      0.16     0.00     1000     0.00     0.00  __odrpack_MOD_workspace_dimensions
+  0.00      0.16     0.00     1000     0.00     0.00  __odrpack_core_MOD_etaf
+  0.00      0.16     0.00     1000     0.00     0.00  __odrpack_core_MOD_fctrw
+  0.00      0.16     0.00     1000     0.00     0.00  __odrpack_core_MOD_iniwk
+  0.00      0.16     0.00     1000     0.00     0.00  __odrpack_core_MOD_iwinf
+  0.00      0.16     0.00     1000     0.00     0.00  __odrpack_core_MOD_odchk
+  0.00      0.16     0.00     1000     0.00     0.00  __odrpack_core_MOD_odvcv
+  0.00      0.16     0.00     1000     0.00     0.00  __odrpack_core_MOD_scaleb
+  0.00      0.16     0.00     1000     0.00     0.00  __odrpack_core_MOD_scaled
+  0.00      0.16     0.00     1000     0.00     0.00  __odrpack_core_MOD_setrow
+  0.00      0.16     0.00     1000     0.00     0.00  __odrpack_core_MOD_winf
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012-2024 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 4 byte(s) for 6.25% of 0.16 seconds
+
+index % time    self  children    called     name
+[1]     74.8    0.05    0.07   13000+4017000 <cycle 1 as a whole> [1]
+                0.02    0.07  159000             __odrpack_core_MOD_odstp <cycle 1> [3]
+                0.03    0.00    1000             __odrpack_MOD_odmn <cycle 1> [5]
+                0.00    0.00 3173000             __odrpack_MOD_odr <cycle 1> [93]
+                0.00    0.00  636000             __odrpack_core_MOD_vevtr <cycle 1> [96]
+                0.00    0.00   58000             __odrpack_core_MOD_odlm <cycle 1> [102]
+                0.00    0.00    1000             __odrpack_MOD_odcnt <cycle 1> [110]
+                0.00    0.00    1000             __odrpack_MOD_oddrv <cycle 1> [111]
+                0.00    0.00    1000             __odrpack_core_MOD_odvcv <cycle 1> [118]
+-----------------------------------------------
+                                                 <spontaneous>
+[2]     69.2    0.00    0.11                 __odrpack_core_MOD_odstp.constprop.0 [2]
+                0.03    0.04    8000/13000       __odrpack_MOD_odr <cycle 1> [93]
+                0.02    0.02    4000/13000       __odrpack_core_MOD_vevtr <cycle 1> [96]
+                0.00    0.00   20000/4444000     __odrpack_core_MOD_solve [4]
+                0.00    0.00    1000/159000      __linpack_MOD_dqrsl [7]
+                0.00    0.00    1000/159000      __linpack_MOD_dqrdc [10]
+                0.00    0.00    8000/1904000     __odrpack_core_MOD_fctr [9]
+                0.00    0.00    4000/1268000     __odrpack_core_MOD_esubi [94]
+                0.00    0.00    1000/59000       __linpack_MOD_dtrco [101]
+-----------------------------------------------
+                                1000             __odrpack_core_MOD_odvcv <cycle 1> [118]
+                              158000             __odrpack_core_MOD_odlm <cycle 1> [102]
+[3]     56.0    0.02    0.07  159000         __odrpack_core_MOD_odstp <cycle 1> [3]
+                0.03    0.00 4424000/4444000     __odrpack_core_MOD_solve [4]
+                0.02    0.00  158000/159000      __linpack_MOD_dqrsl [7]
+                0.01    0.00 1896000/1904000     __odrpack_core_MOD_fctr [9]
+                0.01    0.00  158000/159000      __linpack_MOD_dqrdc [10]
+                0.00    0.00 1264000/1268000     __odrpack_core_MOD_esubi [94]
+                0.00    0.00  316000/690000      __odrpack_core_MOD_wght [95]
+                0.00    0.00  158000/158000      __linpack_MOD_dtrsl [97]
+                0.00    0.00   58000/59000       __linpack_MOD_dtrco [101]
+                             2528000             __odrpack_MOD_odr <cycle 1> [93]
+                              632000             __odrpack_core_MOD_vevtr <cycle 1> [96]
+-----------------------------------------------
+                0.00    0.00   20000/4444000     __odrpack_core_MOD_odstp.constprop.0 [2]
+                0.03    0.00 4424000/4444000     __odrpack_core_MOD_odstp <cycle 1> [3]
+[4]     18.8    0.03    0.00 4444000         __odrpack_core_MOD_solve [4]
+-----------------------------------------------
+                                1000             __odrpack_MOD_oddrv <cycle 1> [111]
+[5]     18.8    0.03    0.00    1000         __odrpack_MOD_odmn <cycle 1> [5]
+                0.00    0.00  370000/690000      __odrpack_core_MOD_wght [95]
+                0.00    0.00   59000/60000       __odrpack_core_MOD_unpack [100]
+                0.00    0.00   58000/144001      __example5perf_model_MOD_fcn [98]
+                0.00    0.00   27000/27000       __odrpack_core_MOD_evjac [103]
+                0.00    0.00    2000/4000        __odrpack_core_MOD_pack [105]
+                0.00    0.00    2000/2000        __odrpack_core_MOD_acces [106]
+                0.00    0.00    1000/2000        __odrpack_core_MOD_flags [108]
+                               58000             __odrpack_core_MOD_odlm <cycle 1> [102]
+                                1000             __odrpack_core_MOD_odvcv <cycle 1> [118]
+-----------------------------------------------
+                                                 <spontaneous>
+[6]     18.8    0.03    0.00                 _mcount_private [6]
+-----------------------------------------------
+                0.00    0.00    1000/159000      __odrpack_core_MOD_odstp.constprop.0 [2]
+                0.02    0.00  158000/159000      __odrpack_core_MOD_odstp <cycle 1> [3]
+[7]     12.5    0.02    0.00  159000         __linpack_MOD_dqrsl [7]
+-----------------------------------------------
+                                                 <spontaneous>
+[8]      6.2    0.01    0.00                 exp [8]
+-----------------------------------------------
+                0.00    0.00    8000/1904000     __odrpack_core_MOD_odstp.constprop.0 [2]
+                0.01    0.00 1896000/1904000     __odrpack_core_MOD_odstp <cycle 1> [3]
+[9]      6.2    0.01    0.00 1904000         __odrpack_core_MOD_fctr [9]
+-----------------------------------------------
+                0.00    0.00    1000/159000      __odrpack_core_MOD_odstp.constprop.0 [2]
+                0.01    0.00  158000/159000      __odrpack_core_MOD_odstp <cycle 1> [3]
+[10]     6.2    0.01    0.00  159000         __linpack_MOD_dqrdc [10]
+-----------------------------------------------
+                                                 <spontaneous>
+[11]     5.8    0.00    0.01                 MAIN__ [11]
+                0.00    0.01    1000/13000       __odrpack_MOD_odr <cycle 1> [93]
+-----------------------------------------------
+                              636000             __odrpack_core_MOD_vevtr <cycle 1> [96]
+                             2528000             __odrpack_core_MOD_odstp <cycle 1> [3]
+                0.00    0.01    1000/13000       MAIN__ [11]
+                0.03    0.04    8000/13000       __odrpack_core_MOD_odstp.constprop.0 [2]
+[93]     0.0    0.00    0.00 3173000         __odrpack_MOD_odr <cycle 1> [93]
+                0.00    0.00    1000/1000        __odrpack_MOD_workspace_dimensions [112]
+                                1000             __odrpack_MOD_odcnt <cycle 1> [110]
+-----------------------------------------------
+                0.00    0.00    4000/1268000     __odrpack_core_MOD_odstp.constprop.0 [2]
+                0.00    0.00 1264000/1268000     __odrpack_core_MOD_odstp <cycle 1> [3]
+[94]     0.0    0.00    0.00 1268000         __odrpack_core_MOD_esubi [94]
+-----------------------------------------------
+                0.00    0.00    4000/690000      __odrpack_MOD_oddrv <cycle 1> [111]
+                0.00    0.00  316000/690000      __odrpack_core_MOD_odstp <cycle 1> [3]
+                0.00    0.00  370000/690000      __odrpack_MOD_odmn <cycle 1> [5]
+[95]     0.0    0.00    0.00  690000         __odrpack_core_MOD_wght [95]
+-----------------------------------------------
+                              632000             __odrpack_core_MOD_odstp <cycle 1> [3]
+                0.02    0.02    4000/13000       __odrpack_core_MOD_odstp.constprop.0 [2]
+[96]     0.0    0.00    0.00  636000         __odrpack_core_MOD_vevtr <cycle 1> [96]
+                              636000             __odrpack_MOD_odr <cycle 1> [93]
+-----------------------------------------------
+                0.00    0.00  158000/158000      __odrpack_core_MOD_odstp <cycle 1> [3]
+[97]     0.0    0.00    0.00  158000         __linpack_MOD_dtrsl [97]
+-----------------------------------------------
+                0.00    0.00       1/144001      main [65]
+                0.00    0.00    1000/144001      __odrpack_MOD_oddrv <cycle 1> [111]
+                0.00    0.00    4000/144001      __odrpack_core_MOD_etaf [113]
+                0.00    0.00   58000/144001      __odrpack_MOD_odmn <cycle 1> [5]
+                0.00    0.00   81000/144001      __odrpack_core_MOD_jacfd [104]
+[98]     0.0    0.00    0.00  144001         __example5perf_model_MOD_fcn [98]
+-----------------------------------------------
+                0.00    0.00  114000/114000      __odrpack_core_MOD_odlm <cycle 1> [102]
+[99]     0.0    0.00    0.00  114000         __odrpack_core_MOD_scalet [99]
+-----------------------------------------------
+                0.00    0.00    1000/60000       __odrpack_MOD_oddrv <cycle 1> [111]
+                0.00    0.00   59000/60000       __odrpack_MOD_odmn <cycle 1> [5]
+[100]    0.0    0.00    0.00   60000         __odrpack_core_MOD_unpack [100]
+-----------------------------------------------
+                0.00    0.00    1000/59000       __odrpack_core_MOD_odstp.constprop.0 [2]
+                0.00    0.00   58000/59000       __odrpack_core_MOD_odstp <cycle 1> [3]
+[101]    0.0    0.00    0.00   59000         __linpack_MOD_dtrco [101]
+-----------------------------------------------
+                               58000             __odrpack_MOD_odmn <cycle 1> [5]
+[102]    0.0    0.00    0.00   58000         __odrpack_core_MOD_odlm <cycle 1> [102]
+                0.00    0.00  114000/114000      __odrpack_core_MOD_scalet [99]
+                              158000             __odrpack_core_MOD_odstp <cycle 1> [3]
+-----------------------------------------------
+                0.00    0.00   27000/27000       __odrpack_MOD_odmn <cycle 1> [5]
+[103]    0.0    0.00    0.00   27000         __odrpack_core_MOD_evjac [103]
+                0.00    0.00   27000/27000       __odrpack_core_MOD_jacfd [104]
+-----------------------------------------------
+                0.00    0.00   27000/27000       __odrpack_core_MOD_evjac [103]
+[104]    0.0    0.00    0.00   27000         __odrpack_core_MOD_jacfd [104]
+                0.00    0.00   81000/144001      __example5perf_model_MOD_fcn [98]
+-----------------------------------------------
+                0.00    0.00    2000/4000        __odrpack_MOD_odmn <cycle 1> [5]
+                0.00    0.00    2000/4000        __odrpack_MOD_oddrv <cycle 1> [111]
+[105]    0.0    0.00    0.00    4000         __odrpack_core_MOD_pack [105]
+-----------------------------------------------
+                0.00    0.00    2000/2000        __odrpack_MOD_odmn <cycle 1> [5]
+[106]    0.0    0.00    0.00    2000         __odrpack_core_MOD_acces [106]
+-----------------------------------------------
+                0.00    0.00    2000/2000        __odrpack_MOD_oddrv <cycle 1> [111]
+[107]    0.0    0.00    0.00    2000         __odrpack_core_MOD_erstep [107]
+-----------------------------------------------
+                0.00    0.00    1000/2000        __odrpack_MOD_odmn <cycle 1> [5]
+                0.00    0.00    1000/2000        __odrpack_MOD_oddrv <cycle 1> [111]
+[108]    0.0    0.00    0.00    2000         __odrpack_core_MOD_flags [108]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_core_MOD_odvcv <cycle 1> [118]
+[109]    0.0    0.00    0.00    1000         __linpack_MOD_dpodi [109]
+-----------------------------------------------
+                                1000             __odrpack_MOD_odr <cycle 1> [93]
+[110]    0.0    0.00    0.00    1000         __odrpack_MOD_odcnt <cycle 1> [110]
+                                1000             __odrpack_MOD_oddrv <cycle 1> [111]
+-----------------------------------------------
+                                1000             __odrpack_MOD_odcnt <cycle 1> [110]
+[111]    0.0    0.00    0.00    1000         __odrpack_MOD_oddrv <cycle 1> [111]
+                0.00    0.00    4000/690000      __odrpack_core_MOD_wght [95]
+                0.00    0.00    2000/4000        __odrpack_core_MOD_pack [105]
+                0.00    0.00    2000/2000        __odrpack_core_MOD_erstep [107]
+                0.00    0.00    1000/2000        __odrpack_core_MOD_flags [108]
+                0.00    0.00    1000/1000        __odrpack_core_MOD_iwinf [116]
+                0.00    0.00    1000/1000        __odrpack_core_MOD_winf [122]
+                0.00    0.00    1000/1000        __odrpack_core_MOD_odchk [117]
+                0.00    0.00    1000/1000        __odrpack_core_MOD_iniwk [115]
+                0.00    0.00    1000/1000        __odrpack_core_MOD_fctrw [114]
+                0.00    0.00    1000/60000       __odrpack_core_MOD_unpack [100]
+                0.00    0.00    1000/144001      __example5perf_model_MOD_fcn [98]
+                0.00    0.00    1000/1000        __odrpack_core_MOD_setrow [121]
+                0.00    0.00    1000/1000        __odrpack_core_MOD_etaf [113]
+                                1000             __odrpack_MOD_odmn <cycle 1> [5]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_MOD_odr <cycle 1> [93]
+[112]    0.0    0.00    0.00    1000         __odrpack_MOD_workspace_dimensions [112]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_MOD_oddrv <cycle 1> [111]
+[113]    0.0    0.00    0.00    1000         __odrpack_core_MOD_etaf [113]
+                0.00    0.00    4000/144001      __example5perf_model_MOD_fcn [98]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_MOD_oddrv <cycle 1> [111]
+[114]    0.0    0.00    0.00    1000         __odrpack_core_MOD_fctrw [114]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_MOD_oddrv <cycle 1> [111]
+[115]    0.0    0.00    0.00    1000         __odrpack_core_MOD_iniwk [115]
+                0.00    0.00    1000/1000        __odrpack_core_MOD_scaleb [119]
+                0.00    0.00    1000/1000        __odrpack_core_MOD_scaled [120]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_MOD_oddrv <cycle 1> [111]
+[116]    0.0    0.00    0.00    1000         __odrpack_core_MOD_iwinf [116]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_MOD_oddrv <cycle 1> [111]
+[117]    0.0    0.00    0.00    1000         __odrpack_core_MOD_odchk [117]
+-----------------------------------------------
+                                1000             __odrpack_MOD_odmn <cycle 1> [5]
+[118]    0.0    0.00    0.00    1000         __odrpack_core_MOD_odvcv <cycle 1> [118]
+                0.00    0.00    1000/1000        __linpack_MOD_dpodi [109]
+                                1000             __odrpack_core_MOD_odstp <cycle 1> [3]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_core_MOD_iniwk [115]
+[119]    0.0    0.00    0.00    1000         __odrpack_core_MOD_scaleb [119]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_core_MOD_iniwk [115]
+[120]    0.0    0.00    0.00    1000         __odrpack_core_MOD_scaled [120]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_MOD_oddrv <cycle 1> [111]
+[121]    0.0    0.00    0.00    1000         __odrpack_core_MOD_setrow [121]
+-----------------------------------------------
+                0.00    0.00    1000/1000        __odrpack_MOD_oddrv <cycle 1> [111]
+[122]    0.0    0.00    0.00    1000         __odrpack_core_MOD_winf [122]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012-2024 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+  [98] __example5perf_model_MOD_fcn [94] __odrpack_core_MOD_esubi [105] __odrpack_core_MOD_pack
+ [109] __linpack_MOD_dpodi   [113] __odrpack_core_MOD_etaf [119] __odrpack_core_MOD_scaleb
+  [10] __linpack_MOD_dqrdc   [103] __odrpack_core_MOD_evjac [120] __odrpack_core_MOD_scaled
+   [7] __linpack_MOD_dqrsl     [9] __odrpack_core_MOD_fctr [99] __odrpack_core_MOD_scalet
+ [101] __linpack_MOD_dtrco   [114] __odrpack_core_MOD_fctrw [121] __odrpack_core_MOD_setrow
+  [97] __linpack_MOD_dtrsl   [108] __odrpack_core_MOD_flags [4] __odrpack_core_MOD_solve
+ [110] __odrpack_MOD_odcnt   [115] __odrpack_core_MOD_iniwk [100] __odrpack_core_MOD_unpack
+ [111] __odrpack_MOD_oddrv   [116] __odrpack_core_MOD_iwinf [96] __odrpack_core_MOD_vevtr
+   [5] __odrpack_MOD_odmn    [104] __odrpack_core_MOD_jacfd [95] __odrpack_core_MOD_wght
+  [93] __odrpack_MOD_odr     [117] __odrpack_core_MOD_odchk [122] __odrpack_core_MOD_winf
+ [112] __odrpack_MOD_workspace_dimensions [102] __odrpack_core_MOD_odlm [6] _mcount_private
+ [106] __odrpack_core_MOD_acces [3] __odrpack_core_MOD_odstp [8] exp
+ [107] __odrpack_core_MOD_erstep [118] __odrpack_core_MOD_odvcv [1] <cycle 1>
