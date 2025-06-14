@@ -2,7 +2,7 @@
 A modernized Fortran package for weighted orthogonal distance regression (ODR).
 
 [![Test](https://github.com/HugoMVale/odrpack95/actions/workflows/test.yml/badge.svg)](https://github.com/HugoMVale/odrpack95/actions)
-[![codecov](https://codecov.io/gh/HugoMVale/odrpack95/branch/main/graph/badge.svg?token=1XL5LQSO9P)](https://codecov.io/gh/HugoMVale/odrpack95)
+[![codecov](https://codecov.io/gh/HugoMVale/odrpack95/graph/badge.svg?token=iaDiXHV9P6)](https://codecov.io/gh/HugoMVale/odrpack95)
 [![Language](https://img.shields.io/badge/-Fortran-734f96?logo=fortran&logoColor=white)](https://github.com/topics/fortran)
 
 ## Description
