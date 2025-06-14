@@ -106,7 +106,7 @@ contains
       real(wp), intent(in), optional :: sstol
          !! Sum-of-squares convergence stopping tolerance.
       real(wp), intent(in), optional :: partol
-      !! Parameter convergence stopping tolerance.
+         !! Parameter convergence stopping tolerance.
       integer, intent(in), optional :: maxit
          !! Maximum number of iterations allowed.
       integer, intent(in), optional :: iprint
@@ -114,12 +114,12 @@ contains
       integer, intent(in), optional :: lunerr
          !! Logical unit number for error messages. Available options are:
          !!   0 => no output.
-         !!   6 => output to standard error (default).
+         !!   6 => output to standard output (default).
          !!   other => output to logical unit number `lunerr`.
       integer, intent(in), optional :: lunrpt
          !! Logical unit number for computation reports. Available options are:
          !!   0 => no output.
-         !!   6 => output to standard error (default).
+         !!   6 => output to standard output (default).
          !!   other => output to logical unit number `lunrpt`.
       real(wp), intent(in), optional, target :: stpb(:)
          !! Relative step for computing finite difference derivatives with respect to `beta`.
@@ -1217,7 +1217,6 @@ contains
 
          ! Perform error checking
          info = 0
-         ! @todo: Need to check again? What has not been checked in ODR?
          call odcheck(n, m, np, nq, &
                       isodr, anajac, &
                       beta, ifixb, &
