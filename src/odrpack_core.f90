@@ -6,7 +6,7 @@ module odrpack_core
 
    abstract interface
       subroutine fcn_t( &
-        n, m, np, nq, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+         n, m, np, nq, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
       !! User-supplied subroutine for evaluating the model.
          import :: wp
          implicit none
@@ -624,13 +624,13 @@ contains
                   deltai, epsi, xplusi, fni, sdi, vcvi, &
                   rvari, wssi, wssdei, wssepi, rcondi, etai, &
                   olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
-                 partli, sstoli, taufci, epsmai, &
-                 beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
-                 fsi, fjacbi, we1i, diffi, &
-                 deltsi, deltni, ti, tti, omegai, fjacdi, &
-                 wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
-                 loweri, upperi, &
-                 lwkmn)
+                  partli, sstoli, taufci, epsmai, &
+                  beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
+                  fsi, fjacbi, we1i, diffi, &
+                  deltsi, deltni, ti, tti, omegai, fjacdi, &
+                  wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
+                  loweri, upperi, &
+                  lwkmn)
 
       if (access) then
          ! Set starting locations for work vectors
@@ -3479,13 +3479,13 @@ contains
                ! Check derivative wrt the J-th parameter at the NROW-th row
                if (interval(j) >= 1) then
                   call jckm(fcn, &
-                             n, m, np, nq, &
-                             betaj, xplusd, &
-                             ifixb, ifixx, ldifx, &
-                             eta, tol, nrow, epsmac, j, lq, typj, h0, hc0, &
-                             iswrtb, pv, fjacb(nrow, j, lq), &
-                             diffj, msgb1, msgb(2), istop, nfev, &
-                             wrk1, wrk2, wrk6, interval)
+                            n, m, np, nq, &
+                            betaj, xplusd, &
+                            ifixb, ifixx, ldifx, &
+                            eta, tol, nrow, epsmac, j, lq, typj, h0, hc0, &
+                            iswrtb, pv, fjacb(nrow, j, lq), &
+                            diffj, msgb1, msgb(2), istop, nfev, &
+                            wrk1, wrk2, wrk6, interval)
                   if (istop /= 0) then
                      msgb(1) = -1
                      return
@@ -3536,13 +3536,13 @@ contains
 
                   ! Check derivative wrt the J-th column of DELTA at row NROW
                   call jckm(fcn, &
-                             n, m, np, nq, &
-                             betaj, xplusd, &
-                             ifixb, ifixx, ldifx, &
-                             eta, tol, nrow, epsmac, j, lq, typj, h0, hc0, &
-                             iswrtb, pv, fjacd(nrow, j, lq), &
-                             diffj, msgd1, msgd(2), istop, nfev, &
-                             wrk1, wrk2, wrk6, interval)
+                            n, m, np, nq, &
+                            betaj, xplusd, &
+                            ifixb, ifixx, ldifx, &
+                            eta, tol, nrow, epsmac, j, lq, typj, h0, hc0, &
+                            iswrtb, pv, fjacd(nrow, j, lq), &
+                            diffj, msgd1, msgd(2), istop, nfev, &
+                            wrk1, wrk2, wrk6, interval)
                   if (istop /= 0) then
                      msgd(1) = -1
                      return
@@ -3746,12 +3746,12 @@ contains
 
       ! Check if finite precision arithmetic could be the culprit.
       call jckf(fcn, &
-                 n, m, np, nq, &
-                 beta, xplusd, ifixb, ifixx, ldifx, &
-                 eta, tol, nrow, j, lq, iswrtb, &
-                 fd, typj, pvpstp, stp0, curve, pv, d, &
-                 diffj, msg, istop, nfev, &
-                 wrk1, wrk2, wrk6)
+                n, m, np, nq, &
+                beta, xplusd, ifixb, ifixx, ldifx, &
+                eta, tol, nrow, j, lq, iswrtb, &
+                fd, typj, pvpstp, stp0, curve, pv, d, &
+                diffj, msg, istop, nfev, &
+                wrk1, wrk2, wrk6)
       if (istop /= 0) then
          return
       end if
@@ -4203,24 +4203,24 @@ contains
             if ((d == zero) .or. (fd == zero)) then
                if (interval(j) >= 10 .or. .not. iswrtb) then
                   call jckz(fcn, &
-                             n, m, np, nq, &
-                             beta, xplusd, ifixb, ifixx, ldifx, &
-                             nrow, epsmac, j, lq, iswrtb, &
-                             tol, d, fd, typj, pvpstp, stp0, pv, &
-                             diffj, msg, istop, nfev, &
-                             wrk1, wrk2, wrk6)
+                            n, m, np, nq, &
+                            beta, xplusd, ifixb, ifixx, ldifx, &
+                            nrow, epsmac, j, lq, iswrtb, &
+                            tol, d, fd, typj, pvpstp, stp0, pv, &
+                            diffj, msg, istop, nfev, &
+                            wrk1, wrk2, wrk6)
                else
                   msg(lq, j) = 8
                end if
             else
                if (interval(j) >= 100 .or. .not. iswrtb) then
                   call jckc(fcn, &
-                             n, m, np, nq, &
-                             beta, xplusd, ifixb, ifixx, ldifx, &
-                             eta, tol, nrow, epsmac, j, lq, hc, iswrtb, &
-                             fd, typj, pvpstp, stp0, pv, d, &
-                             diffj, msg, istop, nfev, &
-                             wrk1, wrk2, wrk6)
+                            n, m, np, nq, &
+                            beta, xplusd, ifixb, ifixx, ldifx, &
+                            eta, tol, nrow, epsmac, j, lq, hc, iswrtb, &
+                            fd, typj, pvpstp, stp0, pv, d, &
+                            diffj, msg, istop, nfev, &
+                            wrk1, wrk2, wrk6)
                else
                   msg(lq, j) = 8
                end if
@@ -4663,7 +4663,7 @@ contains
        tfjacb, omega, u, qraux, kpvt, &
        s, t, phi, irank, rcond, forvcv, &
        wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, tempret, istopc)
-   !! Compute locally constrained steps `s` and `t`, and `phi(alpha)`. 
+   !! Compute locally constrained steps `s` and `t`, and `phi(alpha)`.
       ! @note: This is one of the most time-consuming subroutines in ODRPACK (~25% of total).
 
       use odrpack_kinds, only: zero, one
@@ -4763,65 +4763,21 @@ contains
       real(wp) :: dum(2)
 
       ! Variable definitions (alphabetically)
-      !  ALPHA:   The Levenberg-Marquardt parameter.
       !  CO:      The cosine from the plane rotation.
-      !  DELTA:   The estimated errors in the explanatory variables.
       !  DUM:     A dummy array.
       !  ELIM:    The variable designating whether columns of the Jacobian
-      !           wrt BETA have been eliminated (ELIM=TRUE) or not (ELIM=FALSE).
-      !  EPSFCN:  The function's precision.
-      !  F:       The (weighted) estimated values of EPSILON.
-      !  FJACB:   The Jacobian with respect to BETA.
-      !  FJACD:   The Jacobian with respect to DELTA.
-      !  FORVCV:  The variable designating whether this subroutine was called to set up for the
-      !           covariance matrix computations (FORVCV=TRUE) or not (FORVCV=FALSE).
       !  I:       An indexing variable.
       !  IMAX:    The index of the element of U having the largest absolute value.
       !  INF:     The return code from LINPACK routines.
       !  IPVT:    The variable designating whether pivoting is to be done.
-      !  IRANK:   The rank deficiency of the Jacobian wrt BETA.
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by
-      !           OLS (ISODR=FALSE).
-      !  ISTOPC:  The variable designating whether the computations were stoped due to a numerical
-      !           error within subroutine DODSTP.
       !  J:       An indexing variable.
       !  K:       An indexing variable.
       !  K1:      An indexing variable.
       !  K2:      An indexing variable.
       !  KP:      The rank of the Jacobian wrt BETA.
-      !  KPVT:    The pivot vector.
       !  L:       An indexing variable.
-      !  LDTT:    The leading dimension of array TT.
-      !  LDWD:    The leading dimension of array WD.
-      !  LD2WD:   The second dimension of array WD.
-      !  LWRK:    The length of vector WRK.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  N:       The number of observations.
-      !  NP:      The number of function parameters.
-      !  NPP:     The number of function parameters being estimated.
-      !  OMEGA:   The array defined S.T.
-      !           OMEGA*trans(OMEGA) = inv(I+FJACD*inv(E)*trans(FJACD))
-      !           = (I-FJACD*inv(P)*trans(FJACD))
-      !           where E = D**2 + ALPHA*TT**2
-      !           P = trans(FJACD)*FJACD + D**2 + ALPHA*TT**2
-      !  PHI:     The difference between the norm of the scaled step and the trust region diameter.
-      !  QRAUX:   The array required to recover the orthogonal part of the Q-R decomposition.
-      !  RCOND:   The approximate reciprocal condition number of TFJACB.
-      !  S:       The step for BETA.
       !  SI:      The sine from the plane rotation.
-      !  SS:      The scaling values for the unfixed BETAS.
-      !  T:       The step for DELTA.
       !  TEMP:    A temporary storage LOCATION.
-      !  TFJACB:  The array OMEGA*FJACB.
-      !  TT:      The scaling values for DELTA.
-      !  U:       The approximate null vector for TFJACB.
-      !  WD:      The (squared) DELTA weights.
-      !  WRK:     A work array of (LWRK) elements, equivalenced to WRK1 and WRK2.
-      !  WRK1:    A work array of (N by NQ by M) elements.
-      !  WRK2:    A work array of (N by NQ) elements.
-      !  WRK3:    A work array of (NP) elements.
-      !  WRK4:    A work array of (M by M) elements.
-      !  WRK5:    A work array of (M) elements.
 
       ! Compute loop parameters which depend on weight structure
 
@@ -4844,6 +4800,7 @@ contains
          call weight(n, m, wd, ldwd, ld2wd, delta, t)
 
          do i = 1, n
+
             !  Compute WRK4, such that TRANS(WRK4)*WRK4 = E = (D**2 + ALPHA*TT**2)
             call esubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, wrk4)
             call fctr(.false., wrk4, m, m, inf)
@@ -4866,50 +4823,40 @@ contains
             ! Compute WRK1 = trans(FJACD)*(I-FJACD*inv(P)*trans(JFACD))
             !              = trans(FJACD)*inv(trans(OMEGA)*OMEGA)
             do j = 1, m
-               do l = 1, nq
-                  wrk1(i, l, j) = fjacd(i, j, l)
-               end do
-               call solve(nq, omega, nq, wrk1(i, 1:nq, j), 4)
-               call solve(nq, omega, nq, wrk1(i, 1:nq, j), 2)
+               wrk1(i, :, j) = fjacd(i, j, :)
+               call solve_trl(nq, omega, nq, wrk1(i, 1:nq, j), 4)
+               call solve_trl(nq, omega, nq, wrk1(i, 1:nq, j), 2)
             end do
 
             ! Compute WRK5 = inv(E)*D*G2
-            do j = 1, m
-               wrk5(j) = t(i, j)
-            end do
-            call solve(m, wrk4, m, wrk5, 4)
-            call solve(m, wrk4, m, wrk5, 2)
+            wrk5 = t(i, :)
+            call solve_trl(m, wrk4, m, wrk5, 4)
+            call solve_trl(m, wrk4, m, wrk5, 2)
 
             ! Compute TFJACB = inv(trans(OMEGA))*FJACB
             do k = 1, kp
-               do l = 1, nq
-                  tfjacb(i, l, k) = fjacb(i, kpvt(k), l)
-               end do
-               call solve(nq, omega, nq, tfjacb(i, 1:nq, k), 4)
-               do l = 1, nq
-                  if (ss(1) > zero) then
-                     tfjacb(i, l, k) = tfjacb(i, l, k)/ss(kpvt(k))
-                  else
-                     tfjacb(i, l, k) = tfjacb(i, l, k)/abs(ss(1))
-                  end if
-               end do
+               tfjacb(i, :, k) = fjacb(i, kpvt(k), :)
+               call solve_trl(nq, omega, nq, tfjacb(i, 1:nq, k), 4)
+               if (ss(1) > zero) then
+                  tfjacb(i, :, k) = tfjacb(i, :, k)/ss(kpvt(k))
+               else
+                  tfjacb(i, :, k) = tfjacb(i, :, k)/abs(ss(1))
+               end if
             end do
+
             ! Compute WRK2 = (V*inv(E)*D**2*G2 - G1)
             do l = 1, nq
-               wrk2(i, l) = zero
-               do j = 1, m
-                  wrk2(i, l) = wrk2(i, l) + fjacd(i, j, l)*wrk5(j)
-               end do
-               wrk2(i, l) = wrk2(i, l) - f(i, l)
+               wrk2(i, l) = dot_product(fjacd(i, :, l), wrk5) - f(i, l)
             end do
 
             ! Compute WRK2 = inv(trans(OMEGA))*(V*inv(E)*D**2*G2 - G1)
-            call solve(nq, omega, nq, wrk2(i, 1:nq), 4)
+            call solve_trl(nq, omega, nq, wrk2(i, 1:nq), 4)
+
          end do
 
       else
-         do i = 1, n
-            do l = 1, nq
+         do l = 1, nq
+            do i = 1, n
                do k = 1, kp
                   tfjacb(i, l, k) = fjacb(i, kpvt(k), l)
                   if (ss(1) > zero) then
@@ -4927,7 +4874,7 @@ contains
       ! Do QR factorization (with column pivoting of TFJACB if ALPHA = 0)
       if (alpha == zero) then
          ipvt = 1
-         kpvt(1:np) = 0
+         kpvt = 0
       else
          ipvt = 0
       end if
@@ -5014,6 +4961,7 @@ contains
          !          where T    = WD * DELTA = D*G2
          !          WRK1 = trans(FJACD)*(I-FJACD*inv(P)*trans(JFACD))
          do i = 1, n
+
             ! Compute WRK4, such that trans(WRK4)*WRK4 = E = (D**2 + ALPHA*TT**2)
             call esubi(n, m, wd, ldwd, ld2wd, alpha, tt, ldtt, i, wrk4)
             call fctr(.false., wrk4, m, m, inf)
@@ -5023,31 +4971,24 @@ contains
             end if
 
             ! Compute WRK5 = inv(E)*D*G2
-            do j = 1, m
-               wrk5(j) = t(i, j)
-            end do
-            call solve(m, wrk4, m, wrk5, 4)
-            call solve(m, wrk4, m, wrk5, 2)
+            wrk5 = t(i, :)
+            call solve_trl(m, wrk4, m, wrk5, 4)
+            call solve_trl(m, wrk4, m, wrk5, 2)
 
             do l = 1, nq
-               wrk2(i, l) = f(i, l)
-               do k = 1, npp
-                  wrk2(i, l) = wrk2(i, l) + fjacb(i, k, l)*s(k)
-               end do
-               do j = 1, m
-                  wrk2(i, l) = wrk2(i, l) - fjacd(i, j, l)*wrk5(j)
-               end do
+               wrk2(i, l) = f(i, l) &
+                            + dot_product(fjacb(i, 1:npp, l), s(1:npp)) &
+                            - dot_product(fjacd(i, :, l), wrk5)
             end do
 
             do j = 1, m
-               wrk5(j) = zero
-               do l = 1, nq
-                  wrk5(j) = wrk5(j) + wrk1(i, l, j)*wrk2(i, l)
-               end do
+               wrk5(j) = dot_product(wrk1(i, :, j), wrk2(i, :))
                t(i, j) = -(wrk5(j) + t(i, j))
             end do
-            call solve(m, wrk4, m, t(i, 1:m), 4)
-            call solve(m, wrk4, m, t(i, 1:m), 2)
+
+            call solve_trl(m, wrk4, m, t(i, 1:m), 4)
+            call solve_trl(m, wrk4, m, t(i, 1:m), 2)
+
          end do
 
       end if
@@ -6147,7 +6088,7 @@ contains
 
    end subroutine select_row
 
-   pure subroutine solve(n, t, ldt, b, job)
+   pure subroutine solve_trl(n, t, ldt, b, job)
    !! Solve systems of the form:
    !!
    !!  `t * x = b  or  trans(t) * x = b`
@@ -6244,7 +6185,7 @@ contains
          ! Solve trans(T)*X=B for T lower triangular.
          b(jn) = b(jn)/t(jn, jn)
          do j = jn - 1, j1, -1
-            b(j) = b(j) - dot_product(t(j+1:jn+1, j), b(j+1:jn+1))
+            b(j) = b(j) - dot_product(t(j + 1:jn + 1, j), b(j + 1:jn + 1))
             if (t(j, j) /= zero) then
                b(j) = b(j)/t(j, j)
             else
@@ -6256,7 +6197,7 @@ contains
          ! Solve trans(T)*X=B for T upper triangular
          b(j1) = b(j1)/t(j1, j1)
          do j = j1 + 1, jn
-             b(j) = b(j) - dot_product(t(1:j-1, j), b(1:j-1))
+            b(j) = b(j) - dot_product(t(1:j - 1, j), b(1:j - 1))
             if (t(j, j) /= zero) then
                b(j) = b(j)/t(j, j)
             else
@@ -6267,7 +6208,7 @@ contains
          error stop "Invalid value of JOB."
       end select
 
-   end subroutine solve
+   end subroutine solve_trl
 
    pure subroutine vevtr &
       (m, nq, indx, &
@@ -6333,7 +6274,7 @@ contains
          do j = 1, m
             wrk5(j) = v(indx, j, l1)
          end do
-         call solve(m, e, lde, wrk5, 4)
+         call solve_trl(m, e, lde, wrk5, 4)
          do j = 1, m
             ve(indx, l1, j) = wrk5(j)
          end do
