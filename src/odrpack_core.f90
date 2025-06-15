@@ -5975,7 +5975,7 @@ contains
    !! Select scaling values for `delta` according to the algorithm given in the ODRPACK95
    !! reference guide.
 
-      use odrpack_kinds, only: zero, one, ten
+      use odrpack_kinds, only: zero, one
 
       integer, intent(in) :: n
          !! The number of observations.
@@ -5999,11 +5999,6 @@ contains
       !           X (BIGDIF=.TRUE.) or not (BIGDIF=.FALSE.).
       !  I:       An indexing variable.
       !  J:       An indexing variable.
-      !  LDTT:    The leading dimension of array TT.
-      !  M:       The number of columns of data in the independent variable.
-      !  N:       The number of observations.
-      !  TT:      THE SCALING VALUES FOR DELTA.
-      !  X:       The independent variable.
       !  XMAX:    The largest nonzero magnitude.
       !  XMIN:    THE SMALLEST NONZERO MAGNITUDE.
 
@@ -6014,9 +6009,7 @@ contains
          end do
          if (xmax == zero) then
             !  All input values of X(I,J), I=1,...,N, are zero
-            do i = 1, n
-               tt(i, j) = one
-            end do
+            tt(1:n, j) = one
          else
             !  Some of the input values are nonzero
             xmin = xmax
@@ -6029,12 +6022,12 @@ contains
             do i = 1, n
                if (x(i, j) /= zero) then
                   if (bigdif) then
-                     tt(i, j) = one/abs(x(i, j))
+                     tt(i, j) = 1/abs(x(i, j))
                   else
-                     tt(i, j) = one/xmax
+                     tt(i, j) = 1/xmax
                   end if
                else
-                  tt(i, j) = ten/xmin
+                  tt(i, j) = 10/xmin
                end if
             end do
          end if
