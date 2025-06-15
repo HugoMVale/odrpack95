@@ -6,7 +6,264 @@ module odrpack_reports
 
 contains
 
-   impure subroutine odpc1 &
+   impure subroutine print_header(head, lunit)
+   !! Print report heading.
+
+      logical, intent(inout) :: head
+         !! The variable designating whether the heading is to be printed (`head = .true.`)
+         !! or not (`head = .false.`).
+      integer, intent(in) :: lunit
+         !! The logical unit number to which the heading is written.
+
+      if (head) then
+         write (lunit, 1000)
+         head = .false.
+      end if
+
+      ! Format statements
+
+1000  format( &
+         ' ****************************************************************************** '/ &
+         ' *                                ODRPACK REPORT                              * '/ &
+         ' ****************************************************************************** '/ &
+         )
+
+   end subroutine print_header
+
+   impure subroutine print_reports &
+      (ipr, lunrpt, &
+       head, prtpen, fstitr, didvcv, iflag, &
+       n, m, np, nq, npp, nnzw, &
+       msgb, msgd, beta, y, x, delta, &
+       we, ldwe, ld2we, wd, ldwd, ld2wd, &
+       ifixb, ifixx, ldifx, &
+       lower, upper, &
+       ssf, tt, ldtt, stpb, stpd, ldstpd, &
+       job, neta, taufac, sstol, partol, maxit, &
+       wss, rvar, idf, sdbeta, &
+       niter, nfev, njev, actred, prered, &
+       tau, pnorm, alpha, f, rcond, irank, info, istop)
+   !! Generate computation reports.
+
+      use odrpack_core, only: set_flags
+
+      integer, intent(in) :: ipr
+         !! The variable indicating what is to be printed.
+      integer, intent(in) :: lunrpt
+         !! The logical unit number used for computation reports.
+      logical, intent(inout) :: head
+         !! The variable designating whether the heading is to be printed (`head = .true.`)
+         !! or not (`head = .false.`).
+      logical, intent(in) :: prtpen
+         !! The variable designating whether the penalty parameter is to be printed in the
+         !! iteration report (`prtpen = .true.`) or not (`prtpen = .false.`).
+      logical, intent(in) :: fstitr
+         !! The variable designating whether this is the first iteration (`fstitr = .true.`)
+         !! or not (`fstitr = .false.`).
+      logical, intent(in) :: didvcv
+         !! The variable designating whether the covariance matrix was computed
+         !! (`didvcv = .true.`) or not (`didvcv = .false.`).
+      integer, intent(in) :: iflag
+         !! The variable designating what is to be printed.
+      integer, intent(in) :: n
+         !! The number of observations.
+      integer, intent(in) :: m
+         !! The number of columns of data in the explanatory variable.
+      integer, intent(in) :: np
+         !! The number of function parameters.
+      integer, intent(in) :: nq
+         !! The number of responses per observation.
+      integer, intent(in) :: npp
+         !! The number of function parameters being estimated.
+      integer, intent(in) :: nnzw
+         !! The number of nonzero weighted observations.
+      integer, intent(in) :: msgb(nq*np + 1)
+         !! The error checking results for the Jacobian with respect to `beta`.
+      integer, intent(in) :: msgd(nq*m + 1)
+         !! The error checking results for the Jacobian with respect to `delta`.
+      real(wp), intent(in) :: beta(np)
+         !! The function parameters.
+      real(wp), intent(in) :: y(n, nq)
+         !! The response variable. Unused when the model is implicit.
+      real(wp), intent(in) :: x(n, m)
+         !! The explanatory variable.
+      real(wp), intent(in) :: delta(n, m)
+         !! The estimated errors in the explanatory variables.
+      real(wp), intent(in) :: we(ldwe, ld2we, nq)
+         !! The `epsilon` weights.
+      integer, intent(in) :: ldwe
+         !! The leading dimension of array `we`.
+      integer, intent(in) :: ld2we
+         !! The second dimension of array `we`.
+      real(wp), intent(in) :: wd(ldwd, ld2wd, m)
+         !! The `delta` weights.
+      integer, intent(in) :: ldwd
+         !! The leading dimension of array `wd`.
+      integer, intent(in) :: ld2wd
+         !! The second dimension of array `wd`.
+      integer, intent(in) :: ifixb(np)
+         !! The values designating whether the elements of `beta` are fixed at their input
+         !! values or not.
+      integer, intent(in) :: ifixx(ldifx, m)
+         !! The values designating whether the elements of `x` are fixed at their input values
+         !! or not.
+      integer, intent(in) :: ldifx
+         !! The leading dimension of array `ifixx`.
+      real(wp), intent(in) :: lower(np)
+         !! The lower bounds for `beta`.
+      real(wp), intent(in) :: upper(np)
+         !! The upper bounds for `beta`.
+      real(wp), intent(in) :: ssf(np)
+         !! The scaling values for `beta`.
+      real(wp), intent(in) :: tt(ldtt, m)
+         !! The scaling values for `delta`.
+      integer, intent(in) :: ldtt
+         !! The leading dimension of array `tt`.
+      real(wp), intent(in) :: stpb(np)
+         !! The relative step used for computing finite difference derivatives with respect
+         !! to `beta`.
+      real(wp), intent(in) :: stpd(ldstpd, m)
+         !! The relative step used for computing finite difference derivatives with respect
+         !! to `delta`.
+      integer, intent(in) :: ldstpd
+         !! The leading dimension of array `stpd`.
+      integer, intent(in) :: job
+         !! The variable controlling problem initialization and computational method.
+      integer, intent(in) :: neta
+         !! The number of accurate digits in the function results.
+      real(wp), intent(in) :: taufac
+         !! The factor used to compute the initial trust region diameter.
+      real(wp), intent(in) :: sstol
+         !! The sum-of-squares convergence stopping tolerance.
+      real(wp), intent(in) :: partol
+         !! The parameter convergence stopping tolerance.
+      integer, intent(in) :: maxit
+         !! The maximum number of iterations allowed.
+      real(wp), intent(in) :: wss(3)
+         !! The sum-of-squares of the weighted `epsilon`s and `delta`s, the sum-of-squares of
+         !! the weighted `delta`s, and the sum-of-squares of the weighted `epsilon`s.
+      real(wp), intent(in) :: rvar
+         !! The residual variance.
+      integer, intent(in) :: idf
+         !! The degrees of freedom of the fit, equal to the number of observations with nonzero
+         !! weighted derivatives minus the number of parameters being estimated.
+      real(wp), intent(in) :: sdbeta(np)
+         !! The standard errors of the estimated parameters.
+      integer, intent(in) :: niter
+         !! The number of iterations.
+      integer, intent(in) :: nfev
+         !! The number of function evaluations.
+      integer, intent(in) :: njev
+         !! The number of Jacobian evaluations.
+      real(wp), intent(in) :: actred
+         !! The actual relative reduction in the sum-of-squares.
+      real(wp), intent(in) :: prered
+         !! The predicted relative reduction in the sum-of-squares.
+      real(wp), intent(in) :: tau
+         !! The trust region diameter.
+      real(wp), intent(in) :: pnorm
+         !! The norm of the scaled estimated parameters.
+      real(wp), intent(in) :: alpha
+         !! The Levenberg-Marquardt parameter.
+      real(wp), intent(in) :: f(n, nq)
+         !! The estimated values of `epsilon`.
+      real(wp), intent(in) :: rcond
+         !! The approximate reciprocal condition of `tfjacb`.
+      integer, intent(in) :: irank
+         !! The rank deficiency of the Jacobian with respect to `beta`.
+      integer, intent(in) :: info
+         !! The variable designating why the computations were stopped.
+      integer, intent(in) :: istop
+         !! The variable designating whether there are problems computing the function at the
+         !! current `beta` and `delta`.
+
+      ! Local scalars
+      real(wp) :: pnlty
+      logical :: anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
+      character(len=3) :: typ
+
+      ! Variable Definitions (alphabetically)
+      !  ANAJAC:  The variable designating whether the Jacobians are computed by finite
+      !           differences (ANAJAC=FALSE) or not (ANAJAC=TRUE).
+      !  CDJAC:   The variable designating whether the jacobians are computed by central
+      !           differences (CDJAC=TRUE) or by forward differences (CDJAC=FALSE).
+      !  CHKJAC:  The variable designating whether the user supplied Jacobians are to be checked
+      !           (CHKJAC=TRUE) or not (CHKJAC=FALSE).
+      !  DOVCV:   The variable designating whether the covariance matrix was to be computed
+      !           (DOVCV=TRUE) or not (DOVCV=FALSE).
+      !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
+      !           or explicit ODR (IMPLCT=FALSE).
+      !  INITD:   The variable designating whether DELTA is initialized to zero (INITD=TRUE) or
+      !           to the values in the first N by M elements of array WORK (INITD=FALSE).
+      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by
+      !           OLS (ISODR=FALSE).
+      !  PNLTY:   The penalty parameter for an implicit model.
+      !  REDOJ:   The variable designating whether the Jacobian matrix is to be recomputed for
+      !           the computation of the covariance matrix (REDOJ=TRUE) or not (REDOJ=FALSE).
+      !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or not
+      !           (RESTRT=FALSE).
+      !  TYP:     The CHARACTER*3 string "ODR" or "OLS".
+
+      call set_flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
+      pnlty = abs(we(1, 1, 1))
+
+      if (head) then
+         call print_header(head, lunrpt)
+      end if
+      if (isodr) then
+         typ = 'ODR'
+      else
+         typ = 'OLS'
+      end if
+
+      ! Print initial summary
+      if (iflag == 1) then
+         write (lunrpt, 1200) typ
+         call print_report_initial &
+            (ipr, lunrpt, &
+             anajac, cdjac, chkjac, initd, restrt, isodr, implct, dovcv, redoj, &
+             msgb(1), msgb(2), msgd(1), msgd(2), n, m, np, nq, npp, nnzw, x, &
+             ifixx, ldifx, delta, wd, ldwd, ld2wd, tt, ldtt, stpd, ldstpd, &
+             y, we, ldwe, ld2we, pnlty, beta, ifixb, ssf, stpb, lower, &
+             upper, job, neta, taufac, sstol, partol, maxit, wss(1), wss(2), &
+             wss(3))
+
+         ! Print iteration reports
+      elseif (iflag == 2) then
+
+         if (fstitr) then
+            write (lunrpt, 1300) typ
+         end if
+         call print_report_iter &
+            (ipr, lunrpt, fstitr, implct, prtpen, &
+             pnlty, &
+             niter, nfev, wss(1), actred, prered, alpha, tau, pnorm, np, beta)
+
+         ! Print final summary
+      elseif (iflag == 3) then
+
+         write (lunrpt, 1400) typ
+         call print_report_final &
+            (ipr, lunrpt, &
+             isodr, implct, didvcv, dovcv, redoj, anajac, &
+             n, m, np, nq, npp, &
+             info, niter, nfev, njev, irank, rcond, istop, &
+             wss(1), wss(2), wss(3), pnlty, rvar, idf, &
+             beta, sdbeta, ifixb, f, delta, lower, upper)
+      end if
+
+      ! Format statements
+
+1200  format &
+         (/' *** Initial summary for fit by method of ', A3, ' ***')
+1300  format &
+         (/' *** Iteration reports for fit by method of ', A3, ' ***')
+1400  format &
+         (/' *** Final summary for fit by method of ', A3, ' ***')
+
+   end subroutine print_reports
+
+   impure subroutine print_report_initial &
       (ipr, lunrpt, &
        anajac, cdjac, chkjac, initd, restrt, isodr, implct, dovcv, redoj, &
        msgb1, msgb, msgd1, msgd, &
@@ -146,85 +403,21 @@ contains
       character(len=13) :: tempc2
 
       ! Variable Definitions (alphabetically)
-      !  ANAJAC:  The variable designating whether the Jacobians are computed by finite differences
-      !           (ANAJAC=FALSE) or not (ANAJAC=TRUE).
-      !  BETA:    The function parameters.
-      !  CDJAC:   The variable designating whether the Jacobians are computed by central differences
-      !           (CDJAC=TRUE) or forward differences (CDJAC=FALSE).
-      !  CHKJAC:  The variable designating whether the user supplied Jacobians are to be checked
-      !           (CHKJAC=TRUE) or not (CHKJAC=FALSE).
-      !  DELTA:   The estimated errors in the explanatory variables.
-      !  DOVCV:   The variable designating whether the covariance matrix is to be computed
-      !           (DOVCV=TRUE) or not (DOVCV=FALSE).
       !  I:       An indexing variable.
-      !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
-      !           values or not.
-      !  IFIXX:   The values designating whether the elements of X are fixed at their input
-      !           values or not.
-      !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
-      !           or explicit ODR (IMPLCT=FALSE).
-      !  INITD:   The variable designating whether DELTA is initialized to zero (INITD=TRUE) or
-      !           to the values in the first N by M elements of array WORK (INITD=FALSE).
-      !  IPR:     The value indicating the report to be printed.
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by
-      !           OLS (ISODR=FALSE).
       !  ITEMP:   A temporary integer value.
       !  J:       An indexing variable.
-      !  JOB:     The variable controling problem initialization and computational method.
       !  JOB1:    The 1st digit (from the left) of variable JOB.
       !  JOB2:    The 2nd digit (from the left) of variable JOB.
       !  JOB3:    The 3rd digit (from the left) of variable JOB.
       !  JOB4:    The 4th digit (from the left) of variable JOB.
       !  JOB5:    The 5th digit (from the left) of variable JOB.
       !  L:       An indexing variable.
-      !  LDIFX:   The leading dimension of array IFIXX.
-      !  LDTT:    The leading dimension of array TT.
-      !  LDWD:    The leading dimension of array WD.
-      !  LDWE:    The leading dimension of array WE.
-      !  LD2WD:   The second dimension of array WD.
-      !  LD2WE:   The second dimension of array WE.
-      !  LUNRPT:  The logical unit number for the computation reports.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  MAXIT:   The maximum number of iterations allowed.
-      !  MSGB:    The error checking results for the Jacobian wrt beta.
-      !  MSGB1:   The error checking results for the Jacobian wrt BETA.
-      !  MSGD:    The error checking results for the Jacobian wrt DELTA.
-      !  MSGD1:   The error checking results for the Jacobian wrt DELTA.
-      !  N:       The number of observations.
-      !  NETA:    The number of accurate digits in the function results. A negative value
-      !           indicates that NETA was estimated by ODRPACK. A positive value indictes the
-      !           value was supplied by the user.
-      !  NNZW:    The number of nonzero observational error weights.
-      !  NP:      The number of function parameters.
-      !  NPP:     The number of function parameters being estimated.
-      !  NQ:      The number of responses per observation.
-      !  PARTOL:  The parameter convergence stopping tolerance.
-      !  PNLTY:   The penalty parameter for an implicit model.
-      !  REDOJ:   The variable designating whether the Jacobian matrix is to be recomputed for
-      !           the computation of the covariance matrix (REDOJ=TRUE) or not (REDOJ=FALSE).
-      !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or
-      !           not (RESTRT=FALSE).
-      !  SSF:     The scaling values for BETA.
-      !  SSTOL:   The sum-of-squares convergence stopping tolerance.
-      !  STPB:    The relative step used for computing finite difference derivatives with respect
-      !           to BETA.
-      !  STPD:    The relative step used for computing finite difference derivatives with respect
-      !           to DELTA.
-      !  TAUFAC:  The factor used to compute the initial trust region diameter.
       !  TEMPC0:  A temporary CHARACTER*2 value.
       !  TEMPC1:  A temporary CHARACTER*5 value.
       !  TEMPC2:  A temporary CHARACTER*13 value.
       !  TEMP1:   A temporary REAL (wp) value.
       !  TEMP2:   A temporary REAL (wp) value.
       !  TEMP3:   A temporary REAL (wp) value.
-      !  TT:      The scaling values for DELTA.
-      !  WD:      The DELTA weights.
-      !  WE:      The EPSILON weights.
-      !  WSS:     The sum-of-squares of the weighted EPSILONS and DELTAS.
-      !  WSSDEL:  The sum-of-squares of the weighted DELTAS.
-      !  WSSEPS:  The sum-of-squares of the weighted EPSILONS.
-      !  X:       The explanatory variable.
-      !  Y:       The response variable.  Unused when the model is implicit.
 
       ! Print problem size specification
       write (lunrpt, 1000) n, nnzw, nq, m, np, npp
@@ -705,9 +898,9 @@ contains
          (8X, A2, I2, 1P, 2E12.3, 4X, A5, 2E10.2, 1X, E13.5)
 6000  format &
          (' ')
-   end subroutine odpc1
+   end subroutine print_report_initial
 
-   impure subroutine odpc2 &
+   impure subroutine print_report_iter &
       (ipr, lunrpt, fstitr, implct, prtpen, &
        pnlty, &
        niter, nfev, wss, actred, prered, alpha, tau, pnorm, np, beta)
@@ -757,30 +950,11 @@ contains
       character(len=3) :: gn
 
       ! Variable Definitions (alphabetically)
-      !  ACTRED:  The actual relative reduction in the sum-of-squares.
-      !  ALPHA:   The Levenberg-Marquardt parameter.
-      !  BETA:    The function parameters.
-      !  FSTITR:  The variable designating whether this is the first iteration (FSTITR=.TRUE.)
-      !           or not (FSTITR=.FALSE.).
       !  GN:      The CHARACTER*3 variable indicating whether a Gauss-Newton step was taken.
-      !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
-      !           or explicit ODR (IMPLCT=FALSE).
-      !  IPR:     The value indicating the report to be printed.
       !  J:       An indexing variable.
       !  K:       An indexing variable.
       !  L:       An indexing variable.
-      !  LUNRPT:  The logical unit number used for computation reports.
-      !  NFEV:    The number of function evaluations.
-      !  NITER:   The number of iterations.
-      !  NP:      The number of function parameters.
-      !  PNLTY:   The penalty parameter for an implicit model.
-      !  PNORM:   The norm of the scaled estimated parameters.
-      !  PRERED:  The predicted relative reduction in the sum-of-squares.
-      !  PRTPEN:  The variable designating whether the penalty parameter is to be printed in
-      !           the iteration report (PRTPEN=TRUE) or not (PRTPEN=FALSE).
       !  RATIO:   The ratio of TAU to PNORM.
-      !  TAU:     The trust region diameter.
-      !  WSS:     The sum-of-squares of the weighted EPSILONS and DELTAS.
 
       if (fstitr) then
          if (ipr == 1) then
@@ -885,9 +1059,9 @@ contains
 1152  format &
          (70X, I3, ' To', I3, 1P, 3E16.8)
 
-   end subroutine odpc2
+   end subroutine print_report_iter
 
-   impure subroutine odpc3 &
+   impure subroutine print_report_final &
       (ipr, lunrpt, &
        isodr, implct, didvcv, dovcv, redoj, anajac, &
        n, m, np, nq, npp, &
@@ -981,62 +1155,18 @@ contains
       character(len=90) :: fmt1
 
       ! Variable Definitions (alphabetically)
-      !  ANAJAC:  The variable designating whether the JACOBIANS are computed by finite
-      !           differences (ANAJAC=FALSE) or not (ANAJAC=TRUE).
-      !  BETA:    The function parameters.
       !  D1:      The first digit of INFO.
       !  D2:      The second digit of INFO.
       !  D3:      The third digit of INFO.
       !  D4:      The fourth digit of INFO.
       !  D5:      The fifth digit of INFO.
-      !  DELTA:   The estimated errors in the explanatory variables.
-      !  DIDVCV:  The variable designating whether the covariance matrix was computed
-      !           (DIDVCV=TRUE) or not (DIDVCV=FALSE).
-      !  DOVCV:   The variable designating whether the covariance matrix was to be computed
-      !           (DOVCV=TRUE) or not (DOVCV=FALSE).
-      !  F:       The estimated values of EPSILON.
       !  FMT1:    A CHARACTER*90 variable used for formats.
       !  I:       An indexing variable.
-      !  IDF:     The degrees of freedom of the fit, equal to the number of observations with
-      !           nonzero weighted derivatives minus the number of parameters being estimated.
-      !  IFIXB2:  The values designating whether the elements of BETA were estimated, fixed,
-      !           or dropped because they caused rank deficiency, corresponding to values of
-      !           IFIXB2 equaling 1, 0, and -1, respectively.  If IFIXB2 is -2, then no attempt
-      !           was made to estimate the parameters because MAXIT = 0.
-      !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
-      !           or explicit ODR (IMPLCT=FALSE).
-      !  INFO:    The variable designating why the computations were stopped.
-      !  IPR:     The variable indicating what is to be printed.
-      !  IRANK:   The rank deficiency of the Jacobian wrt BETA.
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by
-      !           OLS (ISODR=FALSE).
-      !  ISTOP:   The variable designating whether there are problems computing the function at
-      !           the current BETA and DELTA.
       !  J:       An indexing variable.
       !  K:       An indexing variable.
       !  L:       An indexing variable.
-      !  LOWER:   Lower bound on BETA.
-      !  LUNRPT:  The logical unit number used for computation reports.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  N:       The number of observations.
-      !  NFEV:    The number of function evaluations.
-      !  NITER:   The number of iterations.
-      !  NJEV:    The number of Jacobian evaluations.
-      !  NP:      The number of function parameters.
       !  NPLM1:   The number of items to be printed per line, minus one.
-      !  NPP:     The number of function parameters being estimated.
-      !  NQ:      The number of responses per observation.
-      !  PNLTY:   The penalty parameter for an implicit model.
-      !  RCOND:   The approximate reciprocal condition of TFJACB.
-      !  REDOJ:   The variable designating whether the Jacobian matrix is to be recomputed for
-      !           the computation of the covariance matrix (REDOJ=TRUE) or not (REDOJ=FALSE).
-      !  RVAR:    The residual variance.
-      !  SDBETA:  The standard errors of the estimated parameters.
       !  TVAL:    The value of the 97.5 percent point function for the T distribution.
-      !  UPPER:   Upper bound on BETA.
-      !  WSS:     The sum-of-squares of the weighted EPSILONS and DELTAS.
-      !  WSSDEL:  The sum-of-squares of the weighted DELTAS.
-      !  WSSEPS:  The sum-of-squares of the weighted EPSILONS.
 
       d1 = info/10000
       d2 = mod(info, 10000)/1000
@@ -1464,43 +1594,22 @@ contains
          ('(/''         I'',', &
           I2, '(''    EPSILON(I,'',I1,'')'')/)')
 
-   end subroutine odpc3
+   end subroutine print_report_final
 
-   impure subroutine odpcr &
-      (ipr, lunrpt, &
-       head, prtpen, fstitr, didvcv, iflag, &
-       n, m, np, nq, npp, nnzw, &
-       msgb, msgd, beta, y, x, delta, &
-       we, ldwe, ld2we, wd, ldwd, ld2wd, &
-       ifixb, ifixx, ldifx, &
-       lower, upper, &
-       ssf, tt, ldtt, stpb, stpd, ldstpd, &
-       job, neta, taufac, sstol, partol, maxit, &
-       wss, rvar, idf, sdbeta, &
-       niter, nfev, njev, actred, prered, &
-       tau, pnorm, alpha, f, rcond, irank, info, istop)
-   !! Generate computation reports.
+   impure subroutine print_errors &
+      (info, lunerr, &
+       n, m, np, nq, &
+       ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
+       lwkmn, liwkmn, &
+       fjacb, fjacd, &
+       diff, msgb, isodr, msgd, &
+       xplusd, nrow, neta, ntol)
+   !! Controlling routine for printing error reports.
 
-      use odrpack_core, only: set_flags
-
-      integer, intent(in) :: ipr
-         !! The variable indicating what is to be printed.
-      integer, intent(in) :: lunrpt
-         !! The logical unit number used for computation reports.
-      logical, intent(inout) :: head
-         !! The variable designating whether the heading is to be printed (`head = .true.`)
-         !! or not (`head = .false.`).
-      logical, intent(in) :: prtpen
-         !! The variable designating whether the penalty parameter is to be printed in the
-         !! iteration report (`prtpen = .true.`) or not (`prtpen = .false.`).
-      logical, intent(in) :: fstitr
-         !! The variable designating whether this is the first iteration (`fstitr = .true.`)
-         !! or not (`fstitr = .false.`).
-      logical, intent(in) :: didvcv
-         !! The variable designating whether the covariance matrix was computed
-         !! (`didvcv = .true.`) or not (`didvcv = .false.`).
-      integer, intent(in) :: iflag
-         !! The variable designating what is to be printed.
+      integer, intent(inout) :: info
+         !! The variable designating why the computations were stopped.
+      integer, intent(in) :: lunerr
+         !! The logical unit number used for error messages.
       integer, intent(in) :: n
          !! The number of observations.
       integer, intent(in) :: m
@@ -1509,267 +1618,132 @@ contains
          !! The number of function parameters.
       integer, intent(in) :: nq
          !! The number of responses per observation.
-      integer, intent(in) :: npp
-         !! The number of function parameters being estimated.
-      integer, intent(in) :: nnzw
-         !! The number of nonzero weighted observations.
-      integer, intent(in) :: msgb(nq*np + 1)
-         !! The error checking results for the Jacobian with respect to `beta`.
-      integer, intent(in) :: msgd(nq*m + 1)
-         !! The error checking results for the Jacobian with respect to `delta`.
-      real(wp), intent(in) :: beta(np)
-         !! The function parameters.
-      real(wp), intent(in) :: y(n, nq)
-         !! The response variable. Unused when the model is implicit.
-      real(wp), intent(in) :: x(n, m)
-         !! The explanatory variable.
-      real(wp), intent(in) :: delta(n, m)
-         !! The estimated errors in the explanatory variables.
-      real(wp), intent(in) :: we(ldwe, ld2we, nq)
-         !! The `epsilon` weights.
+      integer, intent(in) :: ldscld
+         !! The leading dimension of array `scld`.
+      integer, intent(in) :: ldstpd
+         !! The leading dimension of array `stpd`.
       integer, intent(in) :: ldwe
          !! The leading dimension of array `we`.
       integer, intent(in) :: ld2we
          !! The second dimension of array `we`.
-      real(wp), intent(in) :: wd(ldwd, ld2wd, m)
-         !! The `delta` weights.
       integer, intent(in) :: ldwd
          !! The leading dimension of array `wd`.
       integer, intent(in) :: ld2wd
          !! The second dimension of array `wd`.
-      integer, intent(in) :: ifixb(np)
-         !! The values designating whether the elements of `beta` are fixed at their input
-         !! values or not.
-      integer, intent(in) :: ifixx(ldifx, m)
-         !! The values designating whether the elements of `x` are fixed at their input values
-         !! or not.
-      integer, intent(in) :: ldifx
-         !! The leading dimension of array `ifixx`.
-      real(wp), intent(in) :: lower(np)
-         !! The lower bounds for `beta`.
-      real(wp), intent(in) :: upper(np)
-         !! The upper bounds for `beta`.
-      real(wp), intent(in) :: ssf(np)
-         !! The scaling values for `beta`.
-      real(wp), intent(in) :: tt(ldtt, m)
-         !! The scaling values for `delta`.
-      integer, intent(in) :: ldtt
-         !! The leading dimension of array `tt`.
-      real(wp), intent(in) :: stpb(np)
-         !! The relative step used for computing finite difference derivatives with respect
-         !! to `beta`.
-      real(wp), intent(in) :: stpd(ldstpd, m)
-         !! The relative step used for computing finite difference derivatives with respect
-         !! to `delta`.
-      integer, intent(in) :: ldstpd
-         !! The leading dimension of array `stpd`.
-      integer, intent(in) :: job
-         !! The variable controlling problem initialization and computational method.
+      integer, intent(in) :: lwkmn
+         !! The minimum acceptable length of array `work`.
+      integer, intent(in) :: liwkmn
+         !! The minimum acceptable length of array `iwork`.
+      real(wp), intent(in) :: fjacb(n, np, nq)
+         !! The Jacobian with respect to `beta`.
+      real(wp), intent(in) :: fjacd(n, m, nq)
+         !! The Jacobian with respect to `delta`.
+      real(wp), intent(in) :: diff(nq, np + m)
+         !! The relative differences between the user-supplied and finite difference
+         !! derivatives for each derivative checked.
+      integer, intent(in) :: msgb(nq*np + 1)
+         !! The error checking results for the Jacobian with respect to `beta`.
+      logical, intent(in) :: isodr
+         !! The variable designating whether the solution is by ODR (`isodr = .true.`) or
+         !! by OLS (`isodr = .false.`).
+      integer, intent(in) :: msgd(nq*m + 1)
+         !! The error checking results for the Jacobian with respect to `delta`.
+      real(wp), intent(in) :: xplusd(n, m)
+         !! The values `x + delta`.
+      integer, intent(in) :: nrow
+         !! The row number of the explanatory variable array at which the derivative is to be
+         !! checked.
       integer, intent(in) :: neta
-         !! The number of accurate digits in the function results.
-      real(wp), intent(in) :: taufac
-         !! The factor used to compute the initial trust region diameter.
-      real(wp), intent(in) :: sstol
-         !! The sum-of-squares convergence stopping tolerance.
-      real(wp), intent(in) :: partol
-         !! The parameter convergence stopping tolerance.
-      integer, intent(in) :: maxit
-         !! The maximum number of iterations allowed.
-      real(wp), intent(in) :: wss(3)
-         !! The sum-of-squares of the weighted `epsilon`s and `delta`s, the sum-of-squares of
-         !! the weighted `delta`s, and the sum-of-squares of the weighted `epsilon`s.
-      real(wp), intent(in) :: rvar
-         !! The residual variance.
-      integer, intent(in) :: idf
-         !! The degrees of freedom of the fit, equal to the number of observations with nonzero
-         !! weighted derivatives minus the number of parameters being estimated.
-      real(wp), intent(in) :: sdbeta(np)
-         !! The standard errors of the estimated parameters.
-      integer, intent(in) :: niter
-         !! The number of iterations.
-      integer, intent(in) :: nfev
-         !! The number of function evaluations.
-      integer, intent(in) :: njev
-         !! The number of Jacobian evaluations.
-      real(wp), intent(in) :: actred
-         !! The actual relative reduction in the sum-of-squares.
-      real(wp), intent(in) :: prered
-         !! The predicted relative reduction in the sum-of-squares.
-      real(wp), intent(in) :: tau
-         !! The trust region diameter.
-      real(wp), intent(in) :: pnorm
-         !! The norm of the scaled estimated parameters.
-      real(wp), intent(in) :: alpha
-         !! The Levenberg-Marquardt parameter.
-      real(wp), intent(in) :: f(n, nq)
-         !! The estimated values of `epsilon`.
-      real(wp), intent(in) :: rcond
-         !! The approximate reciprocal condition of `tfjacb`.
-      integer, intent(in) :: irank
-         !! The rank deficiency of the Jacobian with respect to `beta`.
-      integer, intent(in) :: info
-         !! The variable designating why the computations were stopped.
-      integer, intent(in) :: istop
-         !! The variable designating whether there are problems computing the function at the
-         !! current `beta` and `delta`.
+         !! The number of reliable digits in the model.
+      integer, intent(in) :: ntol
+         !! The number of digits of agreement required between the finite difference and the
+         !! user-supplied derivatives.
 
       ! Local scalars
-      real(wp) :: pnlty
-      logical :: anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
-      character(len=3) :: typ
+      integer :: d1, d2, d3, d4, d5
+      logical :: head
 
       ! Variable Definitions (alphabetically)
-      !  ACTRED:  The actual relative reduction in the sum-of-squares.
-      !  ALPHA:   The Levenberg-Marquardt parameter.
-      !  ANAJAC:  The variable designating whether the Jacobians are computed by finite
-      !           differences (ANAJAC=FALSE) or not (ANAJAC=TRUE).
-      !  BETA:    The function parameters.
-      !  CDJAC:   The variable designating whether the jacobians are computed by central
-      !           differences (CDJAC=TRUE) or by forward differences (CDJAC=FALSE).
-      !  CHKJAC:  The variable designating whether the user supplied Jacobians are to be checked
-      !           (CHKJAC=TRUE) or not (CHKJAC=FALSE).
-      !  DELTA:   The estimated errors in the explanatory variables.
-      !  DIDVCV:  The variable designating whether the covariance matrix was computed
-      !           (DIDVCV=TRUE) or not (DIDVCV=FALSE).
-      !  DOVCV:   The variable designating whether the covariance matrix was to be computed
-      !           (DOVCV=TRUE) or not (DOVCV=FALSE).
-      !  F:       The (weighted) estimated values of EPSILON.
-      !  FSTITR:  The variable designating whether this is the first iteration (FSTITR=TRUE) or
-      !           not (FSTITR=FALSE).
-      !  HEAD:    The variable designating whether the heading is to be printed (HEAD=TRUE) or
-      !           not (HEAD=FALSE).
-      !  IDF:     The degrees of freedom of the fit, equal to the number of observations with
-      !           nonzero weighted derivatives minus the number of parameters being estimated.
-      !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
-      !           values or not.
-      !  IFIXX:   The values designating whether the elements of X are fixed at their input
-      !           values or not.
-      !  IFLAG:   The variable designating what is to be printed.
-      !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
-      !           or explicit ODR (IMPLCT=FALSE).
-      !  INFO:    The variable designating why the computations were stopped.
-      !  INITD:   The variable designating whether DELTA is initialized to zero (INITD=TRUE) or
-      !           to the values in the first N by M elements of array WORK (INITD=FALSE).
-      !  IPR:     The value indicating the report to be printed.
-      !  IRANK:   The rank deficiency of the Jacobian wrt BETA.
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by
-      !           OLS (ISODR=FALSE).
-      !  ISTOP:   The variable designating whether there are problems computing the function at
-      !           the current BETA and DELTA.
-      !  JOB:     The variable controling problem initialization and computational method.
-      !  LDIFX:   The leading dimension of array IFIXX.
-      !  LDSTPD:  The leading dimension of array STPD.
-      !  LDTT:    The leading dimension of array TT.
-      !  LDWD:    The leading dimension of array WD.
-      !  LDWE:    The leading dimension of array WE.
-      !  LD2WD:   The second dimension of array WD.
-      !  LD2WE:   The second dimension of array WE.
-      !  LOWER:   Lower bound on BETA.
-      !  LUNRPT:  The logical unit number for computation reports.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  MAXIT:   The maximum number of iterations allowed.
-      !  MSGB:    The error checking results for the Jacobian wrt BETA.
-      !  MSGD:    The error checking results for the Jacobian wrt DELTA.
-      !  N:       The number of observations.
-      !  NETA:    The number of accurate digits in the function results.
-      !  NFEV:    The number of function evaluations.
-      !  NITER:   The number of iterations.
-      !  NJEV:    The number of Jacobian evaluations.
-      !  NNZW:    The number of nonzero weighted observations.
-      !  NP:      The number of function parameters.
-      !  NQ:      The number of responses per observation.
-      !  NPP:     The number of function parameters being estimated.
-      !  PARTOL:  The parameter convergence stopping tolerance.
-      !  PNLTY:   The penalty parameter for an implicit model.
-      !  PNORM:   The norm of the scaled estimated parameters.
-      !  PRERED:  The predicted relative reduction in the sum-of-squares.
-      !  PRTPEN:  The variable designating whether the penalty parameter is  to be printed in
-      !           the iteration report (PRTPEN=TRUE) or not (PRTPEN=FALSE).
-      !  RCOND:   The approximate reciprocal condition number of TFJACB.
-      !  REDOJ:   The variable designating whether the Jacobian matrix is to be recomputed for
-      !           the computation of the covariance matrix (REDOJ=TRUE) or not (REDOJ=FALSE).
-      !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or not
-      !           (RESTRT=FALSE).
-      !  RVAR:    The residual variance.
-      !  SDBETA:  The standard deviations of the estimated BETA'S.
-      !  SSF:     The scaling values for BETA.
-      !  SSTOL:   The sum-of-squares convergence stopping tolerance.
-      !  STPB:    The relative step for computing finite difference derivatives with respect
-      !           to BETA.
-      !  STPD:    The relative step for computing finite difference derivatives with respect
-      !           to DELTA.
-      !  TAU:     The trust region diameter.
-      !  TAUFAC:  The factor used to compute the initial trust region diameter.
-      !  TT:      The scaling values for DELTA.
-      !  TYP:     The CHARACTER*3 string "ODR" or "OLS".
-      !  UPPER:   Upper bound on BETA.
-      !  WE:      The EPSILON weights.
-      !  WD:      The DELTA weights.
-      !  WSS:     The sum-of-squares of the weighted EPSILONS and DELTAS, the sum-of-squares of
-      !           the weighted DELTAS, and the sum-of-squares of the weighted EPSILONS.
-      !  X:       The explanatory variable.
-      !  Y:       The dependent variable.  Unused when the model is implicit.
+      !  D1:      The 1st digit (from the left) of INFO.
+      !  D2:      The 2nd digit (from the left) of INFO.
+      !  D3:      The 3rd digit (from the left) of INFO.
+      !  D4:      The 4th digit (from the left) of INFO.
+      !  D5:      The 5th digit (from the left) of INFO.
+      !  HEAD:    The variable designating whether the heading is to be printed (HEAD=.TRUE.)
+      !           or not (HEAD=.FALSE.).
 
-      call set_flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
-      pnlty = abs(we(1, 1, 1))
+      ! Print heading
+      head = .true.
+      call print_header(head, lunerr)
 
-      if (head) then
-         call odphd(head, lunrpt)
-      end if
-      if (isodr) then
-         typ = 'ODR'
-      else
-         typ = 'OLS'
+      ! Extract individual digits from variable INFO
+      d1 = mod(info, 100000)/10000
+      d2 = mod(info, 10000)/1000
+      d3 = mod(info, 1000)/100
+      d4 = mod(info, 100)/10
+      d5 = mod(info, 10)
+
+      ! Print appropriate error messages for ODRPACK invoked stop
+      if ((d1 >= 1 .and. d1 <= 3) .or. (d1 == 7 .or. d1 == 9)) then
+
+         ! Print appropriate messages for errors in
+         !         problem specification parameters
+         !         dimension specification parameters
+         !         number of good digits in X
+         !         weights
+         call print_error_inputs(lunerr, info, d1, d2, d3, d4, d5, &
+                                 n, m, nq, &
+                                 ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
+                                 lwkmn, liwkmn)
+
+      elseif ((d1 == 4) .or. (msgb(1) >= 0)) then
+
+         ! Print appropriate messages for derivative checking
+         call print_error_derivative(lunerr, &
+                                     n, m, np, nq, &
+                                     fjacb, fjacd, &
+                                     diff, msgb(1), msgb(2), isodr, msgd(1), msgd(2), &
+                                     xplusd, nrow, neta, ntol)
+
+      elseif (d1 == 5) then
+
+         ! Print appropriate error message for user invoked stop from FCN
+         call print_error_fcn(lunerr, d2, d3)
+
       end if
 
-      ! Print initial summary
-      if (iflag == 1) then
-         write (lunrpt, 1200) typ
-         call odpc1 &
-            (ipr, lunrpt, &
-             anajac, cdjac, chkjac, initd, restrt, isodr, implct, dovcv, redoj, &
-             msgb(1), msgb(2), msgd(1), msgd(2), n, m, np, nq, npp, nnzw, x, &
-             ifixx, ldifx, delta, wd, ldwd, ld2wd, tt, ldtt, stpd, ldstpd, &
-             y, we, ldwe, ld2we, pnlty, beta, ifixb, ssf, stpb, lower, &
-             upper, job, neta, taufac, sstol, partol, maxit, wss(1), wss(2), &
-             wss(3))
-
-         ! Print iteration reports
-      elseif (iflag == 2) then
-
-         if (fstitr) then
-            write (lunrpt, 1300) typ
-         end if
-         call odpc2 &
-            (ipr, lunrpt, fstitr, implct, prtpen, &
-             pnlty, &
-             niter, nfev, wss(1), actred, prered, alpha, tau, pnorm, np, beta)
-
-         ! Print final summary
-      elseif (iflag == 3) then
-
-         write (lunrpt, 1400) typ
-         call odpc3 &
-            (ipr, lunrpt, &
-             isodr, implct, didvcv, dovcv, redoj, anajac, &
-             n, m, np, nq, npp, &
-             info, niter, nfev, njev, irank, rcond, istop, &
-             wss(1), wss(2), wss(3), pnlty, rvar, idf, &
-             beta, sdbeta, ifixb, f, delta, lower, upper)
+      ! Print correct form of call statement
+      if ((d1 >= 1 .and. d1 <= 3) .or. &
+          (d1 == 4 .and. (d2 == 2 .or. d3 == 2)) .or. &
+          (d1 == 5)) then
+         write (lunerr, 1100)
       end if
 
       ! Format statements
 
-1200  format &
-         (/' *** Initial summary for fit by method of ', A3, ' ***')
-1300  format &
-         (/' *** Iteration reports for fit by method of ', A3, ' ***')
-1400  format &
-         (/' *** Final summary for fit by method of ', A3, ' ***')
+1100  format &
+         (//' The correct form of the call statement is '// &
+           '       call odr'/ &
+           '      +     (fcn,'/ &
+           '      +     n, m, np, nq,'/ &
+           '      +     beta,'/ &
+           '      +     y, x,'/ &
+           '      +     delta*,'/ &
+           '      +     we*, wd*,'/ &
+           '      +     ifixb*, ifixx*,'/ &
+           '      +     job*, ndigit*, taufac*,'/ &
+           '      +     sstol*, partol*, maxit*,'/ &
+           '      +     iprint*, lunerr*, lunrpt*,'/ &
+           '      +     stpb*, stpd*,'/ &
+           '      +     sclb*, scld*,'/ &
+           '      +     work*, iwork*,'/ &
+           '      +     info*,'/ &
+           '      +     lower*, upper*)'/ &
+           ' * optional argument')
 
-   end subroutine odpcr
+   end subroutine print_errors
 
-   impure subroutine odpe1 &
+   impure subroutine print_error_inputs &
       (lunerr, info, d1, d2, d3, d4, d5, &
        n, m, nq, &
        ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
@@ -1813,26 +1787,6 @@ contains
       integer, intent(in) :: liwkmn
          !! The minimum acceptable length of array `iwork`.
 
-      ! Variable Definitions (alphabetically)
-      !  D1:      The 1st digit (from the left) of INFO.
-      !  D2:      The 2nd digit (from the left) of INFO.
-      !  D3:      The 3rd digit (from the left) of INFO.
-      !  D4:      The 4th digit (from the left) of INFO.
-      !  D5:      The 5th digit (from the left) of INFO.
-      !  INFO:    The variable designating why the computations were stopped.
-      !  LDSCLD:  The leading dimension of array SCLD.
-      !  LDSTPD:  The leading dimension of array STPD.
-      !  LDWD:    The leading dimension of array WD.
-      !  LDWE:    The leading dimension of array WE.
-      !  LIWKMN:  The minimum acceptable length of array IWORK.
-      !  LWKMN:   The minimum acceptable length of array WORK.
-      !  LD2WD:   The second dimension of array WD.
-      !  LD2WE:   The second dimension of array WE.
-      !  LUNERR:  The logical unit number used for error messages.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  N:       The number of observations.
-      !  NQ:      The number of responses per observation.
-
       ! Print appropriate messages for errors in problem specification parameters
 
       if (d1 == 1) then
@@ -1849,7 +1803,7 @@ contains
             write (lunerr, 1400)
          end if
 
-      ! Print appropriate messages for errors in dimension specification parameters
+         ! Print appropriate messages for errors in dimension specification parameters
 
       elseif (d1 == 2) then
 
@@ -2170,7 +2124,7 @@ contains
          (/' ERROR :  At least one of the (M by M) arrays starting'/ &
            '          in WD(I,1,1), I = 1, ..., N, is not positive definite.'/ &
            '          When WD(1,1,1) >= 0 and LDWD = N and LD2WD = M, then each of'/ &
-           '          the (M by M) arrays in WD must be positive definite.')   
+           '          the (M by M) arrays in WD must be positive definite.')
 4320  format &
          (/' ERROR :  At least one of the (1 by M) arrays starting'/ &
            '          in WD(I,1,1), I = 1, ..., N, has a nonpositive element.'/ &
@@ -2245,9 +2199,9 @@ contains
 8015  format &
          (/' ERROR :  LOWER has incorrect size. ')
 
-   end subroutine odpe1
+   end subroutine print_error_inputs
 
-   impure subroutine odpe2 &
+   impure subroutine print_error_derivative &
       (lunerr, &
        n, m, np, nq, &
        fjacb, fjacd, &
@@ -2303,34 +2257,13 @@ contains
       logical :: ftnote(0:9)
 
       ! Variable Definitions (alphabetically)
-      !  DIFF:    The relative differences between the user-supplied and finite difference
-      !           derivatives for each derivative checked.
-      !  FJACB:   The Jacobian with respect to BETA.
-      !  FJACD:   The Jacobian with respect to DELTA.
       !  FLAG:    The character string indicating highly questionable results.
       !  FTNOTE:  The array controling footnotes.
       !  I:       An index variable.
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=.TRUE.) or
-      !           by OLS (ISODR=.FALSE.).
       !  J:       An index variable.
       !  K:       An index variable.
       !  L:       An index variable.
-      !  LUNERR:  The logical unit number used for error messages.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  MSGB:    The error checking results for the Jacobian wrt BETA.
-      !  MSGB1:   The error checking results for the Jacobian wrt BETA.
-      !  MSGD:    The error checking results for the Jacobian wrt DELTA.
-      !  MSGD1:   The error checking results for the Jacobian wrt DELTA.
-      !  N:       The number of observations.
-      !  NETA:    The number of reliable digits in the model.
-      !  NP:      The number of function parameters.
-      !  NQ:      The number of responses per observation.
-      !  NROW:    The row number of the explanatory variable array at which the derivative is to
-      !           be checked.
-      !  NTOL:    The number of digits of agreement required between the finite difference and
-      !           the user supplied derivatives.
       !  TYP:     The character string indicating solution type, ODR or OLS.
-      !  XPLUSD:  The values of X + DELTA.
 
       ! Set up for footnotes
 
@@ -2539,9 +2472,9 @@ contains
 8110  format &
          (10X, 'X(', I2, ',', I2, ')', 1X, 1P, 3E16.8)
 
-   end subroutine odpe2
+   end subroutine print_error_derivative
 
-   impure subroutine odpe3(lunerr, d2, d3)
+   impure subroutine print_error_fcn(lunerr, d2, d3)
    !! Print error reports indicating that computations were stopped in user-supplied
    !! subroutine `fcn`.
 
@@ -2551,11 +2484,6 @@ contains
          !! The 2nd digit (from the left) of `info`.
       integer :: d3
          !! The 3rd digit (from the left) of `info`.
-
-      ! Variable Definitions (alphabetically)
-      !  D2:      The 2nd digit (from the left) of INFO.
-      !  D3:      The 3rd digit (from the left) of INFO.
-      !  LUNERR:  The logical unit number used for error messages.
 
       ! Print appropriate messages to indicate where computations were stopped
 
@@ -2615,210 +2543,6 @@ contains
            ' of subroutine FCN before the regression procedure can '/ &
            ' continue.')
 
-   end subroutine odpe3
-
-   impure subroutine odper &
-      (info, lunerr, &
-       n, m, np, nq, &
-       ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-       lwkmn, liwkmn, &
-       fjacb, fjacd, &
-       diff, msgb, isodr, msgd, &
-       xplusd, nrow, neta, ntol)
-   !! Controlling routine for printing error reports.
-
-      integer, intent(inout) :: info
-         !! The variable designating why the computations were stopped.
-      integer, intent(in) :: lunerr
-         !! The logical unit number used for error messages.
-      integer, intent(in) :: n
-         !! The number of observations.
-      integer, intent(in) :: m
-         !! The number of columns of data in the explanatory variable.
-      integer, intent(in) :: np
-         !! The number of function parameters.
-      integer, intent(in) :: nq
-         !! The number of responses per observation.
-      integer, intent(in) :: ldscld
-         !! The leading dimension of array `scld`.
-      integer, intent(in) :: ldstpd
-         !! The leading dimension of array `stpd`.
-      integer, intent(in) :: ldwe
-         !! The leading dimension of array `we`.
-      integer, intent(in) :: ld2we
-         !! The second dimension of array `we`.
-      integer, intent(in) :: ldwd
-         !! The leading dimension of array `wd`.
-      integer, intent(in) :: ld2wd
-         !! The second dimension of array `wd`.
-      integer, intent(in) :: lwkmn
-         !! The minimum acceptable length of array `work`.
-      integer, intent(in) :: liwkmn
-         !! The minimum acceptable length of array `iwork`.
-      real(wp), intent(in) :: fjacb(n, np, nq)
-         !! The Jacobian with respect to `beta`.
-      real(wp), intent(in) :: fjacd(n, m, nq)
-         !! The Jacobian with respect to `delta`.
-      real(wp), intent(in) :: diff(nq, np + m)
-         !! The relative differences between the user-supplied and finite difference
-         !! derivatives for each derivative checked.
-      integer, intent(in) :: msgb(nq*np + 1)
-         !! The error checking results for the Jacobian with respect to `beta`.
-      logical, intent(in) :: isodr
-         !! The variable designating whether the solution is by ODR (`isodr = .true.`) or
-         !! by OLS (`isodr = .false.`).
-      integer, intent(in) :: msgd(nq*m + 1)
-         !! The error checking results for the Jacobian with respect to `delta`.
-      real(wp), intent(in) :: xplusd(n, m)
-         !! The values `x + delta`.
-      integer, intent(in) :: nrow
-         !! The row number of the explanatory variable array at which the derivative is to be
-         !! checked.
-      integer, intent(in) :: neta
-         !! The number of reliable digits in the model.
-      integer, intent(in) :: ntol
-         !! The number of digits of agreement required between the finite difference and the
-         !! user-supplied derivatives.
-
-      ! Local scalars
-      integer :: d1, d2, d3, d4, d5
-      logical :: head
-
-      ! Variable Definitions (alphabetically)
-      !  D1:      The 1st digit (from the left) of INFO.
-      !  D2:      The 2nd digit (from the left) of INFO.
-      !  D3:      The 3rd digit (from the left) of INFO.
-      !  D4:      The 4th digit (from the left) of INFO.
-      !  D5:      The 5th digit (from the left) of INFO.
-      !  DIFF:    The relative differences between the user supplied and finite difference
-      !           derivatives for each derivative checked.
-      !  FJACB:   The Jacobian with respect to BETA.
-      !  FJACD:   The Jacobian with respect to DELTA.
-      !  HEAD:    The variable designating whether the heading is to be printed (HEAD=.TRUE.)
-      !           or not (HEAD=.FALSE.).
-      !  INFO:    The variable designating why the computations were stopped.
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=.TRUE.) or
-      !           by OLS (ISODR=.FALSE.).
-      !  LDSCLD:  The leading dimension of array SCLD.
-      !  LDSTPD:  The leading dimension of array STPD.
-      !  LDWD:    The leading dimension of array WD.
-      !  LDWE:    The leading dimension of array WE.
-      !  LD2WD:   The second dimension of array WD.
-      !  LD2WE:   The second dimension of array WE.
-      !  LIWKMN:  The minimum acceptable length of array IWORK.
-      !  LUNERR:  The logical unit number used for error messages.
-      !  LWKMN:   The minimum acceptable length of array WORK.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  MSGB:    The error checking results for the Jacobian wrt BETA.
-      !  MSGD:    The error checking results for the Jacobian wrt DELTA.
-      !  N:       The number of observations.
-      !  NETA:    The number of reliable digits in the model.
-      !  NP:      The number of function parameters.
-      !  NQ:      The number of responses per observation.
-      !  NROW:    The row number of the explanatory variable array at which the derivative is
-      !           to be checked.
-      !  NTOL:    The number of digits of agreement required between the finite difference and
-      !           the user supplied derivatives.
-      !  XPLUSD:  The values X + DELTA.
-
-      ! Print heading
-      head = .true.
-      call odphd(head, lunerr)
-
-      ! Extract individual digits from variable INFO
-      d1 = mod(info, 100000)/10000
-      d2 = mod(info, 10000)/1000
-      d3 = mod(info, 1000)/100
-      d4 = mod(info, 100)/10
-      d5 = mod(info, 10)
-
-      ! Print appropriate error messages for ODRPACK invoked stop
-      if ((d1 >= 1 .and. d1 <= 3) .or. (d1 == 7 .or. d1 == 9)) then
-
-         ! Print appropriate messages for errors in
-         !         problem specification parameters
-         !         dimension specification parameters
-         !         number of good digits in X
-         !         weights
-         call odpe1(lunerr, info, d1, d2, d3, d4, d5, &
-                     n, m, nq, &
-                     ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-                     lwkmn, liwkmn)
-
-      elseif ((d1 == 4) .or. (msgb(1) >= 0)) then
-
-         ! Print appropriate messages for derivative checking
-         call odpe2(lunerr, &
-                     n, m, np, nq, &
-                     fjacb, fjacd, &
-                     diff, msgb(1), msgb(2), isodr, msgd(1), msgd(2), &
-                     xplusd, nrow, neta, ntol)
-
-      elseif (d1 == 5) then
-
-         ! Print appropriate error message for user invoked stop from FCN
-         call odpe3(lunerr, d2, d3)
-
-      end if
-
-      ! Print correct form of call statement
-      if ((d1 >= 1 .and. d1 <= 3) .or. &
-          (d1 == 4 .and. (d2 == 2 .or. d3 == 2)) .or. &
-          (d1 == 5)) then
-         write (lunerr, 1100)
-      end if
-
-      ! Format statements
-
-1100  format &
-         (//' The correct form of the call statement is '// &
-           '       call odr'/ &
-           '      +     (fcn,'/ &
-           '      +     n, m, np, nq,'/ &
-           '      +     beta,'/ &
-           '      +     y, x,'/ &
-           '      +     delta*,'/ &
-           '      +     we*, wd*,'/ &
-           '      +     ifixb*, ifixx*,'/ &
-           '      +     job*, ndigit*, taufac*,'/ &
-           '      +     sstol*, partol*, maxit*,'/ &
-           '      +     iprint*, lunerr*, lunrpt*,'/ &
-           '      +     stpb*, stpd*,'/ &
-           '      +     sclb*, scld*,'/ &
-           '      +     work*, iwork*,'/ &
-           '      +     info*,'/ &
-           '      +     lower*, upper*)'/ &
-           ' * optional argument')
-
-   end subroutine odper
-
-   impure subroutine odphd(head, lunit)
-   !! Print report heading.
-
-      logical, intent(inout) :: head
-         !! The variable designating whether the heading is to be printed (`head = .true.`)
-         !! or not (`head = .false.`).
-      integer, intent(in) :: lunit
-         !! The logical unit number to which the heading is written.
-
-      ! Variable Definitions (alphabetically)
-      !  HEAD:    The variable designating whether the heading is to be printed (HEAD=.TRUE.)
-      !           or not (HEAD=.FALSE.).
-      !  LUNIT:    The logical unit number to which the heading is written.
-
-      if (head) then
-         write (lunit, 1000)
-         head = .false.
-      end if
-
-      ! Format statements
-
-1000  format( &
-         ' ****************************************************************************** '/ &
-         ' *                                ODRPACK REPORT                              * '/ &
-         ' ****************************************************************************** '/ &
-         )
-
-   end subroutine odphd
+   end subroutine print_error_fcn
 
 end module odrpack_reports
