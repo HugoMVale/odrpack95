@@ -50,7 +50,7 @@ program example5
    real(kind=wp), allocatable :: beta(:), lower(:), upper(:), x(:, :), y(:, :), work(:)
    integer, allocatable :: iwork(:)
    integer :: np, n, m, nq, job
-   integer :: i, lwork, liwork
+   integer :: lwork, liwork !, i
 
    job = 20
 
@@ -60,7 +60,7 @@ program example5
    nq = 1
 
    allocate (beta(np), lower(np), upper(np), x(n, m), y(n, nq))
-   
+
    beta(1:2) = [2.0_wp, 0.5_wp]
    lower(1:2) = [0.0_wp, 0.0_wp]
    upper(1:2) = [10.0_wp, 0.9_wp]
@@ -72,7 +72,7 @@ program example5
    call workspace_dimensions(n, m, np, nq, .true., lwork, liwork)
    allocate (iwork(liwork))
    allocate (work(lwork))
-   
+
    call odr(fcn, n, m, np, nq, beta, y, x, job=job, iwork=iwork, work=work, &
             lower=lower, upper=upper)
 
