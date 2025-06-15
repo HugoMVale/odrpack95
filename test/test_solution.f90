@@ -9,8 +9,8 @@ module test_solution_m
 
 contains
 
-   impure subroutine odrx_main(ntest, tstfac, passed, lunrpt, lunerr, lunsum)
-   !! Exercise features of [[odrpack]].
+   impure subroutine test_odr(ntest, tstfac, passed, lunrpt, lunerr, lunsum)
+   !! Test solutions delivered with [[odr]].
 
       use odrpack, only: odr, workspace_dimensions
 
@@ -35,10 +35,10 @@ contains
 
       ! Local arrays
       integer :: idpymp(ntests)
-      integer, allocatable :: ifixb(:), ifixx(:,:), iwork(:)
+      integer, allocatable :: ifixb(:), ifixx(:, :), iwork(:)
       real(wp) :: dpymp(2, ntests)
-      real(wp), allocatable :: delta(:, :), beta(:), x(:,:), y(:,:), sclb(:), scld(:,:), &
-                               stpb(:), stpd(:, :), we(:,:,:), wd(:,:,:), beta_last(:), &
+      real(wp), allocatable :: delta(:, :), beta(:), x(:, :), y(:, :), sclb(:), scld(:, :), &
+                               stpb(:), stpd(:, :), we(:, :, :), wd(:, :, :), beta_last(:), &
                                work(:)
 
       ! Data statements
@@ -255,9 +255,8 @@ contains
          if (itest == 1) then
 
             ! Test simple ODR problem with analytic derivatives.
-            
+
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1010)
@@ -265,7 +264,7 @@ contains
             end do
 
             setno = 5
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -277,7 +276,6 @@ contains
             ! Test simple OLS problem with forward difference derivatives.
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1020)
@@ -285,7 +283,7 @@ contains
             end do
 
             setno = 5
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -298,7 +296,6 @@ contains
             ! with analytic derivatives. (derivative checking turned off.)
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1030)
@@ -306,7 +303,7 @@ contains
             end do
 
             setno = 3
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -321,7 +318,6 @@ contains
             ! N.B., this run continues from where test 3 left off.
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1040)
@@ -331,7 +327,7 @@ contains
             setno = 3
             wflat = .false.
             beta_last = beta
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -352,7 +348,6 @@ contains
             ! derivatives.
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1050)
@@ -360,7 +355,7 @@ contains
             end do
 
             setno = 1
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -377,7 +372,6 @@ contains
             ! derivatives.
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1060)
@@ -385,7 +379,7 @@ contains
             end do
 
             setno = 4
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -397,15 +391,14 @@ contains
          elseif (itest == 7) then
 
             ! Test restart for unscaled ODR problem with analytic derivatives.
-            
+
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1070)
                lun = lunsum
             end do
-            
+
             setno = 4
             job = 20220
             sstol = hundrd*epsmac
@@ -418,7 +411,6 @@ contains
             ! for ODR problem with central difference derivatives.
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1080)
@@ -426,7 +418,7 @@ contains
             end do
 
             setno = 6
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -440,7 +432,6 @@ contains
             ! and covariance matrix constructed with recomputed derivatives.
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1090)
@@ -448,7 +439,7 @@ contains
             end do
 
             setno = 7
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -463,7 +454,6 @@ contains
             ! variable fixing, and weighting.
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1100)
@@ -471,7 +461,7 @@ contains
             end do
             setno = 8
             wflat = .false.
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -519,7 +509,6 @@ contains
             ! Test detection of incorrect derivatives
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1110)
@@ -527,7 +516,7 @@ contains
             end do
 
             setno = 6
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -538,7 +527,6 @@ contains
             ! Test detection of incorrect derivatives
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1120)
@@ -546,7 +534,7 @@ contains
             end do
 
             setno = 6
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -558,7 +546,6 @@ contains
             ! parameters start on bound, move away, hit bound, move away, find minimum.
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1010)
@@ -566,7 +553,7 @@ contains
             end do
 
             setno = 9
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -581,7 +568,6 @@ contains
             ! Test bounded ODR problem where bounds are never hit.
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1010)
@@ -589,7 +575,7 @@ contains
             end do
 
             setno = 9
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -603,7 +589,6 @@ contains
             ! Test bounded ODR problem where minimum is on boundary.
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1010)
@@ -611,7 +596,7 @@ contains
             end do
 
             setno = 9
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -627,7 +612,6 @@ contains
             ! Test bounded ODR problem where initial BETA is outside bounds.
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1010)
@@ -635,7 +619,7 @@ contains
             end do
 
             setno = 9
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -650,7 +634,6 @@ contains
             ! Test bounded ODR problem where bounds are ill defined.
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1010)
@@ -658,7 +641,7 @@ contains
             end do
 
             setno = 9
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -674,7 +657,6 @@ contains
             ! parameters start on bound, move away, hit bound, move away, find minimum.
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1010)
@@ -682,7 +664,7 @@ contains
             end do
 
             setno = 9
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -698,7 +680,6 @@ contains
             ! Parameters start on bound.
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1010)
@@ -706,7 +687,7 @@ contains
             end do
 
             setno = 9
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -725,7 +706,6 @@ contains
             ! Parameters start on bound.
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1010)
@@ -733,7 +713,7 @@ contains
             end do
 
             setno = 9
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -751,7 +731,6 @@ contains
             ! step sizes using forward differences. Parameters start on bound.
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1010)
@@ -759,7 +738,7 @@ contains
             end do
 
             setno = 9
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -779,7 +758,6 @@ contains
             ! parameters and ensure that bounds and fixed parameters can be mixed.
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1010)
@@ -787,7 +765,7 @@ contains
             end do
 
             setno = 10
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -803,7 +781,6 @@ contains
             ! Similar to test 22 but without bounds.
 
             lun = lunrpt
-            write (lun, 1000)
             do i = 1, 2
                write (lun, 1001) itest
                write (lun, 1010)
@@ -811,7 +788,7 @@ contains
             end do
 
             setno = 10
-            call odrx_inputs( &
+            call set_inputs( &
                wflat, &
                title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
@@ -824,8 +801,8 @@ contains
 
          ! Allocate work arrays
          if (job < 10000) then
-            if (allocated(iwork)) deallocate(iwork)
-            if (allocated(work)) deallocate(work)
+            if (allocated(iwork)) deallocate (iwork)
+            if (allocated(work)) deallocate (work)
             isodr = (job < 0 .or. mod(job, 10) <= 1)
             call workspace_dimensions(n, m, np, nq, isodr, lwork, liwork)
             allocate (iwork(liwork), work(lwork))
@@ -837,7 +814,7 @@ contains
          write (lunsum, 2200) title
 
          if (short) then
-            call odr(fcn=odrx_fcn, &
+            call odr(fcn=fcn, &
                      n=n, m=m, np=np, nq=nq, &
                      beta=beta, &
                      y=y, x=x, &
@@ -847,7 +824,7 @@ contains
                      work=work, iwork=iwork, &
                      info=info)
          else
-            call odr(fcn=odrx_fcn, &
+            call odr(fcn=fcn, &
                      n=n, m=m, np=np, nq=nq, &
                      beta=beta, &
                      y=y, x=x, &
@@ -866,9 +843,9 @@ contains
 
          ! Compare results with those obtained on the CRAY YMP or the Intel Xeon running
          ! Linux using REAL(8) version of ODRPACK95
-        
+
          call loc_wsse(n, m, np, nq, ldwe, ld2we, isodr, wssi, wssdei, wssepi)
-         
+
          wssdel = work(wssdei)
          wsseps = work(wssepi)
          wss = work(wssi)
@@ -969,7 +946,6 @@ contains
          end do
       end do test
 
-      write (lunrpt, 1000)
       if (failed) then
          write (lunrpt, 4100)
          write (lunsum, 4100)
@@ -982,56 +958,26 @@ contains
 
       !  Format statements
 
-1000  format('1')
-1001  format(' Example ', I2/)
-1010  format(' Test simple odr problem'/ &
-             ' with analytic derivatives', &
-             ' using ODR.')
-1020  format(' Test simple OLS problem'/ &
-             ' with finite difference derivatives', &
-             ' using ODR.')
-1030  format(' Test parameter fixing capabilities', &
-             ' for poorly scaled OLS problem'/ &
-             ' with analytic derivatives', &
-             ' using ODR.')
-1040  format(' Test weighting capabilities', &
-             ' for ODR problem'/ &
-             ' with analytic derivatives', &
-             ' using ODR. '/ &
-             ' also shows solution of poorly scaled', &
-             ' ODR problem.'/ &
+1001  format(' Example ', I2,/)
+1010  format(' Test simple ODR problem with analytic derivatives.')
+1020  format(' Test simple OLS problem with finite difference derivatives.')
+1030  format(' Test parameter fixing capabilities for poorly scaled OLS problem with'/ &
+             ' analytic derivatives.')
+1040  format(' Test weighting capabilities for ODR problem with analytic derivatives'/ &
+             ' Also shows solution of poorly scaled ODR problem.'/ &
              ' (derivative checking turned off.)')
-1050  format(' Test DELTA initialization capabilities'/ &
-             ' and use of ISTOP to restrict parameter values', &
-             ' for ODR problem'/ &
-             ' with analytic derivatives', &
-             ' using ODR.')
-1060  format(' Test stiff stopping conditions', &
-             ' for unscaled ODR problem'/ &
-             ' with analytic derivatives', &
-             ' using ODR.')
-1070  format(' Test restart', &
-             ' for unscaled ODR problem'/ &
-             ' with analytic derivatives', &
-             ' using ODR.')
-1080  format(' Test use of TAUFAC to restrict first step', &
-             ' for ODR problem'/ &
-             ' with finite difference derivatives', &
-             ' using ODR.')
-1090  format(' Test implicit model', &
-             ' for OLS problem'/ &
-             ' using ODR.')
-1100  format(' Test multiresponse model', &
-             ' for ODR problem'/ &
-             ' with finite difference derivatives', &
-             ' using ODR.')
-1110  format(' Test detection of questionable analytic derivatives', &
-             ' for OLS problem'/ &
-             ' using ODR.')
-1120  format(' Test detection of incorrect analytic derivatives', &
-             ' for ODR problem'/ &
-             ' with analytic derivatives', &
-             ' using ODR.')
+1050  format(' Test DELTA initialization capabilities and use of ISTOP to restrict'/ &
+             ' parameter values for ODR problem with analytic derivatives.')
+1060  format(' Test stiff stopping conditions for unscaled ODR problem with'/ &
+             ' analytic derivatives.')
+1070  format(' Test restart for unscaled ODR problem with analytic derivatives.')
+1080  format(' Test use of TAUFAC to restrict first step for ODR problem with'/ &
+             ' finite difference derivatives.')
+1090  format(' Test implicit model for OLS problem.')
+1100  format(' Test multiresponse model for ODR problem with finite difference derivatives.')
+1110  format(' Test detection of questionable analytic derivatives for OLS problem.')
+1120  format(' Test detection of incorrect analytic derivatives for ODR problem with'/ &
+             ' analytic derivatives.')
 2200  format(' Data Set Reference: ', A80)
 3100  format &
          (/' Comparison of new results with', &
@@ -1068,14 +1014,14 @@ contains
            ' *** Summary:', &
            ' all tests agree with expected results. ***')
 
-   end subroutine odrx_main
+   end subroutine test_odr
 
-   impure subroutine odrx_inputs( &
+   impure subroutine set_inputs( &
       wflat, &
       title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
       x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
    !! Set up input data for odrpack exerciser.
-   
+
       logical, intent(in) :: wflat
       character(len=80), intent(out) :: title
       integer, intent(out) :: n
@@ -1087,21 +1033,20 @@ contains
       integer, intent(out) :: ldwe
       integer, intent(out) :: ld2we
       integer, intent(out) :: ldstpd
-      real(wp), intent(out), allocatable :: x(:,:)
-      real(wp), intent(out), allocatable :: y(:,:)
+      real(wp), intent(out), allocatable :: x(:, :)
+      real(wp), intent(out), allocatable :: y(:, :)
       real(wp), intent(out), allocatable :: beta(:)
       real(wp), intent(out), allocatable :: lower(:)
       real(wp), intent(out), allocatable :: upper(:)
-      real(wp), intent(out), allocatable :: delta(:,:)
+      real(wp), intent(out), allocatable :: delta(:, :)
       integer, intent(out), allocatable :: ifixb(:)
-      integer, intent(out), allocatable :: ifixx(:,:)
-      real(wp), intent(out), allocatable :: wd(:,:,:)
-      real(wp), intent(out), allocatable :: we(:,:,:)
+      integer, intent(out), allocatable :: ifixx(:, :)
+      real(wp), intent(out), allocatable :: wd(:, :, :)
+      real(wp), intent(out), allocatable :: we(:, :, :)
       real(wp), intent(out), allocatable :: sclb(:)
-      real(wp), intent(out), allocatable :: scld(:,:)
+      real(wp), intent(out), allocatable :: scld(:, :)
       real(wp), intent(out), allocatable :: stpb(:)
-      real(wp), intent(out), allocatable :: stpd(:,:)
-
+      real(wp), intent(out), allocatable :: stpd(:, :)
 
       ! Parameters
       integer, parameter :: maxset = 16
@@ -1992,7 +1937,7 @@ contains
                 sclb(np), scld(n, m), stpb(np), stpd(ldstpd, m))
 
       x = xdata(1:n, 1:m, setno)
-      y = ydata(1:n, 1:nq, setno) 
+      y = ydata(1:n, 1:nq, setno)
       beta = bdata(1:np, setno)
       lower = -huge(1.0_wp)
       upper = huge(1.0_wp)
@@ -2006,9 +1951,9 @@ contains
       we = -1.0_wp
       wd = -1.0_wp
 
-   end subroutine odrx_inputs
+   end subroutine set_inputs
 
-   pure subroutine odrx_fcn( &
+   pure subroutine fcn( &
       n, m, np, nq, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
    !! Compute model function and jacobian for odrpack exerciser.
 
@@ -2383,7 +2328,7 @@ contains
 
       end if
 
-   end subroutine odrx_fcn
+   end subroutine fcn
 
    subroutine loc_wsse(n, m, np, nq, ldwe, ld2we, isodr, wssi, wssdei, wssepi)
    !! Locations of the weighted sum of squares results in the `work` array.
@@ -2413,7 +2358,7 @@ contains
                   loweri, upperi, &
                   lwkmn)
 
-   end subroutine loc_wsse   
+   end subroutine loc_wsse
 
 end module test_solution_m
 
@@ -2421,7 +2366,7 @@ program test_solution
 !! Solution tests for [[odrpack]].
 
    use odrpack_kinds, only: wp, one
-   use test_solution_m, only: odrx_main
+   use test_solution_m, only: test_odr
    implicit none
 
    ! Local scalars
@@ -2453,7 +2398,7 @@ program test_solution
    tstfac = one
    ntest = 23
    passed = .false.
-   call odrx_main(ntest, tstfac, passed, lunrpt, lunerr, lunsum)
+   call test_odr(ntest, tstfac, passed, lunrpt, lunerr, lunsum)
 
    if (passed) then
       stop "Solution tests passed. See report."
