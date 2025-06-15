@@ -5108,64 +5108,14 @@ contains
       logical :: forvcv
 
       ! Variable definitions (alphabetically)
-      !  DELTA:   The estimated errors in the explanatory variables.
-      !  EPSFCN:  The function's precision.
-      !  F:       The (weighted) estimated values of EPSILON.
-      !  FJACB:   The Jacobian with respect to BETA.
-      !  FJACD:   The Jacobian with respect to DELTA.
       !  FORVCV:  The variable designating whether subroutine DODSTP is called to set up for the
       !           covariance matrix computations (FORVCV=TRUE) or not (FORVCV=FALSE).
       !  I:       An indexing variable.
-      !  IDF:     The degrees of freedom of the fit, equal to the number of observations with nonzero
-      !           weighted derivatives minus the number of parameters being estimated.
-      !  IFIXB:   The values designating whether the elements of BETA are fixed at their input values
-      !           or not.
-      !  IMAX:    The index of the element of U having the largest absolute value.
-      !  IRANK:   The rank deficiency of the Jacobian wrt BETA.
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by
-      !           OLS (ISODR=FALSE).
-      !  ISTOPC:  The variable designating whether the computations were stoped due to a numerical
-      !           error within subroutine DODSTP.
       !  IUNFIX:  The index of the next unfixed parameter.
       !  J:       An indexing variable.
-      !  JPVT:    The pivot vector.
       !  JUNFIX:  The index of the next unfixed parameter.
       !  KP:      The rank of the Jacobian wrt BETA.
-      !  L:       An indexing variable.
-      !  LDTT:    The leading dimension of array TT.
-      !  LDWD:    The leading dimension of array WD.
-      !  LD2WD:   The second dimension of array WD.
-      !  LWRK:    The length of vector WRK.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  N:       The number of observations.
-      !  NP:      The number of function parameters.
-      !  NPP:     The number of function parameters being estimated.
-      !  NQ:      The number of responses per observation.
-      !  OMEGA:   The array defined S.T.
-      !           OMEGA*trans(OMEGA) = inv(I+FJACD*inv(E)*trans(FJACD))
-      !           = (I-FJACD*inv(P)*trans(FJACD))
-      !           where E = D**2 + ALPHA*TT**2 and P = trans(FJACD)*FJACD + D**2 + ALPHA*TT**2
-      !  QRAUX:   The array required to recover the orthogonal part of the Q-R decomposition.
-      !  RCOND:   The approximate reciprocal condition of FJACB.
-      !  RSS:     The residual sum of squares.
-      !  RVAR:    The residual variance.
-      !  S:       The step for BETA.
-      !  SD:      The standard deviations of the estimated BETAS.
-      !  SS:      The scaling values for the unfixed BETAS.
-      !  SSF:     The scaling values used for BETA.
-      !  T:       The step for DELTA.
       !  TEMP:    A temporary storage location
-      !  TT:      The scaling values for DELTA.
-      !  U:       The approximate null vector for FJACB.
-      !  VCV:     The covariance matrix of the estimated BETAS.
-      !  WD:      The DELTA weights.
-      !  WRK:     A work array of (LWRK) elements, equivalenced to WRK1 and WRK2.
-      !  WRK1:    A work array of (N by NQ by M) elements.
-      !  WRK2:    A work array of (N by NQ) elements.
-      !  WRK3:    A work array of (NP) elements.
-      !  WRK4:    A work array of (M by M) elements.
-      !  WRK5:    A work array of (M) elements.
-      !  WRK6:    A work array of (N*NQ by P) elements.
 
       forvcv = .true.
       istopc = 0
@@ -5180,6 +5130,7 @@ contains
       if (istopc /= 0) then
          return
       end if
+
       kp = npp - irank
       call dpodi(wrk6, n*nq, kp, wrk3, 1)
 
@@ -5206,12 +5157,11 @@ contains
       end if
 
       ! Store variances in SD, restoring original order
-      do i = 1, np
-         sd(i) = zero
-      end do
+      sd = zero
       do i = 1, kp
          sd(jpvt(i)) = wrk6(i, i)
       end do
+
       if (np > npp) then
          junfix = npp
          do j = np, 1, -1
@@ -5225,11 +5175,7 @@ contains
       end if
 
       ! Store covariance matrix in VCV, restoring original order
-      do i = 1, np
-         do j = 1, i
-            vcv(i, j) = zero
-         end do
-      end do
+      vcv = zero
       do i = 1, kp
          do j = i + 1, kp
             if (jpvt(i) > jpvt(j)) then
@@ -5239,6 +5185,7 @@ contains
             end if
          end do
       end do
+
       if (np > npp) then
          iunfix = npp
          do i = np, 1, -1
@@ -5306,13 +5253,6 @@ contains
 
       ! Variable definitions (alphabetically)
       !  I:       An indexing variable.
-      !  IFIX:    The values designating whether the elements of V2 are fixed at their input
-      !           values or not.
-      !  N1:      The number of items in V1.
-      !  N2:      The number of items in V2.
-      !  V1:      The vector of the unfixed items from V2.
-      !  V2:      The vector of the fixed and unfixed items from which the unfixed elements are
-      !           to be extracted.
 
       n1 = 0
       if (ifix(1) >= 0) then
@@ -5348,13 +5288,7 @@ contains
 
       ! Variable Definitions (alphabetically)
       !  I:       An indexing variable.
-      !  IFIX:    The values designating whether the elements of V2 are fixed at their input
-      !           values or not.
       !  N1:      The number of items in V1.
-      !  N2:      The number of items in V2.
-      !  V1:      The vector of the unfixed items.
-      !  V2:      The vector of the fixed and unfixed items into which the elements of V1 are
-      !           to be inserted.
 
       n1 = 0
       if (ifix(1) >= 0) then
@@ -5442,8 +5376,6 @@ contains
       ! Variable Definitions (alphabetically)
       !  ADEN:    A value used in the approximation.
       !  ANUM:    A value used in the approximation.
-      !  P:       The probability at which the percent point is to be evaluated. P must be between
-      !           0.0E0_wp and 1.0E0_wp, exclusive.
       !  P0:      A parameter used in the approximation.
       !  P1:      A parameter used in the approximation.
       !  P2:      A parameter used in the approximation.
@@ -5555,11 +5487,8 @@ contains
       !  D5:     A value used in the approximation.
       !  D7:     A value used in the approximation.
       !  D9:     A value used in the approximation.
-      !  IDF:    The (positive integer) degrees of freedom.
       !  IPASS:  A value used in the approximation.
       !  MAXIT:  The maximum number of iterations allowed for the approx.
-      !  P:      The probability at which the percent point is to be
-      !          evaluated.  P must lie between 0.0DO and 1.0E0_wp, exclusive.
       !  PPFN:   The normal percent point value.
       !  S:      A value used in the approximation.
       !  TERM1:  A value used in the approximation.
@@ -5712,31 +5641,11 @@ contains
       real(wp) :: betaj
 
       ! Variable Definitions (alphabetically)
-      !  BETA:    The function parameters.
       !  BETAJ:   The current estimate of the jth parameter.
-      !  FCN:     The user-supplied subroutine for evaluating the model.
-      !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
-      !           values or not.
-      !  IFIXX:   The values designating whether the elements of X are fixed at their input
-      !           values or not.
-      !  ISTOP:   The variable designating whether there are problems computing the function at
-      !           the current BETA and DELTA.
-      !  J:       The index of the partial derivative being examined.
-      !  LDIFX:   The leading dimension of array IFIXX.
-      !  LQ:      The response currently being examined.
-      !  M:       The number of columns of data in the independent variable.
-      !  N:       The number of observations.
-      !  NFEV:    The number of function evaluations.
-      !  NP:      The number of function parameters.
-      !  NQ:      The number of responses per observation.
-      !  NROW:    The row number of the independent variable array at which the derivative is
-      !           to be checked.
-      !  PVB:     The function value for the selected observation & response.
-      !  STP:     The step size for the finite difference derivative.
-      !  XPLUSD:  The values of X + DELTA.
 
       betaj = beta(j)
       beta(j) = beta(j) + stp
+
       istop = 0
       call fcn(n, m, np, nq, beta, xplusd, &
                ifixb, ifixx, ldifx, 003, wrk2, wrk6, wrk1, istop)
@@ -5745,8 +5654,8 @@ contains
       else
          return
       end if
-      beta(j) = betaj
 
+      beta(j) = betaj
       pvb = wrk2(nrow, lq)
 
    end subroutine fpvb
@@ -5806,29 +5715,11 @@ contains
       real(wp) :: xpdj
 
       ! Variable Definitions (alphabetically)
-      !  BETA:    The function parameters.
-      !  FCN:     The user-supplied subroutine for evaluating the model.
-      !  IFIXB:   The values designating whether the elements of BETA are
-      !           fixed at their input values or not.
-      !  IFIXX:   The values designating whether the elements of X are fixed at their input values or not.
-      !  ISTOP:   The variable designating whether there are problems
-      !           computing the function at the current BETA and DELTA.
-      !  J:       The index of the partial derivative being examined.
-      !  LDIFX:   The leading dimension of array IFIXX.
-      !  LQ:      The response currently being examined.
-      !  M:       The number of columns of data in the independent variable.
-      !  N:       The number of observations.
-      !  NFEV:    The number of function evaluations.
-      !  NP:      The number of function parameters.
-      !  NQ:      The number of responses per observation.
-      !  NROW:    The row number of the independent variable array at which the derivative is to be checked.
-      !  PVD:     The function value for the selected observation & response.
-      !  STP:     The step size for the finite difference derivative.
       !  XPDJ:    The (NROW,J)th element of XPLUSD.
-      !  XPLUSD:  The values of X + DELTA.
 
       xpdj = xplusd(nrow, j)
       xplusd(nrow, j) = xplusd(nrow, j) + stp
+
       istop = 0
       call fcn(n, m, np, nq, beta, xplusd, &
                ifixb, ifixx, ldifx, 003, wrk2, wrk6, wrk1, istop)
@@ -5837,8 +5728,8 @@ contains
       else
          return
       end if
-      xplusd(nrow, j) = xpdj
 
+      xplusd(nrow, j) = xpdj
       pvd = wrk2(nrow, lq)
 
    end subroutine fpvd
