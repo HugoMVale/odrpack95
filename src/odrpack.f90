@@ -1,7 +1,7 @@
 module odrpack
 !! Main driver routines for finding the weighted explicit or implicit orthogonal distance
 !! regression (ODR) or ordinary linear or nonlinear least squares (OLS) solution.
-    
+
    use odrpack_kinds, only: wp
    use, intrinsic :: iso_fortran_env, only: output_unit
    implicit none
@@ -66,7 +66,7 @@ contains
 
       use odrpack_kinds, only: negone, zero
       use odrpack_core, only: fcn_t
-      use odrpack_reports, only: odphd, odpe1
+      use odrpack_reports, only: print_header, print_error_inputs
 
       procedure(fcn_t) :: fcn
          !! User-supplied subroutine for evaluating the model.
@@ -146,16 +146,16 @@ contains
       integer :: ldwe, ld2we, ldwd, ld2wd, ldifx, ldscld, ldstpd, job_, ndigit_, maxit_, &
                  iprint_, lunerr_, lunrpt_, info_, lwork, liwork, info1_, info2_, info3_, &
                  info4_, info5_
-      integer, allocatable, target :: ifixb_local(:), ifixx_local(:,:), iwork_local(:)
-      integer, pointer :: ifixb_(:), ifixx_(:, :), iwork_(:) 
+      integer, allocatable, target :: ifixb_local(:), ifixx_local(:, :), iwork_local(:)
+      integer, pointer :: ifixb_(:), ifixx_(:, :), iwork_(:)
 
       real(wp) :: taufac_, sstol_, partol_
       real(wp), allocatable :: tempret(:, :)
       real(wp), allocatable, target :: work_local(:), lower_local(:), upper_local(:), &
-                                       sclb_local(:), scld_local(:,:), stpb_local(:), &
-                                       stpd_local(:,:), we_local(:,:,:), wd_local(:,:,:)
-      real(wp), pointer :: work_(:), lower_(:), upper_(:), sclb_(:), scld_(:,:), stpb_(:), &
-                           stpd_(:,:), we_(:,:,:), wd_(:,:,:)
+                                       sclb_local(:), scld_local(:, :), stpb_local(:), &
+                                       stpd_local(:, :), we_local(:, :, :), wd_local(:, :, :)
+      real(wp), pointer :: work_(:), lower_(:), upper_(:), sclb_(:), scld_(:, :), stpb_(:), &
+                           stpd_(:, :), we_(:, :, :), wd_(:, :, :)
 
       logical :: head, isodr, restart
 
@@ -173,7 +173,7 @@ contains
       head = .true.
 
       !  Check for the option arguments for printing (so error messages can be
-      !  printed appropriately from here on out     
+      !  printed appropriately from here on out
       iprint_ = -1
       if (present(iprint)) then
          iprint_ = iprint
@@ -186,7 +186,7 @@ contains
       if (lunrpt_ == 6) then
          lunrpt_ = output_unit
       end if
-      
+
       lunerr_ = 6
       if (present(lunerr)) then
          lunerr_ = lunerr
@@ -205,12 +205,12 @@ contains
          info5_ = 1
          info3_ = 1
       end if
-      
+
       if (np < 1 .or. np > n) then
          info5_ = 1
          info2_ = 1
       end if
-      
+
       if (nq < 1) then
          info5_ = 1
          info1_ = 1
@@ -219,8 +219,8 @@ contains
       if (info5_ /= 0) then
          info_ = 10000*info5_ + 1000*info4_ + 100*info3_ + 10*info2_ + info1_
          if (lunerr_ /= 0 .and. iprint_ /= 0) then
-            call odphd(head, lunrpt_)
-            call odpe1( &
+            call print_header(head, lunrpt_)
+            call print_error_inputs( &
                lunerr_, info_, info5_, info4_, info3_, info2_, info1_, &
                n, m, nq, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
@@ -258,8 +258,8 @@ contains
       if (info5_ /= 0) then
          info_ = 10000*info5_ + 1000*info4_ + 100*info3_ + 10*info2_ + info1_
          if (lunerr_ /= 0 .and. iprint_ /= 0) then
-            call odphd(head, lunrpt_)
-            call odpe1( &
+            call print_header(head, lunrpt_)
+            call print_error_inputs( &
                lunerr_, info_, info5_, info4_, info3_, info2_, info1_, &
                n, m, nq, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
@@ -297,8 +297,8 @@ contains
          info_ = 10000*mod(info5_, 10) + 1000*mod(info4_, 10) + &
                  100*mod(info3_, 10) + 10*mod(info2_, 10) + mod(info1_, 10)
          if (lunerr_ /= 0 .and. iprint_ /= 0) then
-            call odphd(head, lunrpt_)
-            call odpe1( &
+            call print_header(head, lunrpt_)
+            call print_error_inputs( &
                lunerr_, info_, info5_, info4_, info3_, info2_, info1_, &
                n, m, nq, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
@@ -309,7 +309,7 @@ contains
          end if
          return
       end if
-      
+
       if (present(iwork)) then
          if (size(iwork) == liwork) then
             iwork_ => iwork
@@ -326,10 +326,10 @@ contains
          end if
       end if
 
-      ! Check the size of required arguments and return errors if they are too small     
+      ! Check the size of required arguments and return errors if they are too small
       if (any(shape(x) /= [n, m])) then
          info1_ = info1_ + 4
-      end if 
+      end if
 
       if (any(shape(y) /= [n, nq])) then
          info1_ = info1_ + 2
@@ -341,7 +341,7 @@ contains
 
       ! Check the presence of optional array arguments
       ! Arrays are pointed to or allocated if necessary
-      
+
       if (present(delta)) then
          if (any(shape(delta) /= [n, m])) then
             info1_ = info1_ + 8
@@ -365,7 +365,7 @@ contains
          we_local = negone
          we_ => we_local
       end if
-      
+
       if (present(wd)) then
          ldwd = size(wd, 1)
          ld2wd = size(wd, 2)
@@ -404,7 +404,7 @@ contains
          else
             info1_ = info1_ + 128
          end if
-      else 
+      else
          ldifx = 1
          allocate (ifixx_local(ldifx, m))
          ifixx_local = 1
@@ -423,7 +423,7 @@ contains
          stpb_local = negone
          stpb_ => stpb_local
       end if
-      
+
       if (present(stpd)) then
          ldstpd = size(stpd, 1)
          if ((ldstpd == 1 .or. ldstpd == n) .and. (size(stpd, 2) == m)) then
@@ -469,20 +469,20 @@ contains
             upper_ => upper
          else
             info1_ = info1_ + 16384
-         end if 
-      else 
+         end if
+      else
          allocate (upper_local(np))
          upper_local = huge(zero)
          upper_ => upper_local
       end if
-      
+
       if (present(lower)) then
          if (size(lower) == np) then
             lower_ => lower
          else
             info1_ = info1_ + 32768
          end if
-      else 
+      else
          allocate (lower_local(np))
          lower_local = -huge(zero)
          lower_ => lower_local
@@ -493,8 +493,8 @@ contains
          info_ = 100000 + info1_
          info1_ = 0
          if (lunerr_ /= 0 .and. iprint_ /= 0) then
-            call odphd(head, lunrpt_)
-            call odpe1( &
+            call print_header(head, lunrpt_)
+            call print_error_inputs( &
                lunerr_, info_, info5_, info4_, info3_, info2_, info1_, &
                n, m, nq, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, lwork, liwork)
@@ -511,7 +511,7 @@ contains
          work_ = zero
          iwork_ = 0
       end if
-      
+
       if (present(delta) .and. (.not. restart)) then
          work_(1:n*m) = reshape(delta, [n*m])
       end if
@@ -526,12 +526,12 @@ contains
       if (present(ndigit)) then
          ndigit_ = ndigit
       end if
-      
+
       partol_ = negone
       if (present(partol)) then
          partol_ = partol
       end if
-      
+
       sstol_ = negone
       if (present(sstol)) then
          sstol_ = sstol
@@ -543,7 +543,7 @@ contains
       end if
 
       ! Call the driver routine
-      call odrdrive ( &
+      call odrdrive( &
          fcn, &
          n, m, np, nq, &
          beta, y, x, &
@@ -862,7 +862,7 @@ contains
       use odrpack_kinds, only: zero, one, ten, p5 => half
       use odrpack_core, only: fcn_t, etaf, fctrw, set_flags, iniwork, iwinfo, jck, odcheck, &
                               pack_vec, select_row, unpack_vec, weight, rwinfo, derstep, mbfb
-      use odrpack_reports, only: odper
+      use odrpack_reports, only: print_errors
       use blas_interfaces, only: ddot, dnrm2, dcopy
 
       logical, intent(inout) :: head
@@ -1202,13 +1202,13 @@ contains
             call dcopy(n*nq, work(fni), 1, work(fi), 1)
          else
             work(fi:fi + (n*nq - 1)) = &
-            work(fni:fni + (n*nq - 1)) - reshape(y(1:n, :), shape=[n*nq])
+               work(fni:fni + (n*nq - 1)) - reshape(y(1:n, :), shape=[n*nq])
          end if
-         
+
          call weight(n, nq, &
-                    reshape(work(we1i:we1i + ldwe*ld2we*nq - 1), [ldwe, ld2we, nq]), &
-                    ldwe, ld2we, &
-                    reshape(work(fi:fi + n*nq - 1), [n, nq]), tempret(1:n, 1:nq))
+                     reshape(work(we1i:we1i + ldwe*ld2we*nq - 1), [ldwe, ld2we, nq]), &
+                     ldwe, ld2we, &
+                     reshape(work(fi:fi + n*nq - 1), [n, nq]), tempret(1:n, 1:nq))
          work(fi:fi + n*nq - 1) = reshape(tempret(1:n, 1:nq), [n*nq])
          work(wssepi) = ddot(n*nq, work(fi), 1, work(fi), 1)
          work(wssi) = work(wssepi) + work(wssdei)
@@ -1271,19 +1271,19 @@ contains
          ! Evaluate the predicted values and weighted EPSILONS at the starting point
          call unpack_vec(np, work(betaci), beta, ifixb)
          work(xplusi:xplusi + (n*m - 1)) = &
-              work(deltai:deltai + (n*m - 1)) + reshape(x, shape=[n*m])
+            work(deltai:deltai + (n*m - 1)) + reshape(x, shape=[n*m])
          istop = 0
          call fcn(n, m, np, nq, beta, work(xplusi), &
                   ifixb, ifixx, ldifx, 002, work(fni), work(wrk6i), work(wrk1i), istop)
          iwork(istopi) = istop
-         
+
          if (istop == 0) then
             iwork(nfevi) = iwork(nfevi) + 1
             if (implct) then
                call dcopy(n*nq, work(fni), 1, work(fi), 1)
             else
                work(fi:fi + (n*nq - 1)) = &
-                    work(fni:fni + (n*nq - 1)) - reshape(y, shape=[n*nq])
+                  work(fni:fni + (n*nq - 1)) - reshape(y, shape=[n*nq])
             end if
             call weight(n, nq, &
                         reshape(work(we1i:we1i + ldwe*ld2we*nq - 1), [ldwe, ld2we, nq]), &
@@ -1336,14 +1336,14 @@ contains
             iwork(netai) = -1
             nfev = iwork(nfevi)
             call etaf(fcn, &
-                       n, m, np, nq, &
-                       work(xplusi), beta, epsmac, nrow, &
-                       work(betani), work(fni), &
-                       ifixb, ifixx, ldifx, &
-                       istop, nfev, eta, neta, &
-                       work(wrk1i), work(wrk2i), work(wrk6i), work(wrk7i), &
-                       info, &
-                       lower, upper)
+                      n, m, np, nq, &
+                      work(xplusi), beta, epsmac, nrow, &
+                      work(betani), work(fni), &
+                      ifixb, ifixx, ldifx, &
+                      istop, nfev, eta, neta, &
+                      work(wrk1i), work(wrk2i), work(wrk6i), work(wrk7i), &
+                      info, &
+                      lower, upper)
             iwork(istopi) = istop
             iwork(nfevi) = nfev
             if (istop /= 0 .or. info /= 0) then
@@ -1428,7 +1428,7 @@ contains
 50       continue
          if ((info /= 0) .or. (iwork(msgb) /= -1)) then
             if (lunerr /= 0 .and. iprint /= 0) then
-               call odper &
+               call print_errors &
                   (info, lunerr, &
                    n, m, np, nq, &
                    ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
@@ -1464,19 +1464,19 @@ contains
       call dcopy(n*nq, work(fni), 1, work(fsi), 1)
       ldtt = iwork(ldtti)
       call odrsolve(head, fstitr, prtpen, &
-                  fcn, n, m, np, nq, job, beta, y, x, &
-                  we, work(we1i), ldwe, ld2we, wd, ldwd, ld2wd, &
-                  ifixb, ifixx, ldifx, &
-                  work(betaci), work(betani), work(betasi), work(si), &
-                  work(deltai), work(deltni), work(deltsi), &
-                  work(loweri), work(upperi), &
-                  work(ti), work(fi), work(fni), work(fsi), &
-                  work(fjacbi), iwork(msgb), work(fjacdi), iwork(msgd), &
-                  work(ssfi), work(ssi), work(tti), ldtt, &
-                  stpb, stpd, ldstpd, &
-                  work(xplusi), work(wrk), lwrk, &
-                  work, lwork, tempret, iwork, liwork, info, &
-                  iwork(boundi))
+                    fcn, n, m, np, nq, job, beta, y, x, &
+                    we, work(we1i), ldwe, ld2we, wd, ldwd, ld2wd, &
+                    ifixb, ifixx, ldifx, &
+                    work(betaci), work(betani), work(betasi), work(si), &
+                    work(deltai), work(deltni), work(deltsi), &
+                    work(loweri), work(upperi), &
+                    work(ti), work(fi), work(fni), work(fsi), &
+                    work(fjacbi), iwork(msgb), work(fjacdi), iwork(msgd), &
+                    work(ssfi), work(ssi), work(tti), ldtt, &
+                    stpb, stpd, ldstpd, &
+                    work(xplusi), work(wrk), lwrk, &
+                    work, lwork, tempret, iwork, liwork, info, &
+                    iwork(boundi))
       maxit1 = iwork(maxiti) - iwork(niteri)
       tstimp = zero
       do k = 1, np
@@ -1504,7 +1504,7 @@ contains
 
       use odrpack_kinds, only: zero, one
       use odrpack_core, only: fcn_t, access_workspace, evjac, set_flags, unpack_vec, weight, pack_vec, odvcv, odlm
-      use odrpack_reports, only: odpcr
+      use odrpack_reports, only: print_reports
       use blas_interfaces, only: ddot, dnrm2, dcopy
 
       logical, intent(inout) :: head
@@ -1854,18 +1854,18 @@ contains
          end if
          lunr = lunrpt
          do i = 1, npr
-            call odpcr(ipr, lunr, &
-                       head, prtpen, fstitr, didvcv, iflag, &
-                       n, m, np, nq, npp, nnzw, &
-                       msgb, msgd, beta, y, x, delta, &
-                       we, ldwe, ld2we, wd, ldwd, ld2wd, &
-                       ifixb, ifixx, ldifx, &
-                       lower, upper, &
-                       ssf, tt, ldtt, stpb, stpd, ldstpd, &
-                       job, neta, taufac, sstol, partol, maxit, &
-                       wss, rvar, idf, work(sd), &
-                       niter, nfev, njev, actred, prered, &
-                       tau, pnorm, alpha, f, rcond, irank, info, istop)
+            call print_reports(ipr, lunr, &
+                               head, prtpen, fstitr, didvcv, iflag, &
+                               n, m, np, nq, npp, nnzw, &
+                               msgb, msgd, beta, y, x, delta, &
+                               we, ldwe, ld2we, wd, ldwd, ld2wd, &
+                               ifixb, ifixx, ldifx, &
+                               lower, upper, &
+                               ssf, tt, ldtt, stpb, stpd, ldstpd, &
+                               job, neta, taufac, sstol, partol, maxit, &
+                               wss, rvar, idf, work(sd), &
+                               niter, nfev, njev, actred, prered, &
+                               tau, pnorm, alpha, f, rcond, irank, info, istop)
             if (ipr1 >= 5) then
                ipr = 2
             else
@@ -1933,14 +1933,14 @@ contains
       else
          looped = looped + 1
          call odlm(n, m, np, nq, npp, &
-                    f, fjacb, fjacd, &
-                    wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
-                    alpha, tau, eta, isodr, &
-                    work(wrk6), work(omega), &
-                    work(u), work(qraux), iwork(jpvt), &
-                    s, t, nlms, rcond, irank, &
-                    work(wrk1), work(wrk2), work(wrk3), work(wrk4), &
-                    work(wrk5), wrk, lwrk, tempret, istopc)
+                   f, fjacb, fjacd, &
+                   wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
+                   alpha, tau, eta, isodr, &
+                   work(wrk6), work(omega), &
+                   work(u), work(qraux), iwork(jpvt), &
+                   s, t, nlms, rcond, irank, &
+                   work(wrk1), work(wrk2), work(wrk3), work(wrk4), &
+                   work(wrk5), wrk, lwrk, tempret, istopc)
       end if
       if (istopc /= 0) then
          info = istopc
@@ -1974,7 +1974,7 @@ contains
 
       ! Compute norm of scaled steps S and T (TSNORM)
       call weight(npp, 1, reshape(ss, [npp, 1, 1]), npp, 1, reshape(s, [npp, 1]), &
-                tempret(1:npp, 1:1))
+                  tempret(1:npp, 1:1))
       wrk(1:npp) = tempret(1:npp, 1)
       if (isodr) then
          call weight(n, m, reshape(tt, [ldtt, 1, m]), ldtt, 1, t, tempret(1:n, 1:m))
@@ -2123,7 +2123,7 @@ contains
          call dcopy(n*m, deltan, 1, delta, 1)
          rnorm = rnormn
          call weight(npp, 1, reshape(ss, [npp, 1, 1]), npp, 1, &
-                   reshape(betac, [npp, 1]), tempret(1:npp, 1:1))
+                     reshape(betac, [npp, 1]), tempret(1:npp, 1:1))
          wrk(1:npp) = tempret(1:npp, 1)
          if (isodr) then
             call weight(n, m, reshape(tt, [ldtt, 1, m]), ldtt, 1, delta, tempret(1:n, 1:m))
@@ -2168,18 +2168,18 @@ contains
                end if
                lunr = lunrpt
                do i = 1, npr
-                  call odpcr(ipr, lunr, &
-                             head, prtpen, fstitr, didvcv, iflag, &
-                             n, m, np, nq, npp, nnzw, &
-                             msgb, msgd, beta, y, x, delta, &
-                             we, ldwe, ld2we, wd, ldwd, ld2wd, &
-                             ifixb, ifixx, ldifx, &
-                             lower, upper, &
-                             ssf, tt, ldtt, stpb, stpd, ldstpd, &
-                             job, neta, taufac, sstol, partol, maxit, &
-                             wss, rvar, idf, work(sd), &
-                             niter, nfev, njev, actred, prered, &
-                             tau, pnorm, alpha, f, rcond, irank, info, istop)
+                  call print_reports(ipr, lunr, &
+                                     head, prtpen, fstitr, didvcv, iflag, &
+                                     n, m, np, nq, npp, nnzw, &
+                                     msgb, msgd, beta, y, x, delta, &
+                                     we, ldwe, ld2we, wd, ldwd, ld2wd, &
+                                     ifixb, ifixx, ldifx, &
+                                     lower, upper, &
+                                     ssf, tt, ldtt, stpb, stpd, ldstpd, &
+                                     job, neta, taufac, sstol, partol, maxit, &
+                                     wss, rvar, idf, work(sd), &
+                                     niter, nfev, njev, actred, prered, &
+                                     tau, pnorm, alpha, f, rcond, irank, info, istop)
                   if (ipr2 >= 5) then
                      ipr = 2
                   else
@@ -2373,18 +2373,18 @@ contains
          end if
          lunr = lunrpt
          do i = 1, npr
-            call odpcr(ipr, lunr, &
-                       head, prtpen, fstitr, didvcv, iflag, &
-                       n, m, np, nq, npp, nnzw, &
-                       msgb, msgd, beta, y, x, delta, &
-                       we, ldwe, ld2we, wd, ldwd, ld2wd, &
-                       iwork(jpvt), ifixx, ldifx, &
-                       lower, upper, &
-                       ssf, tt, ldtt, stpb, stpd, ldstpd, &
-                       job, neta, taufac, sstol, partol, maxit, &
-                       wss, rvar, idf, work(sd), &
-                       niter, nfev, njev, actred, prered, &
-                       tau, pnorm, alpha, f, rcond, irank, info, istop)
+            call print_reports(ipr, lunr, &
+                               head, prtpen, fstitr, didvcv, iflag, &
+                               n, m, np, nq, npp, nnzw, &
+                               msgb, msgd, beta, y, x, delta, &
+                               we, ldwe, ld2we, wd, ldwd, ld2wd, &
+                               iwork(jpvt), ifixx, ldifx, &
+                               lower, upper, &
+                               ssf, tt, ldtt, stpb, stpd, ldstpd, &
+                               job, neta, taufac, sstol, partol, maxit, &
+                               wss, rvar, idf, work(sd), &
+                               niter, nfev, njev, actred, prered, &
+                               tau, pnorm, alpha, f, rcond, irank, info, istop)
             if (ipr3 >= 5) then
                ipr = 2
             else
