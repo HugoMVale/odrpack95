@@ -4667,7 +4667,7 @@ contains
 
       use odrpack_kinds, only: zero, one
       use linpack, only: dchex, dqrdc, dqrsl, dtrco, dtrsl
-      use blas_interfaces, only: dnrm2, drot, drotg, idamax
+      use blas_interfaces, only: dnrm2, drot, drotg
 
       integer, intent(in) :: n
          !! The number of observations.
@@ -4911,7 +4911,7 @@ contains
                call dtrco(tfjacb, n*nq, kp, rcond, u, 1)
                if (rcond <= epsfcn) then
                   elim = .true.
-                  imax = idamax(kp, u, 1)
+                  imax = maxloc(u(1:kp), dim=1)
                   ! IMAX is the column to remove - use DCHEX and fix KPVT
                   if (imax /= kp) then
                      call dchex(tfjacb, n*nq, kp, imax, kp, wrk2, n*nq, 1, qraux, wrk3, 2)
