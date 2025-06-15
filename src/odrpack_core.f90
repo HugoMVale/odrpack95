@@ -6251,21 +6251,14 @@ contains
       if (nq == 0 .or. m == 0) return
 
       do l1 = 1, nq
-         do j = 1, m
-            wrk5(j) = v(indx, j, l1)
-         end do
+         wrk5 = v(indx, 1:m, l1)
          call solve_trl(m, e, lde, wrk5, 4)
-         do j = 1, m
-            ve(indx, l1, j) = wrk5(j)
-         end do
+         ve(indx, l1, :) = wrk5
       end do
 
       do l1 = 1, nq
          do l2 = 1, l1
-            vev(l1, l2) = zero
-            do j = 1, m
-               vev(l1, l2) = vev(l1, l2) + ve(indx, l1, j)*ve(indx, l2, j)
-            end do
+            vev(l1, l2) = dot_product(ve(indx, l1, :), ve(indx, l2, :))
             vev(l2, l1) = vev(l1, l2)
          end do
       end do
