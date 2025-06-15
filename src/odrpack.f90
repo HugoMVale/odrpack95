@@ -861,7 +861,8 @@ contains
 
       use odrpack_kinds, only: zero, one, ten, p5 => half
       use odrpack_core, only: fcn_t, etaf, fctrw, set_flags, iniwork, iwinfo, jck, odcheck, &
-                              pack_vec, select_row, unpack_vec, weight, rwinfo, derstep, mbfb
+                              pack_vec, select_row, unpack_vec, rwinfo, derstep, mbfb, &
+                              scale_mat
       use odrpack_reports, only: print_errors
       use blas_interfaces, only: ddot, dnrm2, dcopy
 
@@ -1205,11 +1206,10 @@ contains
                work(fni:fni + (n*nq - 1)) - reshape(y(1:n, :), shape=[n*nq])
          end if
 
-         call weight(n, nq, &
-                     reshape(work(we1i:we1i + ldwe*ld2we*nq - 1), [ldwe, ld2we, nq]), &
-                     ldwe, ld2we, &
-                     reshape(work(fi:fi + n*nq - 1), [n, nq]), tempret(1:n, 1:nq))
+         call scale_mat(n, nq, work(we1i:we1i + ldwe*ld2we*nq - 1), &
+                        ldwe, ld2we, work(fi:fi + n*nq - 1), tempret(1:n, 1:nq))
          work(fi:fi + n*nq - 1) = reshape(tempret(1:n, 1:nq), [n*nq])
+
          work(wssepi) = ddot(n*nq, work(fi), 1, work(fi), 1)
          work(wssi) = work(wssepi) + work(wssdei)
 
@@ -1285,10 +1285,8 @@ contains
                work(fi:fi + (n*nq - 1)) = &
                   work(fni:fni + (n*nq - 1)) - reshape(y, shape=[n*nq])
             end if
-            call weight(n, nq, &
-                        reshape(work(we1i:we1i + ldwe*ld2we*nq - 1), [ldwe, ld2we, nq]), &
-                        ldwe, ld2we, &
-                        reshape(work(fi:fi + n*nq - 1), [n, nq]), tempret(1:n, 1:nq))
+            call scale_mat(n, nq, work(we1i:we1i + ldwe*ld2we*nq - 1), &
+                           ldwe, ld2we, work(fi:fi + n*nq - 1), tempret(1:n, 1:nq))
             work(fi:fi + n*nq - 1) = reshape(tempret(1:n, 1:nq), [n*nq])
          else
             info = 52000
@@ -1296,16 +1294,12 @@ contains
          end if
 
          ! Compute norm of the initial estimates
-         call weight(npp, 1, &
-                     reshape(work(ssi:ssi + npp - 1), [npp, 1, 1]), &
-                     npp, 1, &
-                     reshape(work(betaci:betaci + npp - 1), [npp, 1]), tempret(1:npp, 1:1))
+         call scale_mat(npp, 1, work(ssi:ssi + npp - 1), &
+                        npp, 1, work(betaci:betaci + npp - 1), tempret(1:npp, 1:1))
          work(wrk:wrk + npp - 1) = tempret(1:npp, 1)
          if (isodr) then
-            call weight(n, m, &
-                        reshape(work(tti:tti + iwork(ldtti)*1*m - 1), [iwork(ldtti), 1, m]), &
-                        iwork(ldtti), 1, &
-                        reshape(work(deltai:deltai + n*m - 1), [n, m]), tempret(1:n, 1:m))
+            call scale_mat(n, m, work(tti:tti + iwork(ldtti)*1*m - 1), &
+                           iwork(ldtti), 1, work(deltai:deltai + n*m - 1), tempret(1:n, 1:m))
             work(wrk + npp:wrk + npp + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
             work(pnormi) = dnrm2(npp + n*m, work(wrk), 1)
          else
@@ -1315,9 +1309,7 @@ contains
          ! Compute sum of squares of the weighted EPSILONS and weighted DELTAS
          work(wssepi) = ddot(n*nq, work(fi), 1, work(fi), 1)
          if (isodr) then
-            call weight(n, m, wd, ldwd, ld2wd, &
-                        reshape(work(deltai:deltai + n*m), [n, m]), &
-                        tempret(1:n, 1:m))
+            call scale_mat(n, m, wd, ldwd, ld2wd, work(deltai:deltai + n*m), tempret(1:n, 1:m))
             work(wrk:wrk + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
             work(wssdei) = ddot(n*m, work(deltai), 1, work(wrk), 1)
          else
@@ -1503,7 +1495,8 @@ contains
    !! Iteratively compute least squares solution.
 
       use odrpack_kinds, only: zero, one
-      use odrpack_core, only: fcn_t, access_workspace, evjac, set_flags, unpack_vec, weight, pack_vec, odvcv, odlm
+      use odrpack_core, only: fcn_t, access_workspace, evjac, set_flags, unpack_vec, &
+                              scale_mat, pack_vec, odvcv, odlm
       use odrpack_reports, only: print_reports
       use blas_interfaces, only: ddot, dnrm2, dcopy
 
@@ -1940,7 +1933,7 @@ contains
                    work(u), work(qraux), iwork(jpvt), &
                    s, t, nlms, rcond, irank, &
                    work(wrk1), work(wrk2), work(wrk3), work(wrk4), &
-                   work(wrk5), wrk, lwrk, tempret, istopc)
+                   work(wrk5), wrk, lwrk, istopc)
       end if
       if (istopc /= 0) then
          info = istopc
@@ -1973,12 +1966,9 @@ contains
       end do
 
       ! Compute norm of scaled steps S and T (TSNORM)
-      call weight(npp, 1, reshape(ss, [npp, 1, 1]), npp, 1, reshape(s, [npp, 1]), &
-                  tempret(1:npp, 1:1))
-      wrk(1:npp) = tempret(1:npp, 1)
+      call scale_mat(npp, 1, ss, npp, 1, s, wrk(1:npp))
       if (isodr) then
-         call weight(n, m, reshape(tt, [ldtt, 1, m]), ldtt, 1, t, tempret(1:n, 1:m))
-         wrk(npp + 1:npp + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
+         call scale_mat(n, m, tt, ldtt, 1, t, wrk(npp + 1:npp + 1 + n*m - 1))
          tsnorm = dnrm2(npp + n*m, wrk, 1)
       else
          tsnorm = dnrm2(npp, wrk, 1)
@@ -1997,8 +1987,7 @@ contains
       end do
 
       if (isodr) then
-         call weight(n, m, wd, ldwd, ld2wd, t, tempret(1:n, 1:m))
-         wrk(n*nq + 1:n*nq + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
+         call scale_mat(n, m, wd, ldwd, ld2wd, t, wrk(n*nq + 1:n*nq + 1 + n*m - 1))
          temp1 = ddot(n*nq, wrk, 1, wrk, 1) + ddot(n*m, t, 1, wrk(n*nq + 1), 1)
          temp1 = sqrt(temp1)/rnorm
       else
@@ -2033,11 +2022,10 @@ contains
          else
             wrk(1:n*nq) = reshape(fn - y, [n*nq])
          end if
-         call weight(n, nq, we1, ldwe, ld2we, reshape(wrk, [n, nq]), tempret(1:n, 1:nq))
+         call scale_mat(n, nq, we1, ldwe, ld2we, wrk, tempret(1:n, 1:nq))
          wrk(1:n*nq) = reshape(tempret(1:n, 1:nq), [n*nq])
          if (isodr) then
-            call weight(n, m, wd, ldwd, ld2wd, deltan, tempret(1:n, 1:m))
-            wrk(n*nq + 1:n*nq + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
+            call scale_mat(n, m, wd, ldwd, ld2wd, deltan, wrk(n*nq + 1:n*nq + 1 + n*m - 1))
             rnormn = sqrt(ddot(n*nq, wrk, 1, wrk, 1) + &
                           ddot(n*m, deltan, 1, wrk(n*nq + 1), 1))
          else
@@ -2117,17 +2105,14 @@ contains
          else
             f = fs - y
          end if
-         call weight(n, nq, we1, ldwe, ld2we, f, tempret(1:n, 1:nq))
+         call scale_mat(n, nq, we1, ldwe, ld2we, f, tempret(1:n, 1:nq))
          f = tempret(1:n, 1:nq)
          call dcopy(npp, betan, 1, betac, 1)
          call dcopy(n*m, deltan, 1, delta, 1)
          rnorm = rnormn
-         call weight(npp, 1, reshape(ss, [npp, 1, 1]), npp, 1, &
-                     reshape(betac, [npp, 1]), tempret(1:npp, 1:1))
-         wrk(1:npp) = tempret(1:npp, 1)
+         call scale_mat(npp, 1, ss, npp, 1, betac, wrk(1:npp))
          if (isodr) then
-            call weight(n, m, reshape(tt, [ldtt, 1, m]), ldtt, 1, delta, tempret(1:n, 1:m))
-            wrk(npp + 1:npp + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
+            call scale_mat(n, m, tt, ldtt, 1, delta, wrk(npp + 1:npp + 1 + n*m - 1))
             pnorm = dnrm2(npp + n*m, wrk, 1)
          else
             pnorm = dnrm2(npp, wrk, 1)
@@ -2252,8 +2237,7 @@ contains
          end if
 
          if (implct) then
-            call weight(n, m, wd, ldwd, ld2wd, delta, tempret(1:n, 1:m))
-            wrk(n*nq + 1:n*nq + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
+            call scale_mat(n, m, wd, ldwd, ld2wd, delta, wrk(n*nq + 1:n*nq + 1 + n*m - 1))
             rss = ddot(n*m, delta, 1, wrk(n*nq + 1), 1)
          else
             rss = rnorm*rnorm
@@ -2268,7 +2252,7 @@ contains
                        work(u), work(qraux), iwork(jpvt), &
                        s, t, irank, rcond, rss, idf, rvar, ifixb, &
                        work(wrk1), work(wrk2), work(wrk3), work(wrk4), &
-                       work(wrk5), wrk, lwrk, tempret, istopc)
+                       work(wrk5), wrk, lwrk, istopc)
             if (istopc /= 0) then
                info = istopc
                goto 200
@@ -2314,12 +2298,10 @@ contains
       end if
 
       ! Compute weighted sums of squares for return to user
-      call weight(n, nq, we1, ldwe, ld2we, f, tempret(1:n, 1:nq))
-      wrk(1:n*nq) = reshape(tempret(1:n, 1:nq), [n*nq])
+      call scale_mat(n, nq, we1, ldwe, ld2we, f, wrk(1:n*nq))
       wss(3) = ddot(n*nq, wrk, 1, wrk, 1)
       if (isodr) then
-         call weight(n, m, wd, ldwd, ld2wd, delta, tempret(1:n, 1:m))
-         wrk(n*nq + 1:n*nq + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
+         call scale_mat(n, m, wd, ldwd, ld2wd, delta, wrk(n*nq + 1:n*nq + 1 + n*m - 1))
          wss(2) = ddot(n*m, delta, 1, wrk(n*nq + 1), 1)
       else
          wss(2) = zero

@@ -54,7 +54,7 @@ contains
        alpha2, tau, epsfcn, isodr, &
        tfjacb, omega, u, qraux, jpvt, &
        s, t, nlms, rcond, irank, &
-       wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, tempret, istopc)
+       wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
    !! Compute Levenberg-Marquardt parameter and steps `s` and `t` using analog of the
    !! trust-region Levenberg-Marquardt algorithm.
 
@@ -134,8 +134,6 @@ contains
          !! A work array of `(lwrk)` elements, _equivalenced_ to `wrk1` and `wrk2`.
       integer, intent(in) :: lwrk
          !! The length of vector `wrk`.
-      real(wp), intent(inout) :: tempret(:, :)
-         !! Temporary work array for holding return values before copying to a lower rank array.
       integer, intent(out) :: istopc
          !! The variable designating whether the computations were stopped due to some other
          !! numerical error detected within subroutine `dodstp`.
@@ -217,7 +215,7 @@ contains
                   alpha1, epsfcn, isodr, &
                   tfjacb, omega, u, qraux, jpvt, &
                   s, t, phi1, irank, rcond, forvcv, &
-                  wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, tempret, istopc)
+                  wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
       if (istopc /= 0) then
          return
       end if
@@ -247,8 +245,7 @@ contains
       call scale_vec(npp, 1, ss, npp, wrk, npp, wrk, npp) ! work is input (as t) and output (as sclt)
 
       if (isodr) then
-         call weight(n, m, wd, ldwd, ld2wd, delta, tempret(1:n, 1:m))
-         wrk(npp + 1:npp + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
+         call scale_mat(n, m, wd, ldwd, ld2wd, delta, wrk(npp + 1:npp + 1 + n*m - 1))
          iwrk = npp
          do j = 1, m
             do i = 1, n
@@ -277,7 +274,7 @@ contains
                      alpha2, epsfcn, isodr, &
                      tfjacb, omega, u, qraux, jpvt, &
                      s, t, phi2, irank, rcond, forvcv, &
-                     wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, tempret, istopc)
+                     wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
          if (istopc /= 0) then
             return
          end if
@@ -1321,16 +1318,18 @@ contains
       ! Weight the Jacobian wrt the estimated BETAS
       if (ifixb(1) < 0) then
          do k = 1, np
-            call weight(n, nq, we1, ldwe, ld2we, fjacb(1:n, k, 1:nq), tempret(1:n, 1:nq))
-            fjacb(1:n, k, 1:nq) = tempret(1:n, 1:nq)
+            call scale_mat(n, nq, we1, ldwe, ld2we, &
+                           reshape(fjacb(:, k, :), [n, nq]), & ! this reshape should not be required. probably compiler bug
+                           tempret(1:n, 1:nq))
+            fjacb(:, k, :) = tempret(1:n, 1:nq)
          end do
       else
          k1 = 0
          do k = 1, np
             if (ifixb(k) >= 1) then
                k1 = k1 + 1
-               call weight(n, nq, we1, ldwe, ld2we, fjacb(1:n, k, 1:nq), tempret(1:n, 1:nq))
-               fjacb(1:n, k1, 1:nq) = tempret(1:n, 1:nq)
+               call scale_mat(n, nq, we1, ldwe, ld2we, fjacb(:, k, :), tempret(1:n, 1:nq))
+               fjacb(:, k1, :) = tempret(1:n, 1:nq)
             end if
          end do
       end if
@@ -1338,8 +1337,8 @@ contains
       ! Weight the Jacobian's wrt DELTA as appropriate
       if (isodr) then
          do j = 1, m
-            call weight(n, nq, we1, ldwe, ld2we, fjacd(1:n, j, 1:nq), tempret(1:n, 1:nq))
-            fjacd(1:n, j, 1:nq) = tempret(1:n, 1:nq)
+            call scale_mat(n, nq, we1, ldwe, ld2we, fjacd(:, j, :), tempret(1:n, 1:nq))
+            fjacd(:, j, :) = tempret(1:n, 1:nq)
          end do
       end if
 
@@ -4662,7 +4661,7 @@ contains
        alpha, epsfcn, isodr, &
        tfjacb, omega, u, qraux, kpvt, &
        s, t, phi, irank, rcond, forvcv, &
-       wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, tempret, istopc)
+       wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
    !! Compute locally constrained steps `s` and `t`, and `phi(alpha)`.
       ! @note: This is one of the most time-consuming subroutines in ODRPACK (~25% of total).
 
@@ -4748,8 +4747,6 @@ contains
          !! A work array of `(lwrk)` elements, _equivalenced_ to `wrk1` and `wrk2`.
       integer, intent(in) :: lwrk
          !! The length of vector `wrk`.
-      real(wp), intent(inout) :: tempret(:, :)
-         !! Temporary work array for holding return values before copying to a lower rank array.
       integer, intent(inout) :: istopc
          !! The variable designating whether the computations were stopped due to a numerical
          !! error within subroutine `dodstp`.
@@ -4797,7 +4794,7 @@ contains
 
       if (isodr) then
          ! T = WD * DELTA = D*G2
-         call weight(n, m, wd, ldwd, ld2wd, delta, t)
+         call scale_mat(n, m, wd, ldwd, ld2wd, delta, t)
 
          do i = 1, n
 
@@ -4994,11 +4991,9 @@ contains
       end if
 
       ! Compute PHI(ALPHA) from scaled S and T
-      call weight(npp, 1, reshape(ss, [npp, 1, 1]), npp, 1, reshape(s, [npp, 1]), tempret(1:npp, 1:1))
-      wrk(1:npp) = tempret(1:npp, 1)
+      call scale_mat(npp, 1, ss, npp, 1, s, wrk(1:npp))
       if (isodr) then
-         call weight(n, m, reshape(tt, [ldtt, 1, m]), ldtt, 1, t, tempret(1:n, 1:m))
-         wrk(npp + 1:npp + 1 + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
+         call scale_mat(n, m, tt, ldtt, 1, t, wrk(npp + 1:npp + 1 + n*m - 1))
          phi = dnrm2(npp + n*m, wrk, 1)
       else
          phi = dnrm2(npp, wrk, 1)
@@ -5014,7 +5009,7 @@ contains
        vcv, sd, &
        wrk6, omega, u, qraux, jpvt, &
        s, t, irank, rcond, rss, idf, rvar, ifixb, &
-       wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, tempret, istopc)
+       wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
    !! Compute covariance matrix of estimated parameters.
 
       use odrpack_kinds, only: zero
@@ -5103,8 +5098,6 @@ contains
          !! A work array of `(lwrk)` elements, _equivalenced_ to `wrk1` and `wrk2`.
       integer, intent(in) :: lwrk
          !! The length of vector `lwrk`.
-      real(wp), intent(inout) :: tempret(:, :)
-         !! Temporary work array for holding return values before copying to a lower rank array.
       integer, intent(out) :: istopc
          !! The variable designating whether the computations were stoped due to a numerical
          !! error within subroutine `dodstp`.
@@ -5183,7 +5176,7 @@ contains
                   zero, epsfcn, isodr, &
                   wrk6, omega, u, qraux, jpvt, &
                   s, t, temp, irank, rcond, forvcv, &
-                  wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, tempret, istopc)
+                  wrk1, wrk2, wrk3, wrk4, wrk5, wrk, lwrk, istopc)
       if (istopc /= 0) then
          return
       end if
@@ -6291,59 +6284,71 @@ contains
       end do
 
    end subroutine vevtr
-
-   pure subroutine weight(n, m, wt, ldwt, ld2wt, t, wtt)
+ 
+   pure subroutine scale_mat(n, m, wt, ldwt, ld2wt, t, wtt)
    !! Scale matrix `t` using `wt`, i.e., compute `wtt = wt*t`.
 
       use odrpack_kinds, only: zero
 
       integer, intent(in) :: n
-         !! The number of rows of data in `t`.
+         !! Number of rows of data in `t`.
       integer, intent(in) :: m
-         !! The number of columns of data in `t`.
+         !! Number of columns of data in `t`.
+      real(wp), intent(in), target :: wt(..)
+         !! Array of shape `(ldwt,ld2wt,m)` holding the weights.
       integer, intent(in) :: ldwt
-         !! The leading dimension of array `wt`.
+         !! Leading dimension of array `wt`.
       integer, intent(in) :: ld2wt
-         !! The second dimension of array `wt`.
-      real(wp), intent(in) :: wt(:, :, :)
-         !! The weights.
-      real(wp), intent(in) :: t(:, :)
-         !! The array being scaled by `wt`.
-      real(wp), intent(out) :: wtt(:, :)
-         !! The results of weighting array `t` by `wt`. Array `wtt` can be the same as `t` only if
-         !! the arrays in `wt` are upper triangular with zeros below the diagonal.
+         !! Second dimension of array `wt`.
+      real(wp), intent(in), target :: t(..)
+         !! Array of shape `(n,m)` being scaled by `wt`.
+      real(wp), intent(out), target :: wtt(..)
+         !! Array of shape `(n,m)` holding the result of weighting array `t` by `wt`. Array
+         !! `wtt` can be the same as `t` only if the arrays in `wt` are upper triangular with
+         !! zeros below the diagonal.
 
       ! Local scalars
       integer :: i, j
+      real(wp), pointer :: wt_(:, :, :), t_(:, :), wtt_(:, :)
 
       ! Variable Definitions (alphabetically)
       !  I:       An indexing variable.
       !  J:       An indexing variable.
-      !  K:       An indexing variable.
-      !  LDWT:    The leading dimension of array WT.
-      !  LD2WT:   The second dimension of array WT.
-      !  M:       The number of columns of data in T.
-      !  N:       The number of rows of data in T.
-      !  T:       The array being scaled by WT.
-      !  WT:      The weights.
-      !  WTT:     The results of weighting array T by WT. Array WTT can be the same as T only if
-      !           the arrays in WT are upper triangular with zeros below the diagonal.
 
       if (n == 0 .or. m == 0) return
 
-      if (wt(1, 1, 1) >= zero) then
+      select rank (t)
+      rank (1); t_(1:n, 1:m) => t
+      rank (2); t_(1:n, 1:m) => t
+      rank default; error stop "Invalid rank of `t`."
+      end select
+
+      select rank (wtt)
+      rank (1); wtt_(1:n, 1:m) => wtt
+      rank (2); wtt_(1:n, 1:m) => wtt
+      rank default; error stop "Invalid rank of `wt`."
+      end select
+
+      select rank (wt)
+      rank (1); wt_(1:ldwt, 1:ld2wt, 1:m) => wt
+      rank (2); wt_(1:ldwt, 1:ld2wt, 1:m) => wt
+      rank (3); wt_(1:ldwt, 1:ld2wt, 1:m) => wt
+      rank default; error stop "Invalid rank of `wt`."
+      end select
+
+      if (wt_(1, 1, 1) >= zero) then
          if (ldwt >= n) then
             if (ld2wt >= m) then
                ! WT is an N-array of M by M matrices
                do j = 1, m
                   do i = 1, n
-                     wtt(i, j) = dot_product(wt(i, j, :), t(i, :))
+                     wtt_(i, j) = dot_product(wt_(i, j, :), t_(i, :))
                   end do
                end do
             else
                ! WT is an N-array of diagonal matrices
                do j = 1, m
-                  wtt(:, j) = wt(:, 1, j)*t(:, j)
+                  wtt_(:, j) = wt_(:, 1, j)*t_(:, j)
                end do
             end if
          else
@@ -6351,22 +6356,22 @@ contains
                ! WT is an M by M matrix
                do j = 1, m
                   do i = 1, n
-                     wtt(i, j) = dot_product(wt(1, j, :), t(i, :))
+                     wtt_(i, j) = dot_product(wt_(1, j, :), t_(i, :))
                   end do
                end do
             else
                ! WT is a diagonal matrix
                do j = 1, m
-                  wtt(:, j) = wt(1, 1, j)*t(:, j)
+                  wtt_(:, j) = wt_(1, 1, j)*t_(:, j)
                end do
             end if
          end if
       else
          ! WT is a scalar
-         wtt = abs(wt(1, 1, 1))*t
+         wtt_ = abs(wt_(1, 1, 1))*t_
       end if
 
-   end subroutine weight
+   end subroutine scale_mat
 
    pure subroutine mbfb(np, beta, lower, upper, ssf, stpb, neta, eta, interval)
    !! Ensure range of bounds is large enough for derivative checking.
