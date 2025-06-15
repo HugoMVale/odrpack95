@@ -5866,46 +5866,23 @@ contains
          !! The leading dimension of array `sclt`.
 
       ! Local scalars
-      real(wp) :: temp
-      integer :: i, j
+      integer :: j
 
       ! Variable Definitions (alphabetically)
-      !  I:       An indexing variable.
       !  J:       An indexing variable.
-      !  LDSCL:   The leading dimension of array SCL.
-      !  LDSCLT:  The leading dimension of array SCLT.
-      !  LDT:     The leading dimension of array T.
-      !  M:       The number of columns of data in T.
-      !  N:       The number of rows of data in T.
-      !  SCL:     The scale values.
-      !  SCLT:    The inversely scaled matrix.
-      !  T:       The array to be inversely scaled by SCL.
-      !  TEMP:    A temporary scalar.
 
       if (n == 0 .or. m == 0) return
 
       if (scl(1, 1) >= zero) then
          if (ldscl >= n) then
-            do j = 1, m
-               do i = 1, n
-                  sclt(i, j) = t(i, j)/scl(i, j)
-               end do
-            end do
+            sclt(1:n, 1:m) = t(1:n, 1:m)/scl(1:n, 1:m)
          else
             do j = 1, m
-               temp = one/scl(1, j)
-               do i = 1, n
-                  sclt(i, j) = t(i, j)*temp
-               end do
+               sclt(1:n, j) = t(1:n, j)/scl(1, j)
             end do
          end if
       else
-         temp = one/abs(scl(1, 1))
-         do j = 1, m
-            do i = 1, n
-               sclt(i, j) = t(i, j)*temp
-            end do
-         end do
+         sclt(1:n, 1:m) = t(1:n, 1:m)/abs(scl(1, 1))
       end if
 
    end subroutine scale_vec
@@ -5914,7 +5891,7 @@ contains
    !! Select scaling values for `beta` according to the algorithm given in the ODRPACK95
    !! reference guide.
 
-      use odrpack_kinds, only: zero, one, ten
+      use odrpack_kinds, only: zero, one
 
       integer, intent(in) :: np
          !! The number of function parameters.
@@ -5929,14 +5906,11 @@ contains
       logical ::bigdif
 
       ! Variable Definitions (alphabetically)
-      !  BETA:    The function parameters.
       !  BIGDIF:  The variable designating whether there is a significant difference in the
       !           magnitudes of the nonzero elements of BETA (BIGDIF=.TRUE.) or not (BIGDIF=.FALSE.).
       !  BMAX:    The largest nonzero magnitude.
       !  BMIN:    The smallest nonzero magnitude.
       !  K:       An indexing variable.
-      !  NP:      The number of function parameters.
-      !  SSF:     The scaling values for BETA.
 
       bmax = abs(beta(1))
       do k = 2, np
@@ -5957,12 +5931,12 @@ contains
          bigdif = log10(bmax) - log10(bmin) >= one
          do k = 1, np
             if (beta(k) == zero) then
-               ssf(k) = ten/bmin
+               ssf(k) = 10/bmin
             else
                if (bigdif) then
-                  ssf(k) = one/abs(beta(k))
+                  ssf(k) = 1/abs(beta(k))
                else
-                  ssf(k) = one/bmax
+                  ssf(k) = 1/bmax
                end if
             end if
          end do
