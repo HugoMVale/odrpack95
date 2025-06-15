@@ -2333,7 +2333,7 @@ contains
    subroutine loc_wsse(n, m, np, nq, ldwe, ld2we, isodr, wssi, wssdei, wssepi)
    !! Locations of the weighted sum of squares results in the `work` array.
 
-      use odrpack_core, only: rwinfo
+      use odrpack_core, only: loc_rwork
 
       integer, intent(in) :: n, m, np, nq, ldwe, ld2we
       logical, intent(in) :: isodr
@@ -2346,17 +2346,17 @@ contains
                  fjacdi, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, loweri, upperi, &
                  lwkmn
 
-      call rwinfo(n, m, np, nq, ldwe, ld2we, isodr, &
-                  deltai, epsi, xplusi, fni, sdi, vcvi, &
-                  rvari, wssi, wssdei, wssepi, rcondi, etai, &
-                  olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
-                  partli, sstoli, taufci, epsmai, &
-                  beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
-                  fsi, fjacbi, we1i, diffi, &
-                  deltsi, deltni, ti, tti, omegai, fjacdi, &
-                  wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
-                  loweri, upperi, &
-                  lwkmn)
+      call loc_rwork(n, m, np, nq, ldwe, ld2we, isodr, &
+                     deltai, epsi, xplusi, fni, sdi, vcvi, &
+                     rvari, wssi, wssdei, wssepi, rcondi, etai, &
+                     olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
+                     partli, sstoli, taufci, epsmai, &
+                     beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
+                     fsi, fjacbi, we1i, diffi, &
+                     deltsi, deltni, ti, tti, omegai, fjacdi, &
+                     wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
+                     loweri, upperi, &
+                     lwkmn)
 
    end subroutine loc_wsse
 

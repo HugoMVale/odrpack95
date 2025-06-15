@@ -3,7 +3,7 @@ module odrpack_capi
 
    use, intrinsic :: iso_c_binding, only: c_bool, c_char, c_double, c_f_pointer, c_int, c_ptr
    use odrpack, only: odr, workspace_dimensions
-   use odrpack_core, only: iwinfo, rwinfo
+   use odrpack_core, only: loc_iwork, loc_rwork
    implicit none
 
    abstract interface
@@ -449,14 +449,14 @@ contains
                  lunrpi, nrowi, ntoli, netai, maxiti, niteri, nfevi, njevi, int2i, iranki, &
                  ldtti, boundi, liwkmn
 
-      call iwinfo(m, np, nq, &
-                  msgbi, msgdi, ifix2i, istopi, &
-                  nnzwi, nppi, idfi, &
-                  jobi, iprini, luneri, lunrpi, &
-                  nrowi, ntoli, netai, &
-                  maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
-                  boundi, &
-                  liwkmn)
+      call loc_iwork(m, np, nq, &
+                     msgbi, msgdi, ifix2i, istopi, &
+                     nnzwi, nppi, idfi, &
+                     jobi, iprini, luneri, lunrpi, &
+                     nrowi, ntoli, netai, &
+                     maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
+                     boundi, &
+                     liwkmn)
 
       iworkidx%msgb = msgbi - 1
       iworkidx%msgd = msgdi - 1
@@ -512,17 +512,17 @@ contains
                  fjacdi, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, loweri, upperi, &
                  lwkmn
 
-      call rwinfo(n, m, np, nq, ldwe, ld2we, logical(isodr, kind=kind(.true.)), &
-                  deltai, epsi, xplusi, fni, sdi, vcvi, &
-                  rvari, wssi, wssdei, wssepi, rcondi, etai, &
-                  olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
-                  partli, sstoli, taufci, epsmai, &
-                  beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
-                  fsi, fjacbi, we1i, diffi, &
-                  deltsi, deltni, ti, tti, omegai, fjacdi, &
-                  wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
-                  loweri, upperi, &
-                  lwkmn)
+      call loc_rwork(n, m, np, nq, ldwe, ld2we, logical(isodr, kind=kind(.true.)), &
+                     deltai, epsi, xplusi, fni, sdi, vcvi, &
+                     rvari, wssi, wssdei, wssepi, rcondi, etai, &
+                     olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
+                     partli, sstoli, taufci, epsmai, &
+                     beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
+                     fsi, fjacbi, we1i, diffi, &
+                     deltsi, deltni, ti, tti, omegai, fjacdi, &
+                     wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
+                     loweri, upperi, &
+                     lwkmn)
 
       workidx%delta = deltai - 1
       workidx%eps = epsi - 1
@@ -581,7 +581,7 @@ contains
 
    pure subroutine workspace_dimensions_c(n, m, np, nq, isodr, lwork, liwork) bind(C)
    !! Calculate the dimensions of the workspace arrays.
-   
+
       integer(c_int), intent(in) :: n
          !! Number of observations.
       integer(c_int), intent(in) :: m

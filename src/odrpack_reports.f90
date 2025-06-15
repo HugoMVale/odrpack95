@@ -1071,7 +1071,7 @@ contains
        lower, upper)
    !! Generate final summary report.
 
-      use odrpack_core, only: ppt
+      use odrpack_core, only: ppf_tstudent
 
       integer, intent(in) :: ipr
          !! The variable indicating what is to be printed.
@@ -1256,7 +1256,7 @@ contains
       write (lunrpt, 3000)
       if (didvcv) then
          write (lunrpt, 7300)
-         tval = ppt(0.975E0_wp, idf)
+         tval = ppf_tstudent(0.975E0_wp, idf)
          do j = 1, np
             if (ifixb2(j) >= 1) then
                write (lunrpt, 8400) j, beta(j), &

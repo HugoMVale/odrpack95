@@ -47,7 +47,7 @@ module odrpack_core
 
 contains
 
-   subroutine odlm &
+   subroutine trust_region &
       (n, m, np, nq, npp, &
        f, fjacb, fjacd, &
        wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
@@ -209,7 +209,7 @@ contains
 
       ! Compute full Gauss-Newton step (ALPHA=0)
       alpha1 = zero
-      call odstep(n, m, np, nq, npp, &
+      call lcstep(n, m, np, nq, npp, &
                   f, fjacb, fjacd, &
                   wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
                   alpha1, epsfcn, isodr, &
@@ -268,7 +268,7 @@ contains
       do i = 1, 10
 
          ! Compute locally constrained steps S and T and PHI(ALPHA) for current value of ALPHA
-         call odstep(n, m, np, nq, npp, &
+         call lcstep(n, m, np, nq, npp, &
                      f, fjacb, fjacd, &
                      wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
                      alpha2, epsfcn, isodr, &
@@ -320,7 +320,7 @@ contains
       ! Set NLMS to indicate an optimal step could not be found in 10 trys
       nlms = 12
 
-   end subroutine odlm
+   end subroutine trust_region
 
    pure subroutine access_workspace &
       (n, m, np, nq, ldwe, ld2we, &
@@ -607,27 +607,27 @@ contains
       !  XPLUSI:  The starting location in array WORK of array XPLUSD.
 
       ! Find starting locations within integer workspace
-      call iwinfo(m, np, nq, &
-                  msgb, msgd, jpvti, istopi, &
-                  nnzwi, nppi, idfi, &
-                  jobi, iprini, luneri, lunrpi, &
-                  nrowi, ntoli, netai, &
-                  maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
-                  boundi, &
-                  liwkmn)
+      call loc_iwork(m, np, nq, &
+                     msgb, msgd, jpvti, istopi, &
+                     nnzwi, nppi, idfi, &
+                     jobi, iprini, luneri, lunrpi, &
+                     nrowi, ntoli, netai, &
+                     maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
+                     boundi, &
+                     liwkmn)
 
       ! Find starting locations within REAL work space
-      call rwinfo(n, m, np, nq, ldwe, ld2we, isodr, &
-                  deltai, epsi, xplusi, fni, sdi, vcvi, &
-                  rvari, wssi, wssdei, wssepi, rcondi, etai, &
-                  olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
-                  partli, sstoli, taufci, epsmai, &
-                  beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
-                  fsi, fjacbi, we1i, diffi, &
-                  deltsi, deltni, ti, tti, omegai, fjacdi, &
-                  wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
-                  loweri, upperi, &
-                  lwkmn)
+      call loc_rwork(n, m, np, nq, ldwe, ld2we, isodr, &
+                     deltai, epsi, xplusi, fni, sdi, vcvi, &
+                     rvari, wssi, wssdei, wssepi, rcondi, etai, &
+                     olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
+                     partli, sstoli, taufci, epsmai, &
+                     beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
+                     fsi, fjacbi, we1i, diffi, &
+                     deltsi, deltni, ti, tti, omegai, fjacdi, &
+                     wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
+                     loweri, upperi, &
+                     lwkmn)
 
       if (access) then
          ! Set starting locations for work vectors
@@ -892,7 +892,7 @@ contains
 
    end subroutine esubi
 
-   subroutine etaf &
+   subroutine eta_fcn &
       (fcn, &
        n, m, np, nq, &
        xplusd, beta, epsmac, nrow, &
@@ -1100,9 +1100,9 @@ contains
       end do
       neta = int(max(two, p5 - log10(eta)))
 
-   end subroutine etaf
+   end subroutine eta_fcn
 
-   subroutine evjac &
+   subroutine eval_jac &
       (fcn, &
        anajac, cdjac, &
        n, m, np, nq, &
@@ -1284,25 +1284,25 @@ contains
          ! Make sure fixed elements of FJACD are zero
          if (isodr) then
             do l = 1, nq
-               call setifix(n, m, ifixx, ldifx, fjacd(1, 1, l), n, fjacd(1, 1, l), n)
+               call set_ifix(n, m, ifixx, ldifx, fjacd(1, 1, l), n, fjacd(1, 1, l), n)
             end do
          end if
       elseif (cdjac) then
-         call jaccd(fcn, &
-                    n, m, np, nq, &
-                    beta, x, delta, xplusd, ifixb, ifixx, ldifx, &
-                    stpb, stpd, ldstpd, &
-                    ssf, tt, ldtt, neta, fn, stp, wrk1, wrk2, wrk3, wrk6, &
-                    fjacb, isodr, fjacd, nfev, istop, info, &
-                    lower, upper)
+         call jac_cdiff(fcn, &
+                        n, m, np, nq, &
+                        beta, x, delta, xplusd, ifixb, ifixx, ldifx, &
+                        stpb, stpd, ldstpd, &
+                        ssf, tt, ldtt, neta, fn, stp, wrk1, wrk2, wrk3, wrk6, &
+                        fjacb, isodr, fjacd, nfev, istop, info, &
+                        lower, upper)
       else
-         call jacfd(fcn, &
-                    n, m, np, nq, &
-                    beta, x, delta, xplusd, ifixb, ifixx, ldifx, &
-                    stpb, stpd, ldstpd, &
-                    ssf, tt, ldtt, neta, fn, stp, wrk1, wrk2, wrk3, wrk6, &
-                    fjacb, isodr, fjacd, nfev, istop, info, &
-                    lower, upper)
+         call jac_fwdiff(fcn, &
+                         n, m, np, nq, &
+                         beta, x, delta, xplusd, ifixb, ifixx, ldifx, &
+                         stpb, stpd, ldstpd, &
+                         ssf, tt, ldtt, neta, fn, stp, wrk1, wrk2, wrk3, wrk6, &
+                         fjacb, isodr, fjacd, nfev, istop, info, &
+                         lower, upper)
       end if
       if (istop < 0 .or. info >= 10000) then
          return
@@ -1342,7 +1342,7 @@ contains
          end do
       end if
 
-   end subroutine evjac
+   end subroutine eval_jac
 
    pure subroutine fctr(oksemi, a, lda, n, info)
    !! Factor the positive (semi)definite matrix `a` using a modified Cholesky factorization.
@@ -1837,7 +1837,7 @@ contains
 
    end function hstep
 
-   pure subroutine setifix(n, m, ifix, ldifix, t, ldt, tfix, ldtfix)
+   pure subroutine set_ifix(n, m, ifix, ldifix, t, ldt, tfix, ldtfix)
    !! Set elements of `t` to zero according to `ifix`.
 
       use odrpack_kinds, only: zero
@@ -1902,9 +1902,9 @@ contains
          end if
       end if
 
-   end subroutine setifix
+   end subroutine set_ifix
 
-   pure subroutine iwinfo &
+   pure subroutine loc_iwork &
       (m, np, nq, &
        msgbi, msgdi, ifix2i, istopi, &
        nnzwi, nppi, idfi, &
@@ -2045,9 +2045,9 @@ contains
          liwkmn = 1
       end if
 
-   end subroutine iwinfo
+   end subroutine loc_iwork
 
-   pure subroutine rwinfo &
+   pure subroutine loc_rwork &
       (n, m, np, nq, ldwe, ld2we, isodr, &
        deltai, epsi, xplusi, fni, sdi, vcvi, &
        rvari, wssi, wssdei, wssepi, rcondi, etai, &
@@ -2377,9 +2377,9 @@ contains
          lwkmn = 1
       end if
 
-   end subroutine rwinfo
+   end subroutine loc_rwork
 
-   pure subroutine iniwork &
+   pure subroutine init_work &
       (n, m, np, work, lwork, iwork, liwork, &
        x, ifixx, ldifx, scld, ldscld, &
        beta, sclb, &
@@ -2651,9 +2651,9 @@ contains
       ! Initialize parameters on bounds in IWORK
       iwork(boundi:boundi + np - 1) = 0
 
-   end subroutine iniwork
+   end subroutine init_work
 
-   subroutine jaccd &
+   subroutine jac_cdiff &
       (fcn, &
        n, m, np, nq, &
        beta, x, delta, xplusd, ifixb, ifixx, ldifx, &
@@ -2957,9 +2957,9 @@ contains
          end do
       end if
 
-   end subroutine jaccd
+   end subroutine jac_cdiff
 
-   subroutine jacfd &
+   subroutine jac_fwdiff &
       (fcn, &
        n, m, np, nq, &
        beta, x, delta, xplusd, ifixb, ifixx, ldifx, &
@@ -3238,9 +3238,9 @@ contains
          end do
       end if
 
-   end subroutine jacfd
+   end subroutine jac_fwdiff
 
-   subroutine jck &
+   subroutine check_jac &
       (fcn, &
        n, m, np, nq, &
        beta, betaj, xplusd, &
@@ -3477,14 +3477,14 @@ contains
 
                ! Check derivative wrt the J-th parameter at the NROW-th row
                if (interval(j) >= 1) then
-                  call jckm(fcn, &
-                            n, m, np, nq, &
-                            betaj, xplusd, &
-                            ifixb, ifixx, ldifx, &
-                            eta, tol, nrow, epsmac, j, lq, typj, h0, hc0, &
-                            iswrtb, pv, fjacb(nrow, j, lq), &
-                            diffj, msgb1, msgb(2), istop, nfev, &
-                            wrk1, wrk2, wrk6, interval)
+                  call check_jac_value(fcn, &
+                                       n, m, np, nq, &
+                                       betaj, xplusd, &
+                                       ifixb, ifixx, ldifx, &
+                                       eta, tol, nrow, epsmac, j, lq, typj, h0, hc0, &
+                                       iswrtb, pv, fjacb(nrow, j, lq), &
+                                       diffj, msgb1, msgb(2), istop, nfev, &
+                                       wrk1, wrk2, wrk6, interval)
                   if (istop /= 0) then
                      msgb(1) = -1
                      return
@@ -3534,14 +3534,14 @@ contains
                   hc0 = hstep(1, neta, nrow, j, stpd, ldstpd)
 
                   ! Check derivative wrt the J-th column of DELTA at row NROW
-                  call jckm(fcn, &
-                            n, m, np, nq, &
-                            betaj, xplusd, &
-                            ifixb, ifixx, ldifx, &
-                            eta, tol, nrow, epsmac, j, lq, typj, h0, hc0, &
-                            iswrtb, pv, fjacd(nrow, j, lq), &
-                            diffj, msgd1, msgd(2), istop, nfev, &
-                            wrk1, wrk2, wrk6, interval)
+                  call check_jac_value(fcn, &
+                                       n, m, np, nq, &
+                                       betaj, xplusd, &
+                                       ifixb, ifixx, ldifx, &
+                                       eta, tol, nrow, epsmac, j, lq, typj, h0, hc0, &
+                                       iswrtb, pv, fjacd(nrow, j, lq), &
+                                       diffj, msgd1, msgd(2), istop, nfev, &
+                                       wrk1, wrk2, wrk6, interval)
                   if (istop /= 0) then
                      msgd(1) = -1
                      return
@@ -3557,9 +3557,9 @@ contains
       msgb(1) = msgb1
       msgd(1) = msgd1
 
-   end subroutine jck
+   end subroutine check_jac
 
-   subroutine jckc &
+   subroutine check_jac_curv &
       (fcn, &
        n, m, np, nq, &
        beta, xplusd, ifixb, ifixx, ldifx, &
@@ -3744,13 +3744,13 @@ contains
       curve = curve + eta*(abs(pvpcrv) + abs(pvmcrv) + two*abs(pv))/(stpcrv**2)
 
       ! Check if finite precision arithmetic could be the culprit.
-      call jckf(fcn, &
-                n, m, np, nq, &
-                beta, xplusd, ifixb, ifixx, ldifx, &
-                eta, tol, nrow, j, lq, iswrtb, &
-                fd, typj, pvpstp, stp0, curve, pv, d, &
-                diffj, msg, istop, nfev, &
-                wrk1, wrk2, wrk6)
+      call check_jac_fp(fcn, &
+                        n, m, np, nq, &
+                        beta, xplusd, ifixb, ifixx, ldifx, &
+                        eta, tol, nrow, j, lq, iswrtb, &
+                        fd, typj, pvpstp, stp0, curve, pv, d, &
+                        diffj, msg, istop, nfev, &
+                        wrk1, wrk2, wrk6)
       if (istop /= 0) then
          return
       end if
@@ -3805,9 +3805,9 @@ contains
          msg(lq, j) = 5
       end if
 
-   end subroutine jckc
+   end subroutine check_jac_curv
 
-   subroutine jckf &
+   subroutine check_jac_fp &
       (fcn, &
        n, m, np, nq, &
        beta, xplusd, ifixb, ifixx, ldifx, &
@@ -3986,9 +3986,9 @@ contains
          end if
       end if
 
-   end subroutine jckf
+   end subroutine check_jac_fp
 
-   subroutine jckm &
+   subroutine check_jac_value &
       (fcn, &
        n, m, np, nq, &
        beta, xplusd, ifixb, ifixx, ldifx, &
@@ -4201,25 +4201,25 @@ contains
             ! Numerical and analytic derivatives disagree.  Check why
             if ((d == zero) .or. (fd == zero)) then
                if (interval(j) >= 10 .or. .not. iswrtb) then
-                  call jckz(fcn, &
-                            n, m, np, nq, &
-                            beta, xplusd, ifixb, ifixx, ldifx, &
-                            nrow, epsmac, j, lq, iswrtb, &
-                            tol, d, fd, typj, pvpstp, stp0, pv, &
-                            diffj, msg, istop, nfev, &
-                            wrk1, wrk2, wrk6)
+                  call check_jac_zero(fcn, &
+                                      n, m, np, nq, &
+                                      beta, xplusd, ifixb, ifixx, ldifx, &
+                                      nrow, epsmac, j, lq, iswrtb, &
+                                      tol, d, fd, typj, pvpstp, stp0, pv, &
+                                      diffj, msg, istop, nfev, &
+                                      wrk1, wrk2, wrk6)
                else
                   msg(lq, j) = 8
                end if
             else
                if (interval(j) >= 100 .or. .not. iswrtb) then
-                  call jckc(fcn, &
-                            n, m, np, nq, &
-                            beta, xplusd, ifixb, ifixx, ldifx, &
-                            eta, tol, nrow, epsmac, j, lq, hc, iswrtb, &
-                            fd, typj, pvpstp, stp0, pv, d, &
-                            diffj, msg, istop, nfev, &
-                            wrk1, wrk2, wrk6)
+                  call check_jac_curv(fcn, &
+                                      n, m, np, nq, &
+                                      beta, xplusd, ifixb, ifixx, ldifx, &
+                                      eta, tol, nrow, epsmac, j, lq, hc, iswrtb, &
+                                      fd, typj, pvpstp, stp0, pv, d, &
+                                      diffj, msg, istop, nfev, &
+                                      wrk1, wrk2, wrk6)
                else
                   msg(lq, j) = 8
                end if
@@ -4242,9 +4242,9 @@ contains
          msg1 = 2
       end if
 
-   end subroutine jckm
+   end subroutine check_jac_value
 
-   subroutine jckz &
+   subroutine check_jac_zero &
       (fcn, &
        n, m, np, nq, &
        beta, xplusd, ifixb, ifixx, ldifx, &
@@ -4407,9 +4407,9 @@ contains
          msg(lq, j) = 3
       end if
 
-   end subroutine jckz
+   end subroutine check_jac_zero
 
-   pure subroutine odcheck &
+   pure subroutine check_inputs &
       (n, m, np, nq, &
        isodr, anajac, &
        beta, ifixb, &
@@ -4652,9 +4652,9 @@ contains
          end if
       end if
 
-   end subroutine odcheck
+   end subroutine check_inputs
 
-   subroutine odstep &
+   subroutine lcstep &
       (n, m, np, nq, npp, &
        f, fjacb, fjacd, &
        wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
@@ -4999,9 +4999,9 @@ contains
          phi = dnrm2(npp, wrk, 1)
       end if
 
-   end subroutine odstep
+   end subroutine lcstep
 
-   subroutine odvcv &
+   subroutine vcv_beta &
       (n, m, np, nq, npp, &
        f, fjacb, fjacd, &
        wd, ldwd, ld2wd, ssf, ss, tt, ldtt, delta, &
@@ -5170,7 +5170,7 @@ contains
       forvcv = .true.
       istopc = 0
 
-      call odstep(n, m, np, nq, npp, &
+      call lcstep(n, m, np, nq, npp, &
                   f, fjacb, fjacd, &
                   wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
                   zero, epsfcn, isodr, &
@@ -5285,7 +5285,7 @@ contains
          end do
       end do
 
-   end subroutine odvcv
+   end subroutine vcv_beta
 
    pure subroutine pack_vec(n2, n1, v1, v2, ifix)
    !! Select the unfixed elements of `v2` and return them in `v1`.
@@ -5371,7 +5371,7 @@ contains
 
    end subroutine unpack_vec
 
-   real(wp) pure function ppnml(p) result(res)
+   real(wp) pure function ppf_normal(p) result(res)
    !! Compute the percent point function value for the normal (Gaussian) distribution with
    !!  mean 0 and standard deviation 1, and with probability density function:
    !!
@@ -5469,9 +5469,9 @@ contains
          if (p < half) res = -res
       end if
 
-   end function ppnml
+   end function ppf_normal
 
-   real(wp) pure function ppt(p, idf) result(res)
+   real(wp) pure function ppf_tstudent(p, idf) result(res)
    !! Compute the percent point function value for the student's T distribution with `idf`
    !! degrees of freedom.
       ! Adapted from DATAPAC subroutine TPPF, with modifications to facilitate conversion to
@@ -5590,7 +5590,7 @@ contains
 
       elseif (idf >= 3) then
          ! Treat the IDF greater than or equal to 3 case
-         ppfn = ppnml(p)
+         ppfn = ppf_normal(p)
          d1 = ppfn
          d3 = ppfn**3
          d5 = ppfn**5
@@ -5655,7 +5655,7 @@ contains
          end if
       end if
 
-   end function ppt
+   end function ppf_tstudent
 
    subroutine fpvb &
       (fcn, &
@@ -6244,22 +6244,9 @@ contains
       integer :: j, l1, l2
 
       ! Variable Definitions (alphabetically)
-      !  INDX:    The row in V in which the M by NQ array is stored.
       !  J:       An indexing variable.
-      !  LDE:     The leading dimension of array E.
-      !  LDV:     The leading dimension of array V.
-      !  LDVE:    The leading dimension of array VE.
-      !  LDVEV:   The leading dimension of array VEV.
-      !  LD2V:    The second dimension of array V.
       !  L1:      An indexing variable.
       !  L2:      An indexing variable.
-      !  M:       The number of columns of data in the independent variable.
-      !  NQ:      The number of responses per observation.
-      !  E:       The M by M matrix of the factors so ETE = (D**2 + ALPHA*T**2).
-      !  V:       An array of NQ by M matrices.
-      !  VE:      The NQ by M array VE = V * inv(E)
-      !  VEV:     The NQ by NQ array VEV = V * inv(ETE) * trans(V).
-      !  WRK5:    An M work vector.
 
       if (nq == 0 .or. m == 0) return
 
@@ -6284,7 +6271,7 @@ contains
       end do
 
    end subroutine vevtr
- 
+
    pure subroutine scale_mat(n, m, wt, ldwt, ld2wt, t, wtt)
    !! Scale matrix `t` using `wt`, i.e., compute `wtt = wt*t`.
 
@@ -6373,7 +6360,8 @@ contains
 
    end subroutine scale_mat
 
-   pure subroutine mbfb(np, beta, lower, upper, ssf, stpb, neta, eta, interval)
+   pure subroutine move_beta( &
+      np, beta, lower, upper, ssf, stpb, neta, eta, interval)
    !! Ensure range of bounds is large enough for derivative checking.
    !! Move beta away from bounds so that derivatives can be calculated.
 
@@ -6401,24 +6389,16 @@ contains
 
       ! Local scalars
       integer :: k
-      real(wp) :: h, h0, h1, hc, hc0, hc1, stpr, stpl, typj
+      real(wp) :: h, h0, h1, hc, hc0, hc1, stpl, stpr, typj
 
       ! VARIABLE DEFINITIONS (ALPHABETICALLY)
-      !  BETA:     BETA for the jacobian checker.  BETA will be moved far enough from the bounds so
-      !            that the derivative checker may proceed.
       !  H:        Relative step size for forward differences.
       !  H0:       Initial relative step size for forward differences.
       !  H1:       Default relative step size for forward differences.
       !  HC:       Relative step size for center differences.
       !  HC0:      Initial relative step size for center differences.
       !  HC1:      Default relative step size for center differences.
-      !  INTERVAL: Specifies which difference methods and step sizes are supported by the current
-      !            interval UPPER-LOWER.
       !  K:        Index variable for BETA.
-      !  NETA:     Number of good digits in the function results.
-      !  SSF:      The scale used for the BETA'S.
-      !  STPB:     The relative step used for computing finite difference derivatives with respect
-      !            to BETA.
       !  STPL:     Maximum step to the left of BETA (-) the derivative checker will use.
       !  STPR:     Maximum step to the right of BETA (+) the derivative checker will use.
       !  TYPJ:     The typical size of the J-th unkonwn BETA.
@@ -6472,6 +6452,6 @@ contains
          end if
       end do
 
-   end subroutine mbfb
+   end subroutine move_beta
 
 end module odrpack_core

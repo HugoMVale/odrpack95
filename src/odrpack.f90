@@ -860,8 +860,8 @@ contains
    !! distance regression (ODR) or ordinary linear or nonlinear least squares (OLS).
 
       use odrpack_kinds, only: zero, one, ten, p5 => half
-      use odrpack_core, only: fcn_t, etaf, fctrw, set_flags, iniwork, iwinfo, jck, odcheck, &
-                              pack_vec, select_row, unpack_vec, rwinfo, derstep, mbfb, &
+      use odrpack_core, only: fcn_t, eta_fcn, fctrw, set_flags, init_work, loc_iwork, check_jac, check_inputs, &
+                              pack_vec, select_row, unpack_vec, loc_rwork, derstep, move_beta, &
                               scale_mat
       use odrpack_reports, only: print_errors
       use blas_interfaces, only: ddot, dnrm2, dcopy
@@ -1144,25 +1144,25 @@ contains
       call set_flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
 
       ! Set starting locations within integer workspace
-      call iwinfo(m, np, nq, &
-                  msgb, msgd, jpvti, istopi, &
-                  nnzwi, nppi, idfi, &
-                  jobi, iprini, luneri, lunrpi, &
-                  nrowi, ntoli, netai, &
-                  maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
-                  boundi, liwkmn)
+      call loc_iwork(m, np, nq, &
+                     msgb, msgd, jpvti, istopi, &
+                     nnzwi, nppi, idfi, &
+                     jobi, iprini, luneri, lunrpi, &
+                     nrowi, ntoli, netai, &
+                     maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
+                     boundi, liwkmn)
 
       ! Set starting locations within REAL work space
-      call rwinfo(n, m, np, nq, ldwe, ld2we, isodr, &
-                  deltai, fi, xplusi, fni, sdi, vcvi, &
-                  rvari, wssi, wssdei, wssepi, rcondi, etai, &
-                  olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
-                  partli, sstoli, taufci, epsmai, &
-                  beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
-                  fsi, fjacbi, we1i, diffi, &
-                  deltsi, deltni, ti, tti, omegai, fjacdi, &
-                  wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
-                  loweri, upperi, lwkmn)
+      call loc_rwork(n, m, np, nq, ldwe, ld2we, isodr, &
+                     deltai, fi, xplusi, fni, sdi, vcvi, &
+                     rvari, wssi, wssdei, wssepi, rcondi, etai, &
+                     olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
+                     partli, sstoli, taufci, epsmai, &
+                     beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
+                     fsi, fjacbi, we1i, diffi, &
+                     deltsi, deltni, ti, tti, omegai, fjacdi, &
+                     wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
+                     loweri, upperi, lwkmn)
 
       if (isodr) then
          wrk = wrk1i
@@ -1217,14 +1217,14 @@ contains
 
          ! Perform error checking
          info = 0
-         call odcheck(n, m, np, nq, &
-                      isodr, anajac, &
-                      beta, ifixb, &
-                      ldifx, ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-                      lwork, lwkmn, liwork, liwkmn, &
-                      sclb, scld, stpb, stpd, &
-                      info, &
-                      lower, upper)
+         call check_inputs(n, m, np, nq, &
+                           isodr, anajac, &
+                           beta, ifixb, &
+                           ldifx, ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
+                           lwork, lwkmn, liwork, liwkmn, &
+                           sclb, scld, stpb, stpd, &
+                           info, &
+                           lower, upper)
          if (info > 0) then
             goto 50
          end if
@@ -1232,17 +1232,17 @@ contains
          ! Initialize work vectors as necessary
          work(n*m + n*nq + 1:lwork) = zero
          iwork = 0
-         call iniwork(n, m, np, &
-                      work, lwork, iwork, liwork, &
-                      x, ifixx, ldifx, scld, ldscld, &
-                      beta, sclb, &
-                      sstol, partol, maxit, taufac, &
-                      job, iprint, lunerr, lunrpt, &
-                      lower, upper, &
-                      epsmai, sstoli, partli, maxiti, taufci, &
-                      jobi, iprini, luneri, lunrpi, &
-                      ssfi, tti, ldtti, deltai, &
-                      loweri, upperi, boundi)
+         call init_work(n, m, np, &
+                        work, lwork, iwork, liwork, &
+                        x, ifixx, ldifx, scld, ldscld, &
+                        beta, sclb, &
+                        sstol, partol, maxit, taufac, &
+                        job, iprint, lunerr, lunrpt, &
+                        lower, upper, &
+                        epsmai, sstoli, partli, maxiti, taufci, &
+                        jobi, iprini, luneri, lunrpi, &
+                        ssfi, tti, ldtti, deltai, &
+                        loweri, upperi, boundi)
 
          iwork(msgb) = -1
          iwork(msgd) = -1
@@ -1327,15 +1327,15 @@ contains
          if (ndigit < 2) then
             iwork(netai) = -1
             nfev = iwork(nfevi)
-            call etaf(fcn, &
-                      n, m, np, nq, &
-                      work(xplusi), beta, epsmac, nrow, &
-                      work(betani), work(fni), &
-                      ifixb, ifixx, ldifx, &
-                      istop, nfev, eta, neta, &
-                      work(wrk1i), work(wrk2i), work(wrk6i), work(wrk7i), &
-                      info, &
-                      lower, upper)
+            call eta_fcn(fcn, &
+                         n, m, np, nq, &
+                         work(xplusi), beta, epsmac, nrow, &
+                         work(betani), work(fni), &
+                         ifixb, ifixx, ldifx, &
+                         istop, nfev, eta, neta, &
+                         work(wrk1i), work(wrk2i), work(wrk6i), work(wrk7i), &
+                         info, &
+                         lower, upper)
             iwork(istopi) = istop
             iwork(nfevi) = nfev
             if (istop /= 0 .or. info /= 0) then
@@ -1387,20 +1387,20 @@ contains
 
             ! Ensure beta is not too close to bounds for the derivative check
             betaj = beta
-            call mbfb(np, betaj, lower, upper, work(ssfi), stpb, neta, eta, interval)
+            call move_beta(np, betaj, lower, upper, work(ssfi), stpb, neta, eta, interval)
 
             ! Check the derivatives
-            call jck(fcn, &
-                     n, m, np, nq, &
-                     beta, betaj, work(xplusi), &
-                     ifixb, ifixx, ldifx, stpb, stpd, ldstpd, &
-                     work(ssfi), work(tti), ldtt, &
-                     eta, neta, ntol, nrow, isodr, epsmac, &
-                     work(fni), work(fjacbi), work(fjacdi), &
-                     iwork(msgb), iwork(msgd), work(diffi), &
-                     istop, nfev, njev, &
-                     work(wrk1i), work(wrk2i), work(wrk6i), &
-                     interval)
+            call check_jac(fcn, &
+                           n, m, np, nq, &
+                           beta, betaj, work(xplusi), &
+                           ifixb, ifixx, ldifx, stpb, stpd, ldstpd, &
+                           work(ssfi), work(tti), ldtt, &
+                           eta, neta, ntol, nrow, isodr, epsmac, &
+                           work(fni), work(fjacbi), work(fjacdi), &
+                           iwork(msgb), iwork(msgd), work(diffi), &
+                           istop, nfev, njev, &
+                           work(wrk1i), work(wrk2i), work(wrk6i), &
+                           interval)
             iwork(istopi) = istop
             iwork(nfevi) = nfev
             iwork(njevi) = njev
@@ -1495,8 +1495,8 @@ contains
    !! Iteratively compute least squares solution.
 
       use odrpack_kinds, only: zero, one
-      use odrpack_core, only: fcn_t, access_workspace, evjac, set_flags, unpack_vec, &
-                              scale_mat, pack_vec, odvcv, odlm
+      use odrpack_core, only: fcn_t, access_workspace, eval_jac, set_flags, unpack_vec, &
+                              scale_mat, pack_vec, vcv_beta, trust_region
       use odrpack_reports, only: print_reports
       use blas_interfaces, only: ddot, dnrm2, dcopy
 
@@ -1897,17 +1897,17 @@ contains
       if ((niter == 1) .and. (anajac .and. chkjac)) then
          istop = 0
       else
-         call evjac(fcn, &
-                    anajac, cdjac, &
-                    n, m, np, nq, &
-                    betac, beta, stpb, &
-                    ifixb, ifixx, ldifx, &
-                    x, delta, xplusd, stpd, ldstpd, &
-                    ssf, tt, ldtt, neta, fs, &
-                    t, work(wrk1), work(wrk2), work(wrk3), work(wrk6), tempret, &
-                    fjacb, isodr, fjacd, we1, ldwe, ld2we, &
-                    njev, nfev, istop, info, &
-                    lower, upper)
+         call eval_jac(fcn, &
+                       anajac, cdjac, &
+                       n, m, np, nq, &
+                       betac, beta, stpb, &
+                       ifixb, ifixx, ldifx, &
+                       x, delta, xplusd, stpd, ldstpd, &
+                       ssf, tt, ldtt, neta, fs, &
+                       t, work(wrk1), work(wrk2), work(wrk3), work(wrk6), tempret, &
+                       fjacb, isodr, fjacd, we1, ldwe, ld2we, &
+                       njev, nfev, istop, info, &
+                       lower, upper)
       end if
       if (istop /= 0) then
          info = 51000
@@ -1925,15 +1925,15 @@ contains
          goto 200
       else
          looped = looped + 1
-         call odlm(n, m, np, nq, npp, &
-                   f, fjacb, fjacd, &
-                   wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
-                   alpha, tau, eta, isodr, &
-                   work(wrk6), work(omega), &
-                   work(u), work(qraux), iwork(jpvt), &
-                   s, t, nlms, rcond, irank, &
-                   work(wrk1), work(wrk2), work(wrk3), work(wrk4), &
-                   work(wrk5), wrk, lwrk, istopc)
+         call trust_region(n, m, np, nq, npp, &
+                           f, fjacb, fjacd, &
+                           wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
+                           alpha, tau, eta, isodr, &
+                           work(wrk6), work(omega), &
+                           work(u), work(qraux), iwork(jpvt), &
+                           s, t, nlms, rcond, irank, &
+                           work(wrk1), work(wrk2), work(wrk3), work(wrk4), &
+                           work(wrk5), wrk, lwrk, istopc)
       end if
       if (istopc /= 0) then
          info = istopc
@@ -2216,17 +2216,17 @@ contains
          ! Otherwise, Jacobian from beginning of last iteration will be used
          ! to compute covariance matrix
          if (redoj) then
-            call evjac(fcn, &
-                       anajac, cdjac, &
-                       n, m, np, nq, &
-                       betac, beta, stpb, &
-                       ifixb, ifixx, ldifx, &
-                       x, delta, xplusd, stpd, ldstpd, &
-                       ssf, tt, ldtt, neta, fs, &
-                       t, work(wrk1), work(wrk2), work(wrk3), work(wrk6), tempret, &
-                       fjacb, isodr, fjacd, we1, ldwe, ld2we, &
-                       njev, nfev, istop, info, &
-                       lower, upper)
+            call eval_jac(fcn, &
+                          anajac, cdjac, &
+                          n, m, np, nq, &
+                          betac, beta, stpb, &
+                          ifixb, ifixx, ldifx, &
+                          x, delta, xplusd, stpd, ldstpd, &
+                          ssf, tt, ldtt, neta, fs, &
+                          t, work(wrk1), work(wrk2), work(wrk3), work(wrk6), tempret, &
+                          fjacb, isodr, fjacd, we1, ldwe, ld2we, &
+                          njev, nfev, istop, info, &
+                          lower, upper)
 
             if (istop /= 0) then
                info = 51000
@@ -2243,16 +2243,16 @@ contains
             rss = rnorm*rnorm
          end if
          if (redoj .or. niter >= 1) then
-            call odvcv(n, m, np, nq, npp, &
-                       f, fjacb, fjacd, &
-                       wd, ldwd, ld2wd, ssf, ss, tt, ldtt, delta, &
-                       eta, isodr, &
-                       work(vcv), work(sd), &
-                       work(wrk6), work(omega), &
-                       work(u), work(qraux), iwork(jpvt), &
-                       s, t, irank, rcond, rss, idf, rvar, ifixb, &
-                       work(wrk1), work(wrk2), work(wrk3), work(wrk4), &
-                       work(wrk5), wrk, lwrk, istopc)
+            call vcv_beta(n, m, np, nq, npp, &
+                          f, fjacb, fjacd, &
+                          wd, ldwd, ld2wd, ssf, ss, tt, ldtt, delta, &
+                          eta, isodr, &
+                          work(vcv), work(sd), &
+                          work(wrk6), work(omega), &
+                          work(u), work(qraux), iwork(jpvt), &
+                          s, t, irank, rcond, rss, idf, rvar, ifixb, &
+                          work(wrk1), work(wrk2), work(wrk3), work(wrk4), &
+                          work(wrk5), wrk, lwrk, istopc)
             if (istopc /= 0) then
                info = istopc
                goto 200
