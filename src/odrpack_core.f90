@@ -3343,68 +3343,25 @@ contains
       real(wp) :: pv0(n, nq)
 
       ! Variable Definitions (alphabetically)
-      !  BETA:     The function parameters.
-      !  BETAJ:    The function parameters offset such that steps don't cross bounds.
-      !  DIFF:     The relative differences between the user supplied and finite difference
-      !            derivatives for each derivative checked.
       !  DIFFJ:    The relative differences between the user supplied and finite difference
       !            derivatives for the derivative being checked.
-      !  EPSMAC:   The value of machine precision.
-      !  ETA:      The relative noise in the function results.
-      !  FCN:      The user supplied subroutine for evaluating the model.
-      !  FJACB:    The Jacobian with respect to BETA.
-      !  FJACD:    The Jacobian with respect to DELTA.
       !  H0:       The initial relative step size for forward differences.
       !  HC0:      The initial relative step size for central differences.
       !  IDEVAL:   The variable designating what computations are to be performed by user supplied
       !            subroutine FCN.
-      !  IFIXB:    The values designating whether the elements of BETA are fixed at their input
-      !            values or not.
-      !  IFIXX:    The values designating whether the elements of X are fixed at their input values or not.
-      !  INTERVAL: Specifies which checks can be performed when checking derivatives based on the
-      !            interval of the bound constraints.
       !  ISFIXD:   The variable designating whether the parameter is fixed (ISFIXD=TRUE) or not (ISFIXD=FALSE).
-      !  ISTOP:    The variable designating whether there are problems computing the function at the
-      !            current BETA and DELTA.
-      !  ISODR:    The variable designating whether the solution is by ODR (ISODR=.TRUE.) or by
-      !            OLS (ISODR=.FALSE.).
       !  ISWRTB:   The variable designating whether the derivatives wrt BETA (ISWRTB=TRUE) or DELTA
       !            (ISWRTB=FALSE) are being checked.
       !  J:        An index variable.
-      !  LDIFX:    The leading dimension of array IFIXX.
-      !  LDSTPD:   The leading dimension of array STPD.
-      !  LDTT:     The leading dimension of array TT.
       !  LQ:       The response currently being examined.
-      !  M:        The number of columns of data in the explanatory variable.
-      !  MSGB:     The error checking results for the Jacobian wrt BETA.
       !  MSGB1:    The error checking results for the Jacobian wrt BETA.
-      !  MSGD:     The error checking results for the Jacobian wrt DELTA.
       !  MSGD1:    The error checking results for the Jacobian wrt DELTA.
-      !  N:        The number of observations.
-      !  NETA:     The number of reliable digits in the model results, either set by the user or
-      !            computed by DETAF.
-      !  NFEV:     The number of function evaluations.
-      !  NJEV:     The number of Jacobian evaluations.
-      !  NP:       The number of function parameters.
-      !  NQ:       The number of responses per observation.
-      !  NROW:     The row number of the explanatory variable array at which the derivative is checked.
-      !  NTOL:     The number of digits of agreement required between the numerical derivatives and
-      !            the user supplied derivatives.
       !  PV:       The scalar in which the predicted value from the model for row NROW is stored.
       !  PV0:      The predicted values using the current parameter estimates (possibly offset from
       !            the user supplied estimates to create distance between parameters and the bounds
       !            on the parameters).
-      !  PV0I:     The predicted values using the user supplied parameter estimates.
-      !  SSF:      The scaling values used for BETA.
-      !  STPB:     The step size for finite difference derivatives wrt BETA.
-      !  STPD:     The step size for finite difference derivatives wrt DELTA.
       !  TOL:      The agreement tolerance.
-      !  TT:       The scaling values used for DELTA.
       !  TYPJ:     The typical size of the J-th unknown BETA or DELTA.
-      !  WRK1:     A work array of (N BY M BY NQ) elements.
-      !  WRK2:     A work array of (N BY NQ) elements.
-      !  WRK6:     A work array of (N BY NP BY NQ) elements.
-      !  XPLUSD:   The values of X + DELTA.
 
       ! Set tolerance for checking derivatives
       tol = eta**(0.25E0_wp)
@@ -3500,6 +3457,7 @@ contains
 
          ! Check derivatives wrt X for each response of observation NROW
          if (isodr) then
+
             iswrtb = .false.
             do j = 1, m
 
@@ -3551,7 +3509,9 @@ contains
                end if
 
             end do
+
          end if
+
       end do
 
       msgb(1) = msgb1
@@ -3646,52 +3606,13 @@ contains
       real(wp) :: curve, pvmcrv, pvpcrv, stp, stpcrv
 
       ! Variable Definitions (alphabetically)
-      !  BETA:    The function parameters.
       !  CURVE:   A measure of the curvature in the model.
-      !  D:       The derivative with respect to the Jth unknown parameter.
-      !  DIFFJ:   The relative differences between the user supplied and finite difference
-      !           derivatives for the derivative being checked.
-      !  EPSMAC:  The value of machine precision.
-      !  ETA:     The relative noise in the model.
-      !  FCN:     The user supplied subroutine for evaluating the model.
-      !  FD:      The forward difference derivative wrt the Jth parameter.
-      !  HC:      The relative step size for central finite differences.
-      !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
-      !           values or not.
-      !  IFIXX:   The values designating whether the elements of X are fixed at their input values
-      !           or not.
-      !  ISTOP:   The variable designating whether there are problems computing the function at the
-      !           current BETA and DELTA.
-      !  ISWRTB:  The variable designating whether the derivatives wrt BETA (ISWRTB=TRUE) or
-      !           DELTA(ISWRTB=FALSE) are being checked.
-      !  J:       The index of the partial derivative being examined.
-      !  LDIFX:   The leading dimension of array IFIXX.
-      !  LQ:      The response currently being examined.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  MSG:     The error checking results.
-      !  N:       The number of observations.
-      !  NFEV:    The number of function evaluations.
-      !  NP:      The number of function parameters.
-      !  NQ:      The number of responses per observation.
-      !  NROW:    The row number of the explanatory variable array at which the derivative is to be
-      !           checked.
-      !  PV:      The predicted value of the model for row NROW.
       !  PVMCRV:  The predicted value for row  NROW of the model based on the current parameter
       !           estimates for all but the Jth parameter value, which is BETA(J)-STPCRV.
       !  PVPCRV:  The predicted value for row NROW of the model based on the current parameter
       !           estimates for all but the Jth parameter value, which is BETA(J)+STPCRV.
-      !  PVPSTP:  The predicted value for row NROW of the model based on the current parameter
-      !           estimates for all but the Jth parameter value, which is BETA(J) + STP0.
-      !  P01:     The value 0.01E0_wp.
-      !  STP0:    The initial step size for the finite difference derivative.
       !  STP:     A step size for the finite difference derivative.
       !  STPCRV:  The step size selected to check for curvature in the model.
-      !  TOL:     The agreement tolerance.
-      !  TYPJ:    The typical size of the J-th unknown BETA or DELTA.
-      !  WRK1:    A work array of (N BY M BY NQ) elements.
-      !  WRK2:    A work array of (N BY NQ) elements.
-      !  WRK6:    A work array of (N BY NP BY NQ) elements.
-      !  XPLUSD:  The values of X + DELTA.
 
       if (iswrtb) then
 
@@ -3892,46 +3813,9 @@ contains
       logical :: large
 
       ! Variable Definitions (alphabetically)
-      !  BETA:    The function parameters.
-      !  CURVE:   A measure of the curvature in the model.
-      !  D:       The derivative with respect to the Jth unknown parameter.
-      !  DIFFJ:   The relative differences between the user supplied and finite difference
-      !           derivatives for the derivative being checked.
-      !  ETA:     The relative noise in the model.
-      !  FCN:     The user supplied subroutine for evaluating the model.
-      !  FD:      The forward difference derivative wrt the Jth parameter.
-      !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
-      !           values or not.
-      !  IFIXX:   The values designating whether the elements of X are fixed at their input values
-      !           or not.
-      !  ISTOP:   The variable designating whether there are problems computing the function at
-      !           the current BETA and DELTA.
-      !  ISWRTB:  The variable designating whether the derivatives wrt BETA (ISWRTB=TRUE) or
-      !           DELTA(ISWRTB=FALSE) are being checked.
-      !  J:       The index of the partial derivative being examined.
       !  LARGE:   The value designating whether the recommended increase in the step size would
       !           be greater than TYPJ.
-      !  LDIFX:   The leading dimension of array IFIXX.
-      !  LQ:      The response currently being examined.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  MSG:     The error checking results.
-      !  N:       The number of observations.
-      !  NFEV:    The number of function evaluations.
-      !  NP:      The number of function parameters.
-      !  NQ:      The number of responses per observation.
-      !  NROW:    The row number of the explanatory variable array at which the derivative is to
-      !           be checked.
-      !  PV:      The predicted value for row NROW.
-      !  PVPSTP:  The predicted value for row NROW of the model based on the current parameter
-      !           estimates for all but the Jth parameter value, which is BETA(J) + STP0.
-      !  P1:      The value 0.1E0_wp.
-      !  STP0:    The step size for the finite difference derivative.
-      !  TOL:     The agreement tolerance.
-      !  TYPJ:    The typical size of the J-th unknown BETA or DELTA.
-      !  WRK1:    A work array of (N BY M BY NQ) elements.
-      !  WRK2:    A work array of (N BY NQ) elements.
-      !  WRK6:    A work array of (N BY NP BY NQ) elements.
-      !  XPLUSD:  The values of X + DELTA.
+      !  STP:     A step size for the finite difference derivative.
 
       ! Finite precision arithmetic could be the problem.
       ! Try a larger step size based on estimate of condition error.
@@ -4075,61 +3959,22 @@ contains
       integer :: i
 
       ! Variable Definitions (alphabetically)
-      !  BETA:     The function parameters.
       !  BIG:      A big value, used to initialize DIFFJ.
-      !  D:        The derivative with respect to the Jth unknown parameter.
-      !  DIFFJ:    The relative differences between the user supplied and finite difference
-      !            derivatives for the derivative being checked.
-      !  EPSMAC:   The value of machine precision.
-      !  ETA:      The relative noise in the function results.
-      !  FCN:      The user supplied subroutine for evaluating the model.
       !  FD:       The forward difference derivative wrt the Jth parameter.
       !  H:        The relative step size for forward differences.
-      !  H0:       The initial relative step size for forward differences.
       !  H1:       The default relative step size for forward differences.
       !  HC:       The relative step size for central differences.
-      !  HC0:      The initial relative step size for central differences.
       !  HC1:      The default relative step size for central differences.
-      !  IFIXB:    The values designating whether the elements of BETA are fixed at their input
-      !            values or not.
-      !  IFIXX:    The values designating whether the elements of X are fixed at their input values or not.
-      !  INTERVAL: Specifies which checks can be performed when checking derivatives based on the
-      !            interval of the bound constraints.
-      !  ISTOP:    The variable designating whether there are problems computing the function at
-      !            the current BETA and DELTA.
-      !  ISWRTB:   The variable designating whether the derivatives wrt BETA (ISWRTB=TRUE) or
-      !            DELTAS (ISWRTB=FALSE) are being checked.
-      !  J:        The index of the partial derivative being examined.
-      !  LDIFX:    The leading dimension of array IFIXX.
-      !  LQ:       The response currently being examined.
-      !  M:        The number of columns of data in the explanatory variable.
-      !  MSG:      The error checking results.
-      !  MSG1:     The error checking results summary.
-      !  N:        The number of observations.
-      !  NFEV:     The number of function evaluations.
-      !  NP:       The number of function parameters.
-      !  NQ:       The number of responses per observation.
-      !  NROW:     The row number of the explanatory variable array at which the derivative is to
-      !            be checked.
-      !  PV:       The predicted value from the model for row NROW.
       !  PVPSTP:   The predicted value for row NROW of the model using the current parameter
       !            estimates for all but the Jth parameter value, which is BETA(J) + STP0.
-      !  P01:     The value 0.01E0_wp.
-      !  P1:      The value 0.1E0_wp.
-      !  STP0:    The initial step size for the finite difference derivative.
-      !  TOL:     The agreement tolerance.
-      !  TOL2:    A minimum agreement tolerance.
-      !  TYPJ:    The typical size of the J-th unknown BETA or DELTA.
-      !  WRK1:    A work array of (N BY M BY NQ) elements.
-      !  WRK2:    A work array of (N BY NQ) elements.
-      !  WRK6:    A work array of (N BY NP BY NQ) elements.
-      !  XPLUSD:  The values of X + DELTA.
+      !  STP0:     The initial step size for the finite difference derivative.
+      !  TOL2:     A minimum agreement tolerance.
 
-      ! Calculate the Jth partial derivative using forward difference quotients and decide if it
-      ! agrees with user supplied values
+      ! Calculate the Jth partial derivative using forward difference quotients and decide if
+      ! it agrees with user supplied values
 
       h1 = sqrt(eta)
-      hc1 = eta**(one/three)
+      hc1 = eta**(1/three)
 
       msg(lq, j) = 7
       diffj = big
@@ -4256,7 +4101,7 @@ contains
    !! the analytic derivative and the analytic derivative is zero.
       ! Adapted from STARPAC subroutine DCKZRO.
 
-      use odrpack_kinds, only: zero, one, two, three
+      use odrpack_kinds, only: zero, three
 
       procedure(fcn_t) :: fcn
          !! The user supplied subroutine for evaluating the model.
@@ -4325,45 +4170,9 @@ contains
       real(wp) :: cd, pvmstp
 
       ! Variable Definitions (alphabetically)
-      !  BETA:    The function parameters.
       !  CD:      The central difference derivative wrt the Jth parameter.
-      !  D:       The derivative with respect to the Jth unknown parameter.
-      !  DIFFJ:   The relative differences between the user supplied and finite difference
-      !           derivatives for the derivative being checked.
-      !  EPSMAC:  The value of machine precision.
-      !  FCN:     The user supplied subroutine for evaluating the model.
-      !  FD:      The forward difference derivative wrt the Jth parameter.
-      !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
-      !           values or not.
-      !  IFIXX:   The values designating whether the elements of X are fixed at their input values
-      !           or not.
-      !  ISTOP:   The variable designating whether there are problems computing the function at the
-      !           current BETA and DELTA.
-      !  ISWRTB:  The variable designating whether the derivatives wrt BETA (ISWRTB=TRUE) or
-      !           X (ISWRTB=FALSE) are being checked.
-      !  J:       The index of the partial derivative being examined.
-      !  LDIFX:   The leading dimension of array IFIXX.
-      !  LQ:      The response currently being examined.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  MSG:     The error checking results.
-      !  N:       The number of observations.
-      !  NFEV:    The number of function evaluations.
-      !  NP:      The number of function parameters.
-      !  NQ:      The number of responses per observation.
-      !  NROW:    The row number of the explanatory variable array at which the derivative is to be
-      !           checked.
-      !  PV:      The predicted value from the model for row NROW.
       !  PVMSTP:  The predicted value for row NROW of the model using the current parameter
       !           estimates for all but the Jth parameter value, which is BETA(J) - STP0.
-      !  PVPSTP:  The predicted value for row NROW of the model using the current parameter
-      !           estimates for all but the JTH parameter value, which is BETA(J) + STP0.
-      !  STP0:    The initial step size for the finite difference derivative.
-      !  TOL:     The agreement tolerance.
-      !  TYPJ:    The typical size of the J-th unknown BETA or DELTA.
-      !  WRK1:    A work array of (N BY M BY NQ) elements.
-      !  WRK2:    A work array of (N BY NQ) elements.
-      !  WRK6:    A work array of (N BY NP BY NQ) elements.
-      !  XPLUSD:  The values of X + DELTA.
 
       ! Recalculate numerical derivative using central difference and step size of 2*STP0
       if (iswrtb) then
@@ -4388,7 +4197,7 @@ contains
          return
       end if
 
-      cd = (pvpstp - pvmstp)/(two*stp0)
+      cd = (pvpstp - pvmstp)/(2*stp0)
       diffj = min(abs(cd - d), abs(fd - d))
 
       ! Check for agreement
@@ -4399,7 +4208,7 @@ contains
          else
             msg(lq, j) = 0
          end if
-      elseif (diffj*typj <= abs(pv*epsmac**(one/three))) then
+      elseif (diffj*typj <= abs(pv*epsmac**(1/three))) then
          ! Derivatives are both close to zero
          msg(lq, j) = 2
       else
@@ -4481,39 +4290,8 @@ contains
       integer :: last, npp
 
       ! Variable Definitions (alphabetically)
-      !  ANAJAC:  The variable designating whether the Jacobians are computed by finite
-      !           differences (ANAJAC=FALSE) or not (ANAJAC=TRUE).
-      !  I:       An indexing variable.
-      !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
-      !           values or not.
-      !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
-      !           or explicit ODR (IMPLCT=FALSE).
-      !  INFO:    The variable designating why the computations were stopped.
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or
-      !           by OLS (ISODR=FALSE).
-      !  J:       An indexing variable.
-      !  K:       An indexing variable.
       !  LAST:    The last row of the array to be accessed.
-      !  LDIFX:   The leading dimension of array IFIXX.
-      !  LDSCLD:  The leading dimension of array SCLD.
-      !  LDSTPD:  The leading dimension of array STPD.
-      !  LDWD:    The leading dimension of array WD.
-      !  LDWE:    The leading dimension of array WE.
-      !  LD2WD:   The second dimension of array WD.
-      !  LD2WE:   The second dimension of array WE.
-      !  LIWKMN:  The minimum acceptable length of array IWORK.
-      !  LIWORK:  The length of vector IWORK.
-      !  LWKMN:   The minimum acceptable length of array WORK.
-      !  LWORK:   The length of vector WORK.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  N:       The number of observations.
-      !  NP:      The number of function parameters.
       !  NPP:     The number of function parameters being estimated.
-      !  NQ:      The number of responses per observations.
-      !  SCLB:    The scaling values for BETA.
-      !  SCLD:    The scaling value for DELTA.
-      !  STPB:    The step for the finite difference derivitive wrt BETA.
-      !  STPD:    The step for the finite difference derivitive wrt DELTA.
 
       ! Find actual number of parameters being estimated
       if ((np <= 0) .or. (ifixb(1) < 0)) then
@@ -4592,7 +4370,7 @@ contains
          else
             last = 1
          end if
-         if (any(scld(1:last, 1:m) <= zero)) then
+         if (any(scld(1:last, :) <= zero)) then
             info = 30200
          end if
       end if
@@ -5354,7 +5132,7 @@ contains
       !       Pearson and Hartley, Biometrika Tables for
       !       Statisticians, Volume 1, 1954, Pages 104-113.
 
-      use odrpack_kinds, only: zero, half, one, two
+      use odrpack_kinds, only: zero, half, one
 
       real(wp), intent(in) :: p
          !! The probability at which the percent point is to be evaluated. `p` must lie between
@@ -5394,7 +5172,7 @@ contains
       else
          r = p
          if (p > half) r = one - r
-         t = sqrt(-two*log(r))
+         t = sqrt(-2*log(r))
          anum = ((((t*p4 + p3)*t + p2)*t + p1)*t + p0)
          aden = ((((t*q4 + q3)*t + q2)*t + q1)*t + q0)
          res = t + (anum/aden)
@@ -5508,12 +5286,12 @@ contains
       elseif (idf == 1) then
          !Treat the IDF = 1 (Cauchy) case
          arg = pi*p
-         res = -cos(arg)/sin(arg)
+         res = -1/tan(arg)
 
       elseif (idf == 2) then
          !  Treat the IDF = 2 case
-         term1 = sqrt(two)/two
-         term2 = two*p - one
+         term1 = sqrt(two)/2
+         term2 = 2*p - one
          term3 = sqrt(p*(one - p))
          res = term1*term2/term3
 
@@ -5540,13 +5318,13 @@ contains
             do ipass = 1, maxit
                s = sin(z)
                c = cos(z)
-               z = z - (z + s*c - con)/(two*c**2)
+               z = z - (z + s*c - con)/(2*c**2)
             end do
             res = sqrt(df)*s/c
 
          elseif (idf == 4) then
             ! Augment the results for the IDF = 4 case
-            con = two*(p - half)
+            con = 2*(p - half)
             arg = res/sqrt(df)
             z = atan(arg)
             do ipass = 1, maxit
@@ -5564,21 +5342,19 @@ contains
             do ipass = 1, maxit
                s = sin(z)
                c = cos(z)
-               z = z - (z + (c + (two/three)*c**3)*s - con)/ &
-                   ((eight/three)*c**4)
+               z = z - (z + (c + (two/three)*c**3)*s - con)/((eight/three)*c**4)
             end do
             res = sqrt(df)*s/c
 
          elseif (idf == 6) then
             !  Augment the results for the IDF = 6 case
-            con = two*(p - half)
+            con = 2*(p - half)
             arg = res/sqrt(df)
             z = atan(arg)
             do ipass = 1, maxit
                s = sin(z)
                c = cos(z)
-               z = z - ((one + half*c**2 + (three/eight)*c**4)*s - con)/ &
-                   ((fiftn/eight)*c**5)
+               z = z - ((one + half*c**2 + (three/eight)*c**4)*s - con)/((fiftn/eight)*c**5)
             end do
             res = sqrt(df)*s/c
          end if
@@ -5737,7 +5513,7 @@ contains
    pure subroutine scale_vec(n, m, scl, ldscl, t, ldt, sclt, ldsclt)
    !! Scale `t` by the inverse of `scl`, i.e., compute `t/scl`.
 
-      use odrpack_kinds, only: zero, one
+      use odrpack_kinds, only: zero
 
       integer, intent(in) :: n
          !! The number of rows of data in `t`.
@@ -6067,8 +5843,6 @@ contains
        wrk5)
    !! Compute `v*e*trans(v)` for the (`indx`)th `m` by `nq` array in `v`.
 
-      use odrpack_kinds, only: zero
-
       integer, intent(in) :: m
          !! The number of columns of data in the independent variable.
       integer, intent(in) :: nq
@@ -6099,7 +5873,7 @@ contains
          !! An `m` work vector.
 
       ! Local scalars
-      integer :: j, l1, l2
+      integer :: l1, l2
 
       ! Variable Definitions (alphabetically)
       !  J:       An indexing variable.
