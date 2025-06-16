@@ -3044,54 +3044,19 @@ contains
       ! Local scalars
       real(wp) :: betak, step, typj
       integer :: i, j, k, l
-      logical :: doit, setzro
+      logical :: doit, setzero
 
       ! Variable Definitions (alphabetically)
-      !  BETA:    The function parameters.
       !  BETAK:   The K-th function parameter.
-      !  DELTA:   The estimated errors in the explanatory variables.
       !  DOIT:    The variable designating whether the derivative wrt a given BETA or DELTA needs
       !           to be computed (DOIT=TRUE) or not (DOIT=FALSE).
-      !  FCN:     The user supplied subroutine for evaluating the model.
-      !  FJACB:   The Jacobian with respect to BETA.
-      !  FJACD:   The Jacobian with respect to DELTA.
-      !  FN:      The new predicted values from the function.
       !  I:       An indexing variable.
-      !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
-      !           values or not.
-      !  IFIXX:   The values designating whether the elements of X are fixed at their input values
-      !           or not.
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by
-      !           OLS (ISODR=FALSE).
-      !  ISTOP:   The variable designating whether there are problems computing the function at
-      !           the current BETA and DELTA.
       !  J:       An indexing variable.
       !  K:       An indexing variable.
       !  L:       An indexing variable.
-      !  LDIFX:   The leading dimension of array IFIXX.
-      !  LDSTPD:  The leading dimension of array STPD.
-      !  LDTT:    The leading dimension of array TT.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  N:       The number of observations.
-      !  NETA:    The number of good digits in the function results.
-      !  NFEV:    The number of function evaluations.
-      !  NP:      The number of function parameters.
       !  SETZRO:  The variable designating whether the derivative wrt some DELTA needs to be set
       !           to zero (SETZRO=TRUE) or not (SETZRO=FALSE).
-      !  SSF:     The scale used for the BETA'S.
-      !  STP:     The step used for computing finite difference derivatives with respect to DELTA.
-      !  STPB:    The relative step used for computing finite difference derivatives with respect
-      !           to BETA.
-      !  STPD:    The relative step used for computing finite difference derivatives with respect
-      !           to DELTA.
-      !  TT:      The scaling values used for DELTA.
       !  TYPJ:    The typical size of the J-th unknown BETA or DELTA.
-      !  X:       The explanatory variable.
-      !  XPLUSD:  The values of X + DELTA.
-      !  WRK1:    A work array of (N by M by NQ) elements.
-      !  WRK2:    A work array of (N BY NQ) elements.
-      !  WRK3:    A work array of (NP) elements.
-      !  WRK6:    A work array of (N BY NP BY NQ) elements.
 
       ! Compute the Jacobian wrt the estimated BETAS
       do k = 1, np
@@ -3105,9 +3070,7 @@ contains
             doit = .true.
          end if
          if (.not. doit) then
-            do l = 1, nq
-               fjacb(1:n, k, l) = zero
-            end do
+            fjacb(:, k, :) = zero
          else
             betak = beta(k)
             step = derstep(0, k, betak, ssf, stpb, neta)
@@ -3138,11 +3101,7 @@ contains
             else
                nfev = nfev + 1
             end if
-            do l = 1, nq
-               do i = 1, n
-                  fjacb(i, k, l) = (wrk2(i, l) - fn(i, l))/wrk3(k)
-               end do
-            end do
+            fjacb(:, k, :) = (wrk2 - fn)/wrk3(k)
             beta(k) = betak
          end if
       end do
@@ -3150,50 +3109,44 @@ contains
       ! Compute the Jacobian wrt the X'S
       if (isodr) then
          do j = 1, m
+
             if (ifixx(1, 1) < 0) then
                doit = .true.
-               setzro = .false.
+               setzero = .false.
             elseif (ldifx == 1) then
                if (ifixx(1, j) == 0) then
                   doit = .false.
                else
                   doit = .true.
                end if
-               setzro = .false.
+               setzero = .false.
             else
-               doit = .false.
-               setzro = .false.
-               do i = 1, n
-                  if (ifixx(i, j) /= 0) then
-                     doit = .true.
-                  else
-                     setzro = .true.
-                  end if
-               end do
+               doit = any(ifixx(:, j) /= 0)
+               setzero = any(ifixx(:, j) == 0)
             end if
+
             if (.not. doit) then
-               do l = 1, nq
-                  fjacd(1:n, j, l) = zero
-               end do
+               fjacd(:, j, :) = zero
             else
                do i = 1, n
+
                   if (xplusd(i, j) == zero) then
                      if (tt(1, 1) < zero) then
-                        typj = one/abs(tt(1, 1))
+                        typj = 1/abs(tt(1, 1))
                      elseif (ldtt == 1) then
-                        typj = one/tt(1, j)
+                        typj = 1/tt(1, j)
                      else
-                        typj = one/tt(i, j)
+                        typj = 1/tt(i, j)
                      end if
                   else
                      typj = abs(xplusd(i, j))
                   end if
 
                   stp(i) = xplusd(i, j) &
-                           + sign(one, xplusd(i, j)) &
-                           *typj*hstep(0, neta, i, j, stpd, ldstpd)
+                           + sign(one, xplusd(i, j))*typj*hstep(0, neta, i, j, stpd, ldstpd)
                   stp(i) = stp(i) - xplusd(i, j)
                   xplusd(i, j) = xplusd(i, j) + stp(i)
+
                end do
 
                istop = 0
@@ -3203,38 +3156,26 @@ contains
                   return
                else
                   nfev = nfev + 1
-                  do l = 1, nq
-                     do i = 1, n
-                        fjacd(i, j, l) = wrk2(i, l)
-                     end do
-                  end do
-
+                  fjacd(:, j, :) = wrk2
                end if
 
-               if (setzro) then
+               if (setzero) then
                   do i = 1, n
                      if (ifixx(i, j) == 0) then
-                        do l = 1, nq
-                           fjacd(i, j, l) = zero
-                        end do
+                        fjacd(i, j, :) = zero
                      else
-                        do l = 1, nq
-                           fjacd(i, j, l) = (fjacd(i, j, l) - fn(i, l))/ &
-                                            stp(i)
-                        end do
+                        fjacd(i, j, :) = (fjacd(i, j, :) - fn(i, :))/stp(i)
                      end if
                   end do
                else
                   do l = 1, nq
-                     do i = 1, n
-                        fjacd(i, j, l) = (fjacd(i, j, l) - fn(i, l))/stp(i)
-                     end do
+                     fjacd(:, j, l) = (fjacd(:, j, l) - fn(:, l))/stp(:)
                   end do
                end if
-               do i = 1, n
-                  xplusd(i, j) = x(i, j) + delta(i, j)
-               end do
+
+               xplusd(:, j) = x(:, j) + delta(:, j)
             end if
+
          end do
       end if
 
