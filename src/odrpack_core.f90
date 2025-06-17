@@ -1864,39 +1864,23 @@ contains
 
       ! Variable Definitions (alphabetically)
       !  I:       An indexing variable.
-      !  IFIX:    The array designating whether an element of T is to be set to zero.
       !  J:       an indexing variable.
-      !  LDT:     The leading dimension of array T.
-      !  LDIFIX:  The leading dimension of array IFIX.
-      !  LDTFIX:  The leading dimension of array TFIX.
-      !  M:       The number of columns of data in the array.
-      !  N:       The number of rows of data in the array.
-      !  T:       The array being set to zero according to the elements of IFIX.
-      !  TFIX:    The resulting array.
 
       if (n == 0 .or. m == 0) return
 
       if (ifix(1, 1) >= zero) then
-         if (ldifix >= n) then
-            do j = 1, m
-               do i = 1, n
-                  if (ifix(i, j) == 0) then
-                     tfix(i, j) = zero
-                  else
-                     tfix(i, j) = t(i, j)
-                  end if
-               end do
-            end do
+         if (ldifix == n) then
+            where (ifix(:, :) == 0)
+               tfix(1:n, :) = zero
+            else where
+               tfix(1:n, :) = t(1:n, :)
+            end where
          else
             do j = 1, m
                if (ifix(1, j) == 0) then
-                  do i = 1, n
-                     tfix(i, j) = zero
-                  end do
+                  tfix(1:n, j) = zero
                else
-                  do i = 1, n
-                     tfix(i, j) = t(i, j)
-                  end do
+                  tfix(1:n, j) = t(1:n, j)
                end if
             end do
          end if
