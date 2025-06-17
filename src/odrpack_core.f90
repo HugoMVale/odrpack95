@@ -1968,33 +1968,6 @@ contains
       integer, intent(out) :: liwkmn
          !! The minimum acceptable length of array `iwork`.
 
-      ! Variable Definitions (alphabetically)
-      !  IDFI:    The location in array IWORK of variable IDF.
-      !  IFIX2I:  The starting location in array IWORK of array IFIX2.
-      !  INT2I:   The location in array IWORK of variable INT2.
-      !  IPRINI:  The location in array IWORK of variable IPRINT.
-      !  IRANKI:  The location in array IWORK of variable IRANK.
-      !  ISTOPI:  The location in array IWORK of variable ISTOP.
-      !  JOBI:    The location in array IWORK of variable JOB.
-      !  LDTTI:   The location in array IWORK of variable LDTT.
-      !  LIWKMN:  The minimum acceptable length of array IWORK.
-      !  LUNERI:  The location in array IWORK of variable LUNERR.
-      !  LUNRPI:  The location in array IWORK of variable LUNRPT.
-      !  M:       The number of columns of data in the independent variable.
-      !  MAXITI:  The location in array iwork of variable MAXIT.
-      !  MSGBI:   The starting location in array IWORK of array MSGB.
-      !  MSGDI:   The starting location in array IWORK of array MSGD.
-      !  NETAI:   The location in array IWORK of variable NETA.
-      !  NFEVI:   The location in array IWORK of variable NFEV.
-      !  NITERI:  The location in array IWORK of variabel NITER.
-      !  NJEVI:   The location in array IWORK of variable NJEV.
-      !  NNZWI:   The location in array IWORK of variable NNZW.
-      !  NP:      The number of function parameters.
-      !  NPPI:    The location in array IWORK of variable NPP.
-      !  NQ:      The number of responses per observation.
-      !  NROWI:   The location in array IWORK of variable NROW.
-      !  NTOLI:   The location in array IWORK of variable NTOL.
-
       if (np >= 1 .and. m >= 1) then
          msgbi = 1
          msgdi = msgbi + nq*np + 1
@@ -2184,68 +2157,10 @@ contains
       integer :: next
 
       ! Variable Definitions (alphabetically)
-      !  ACTRSI:  The location in array WORK of variable ACTRS.
-      !  ALPHAI:  The location in array WORK of variable ALPHA.
-      !  BETACI:  The starting location in array WORK of array BETAC.
-      !  BETANI:  The starting location in array WORK of array BETAN.
-      !  BETASI:  The starting location in array WORK of array BETAS.
-      !  BETA0I:  The starting location in array WORK of array BETA0.
-      !  DELTAI:  The starting location in array WORK of array DELTA.
-      !  DELTNI:  The starting location in array WORK of array DELTAN.
-      !  DELTSI:  The starting location in array WORK of array DELTAS.
-      !  DIFFI:   The starting location in array WORK of array DIFF.
-      !  EPSI:    The starting location in array WORK of array EPS.
-      !  EPSMAI:  The location in array WORK of variable EPSMAC.
-      !  ETAI:    The location in array WORK of variable ETA.
-      !  FJACBI:  The starting location in array WORK of array FJACB.
-      !  FJACDI:  The starting location in array WORK of array FJACD.
-      !  FNI:     The starting location in array WORK of array FN.
-      !  FSI:     The starting location in array WORK of array FS.
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or
-      !           by OLS (ISODR=FALSE).
-      !  LDWE:    The leading dimension of array WE.
-      !  LD2WE:   The second dimension of array WE.
-      !  LWKMN:   The minimum acceptable length of vector work.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  N:       The number of observations.
       !  NEXT:    The next available location with WORK.
-      !  NP:      The number of function parameters.
-      !  NQ:      The number of responses per observation.
-      !  OLMAVI:  The location in array WORK of variable OLMAVG.
-      !  OMEGAI:  The starting location in array WORK of array OMEGA.
-      !  PARTLI:  The location in array WORK of variable PARTOL.
-      !  PNORMI:  The location in array WORK of variable PNORM.
-      !  PRERSI:  The location in array WORK of variable PRERS.
-      !  QRAUXI:  The starting location in array WORK of array QRAUX.
-      !  RCONDI:  The location in array WORK of variable RCONDI.
-      !  RNORSI:  The location in array WORK of variable RNORMS.
-      !  RVARI:   The location in array WORK of variable RVAR.
-      !  SDI:     The starting location in array WORK of array SD.
-      !  SI:      The starting location in array WORK of array S.
-      !  SSFI:    The starting location in array WORK of array SSF.
-      !  SSI:     The starting location in array WORK of array SS.
-      !  SSTOLI:  The location in array WORK of variable SSTOL.
-      !  TAUFCI:  The location in array WORK of variable TAUFAC.
-      !  TAUI:    The location in array WORK of variable TAU.
-      !  TI:      The starting location in array WORK of array T.
-      !  TTI:     The starting location in array WORK of array TT.
-      !  UI:      The starting location in array WORK of array U.
-      !  VCVI:    The starting location in array WORK of array VCV.
-      !  WE1I:    The starting location in array WORK of array WE1.
-      !  WRK1I:   The starting location in array WORK of array WRK1.
-      !  WRK2I:   The starting location in array WORK of array WRK2.
-      !  WRK3I:   The starting location in array WORK of array WRK3.
-      !  WRK4I:   The starting location in array WORK of array WRK4.
-      !  WRK5I:   The starting location in array WORK of array WRK5.
-      !  WRK6I:   The starting location in array WORK of array WRK6.
-      !  WRK7I:   The starting location in array WORK of array WRK7.
-      !  WSSI:    The location in array WORK of variable WSS.
-      !  WSSDEI:  The location in array WORK of variable WSSDEL.
-      !  WSSEPI:  The location in array work of variable WSSEPS.
-      !  XPLUSI:  The starting location in array WORK of array XPLUSD.
 
-      if (n >= 1 .and. m >= 1 .and. np >= 1 .and. nq >= 1 .and. &
-          ldwe >= 1 .and. ld2we >= 1) then
+      if (n >= 1 .and. m >= 1 .and. np >= 1 .and. nq >= 1 .and. ldwe >= 1 &
+          .and. ld2we >= 1) then
 
          deltai = 1
          epsi = deltai + n*m
@@ -2482,59 +2397,24 @@ contains
       ! Variable Definitions (alphabetically)
       !  ANAJAC:  The variable designating whether the Jacobians are computed by finite differences
       !           (ANAJAC=FALSE) or not (ANAJAC=TRUE).
-      !  BETA:    The function parameters.
       !  CDJAC:   The variable designating whether the Jacobians are computed by central differences
       !           (CDJAC=TRUE) or by forward differences (CDJAC=FALSE).
       !  CHKJAC:  The variable designating whether the user-supplied Jacobians are to be checked
       !           (CHKJAC=TRUE) or not (CHKJAC=FALSE).
-      !  DELTAI:  The starting location in array WORK of array DELTA.
       !  DOVCV:   The variable designating whether the covariance matrix is to be computed (DOVCV=TRUE)
       !           or not (DOVCV=FALSE).
-      !  EPSMAI:  The location in array WORK of variable EPSMAC.
       !  I:       An indexing variable.
-      !  IFIXX:   The values designating whether the elements of X are fixed at their input values or not.
       !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE) or
       !           explicit ODR (IMPLCT=FALSE).
       !  INITD:   The variable designating whether DELTA is to be initialized to zero (INITD=TRUE) or
       !           to the values in the first N by M elements of array WORK (INITD=FALSE).
-      !  IPRINI:  The location in array IWORK of variable IPRINT.
-      !  IPRINT:  The print control variable.
       !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by OLS
       !           ISODR=FALSE).
-      !  IWORK:   The integer work space.
       !  J:       An indexing variable.
-      !  JOB:     The variable controling problem initialization and computational method.
-      !  JOBI:    The location in array IWORK of variable JOB.
-      !  LDIFX:   The leading dimension of array IFIXX.
-      !  LDSCLD:  The leading dimension of array SCLD.
-      !  LDTTI:   The leading dimension of array TT.
-      !  LIWORK:  The length of vector IWORK.
-      !  LUNERI:  The location in array IWORK of variable LUNERR.
-      !  LUNERR:  The logical unit number used for error messages.
-      !  LUNRPI:  The location in array iwork of variable LUNRPT.
-      !  LUNRPT:  The logical unit number used for computation reports.
-      !  LWORK:   The length of vector WORK.
-      !  M:       The number of columns of data in the independent variable.
-      !  MAXIT:   The maximum number of iterations allowed.
-      !  MAXITI:  The location in array IWORK of variable MAXIT.
-      !  N:       The number of observations.
-      !  NP:      The number of function parameters.
-      !  PARTLI:  The location in array work of variable partol.
-      !  PARTOL:  The parameter convergence stopping criteria.
       !  REDOJ:   The variable designating whether the Jacobian matrix is to be recomputed for the
       !           computation of the covariance matrix (REDOJ=TRUE) or not (REDOJ=FALSE).
       !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or not
       !           (RESTRT=FALSE).
-      !  SCLB:    The scaling values for BETA.
-      !  SCLD:    The scaling values for DELTA.
-      !  SSFI:    The starting location in array WORK of array SSF.
-      !  SSTOL:   The sum-of-squares convergence stopping criteria.
-      !  SSTOLI:  The location in array WORK of variable SSTOL.
-      !  TAUFAC:  The factor used to compute the initial trust region diameter.
-      !  TAUFCI:  The location in array WORK of variable TAUFAC.
-      !  TTI:     The starting location in array WORK of the ARRAY TT.
-      !  WORK:    The REAL (wp) work space.
-      !  X:       The independent variable.
 
       call set_flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
 
