@@ -2738,57 +2738,19 @@ contains
       ! Local scalars
       real(wp) :: betak, typj
       integer :: i, j, k, l
-      logical :: doit, setzro
+      logical :: doit, setzero
 
       ! Variable Definitions (alphabetically)
-      !  BETA:    The function parameters.
-      !  BETAK:   The K-th function parameter.
-      !  DELTA:   The estimated errors in the explanatory variables.
-      !  DOIT:    The variable designating whether the derivative wrt a given BETA or DELTA needs
-      !           to be computed (DOIT=TRUE) or not (DOIT=FALSE).
-      !  FCN:     The user supplied subroutine for evaluating the model.
-      !  FJACB:   The Jacobian with respect to BETA.
-      !  FJACD:   The Jacobian with respect to DELTA.
-      !  FN:      The new predicted values from the function. Used when parameter is on a boundary.
-      !  I:       An indexing variable.
-      !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
-      !           values or not.
-      !  IFIXX:   The values designating whether the elements of X are fixed at their input values
-      !           or not.
-      !  INFO:    The variable designating why the computations were stopped.
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by
-      !           OLS (ISODR=FALSE).
-      !  ISTOP:   The variable designating whether there are problems computing the function at the
-      !           current BETA and DELTA.
-      !  J:       An indexing variable.
-      !  K:       An indexing variable.
-      !  L:       An indexing variable.
-      !  LDIFX:   The leading dimension of array IFIXX.
-      !  LDSTPD:  The leading dimension of array STPD.
-      !  LDTT:    The leading dimension of array TT.
-      !  LOWER:   The lower bound on BETA.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  N:       The number of observations.
-      !  NETA:    The number of good digits in the function results.
-      !  NFEV:    The number of function evaluations.
-      !  NP:      The number of function parameters.
-      !  SETZRO:  The variable designating whether the derivative wrt some DELTA needs to be set to
-      !           zero (SETZRO=TRUE) or not (SETZRO=FALSE).
-      !  SSF:     The scaling values used for BETA.
-      !  STP:     The step used for computing finite difference derivatives with respect to each DELTA.
-      !  STPB:    the relative step used for computing finite difference derivatives with respect
-      !           to each BETA.
-      !  STPD:    The relative step used for computing finite difference derivatives with respect
-      !           to each DELTA.
-      !  TT:      The scaling values used for DELTA.
-      !  TYPJ:    The typical size of the J-th unknown BETA or DELTA.
-      !  UPPER:   The upper bound on BETA.
-      !  X:       The explanatory variable.
-      !  XPLUSD:  The values of X + DELTA.
-      !  WRK1:    A work array of (N BY M BY NQ) elements.
-      !  WRK2:    A work array of (N BY NQ) elements.
-      !  WRK3:    A work array of (NP) elements.
-      !  WRK6:    A WORK ARRAY OF (N BY NP BY NQ) elements.
+      !  BETAK:    The K-th function parameter.
+      !  DOIT:     The variable designating whether the derivative wrt a given BETA or DELTA
+      !            needs to be computed (DOIT=TRUE) or not (DOIT=FALSE).
+      !  I:        An indexing variable.
+      !  J:        An indexing variable.
+      !  K:        An indexing variable.
+      !  L:        An indexing variable.
+      !  SETZERO:  The variable designating whether the derivative wrt some DELTA needs to be
+      !            set to zero (SETZRO=TRUE) or not (SETZRO=FALSE).
+      !  TYPJ:     The typical size of the J-th unknown BETA or DELTA.
 
       ! Compute the Jacobian wrt the estimated BETAS
       do k = 1, np
@@ -2802,7 +2764,7 @@ contains
             doit = .true.
          end if
          if (.not. doit) then
-            fjacb(1:n, k, 1:nq) = zero
+            fjacb(:, k, :) = zero
          else
             betak = beta(k)
             wrk3(k) = betak + derstep(1, k, betak, ssf, stpb, neta)
@@ -2823,9 +2785,10 @@ contains
                info = 60001
                return
             end if
+
             istop = 0
             if (beta(k) == betak) then
-               wrk2(1:n, 1:nq) = fn(1:n, 1:nq)
+               wrk2 = fn
             else
                call fcn(n, m, np, nq, beta, xplusd, &
                         ifixb, ifixx, ldifx, 001, wrk2, wrk6, wrk1, istop)
@@ -2835,7 +2798,7 @@ contains
                   nfev = nfev + 1
                end if
             end if
-            fjacb(1:n, k, 1:nq) = wrk2(1:n, 1:nq)
+            fjacb(:, k, :) = wrk2
 
             beta(k) = beta(k) - 2*wrk3(k)
             if (beta(k) > upper(k)) then
@@ -2848,7 +2811,7 @@ contains
             end if
             istop = 0
             if (beta(k) == betak) then
-               wrk2(1:n, 1:nq) = fn(1:n, 1:nq)
+               wrk2 = fn
             else
                call fcn(n, m, np, nq, beta, xplusd, &
                         ifixb, ifixx, ldifx, 001, wrk2, wrk6, wrk1, istop)
@@ -2859,12 +2822,9 @@ contains
                end if
             end if
 
-            do l = 1, nq
-               do i = 1, n
-                  fjacb(i, k, l) = (fjacb(i, k, l) - wrk2(i, l))/(2*wrk3(k))
-               end do
-            end do
+            fjacb(:, k, :) = (fjacb(:, k, :) - wrk2)/(2*wrk3(k))
             beta(k) = betak
+
          end if
       end do
 
@@ -2873,46 +2833,43 @@ contains
          do j = 1, m
             if (ifixx(1, 1) < 0) then
                doit = .true.
-               setzro = .false.
+               setzero = .false.
             elseif (ldifx == 1) then
                if (ifixx(1, j) == 0) then
                   doit = .false.
                else
                   doit = .true.
                end if
-               setzro = .false.
+               setzero = .false.
             else
-               doit = .false.
-               setzro = .false.
-               do i = 1, n
-                  if (ifixx(i, j) /= 0) then
-                     doit = .true.
-                  else
-                     setzro = .true.
-                  end if
-               end do
+               doit = any(ifixx(:, j) /= 0)
+               setzero = any(ifixx(:, j) == 0)
             end if
+
             if (.not. doit) then
-               do l = 1, nq
-                  fjacd(1:n, j, l) = zero
-               end do
+               fjacd(:, j, :) = zero
             else
                do i = 1, n
+
                   if (xplusd(i, j) == zero) then
                      if (tt(1, 1) < zero) then
-                        typj = one/abs(tt(1, 1))
+                        typj = 1/abs(tt(1, 1))
                      elseif (ldtt == 1) then
-                        typj = one/tt(1, j)
+                        typj = 1/tt(1, j)
                      else
-                        typj = one/tt(i, j)
+                        typj = 1/tt(i, j)
                      end if
                   else
                      typj = abs(xplusd(i, j))
                   end if
-                  stp(i) = xplusd(i, j) + sign(one, xplusd(i, j))*typj*hstep(1, neta, i, j, stpd, ldstpd)
+
+                  stp(i) = xplusd(i, j) &
+                           + sign(one, xplusd(i, j))*typj*hstep(1, neta, i, j, stpd, ldstpd)
                   stp(i) = stp(i) - xplusd(i, j)
                   xplusd(i, j) = xplusd(i, j) + stp(i)
+
                end do
+
                istop = 0
                call fcn(n, m, np, nq, beta, xplusd, &
                         ifixb, ifixx, ldifx, 001, wrk2, wrk6, wrk1, istop)
@@ -2920,16 +2877,11 @@ contains
                   return
                else
                   nfev = nfev + 1
-                  do l = 1, nq
-                     do i = 1, n
-                        fjacd(i, j, l) = wrk2(i, l)
-                     end do
-                  end do
+                  fjacd(:, j, :) = wrk2
                end if
 
-               do i = 1, n
-                  xplusd(i, j) = x(i, j) + delta(i, j) - stp(i)
-               end do
+               xplusd(:, j) = x(:, j) + delta(:, j) - stp
+
                istop = 0
                call fcn(n, m, np, nq, beta, xplusd, &
                         ifixb, ifixx, ldifx, 001, wrk2, wrk6, wrk1, istop)
@@ -2939,21 +2891,24 @@ contains
                   nfev = nfev + 1
                end if
 
-               if (setzro) then
+               if (setzero) then
                   do i = 1, n
                      if (ifixx(i, j) == 0) then
-                        fjacd(i, j, 1:nq) = zero
+                        fjacd(i, j, :) = zero
                      else
-                        fjacd(i, j, 1:nq) = (fjacd(i, j, 1:nq) - wrk2(i, 1:nq))/(2*stp(i))
+                        fjacd(i, j, :) = (fjacd(i, j, :) - wrk2(i, :))/(2*stp(i))
                      end if
                   end do
                else
                   do l = 1, nq
-                     fjacd(1:n, j, l) = (fjacd(1:n, j, l) - wrk2(1:n, l))/(2*stp(1:n))
+                     fjacd(:, j, l) = (fjacd(:, j, l) - wrk2(:, l))/(2*stp(:))
                   end do
                end if
-               xplusd(1:n, j) = x(1:n, j) + delta(1:n, j)
+
+               xplusd(:, j) = x(:, j) + delta(:, j)
+
             end if
+
          end do
       end if
 
@@ -3174,6 +3129,7 @@ contains
                end if
 
                xplusd(:, j) = x(:, j) + delta(:, j)
+
             end if
 
          end do
