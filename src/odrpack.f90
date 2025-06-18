@@ -864,7 +864,7 @@ contains
                               pack_vec, select_row, unpack_vec, loc_rwork, derstep, move_beta, &
                               scale_mat
       use odrpack_reports, only: print_errors
-      use blas_interfaces, only: ddot, dnrm2, dcopy
+      use blas_interfaces, only: ddot, dnrm2
 
       logical, intent(inout) :: head
          !! Variable designating whether the heading is to be printed (`head = .true.`)
@@ -984,7 +984,6 @@ contains
       !  ALPHAI:   The location in array work of variable ALPHA.
       !  ANAJAC:   The variable designating whether the Jacobians are computed by finite
       !            differences (ANAJAC=FALSE) or not (ANAJAC=TRUE).
-      !  BETA:     The function parameters.
       !  BETACI:   The starting location in array WORK of array BETAC.
       !  BETAJ:    The parameters to use in the derivative checking algorithm.
       !  BETANI:   The starting location in array WORK of array BETAN.
@@ -1003,69 +1002,39 @@ contains
       !  EPSMAI:   The location in array WORK of variable EPSMAC.
       !  ETA:      The relative noise in the function results.
       !  ETAI:     The location in array WORK of variable ETA.
-      !  FCN:      THE USER SUPPLIED SUBROUTINE FOR EVALUATING THE MODEL.
       !  FI:       The starting location in array WORK of array F.
       !  FJACBI:   The starting location in array WORK of array FJACB.
       !  FJACDI:   The starting location in array WORK of array FJACD.
       !  FNI:      The starting location in array WORK of array FN.
       !  FSI:      The starting location in array WORK of array FS.
-      !  FSTITR:   The variable designating whether this is the first iteration (FSTITR=TRUE)
-      !            or not (FSTITR=FALSE).
-      !  HEAD:     The variable designating whether the heading is to be printed (HEAD=TRUE)
-      !            or not (HEAD=FALSE).
       !  IDFI:     The location in array iwork of variable IDF.
-      !  IFIXB:    The values designating whether the elements of BETA are fixed at their input
-      !            values or not.
-      !  IFIXX:    The values designating whether the elements of X are fixed at their input
-      !            values or not.
       !  IMPLCT:   The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
       !            or explicit ODR (IMPLCT=FALSE).
-      !  INFO:     The variable designating why the computations were stopped.
       !  INITD:    The variable designating whether DELTA is to be initialized to zero (INITD=TRUE)
       !            or to the values in the first N by M elements of array WORK (INITD=FALSE).
       !  INT2I:    The location in array IWORK of variable INT2.
       !  INTERVAL: Specifies which checks can be performed when checking derivatives based on the
       !            interval of the bound constraints.
       !  IPRINI:   The location in array iwork of variable IPRINT.
-      !  IPRINT:   The print control variable.
       !  IRANKI:   The location in array IWORK of variable IRANK.
       !  ISODR:    The variable designating whether the solution is by ODR (ISODR=TRUE)
       !            or by OLS (ISODR=FALSE).
       !  ISTOP:    The variable designating whether there are problems computing the function
       !            at the current BETA and DELTA.
       !  ISTOPI:   The location in array IWORK of variable ISTOP.
-      !  IWORK:    The integer work space.
-      !  JOB:      The variable controling problem initialization and computational method.
       !  JOBI:     The location in array IWORK of variable JOB.
       !  JPVTI:    The starting location in array IWORK of array JPVT.
       !  K:        An index variable.
-      !  LDIFX:    The leading dimension of array IFIXX.
-      !  LDSCLD:   The leading dimension of array SCLD.
-      !  LDSTPD:   The leading dimension of array STPD.
       !  LDTT:     The leading dimension of array TT.
       !  LDTTI:    The location in array IWORK of variable LDTT.
-      !  LDWD:     The leading dimension of array WD.
-      !  LDWE:     The leading dimension of array WE.
-      !  LD2WD:    The second dimension of array WD.
-      !  LD2WE:    The second dimension of array WE.
       !  LIWKMN:   The minimum acceptable length of array IWORK.
-      !  LIWORK:   The length of vector IWORK.
-      !  LOWER:    The lower bound for BETA.
       !  LUNERI:   The location in array IWORK of variable LUNERR.
-      !  LUNERR:   The logical unit number used for error messages.
       !  LUNRPI:   The location in array IWORK of variable LUNRPT.
-      !  LUNRPT:   The logical unit number used for computation reports.
       !  LWKMN:    The minimum acceptable length of array WORK.
-      !  LWORK:    The length of vector WORK.
       !  LWRK:     The length of vector WRK.
-      !  M:        The number of columns of data in the explanatory variable.
-      !  MAXIT:    The maximum number of iterations allowed.
-      !  MAXIT1:   For implicit models, the iterations allowed for the next penalty parameter value.
       !  MAXITI:   The location in array IWORK of variable MAXIT.
       !  MSGB:     The starting location in array IWORK of array MSGB.
       !  MSGD:     The starting location in ARRAY IWORK of array MSGD.
-      !  N:        The number of observations.
-      !  NDIGIT:   The number of accurate digits in the function results, as supplied by the user.
       !  NETA:     The number of accurate digits in the function results.
       !  NETAI:    The location in array IWORK of variable NETA.
       !  NFEV:     The number of function evaluations.
@@ -1075,10 +1044,8 @@ contains
       !  NJEVI:    The location in array IWORK of variable NJEV.
       !  NNZW:     The number of nonzero observational error weights.
       !  NNZWI:    The location in array IWORK of variable NNZW.
-      !  NP:       The number of function parameters.
       !  NPP:      The number of function parameters being estimated.
       !  NPPI:     The location in array IWORK of variable NPP.
-      !  NQ:       The number of responses per observation.
       !  NROW:     The row number at which the derivative is to be checked.
       !  NROWI:    The location in array IWORK of variable NROW.
       !  NTOL:     The number of digits of agreement required between the numerical derivatives
@@ -1087,12 +1054,9 @@ contains
       !  OLMAVI:   The location in array WORK of variable OLMAVG.
       !  OMEGAI:   The starting location in array WORK of array OMEGA.
       !  PARTLI:   The location in array WORK of variable PARTOL.
-      !  PARTOL:   The parameter convergence stopping tolerance.
       !  PNORM:    The norm of the scaled estimated parameters.
       !  PNORMI:   The location in array WORK of variable PNORM.
       !  PRERSI:   The location in array WORK of variable PRERS.
-      !  PRTPEN:   The variable designating whether the penalty parameter is to be printed in
-      !            the iteration report (PRTPEN=TRUE) or not (PRTPEN=FALSE).
       !  QRAUXI:   The starting location in array WORK of array QRAUX.
       !  RCONDI:   The location in array WORK of variable RCOND.
       !  REDOJ:    The variable designating whether the Jacobian matrix is to be recomputed for
@@ -1101,30 +1065,18 @@ contains
       !            not (RESTRT=FALSE).
       !  RNORSI:   The location in array WORK of variable RNORMS.
       !  RVARI:    The location in array WORK of variable RVAR.
-      !  SCLB:     The scaling values for BETA.
-      !  SCLD:     The scaling values for DELTA.
       !  SDI:      The starting location in array WORK of array SD.
       !  SI:       The starting location in array WORK of array S.
       !  SSFI:     The starting location in array WORK of array SSF.
       !  SSI:      The starting location in array WORK of array SS.
-      !  SSTOL:    The sum-of-squares convergence stopping tolerance.
       !  SSTOLI:   The location in array WORK of variable SSTOL.
-      !  STPB:     The step size for finite difference derivatives wrt BETA.
-      !  STPD:     The step size for finite difference derivatives wrt DELTA.
-      !  TAUFAC:   The factor used to compute the initial trust region diameter.
       !  TAUFCI:   The location in array WORK of variable TAUFAC.
       !  TAUI:     The location in array WORK of variable TAU.
       !  TI:       The starting location in array WORK of array T.
-      !  TSTIMP:   The relative change in the parameters between the initial values and
-      !            the solution.
       !  TTI:      The starting location in array WORK of array TT.
       !  UI:       The starting location in array WORK of array U.
-      !  UPPER:    The upper bound for BETA.
       !  VCVI:     The starting location in array WORK of array VCV.
-      !  WD:       The DELTA weights.
-      !  WE:       The EPSILON weights.
       !  WE1I:     The starting location in array WORK of array WE1.
-      !  WORK:     The REAL (wp) work space.
       !  WRK:      The starting location in array WORK of array WRK, equivalenced to WRK1 and WRK2.
       !  WRK1I:    The starting location in array WORK of array WRK1.
       !  WRK2I:    The starting location in array WORK of array WRK2.
@@ -1136,9 +1088,7 @@ contains
       !  WSSI:     The location in array WORK of variable wss.
       !  WSSDEI:   The location in array WORK of variable WSSDEL.
       !  WSSEPI:   The location in array WORK of variable WSSEPS.
-      !  X:        The explanatory variable.
       !  XPLUSI:   The starting location in array WORK of array XPLUSD.
-      !  Y:        The dependent variable.  Unused when the model is implicit.
 
       ! Initialize necessary variables
       call set_flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
@@ -1200,10 +1150,10 @@ contains
          work(olmavi) = work(olmavi)*iwork(niteri)
 
          if (implct) then
-            call dcopy(n*nq, work(fni), 1, work(fi), 1)
+            work(fi:fi + n*nq - 1) = work(fni:fni + n*nq - 1)
          else
-            work(fi:fi + (n*nq - 1)) = &
-               work(fni:fni + (n*nq - 1)) - reshape(y(1:n, :), shape=[n*nq])
+            work(fi:fi + n*nq - 1) = &
+               work(fni:fni + n*nq - 1) - reshape(y, [n*nq])
          end if
 
          call scale_mat(n, nq, work(we1i:we1i + ldwe*ld2we*nq - 1), &
@@ -1270,8 +1220,8 @@ contains
 
          ! Evaluate the predicted values and weighted EPSILONS at the starting point
          call unpack_vec(np, work(betaci), beta, ifixb)
-         work(xplusi:xplusi + (n*m - 1)) = &
-            work(deltai:deltai + (n*m - 1)) + reshape(x, shape=[n*m])
+         work(xplusi:xplusi + n*m - 1) = &
+            work(deltai:deltai + n*m - 1) + reshape(x, [n*m])
          istop = 0
          call fcn(n, m, np, nq, beta, work(xplusi), &
                   ifixb, ifixx, ldifx, 002, work(fni), work(wrk6i), work(wrk1i), istop)
@@ -1280,10 +1230,10 @@ contains
          if (istop == 0) then
             iwork(nfevi) = iwork(nfevi) + 1
             if (implct) then
-               call dcopy(n*nq, work(fni), 1, work(fi), 1)
+               work(fi:fi + n*nq - 1) = work(fni:fni + n*nq - 1)
             else
-               work(fi:fi + (n*nq - 1)) = &
-                  work(fni:fni + (n*nq - 1)) - reshape(y, shape=[n*nq])
+               work(fi:fi + n*nq - 1) = &
+                  work(fni:fni + n*nq - 1) - reshape(y, [n*nq])
             end if
             call scale_mat(n, nq, work(we1i:we1i + ldwe*ld2we*nq - 1), &
                            ldwe, ld2we, work(fi:fi + n*nq - 1), tempret(1:n, 1:nq))
@@ -1450,10 +1400,10 @@ contains
       end if
 
       ! Save the initial values of BETA
-      call dcopy(np, beta, 1, work(beta0i), 1)
+      work(beta0i:beta0i + np - 1) = beta
 
       ! Find least squares solution
-      call dcopy(n*nq, work(fni), 1, work(fsi), 1)
+      work(fsi:fsi + n*nq - 1) = work(fni:fni + n*nq - 1)
       ldtt = iwork(ldtti)
       call odrsolve(head, fstitr, prtpen, &
                     fcn, n, m, np, nq, job, beta, y, x, &
