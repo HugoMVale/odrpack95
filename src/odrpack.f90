@@ -1498,7 +1498,7 @@ contains
       use odrpack_core, only: fcn_t, access_workspace, eval_jac, set_flags, unpack_vec, &
                               scale_mat, pack_vec, vcv_beta, trust_region
       use odrpack_reports, only: print_reports
-      use blas_interfaces, only: ddot, dnrm2, dcopy
+      use blas_interfaces, only: ddot, dnrm2
 
       logical, intent(inout) :: head
          !! Variable designating whether the heading is to be printed (`head = .true.`)
@@ -2018,7 +2018,7 @@ contains
       else
          ! Compute norm of new weighted EPSILONS and weighted DELTAS (RNORMN)
          if (implct) then
-            call dcopy(n*nq, fn, 1, wrk, 1)
+            wrk(1:n*nq) = reshape(fn, [n*nq])
          else
             wrk(1:n*nq) = reshape(fn - y, [n*nq])
          end if
@@ -2052,9 +2052,9 @@ contains
          istop = 0
          tau = tau*p5
          alpha = alpha/p5
-         call dcopy(npp, betas, 1, betan, 1)
-         call dcopy(n*m, deltas, 1, deltan, 1)
-         call dcopy(n*nq, fs, 1, fn, 1)
+         betan(1:npp) = betas(1:npp)
+         deltan = deltas
+         fn = fs
          actred = actrs
          prered = prers
          rnormn = rnorms
@@ -2083,9 +2083,9 @@ contains
          intdbl = .true.
          tau = tsnorm/p5
          alpha = alpha*p5
-         call dcopy(npp, betan, 1, betas, 1)
-         call dcopy(n*m, deltan, 1, deltas, 1)
-         call dcopy(n*nq, fn, 1, fs, 1)
+         betas(1:npp) = betan(1:npp)
+         deltas = deltan
+         fs = fn
          actrs = actred
          prers = prered
          rnorms = rnormn
@@ -2099,16 +2099,16 @@ contains
 
       ! Check acceptance
       if (ratio >= p0001) then
-         call dcopy(n*nq, fn, 1, fs, 1)
+         fs = fn
          if (implct) then
-            call dcopy(n*nq, fs, 1, f, 1)
+            f = fs
          else
             f = fs - y
          end if
          call scale_mat(n, nq, we1, ldwe, ld2we, f, tempret(1:n, 1:nq))
          f = tempret(1:n, 1:nq)
-         call dcopy(npp, betan, 1, betac, 1)
-         call dcopy(n*m, deltan, 1, delta, 1)
+         betac(1:npp) = betan(1:npp)
+         delta = deltan
          rnorm = rnormn
          call scale_mat(npp, 1, ss, npp, 1, betac, wrk(1:npp))
          if (isodr) then
