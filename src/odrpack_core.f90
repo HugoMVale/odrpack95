@@ -1206,59 +1206,17 @@ contains
          !! The upper bound of `beta`.
 
       ! Local scalars
-      integer :: ideval, j, k, k1, l
+      integer :: ideval, j, j1
       logical :: ferror
 
       ! Variable Definitions (alphabetically)
-      !  ANAJAC:  The variable designating whether the Jacobians are computed by finite differences
-      !          (ANAJAC=FALSE) or not (ANAJAC=TRUE).
-      !  BETA:    The function parameters.
-      !  BETAC:   The current estimated values of the unfixed BETA's.
-      !  CDJAC:   The variable designating whether the Jacobians are computed by central differences
-      !           (CDJAC=TRUE) or by forward differences (CDJAC=FALSE).
-      !  DELTA:   The estimated values of DELTA.
       !  FERROR:  The variable designating whether ODRPACK95 detected nonzero values in array DELTA
       !           in the OLS case, and thus whether the user may have overwritten important information
       !           by computing FJACD in the OLS case.
-      !  FCN:     The user-supplied subroutine for evaluating the model.
-      !  FJACB:   The Jacobian with respect to BETA.
-      !  FJACD:   The Jacobian with respect to DELTA.
-      !  FN:      The predicted values of the function at the current point.
       !  IDEVAL:  The variable designating what computations are to be performed by user-supplied
       !           subroutine FCN.
-      !  IFIXB:   The values designating whether the elements of BETA are fixed at their input values or not.
-      !  IFIXX:   The values designating whether the elements of DELTA are fixed at their input values or not.
-      !  INFO:    The variable designating why the computations were stopped.
-      !  ISTOP:   The variable designating that the user wishes the computations stopped.
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or OLS (ISODR=FALSE).
       !  J:       An indexing variable.
-      !  K:       An indexing variable.
-      !  K1:      An indexing variable.
-      !  L:       An indexing variable.
-      !  LDIFX:   The leading dimension of array IFIXX.
-      !  LDSTPD:  The leading dimension of array STPD.
-      !  LDTT:    The leading dimension of array TT.
-      !  LDWE:    The leading dimension of arrays WE and WE1.
-      !  LD2WE:   The second dimension of arrays WE and WE1.
-      !  M:       The number of columns of data in the independent variable.
-      !  N:       The number of observations.
-      !  NETA:    The number of accurate digits in the function results.
-      !  NFEV:    The number of function evaluations.
-      !  NJEV:    The number of Jacobian evaluations.
-      !  NP:      The number of function parameters.
-      !  NQ:      The number of responses per observation.
-      !  SSF:     The scale used for the BETA's.
-      !  STP:     The step used for computing finite difference derivatives with respect to DELTA.
-      !  STPB:    The relative step used for computing finite difference derivatives with respect to BETA.
-      !  STPD:    The relative step used for computing finite difference derivatives with respect to DELTA.
-      !  TT:      The scaling values used for DELTA.
-      !  WE1:     The square roots of the EPSILON weights in array WE.
-      !  WRK1:    A work array of (N by M by NQ) elements.
-      !  WRK2:    A work array of (N by NQ) elements.
-      !  WRK3:    A work array of (NP) elements.
-      !  WRK6:    A work array of (N BY NP BY NQ) elements.
-      !  X:       The independent variable.
-      !  XPLUSD:  The values of X + DELTA.
+      !  J1:      An indexing variable.
 
       ! Insert current unfixed BETA estimates into BETA
       call unpack_vec(np, betac, beta, ifixb)
@@ -1283,8 +1241,8 @@ contains
          end if
          ! Make sure fixed elements of FJACD are zero
          if (isodr) then
-            do l = 1, nq
-               call set_ifix(n, m, ifixx, ldifx, fjacd(1, 1, l), n, fjacd(1, 1, l), n)
+            do j = 1, nq
+               call set_ifix(n, m, ifixx, ldifx, fjacd(1, 1, j), n, fjacd(1, 1, j), n)
             end do
          end if
       elseif (cdjac) then
@@ -1317,19 +1275,19 @@ contains
 
       ! Weight the Jacobian wrt the estimated BETAS
       if (ifixb(1) < 0) then
-         do k = 1, np
+         do j = 1, np
             call scale_mat(n, nq, we1, ldwe, ld2we, &
-                           reshape(fjacb(:, k, :), [n, nq]), & ! this reshape should not be required. probably compiler bug
+                           reshape(fjacb(:, j, :), [n, nq]), & ! this reshape should not be required. probably compiler bug
                            tempret(1:n, 1:nq))
-            fjacb(:, k, :) = tempret(1:n, 1:nq)
+            fjacb(:, j, :) = tempret(1:n, 1:nq)
          end do
       else
-         k1 = 0
-         do k = 1, np
-            if (ifixb(k) >= 1) then
-               k1 = k1 + 1
-               call scale_mat(n, nq, we1, ldwe, ld2we, fjacb(:, k, :), tempret(1:n, 1:nq))
-               fjacb(:, k1, :) = tempret(1:n, 1:nq)
+         j1 = 0
+         do j = 1, np
+            if (ifixb(j) >= 1) then
+               j1 = j1 + 1
+               call scale_mat(n, nq, we1, ldwe, ld2we, fjacb(:, j, :), tempret(1:n, 1:nq))
+               fjacb(:, j1, :) = tempret(1:n, 1:nq)
             end if
          end do
       end if
@@ -1776,10 +1734,9 @@ contains
          !! The leading dimension of array `tfix`.
 
       ! Local scalars
-      integer :: i, j
+      integer :: j
 
       ! Variable Definitions (alphabetically)
-      !  I:       An indexing variable.
       !  J:       an indexing variable.
 
       if (n == 0 .or. m == 0) return
