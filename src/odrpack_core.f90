@@ -456,20 +456,17 @@ contains
          !! current `beta` and `delta`.
 
       ! Local scalars
-      integer :: actrsi, alphai, betaci, betani, betasi, beta0i, boundi, deltai, deltni, deltsi, &
-                 diffi, epsi, epsmai, etai, fjacbi, fjacdi, fni, fsi, idfi, int2i, iprini, &
-                 iprint, iranki, istopi, jobi, jpvti, ldtti, liwkmn, loweri, luneri, lunrpi, &
-                 lwkmn, maxiti, msgb, msgd, netai, nfevi, niteri, njevi, nnzwi, nppi, nrowi, &
-                 ntoli, olmavi, omegai, partli, pnormi, prersi, qrauxi, rcondi, rnorsi, rvari, &
-                 sdi, si, ssfi, ssi, sstoli, taufci, taui, ti, tti, ui, upperi, vcvi, we1i, &
-                 wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, wssi, wssdei, wssepi, xplusi
+      integer :: actrsi, alphai, betaci, betani, betasi, beta0i, boundi, deltai, deltni, &
+                 deltsi, diffi, epsi, epsmai, etai, fjacbi, fjacdi, fni, fsi, idfi, int2i, &
+                 iprini, iprint, iranki, istopi, jobi, jpvti, ldtti, liwkmn, loweri, luneri, &
+                 lunrpi, lwkmn, maxiti, msgb, msgd, netai, nfevi, niteri, njevi, nnzwi, nppi, &
+                 nrowi, ntoli, olmavi, omegai, partli, pnormi, prersi, qrauxi, rcondi, rnorsi, &
+                 rvari, sdi, si, ssfi, ssi, sstoli, taufci, taui, ti, tti, ui, upperi, vcvi, &
+                 we1i, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, wssi, wssdei, wssepi, &
+                 xplusi
 
       ! Variable Definitions (alphabetically)
-      !  ACCESS:  The variable designating whether information is to be accessed from the work
-      !           arrays (ACCESS=TRUE) or stored in them (ACCESS=FALSE).
-      !  ACTRS:   The saved actual relative reduction in the sum-of-squares.
       !  ACTRSI:  The location in array WORK of variable ACTRS.
-      !  ALPHA:   The Levenberg-Marquardt parameter.
       !  ALPHAI:  The location in array WORK of variable ALPHA.
       !  BETACI:  The starting location in array WORK of array BETAC.
       !  BETANI:  The starting location in array WORK of array BETAN.
@@ -481,126 +478,62 @@ contains
       !  DIFFI:   The starting location in array WORK of array DIFF.
       !  EPSI:    The starting location in array WORK of array EPS.
       !  EPSMAI:  The location in array WORK of variable EPSMAC.
-      !  ETA:     The relative noise in the function results.
       !  ETAI:    The location in array WORK of variable ETA.
       !  FJACBI:  The starting location in array WORK of array FJACB.
       !  FJACDI:  The starting location in array WORK of array FJACD.
       !  FNI:     The starting location in array WORK of array FN.
       !  FSI:     The starting location in array WORK of array FS.
-      !  IDF:     The degrees of freedom of the fit, equal to the number of observations with
-      !           nonzero weighted derivatives minus the number of parameters being estimated.
       !  IDFI:    The starting location in array IWORK of variable IDF.
-      !  INT2:    The number of internal doubling steps.
       !  INT2I:   The location in array IWORK of variable INT2.
-      !  IPR1:    The value of the fourth digit (from the right) of IPRINT, which controls the
-      !           initial summary report.
-      !  IPR2:    The value of the third digit (from the right) of IPRINT, which controls the
-      !           iteration reports.
-      !  IPR2F:   The value of the second digit (from the right) of IPRINT, which controls the
-      !           frequency of the iteration reports.
-      !  IPR3:    The value of the first digit (from the right) of IPRINT, which controls the
-      !           final summary report.
       !  IPRINI:  The location in array IWORK of variable IPRINT.
       !  IPRINT:  The print control variable.
-      !  IRANK:   The rank deficiency of the Jacobian wrt BETA.
       !  IRANKI:  The location in array IWORK of variable IRANK.
-      !  ISODR:   The variable designating whether the solution is to be found by ODR (ISODR=TRUE)
-      !           or by OLS (ISODR=FALSE).
-      !  ISTOP:   The variable designating whether there are problems computing the function at
-      !           the current BETA and DELTA.
       !  ISTOPI:  The location in array IWORK of variable ISTOP.
-      !  IWORK:   The integer work space.
-      !  JOB:     The variable controling problem initialization and computational method.
       !  JOBI:    The location in array IWORK of variable JOB.
-      !  JPVT:    The pivot vector.
       !  JPVTI:   The starting location in array IWORK of variable JPVT.
       !  LDTTI:   The starting location in array IWORK of variable LDTT.
-      !  LDWE:    The leading dimension of array WE.
-      !  LD2WE:   The second dimension of array WE.
-      !  LIWORK:  The length of vector IWORK.
       !  LUNERI:  The location in array IWORK of variable LUNERR.
-      !  LUNERR:  The logical unit number used for error messages.
       !  LUNRPI:  The location in array IWORK of variable LUNRPT.
-      !  LUNRPT:  The logical unit number used for computation reports.
       !  LWKMN:   The minimum acceptable length of array WORK.
-      !  LWORK:   The length of vector WORK.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  MAXIT:   The maximum number of iterations allowed.
       !  MAXITI:  The location in array IWORK of variable MAXIT.
       !  MSGB:    The starting location in array IWORK of array MSGB.
       !  MSGD:    The starting location in array IWORK of array MSGD.
-      !  N:       The number of observations.
-      !  NETA:    The number of accurate digits in the function results.
       !  NETAI:   The location in array IWORK of variable NETA.
-      !  NFEV:    The number of function evaluations.
       !  NFEVI:   The location in array IWORK of variable NFEV.
-      !  NITER:   The number of iterations taken.
       !  NITERI:  The location in array IWORK of variable NITER.
-      !  NJEV:    The number of Jacobian evaluations.
       !  NJEVI:   The location in array IWORK of variable NJEV.
-      !  NNZW:    The number of nonzero weighted observations.
       !  NNZWI:   The location in array IWORK of variable NNZW.
-      !  NP:      The number of function parameters.
-      !  NPP:     The number of function parameters actually estimated.
       !  NPPI:    The location in array IWORK of variable NPP.
       !  NQ:      The number of responses per observation.
       !  NROWI:   The location in array IWORK of variable NROW.
       !  NTOLI:   The location in array IWORK of variable NTOL.
-      !  OLMAVG:  The average number of Levenberg-Marquardt steps per iteration.
       !  OLMAVI:  The location in array WORK of variable OLMAVG.
-      !  OMEGA:   The starting location in array WORK of array OMEGA.
       !  OMEGAI:  The starting location in array WORK of array OMEGA.
       !  PARTLI:  The location in array work of variable PARTOL.
-      !  PARTOL:  The parameter convergence stopping tolerance.
-      !  PNORM:   The norm of the scaled estimated parameters.
       !  PNORMI:  The location in array WORK of variable PNORM.
-      !  PRERS:   The saved predicted relative reduction in the sum-of-squares.
       !  PRERSI:  The location in array WORK of variable PRERS.
-      !  QRAUX:   The starting location in array WORK of array QRAUX.
       !  QRAUXI:  The starting location in array WORK of array QRAUX.
-      !  RCOND:   The approximate reciprocal condition of FJACB.
       !  RCONDI:  The location in array WORK of variable RCOND.
-      !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or
-      !           not (RESTRT=FALSE).
-      !  RNORMS:  The norm of the saved weighted EPSILONS and DELTAS.
       !  RNORSI:  The location in array WORK of variable RNORMS.
-      !  RVAR:    The residual variance, i.e. standard deviation squared.
       !  RVARI:   The location in array WORK of variable RVAR.
-      !  SCLB:    The scaling values used for BETA.
-      !  SCLD:    The scaling values used for DELTA.
-      !  SD:      The starting location in array WORK of array SD.
       !  SDI:     The starting location in array WORK of array SD.
-      !  SI:      The starting location in array WORK of array S.
       !  SSFI:    The starting location in array WORK of array SSF.
       !  SSI:     The starting location in array WORK of array SS.
-      !  SSTOL:   The sum-of-squares convergence stopping tolerance.
       !  SSTOLI:  The location in array WORK of variable SSTOL.
-      !  TAU:     The trust region diameter.
-      !  TAUFAC:  The factor used to compute the initial trust region diameter.
       !  TAUFCI:  The location in array WORK of variable TAUFAC.
       !  TAUI:    the location in array WORK of variable TAU.
       !  TI:      The starting location in array WORK of array T.
       !  TTI:     The starting location in array WORK of array TT.
-      !  U:       The starting location in array WORK of array U.
       !  UI:      The starting location in array WORK of array U.
-      !  VCV:     The starting location in array WORK of array VCV.
       !  VCVI:    The starting location in array WORK of array VCV.
       !  WE1I:    The starting location in array WORK of array WE1.
-      !  WORK:    The REAL (wp) work space.
-      !  WRK1:    The starting location in array WORK of array WRK1.
       !  WRK1I:   The starting location in array WORK of array WRK1.
-      !  WRK2:    The starting location in array WORK of array WRK2.
       !  WRK2I:   The starting location in array WORK of array WRK2.
-      !  WRK3:    The starting location in array WORK of array wrk3.
       !  WRK3I:   The starting location in array WORK of array wrk3.
-      !  WRK4:    The starting location in array WORK of array wrk4.
       !  WRK4I:   The starting location in array WORK of array wrk4.
-      !  WRK5:    The starting location in array WORK of array wrk5.
       !  WRK5I:   The starting location in array WORK of array wrk5.
-      !  WRK6:    The starting location in array WORK of array wrk6.
       !  WRK6I:   The starting location in array WORK of array wrk6.
       !  WRK7I:   The starting location in array WORK of array wrk7.
-      !  WSS:     The sum of the squares of the weighted EPSILONS and DELTAS.
       !  WSSI:    The starting location in array WORK of variable WSS(1).
       !  WSSDEI:  The starting location in array WORK of variable WSS(2).
       !  WSSEPI:  The starting location in array WORK of variable WSS(3).
@@ -733,20 +666,13 @@ contains
       real(wp) :: typj
 
       ! Variable definitions (alphabetically)
-      !  BETAK:   The K-th function parameter.
-      !  ITYPE:   0 - calc foward difference step, 1 - calc center difference step.
-      !  K:       Index into beta where BETAK resides.
-      !  NETA:    Number of good digits in the function results.
-      !  SSF:     The scale used for the BETA'S.
-      !  STPB:    The relative step used for computing finite difference derivatives with
-      !           respect to BETA.
       !  TYPJ:    The typical size of the J-th unkonwn BETA.
 
       if (betak == zero) then
          if (ssf(1) < zero) then
-            typj = one/abs(ssf(1))
+            typj = 1/abs(ssf(1))
          else
-            typj = one/ssf(k)
+            typj = 1/ssf(k)
          end if
       else
          typj = abs(betak)
