@@ -1,6 +1,6 @@
- ********************************************************* 
- *                      ODRPACK REPORT                   * 
- ********************************************************* 
+ ****************************************************************************** 
+ *                                ODRPACK REPORT                              * 
+ ****************************************************************************** 
 
 
  *** Initial summary for fit by method of ODR ***
@@ -62,14 +62,14 @@
  --- Stopping Conditions:
          INFO =     2 ==> parameter convergence.
         NITER =    17          (number of iterations)
-         NFEV =   206          (number of function evaluations)
+         NFEV =   208          (number of function evaluations)
         IRANK =     0          (rank deficiency)
         RCOND =     3.18E-02   (inverse condition number)
         ISTOP =     0          (returned by user from subroutine FCN)
 
  --- Final Sum of Squared Weighted Deltas =                     8.82420346E-02
          Final Penalty Function Value     =    8.82445616E-02
-               Penalty Term               =    2.52700937E-06
+               Penalty Term               =    2.52701343E-06
                Penalty Parameter          =    1.0E+05
 
  --- Residual Standard Deviation          =    7.66994283E-02
@@ -80,8 +80,8 @@
                      BETA      LOWER     UPPER      S.D.  ___ 95% Confidence ___
                                                     BETA         Interval
 
-       1  -9.99381083E-01  -1.80+308  1.80+308  1.11E-01  -1.24E+00 to -7.62E-01
-       2  -2.93104829E+00  -1.80+308  1.80+308  1.10E-01  -3.17E+00 to -2.70E+00
-       3   8.75730444E-02  -1.80+308  1.80+308  4.11E-03   7.88E-02 to  9.63E-02
-       4   1.62299737E-02  -1.80+308  1.80+308  2.75E-03   1.04E-02 to  2.21E-02
-       5   7.97537925E-02  -1.80+308  1.80+308  3.50E-03   7.23E-02 to  8.72E-02
+       1  -9.99380388E-01  -1.80+308  1.80+308  1.11E-01  -1.24E+00 to -7.62E-01
+       2  -2.93104900E+00  -1.80+308  1.80+308  1.10E-01  -3.17E+00 to -2.70E+00
+       3   8.75730642E-02  -1.80+308  1.80+308  4.11E-03   7.88E-02 to  9.63E-02
+       4   1.62299561E-02  -1.80+308  1.80+308  2.75E-03   1.04E-02 to  2.21E-02
+       5   7.97538143E-02  -1.80+308  1.80+308  3.50E-03   7.23E-02 to  8.72E-02
