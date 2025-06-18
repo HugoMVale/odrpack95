@@ -905,7 +905,7 @@ contains
    !! Compute noise and number of good digits in function results.
       ! Adapted from STARPAC subroutine ETAFUN.
 
-      use odrpack_kinds, only: zero, one, two, hundred
+      use odrpack_kinds, only: zero, one, two
 
       procedure(fcn_t) :: fcn
          !! The user-supplied subroutine for evaluating the model.
@@ -962,7 +962,7 @@ contains
       ! Local scalars
       real(wp), parameter :: p1 = 0.1_wp, p2 = 0.2_wp, p5 = 0.5_wp
       real(wp) :: a, b, fac, shift, stp
-      integer :: j, k, l, sbk
+      integer :: j, k, sbk
 
       ! Local arrays
       real(wp) :: parpts(-2:2, np)
@@ -970,44 +970,12 @@ contains
       ! Variable Definitions (ALPHABETICALLY)
       !  A:       Parameters of the local fit.
       !  B:       Parameters of the local fit.
-      !  BETA:    The function parameters.
-      !  EPSMAC:  The value of machine precision.
-      !  ETA:     The noise in the model results.
       !  FAC:     A factor used in the computations.
-      !  FCN:     The user supplied subroutine for evaluating the model.
-      !  IFIXB:   The values designating whether the elements of BETA are fixed at their input
-      !           values or not.
-      !  IFIXX:   The values designating whether the elements of X are fixed at their input values
-      !           or not.
-      !  ISTOP:   The variable designating whether there are problems computing the function at the
-      !           current BETA and DELTA.
       !  J:       An index variable.
       !  K:       An index variable.
-      !  L:       AN INDEX VARIABLE.
-      !  LDIFX:   The leading dimension of array IFIXX.
-      !  LOWER:   The lower bound of BETA.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  N:       The number of observations.
-      !  NETA:    The number of accurate digits in the model results.
-      !  NFEV:    The number of function evaluations.
-      !  NP:      The number of function parameters.
-      !  NQ:      The number of responses per observation.
-      !  NROW:    The row number at which the derivative is to be checked.
-      !  P1:      The value 0.1E0_wp.
-      !  P2:      The value 0.2E0_wp.
-      !  P5:      The value 0.5E0_wp.
-      !  PARPTS:  The points that PARTMP will take on during FCN evaluations.
-      !  PARTMP:  The model parameters.
-      !  PV0:     The original predicted values.
       !  SHIFT:   When PARPTS cross the parameter bounds they are shifted by SHIFT.
       !  SBK:     The sign of BETA(K).
       !  STP:     A small value used to perturb the parameters.
-      !  UPPER:   The upper bound of BETA.
-      !  WRK1:    A work array of (N BY M BY NQ) elements.
-      !  WRK2:    A work array of (N BY NQ) elements.
-      !  WRK6:    A work array of (N BY NP BY NQ) elements.
-      !  WRK7:    A work array of (5 BY NQ) elements.
-      !  XPLUSD:  The values of X + DELTA.
 
       stp = hundred*epsmac
       eta = epsmac
@@ -1059,9 +1027,7 @@ contains
       ! Evaluate FCN for all points in PARPTS
       do j = -2, 2
          if (all(parpts(j, :) == beta)) then
-            do l = 1, nq
-               wrk7(j, l) = pv0(nrow, l)
-            end do
+            wrk7(j, :) = pv0(nrow, :)
          else
             partmp = parpts(j, :)
             istop = 0
@@ -1072,30 +1038,28 @@ contains
             else
                nfev = nfev + 1
             end if
-            do l = 1, nq
-               wrk7(j, l) = wrk2(nrow, l)
-            end do
+            wrk7(j, :) = wrk2(nrow, :)
          end if
       end do
 
       ! Calculate ETA and NETA
-      do l = 1, nq
+      do k = 1, nq
          a = zero
          b = zero
          do j = -2, 2
-            a = a + wrk7(j, l)
-            b = b + j*wrk7(j, l)
+            a = a + wrk7(j, k)
+            b = b + j*wrk7(j, k)
          end do
          a = p2*a
          b = p1*b
-         if ((wrk7(0, l) /= zero) .and. (abs(wrk7(1, l) + wrk7(-1, l)) > hundred*epsmac)) then
-            fac = one/abs(wrk7(0, l))
+         if ((wrk7(0, k) /= zero) .and. (abs(wrk7(1, k) + wrk7(-1, k)) > 100*epsmac)) then
+            fac = 1/abs(wrk7(0, k))
          else
             fac = one
          end if
          do j = -2, 2
-            wrk7(j, l) = abs((wrk7(j, l) - (a + j*b))*fac)
-            eta = max(wrk7(j, l), eta)
+            wrk7(j, k) = abs((wrk7(j, k) - (a + j*b))*fac)
+            eta = max(wrk7(j, k), eta)
          end do
       end do
       neta = int(max(two, p5 - log10(eta)))
