@@ -147,62 +147,19 @@ contains
       ! Variable Definitions (alphabetically)
       !  ALPHAN:  The new Levenberg-Marquardt parameter.
       !  ALPHA1:  The previous Levenberg-Marquardt parameter.
-      !  ALPHA2:  The current Levenberg-Marquardt parameter.
       !  BOT:     The lower limit for setting ALPHA.
-      !  DELTA:   The estimated errors in the explanatory variables.
-      !  EPSFCN:  The function's precision.
-      !  F:       The (weighted) estimated values of EPSILON.
-      !  FJACB:   The Jacobian with respect to BETA.
-      !  FJACD:   The Jacobian with respect to DELTA.
       !  FORVCV:  The variable designating whether this subroutine was called to set up for the
       !           covariance matrix computations (FORVCV=TRUE) or not (FORVCV=FALSE).
       !  I:       An indexing variable.
-      !  IRANK:   The rank deficiency of the Jacobian wrt BETA.
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or
-      !           by OLS (ISODR=FALSE).
-      !  ISTOPC:  The variable designating whether the computations were stoped due to some
-      !           other numerical error detected within subroutine DODSTP.
       !  IWRK:    An indexing variable.
       !  J:       An indexing variable.
       !  K:       An indexing variable.
-      !  L:       An indexing variable.
-      !  JPVT:    The pivot vector.
-      !  LDTT:    The leading dimension of array TT.
-      !  LDWD:    The leading dimension of array WD.
-      !  LD2WD:   The second dimension of array WD.
-      !  LWRK:    The length of vector WRK.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  N:       The number of observations.
-      !  NLMS:    The number of Levenberg-Marquardt steps taken.
-      !  NP:      The number of function parameters.
-      !  NPP:     The number of function parameters being estimated.
-      !  NQ:      The number of responses per observation.
-      !  OMEGA:   The array (I-FJACD*INV(P)*trans(FJACD))**(-1/2)  where
-      !            P = trans(FJACD)*FJACD + D**2 + ALPHA*TT**2
-      !  P001:    The value 0.001E0_wp
-      !  P1:      The value 0.1E0_wp
       !  PHI1:    The previous difference between the norm of the scaled step and the trust
       !           region diameter.
       !  PHI2:    The current difference between the norm of the scaled step and the trust region
       !           diameter.
-      !  QRAUX:   The array required to recover the orthogonal part of the Q-R decomposition.
-      !  RCOND:   The approximate reciprocal condition of TFJACB.
-      !  S:       The step for BETA.
       !  SA:      The scalar PHI2*(ALPHA1-ALPHA2)/(PHI1-PHI2).
-      !  SS:      The scaling values used for the unfixed BETAS.
-      !  T:       The step for DELTA.
-      !  TAU:     The trust region diameter.
-      !  TFJACB:  The array OMEGA*FJACB.
       !  TOP:     The upper limit for setting ALPHA.
-      !  TT:      The scale used for the DELTA'S.
-      !  U:       The approximate null vector for TFJACB.
-      !  WD:      The DELTA weights.
-      !  WRK:     A work array of (LWRK) elements, equivalenced to WRK1 and WRK2.
-      !  WRK1:    A work array of (N by NQ by M) elements.
-      !  WRK2:    A work array of (N by NQ) elements.
-      !  WRK3:    A work array of (NP) elements.
-      !  WRK4:    A work array of (M by M) elements.
-      !  WRK5:    A work array of (M) elements.
 
       forvcv = .false.
       istopc = 0
@@ -242,6 +199,7 @@ contains
          tfjacb(1:n, 1:nq, k) = fjacb(1:n, k, 1:nq)
          wrk(k) = ddot(n*nq, tfjacb(1, 1, k), 1, f(1, 1), 1)
       end do
+
       call scale_vec(npp, 1, ss, npp, wrk, npp, wrk, npp) ! work is input (as t) and output (as sclt)
 
       if (isodr) then
