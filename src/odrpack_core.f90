@@ -782,22 +782,10 @@ contains
          !! The value of the array `e = wd + alpha*tt**2`.
 
       ! Local scalars
-      integer :: j, j1, j2
+      integer :: j
 
       ! Variable Definitions (alphabetically)
-      !  ALPHA:  The Levenberg-Marquardt parameter.
-      !  E:      The value of the array E = WD + ALPHA*TT**2
-      !  I:      An indexing variable.
       !  J:      An indexing variable.
-      !  J1:     An indexing variable.
-      !  J2:     An indexing variable.
-      !  LDWD:   The leading dimension of array WD.
-      !  LD2WD:  The second dimension of array WD.
-      !  M:      The number of columns of data in the independent variable.
-      !  N:      The number of observations.
-      !  NP:     The number of responses per observation.
-      !  TT:     The scaling values used for DELTA.
-      !  WD:     The squared DELTA weights, D**2.
 
       ! N.B. the locations of WD and TT accessed depend on the value of the first element of
       ! each array and the leading dimensions of the multiply subscripted arrays.
@@ -815,13 +803,9 @@ contains
                end do
             else
                ! The arrays stored in WD are full positive semidefinite matrices
-               do j1 = 1, m
-                  do j2 = 1, m
-                     e(j1, j2) = wd(i, j1, j2)
-                  end do
-               end do
+               e = wd(i, :, :)
             end if
-            !
+
             if (tt(1, 1) > zero) then
                if (ldtt >= n) then
                   do j = 1, m
@@ -847,11 +831,7 @@ contains
                end do
             else
                ! The array stored in WD is a full positive semidefinite matrix
-               do j1 = 1, m
-                  do j2 = 1, m
-                     e(j1, j2) = wd(1, j1, j2)
-                  end do
-               end do
+               e = wd(1, :, :)
             end if
 
             if (tt(1, 1) > zero) then
@@ -977,7 +957,7 @@ contains
       !  SBK:     The sign of BETA(K).
       !  STP:     A small value used to perturb the parameters.
 
-      stp = hundred*epsmac
+      stp = 100*epsmac
       eta = epsmac
 
       ! Create points to use in calculating FCN for ETA and NETA
