@@ -1436,8 +1436,8 @@ contains
        we, ldwe, ld2we, wd, ldwd, ld2wd, &
        wrk0, wrk4, &
        we1, nnzw, info)
-   !! Check input parameters, indicating errors found using nonzero values of argument `info` as
-   !! described in the ODRPACK95 reference guide.
+   !! Check input parameters, indicating errors found using nonzero values of argument `info`
+   !! as described in the ODRPACK95 reference guide.
 
       use odrpack_kinds, only: zero
 
@@ -1476,37 +1476,15 @@ contains
          !! The variable designating why the computations were stopped.
 
       ! Local scalars
-      integer :: i, inf, j, j1, j2, l, l1, l2
-      logical :: notzro, exited
+      integer :: i, finfo, j
+      logical :: notzero, exited
 
       ! Variable Definitions (alphabetically)
-      !  I:       An indexing variable.
-      !  INFO:    The variable designating why the computations were stopped.
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by
-      !           OLS (ISODR=FALSE).
-      !  J:       An indexing variable.
-      !  J1:      An indexing variable.
-      !  J2:      An indexing variable.
-      !  L:       An indexing variable.
-      !  L1:      An indexing variable.
-      !  L2:      An indexing variable.
-      !  LAST:    The last row of the array to be accessed.
-      !  LDWD:    The leading dimension of array WD.
-      !  LDWE:    The leading dimension of array WE.
-      !  LD2WD:   The second dimension of array WD.
-      !  LD2WE:   The second dimension of array WE.
-      !  M:       The number of columns of data in the explanatory variable.
-      !  N:       The number of observations.
-      !  NNZW:    The number of nonzero weighted observations.
-      !  NOTZRO:  The variable designating whether a given component of the weight array WE
-      !           contains a nonzero element (NOTZRO=FALSE) or not (NOTZRO=TRUE).
-      !  NPP:     The number of function parameters being estimated.
-      !  NQ:      The number of responses per observations.
-      !  WE:      The (squared) EPSILON weights.
-      !  WE1:     The factored EPSILON weights, S.T. trans(WE1)*WE1 = WE.
-      !  WD:      The (squared) DELTA weights.
-      !  WRK0:    A work array of (NQ BY NQ) elements.
-      !  WRK4:    A work array of (M BY M) elements.
+      !  I:        An indexing variable.
+      !  J:        An indexing variable.
+      !  L:        An indexing variable.
+      !  NOTZERO:  The variable designating whether a given component of the weight array WE
+      !            contains a nonzero element (NOTZRO=FALSE) or not (NOTZRO=TRUE).
 
       ! Check EPSILON weights, and store factorization in WE1
 
@@ -1521,11 +1499,11 @@ contains
          if (ldwe == 1) then
             if (ld2we == 1) then
                ! WE contains a diagonal matrix
-               do l = 1, nq
-                  if (we(1, 1, l) > zero) then
+               do j = 1, nq
+                  if (we(1, 1, j) > zero) then
                      nnzw = n
-                     we1(1, 1, l) = sqrt(we(1, 1, l))
-                  elseif (we(1, 1, l) < zero) then
+                     we1(1, 1, j) = sqrt(we(1, 1, j))
+                  elseif (we(1, 1, j) < zero) then
                      info = 30010
                      exited = .true.
                      exit
@@ -1533,21 +1511,17 @@ contains
                end do
             else
                ! WE contains a full NQ by NQ semidefinite matrix
-               do l1 = 1, nq
-                  do l2 = l1, nq
-                     wrk0(l1, l2) = we(1, l1, l2)
-                  end do
+               do j = 1, nq
+                  wrk0(1:j, j) = we(1, 1:j, j)
                end do
-               call fctr(.true., wrk0, nq, nq, inf)
-               if (inf /= 0) then
+               call fctr(.true., wrk0, nq, nq, finfo)
+               if (finfo /= 0) then
                   info = 30010
                   exited = .true.
                else
-                  do l1 = 1, nq
-                     do l2 = 1, nq
-                        we1(1, l1, l2) = wrk0(l1, l2)
-                     end do
-                     if (we1(1, l1, l1) /= zero) then
+                  do j = 1, nq
+                     we1(1, :, j) = wrk0(:, j)
+                     if (we1(1, j, j) /= zero) then
                         nnzw = n
                      end if
                   end do
@@ -1557,47 +1531,43 @@ contains
             if (ld2we == 1) then
                ! WE contains an array of  diagonal matrix
                do i = 1, n
-                  notzro = .false.
-                  do l = 1, nq
-                     if (we(i, 1, l) > zero) then
-                        notzro = .true.
-                        we1(i, 1, l) = sqrt(we(i, 1, l))
-                     elseif (we(i, 1, l) < zero) then
+                  notzero = .false.
+                  do j = 1, nq
+                     if (we(i, 1, j) > zero) then
+                        notzero = .true.
+                        we1(i, 1, j) = sqrt(we(i, 1, j))
+                     elseif (we(i, 1, j) < zero) then
                         info = 30010
                         exited = .true.
                         exit
                      end if
                   end do
                   if (exited) exit
-                  if (notzro) then
+                  if (notzero) then
                      nnzw = nnzw + 1
                   end if
                end do
             else
                ! WE contains an array of full NQ by NQ semidefinite matrices
                do i = 1, n
-                  do l1 = 1, nq
-                     do l2 = l1, nq
-                        wrk0(l1, l2) = we(i, l1, l2)
-                     end do
+                  do j = 1, nq
+                     wrk0(1:j, j) = we(i, 1:j, j)
                   end do
-                  call fctr(.true., wrk0, nq, nq, inf)
-                  if (inf /= 0) then
+                  call fctr(.true., wrk0, nq, nq, finfo)
+                  if (finfo /= 0) then
                      info = 30010
                      exited = .true.
                      exit
                   else
-                     notzro = .false.
-                     do l1 = 1, nq
-                        do l2 = 1, nq
-                           we1(i, l1, l2) = wrk0(l1, l2)
-                        end do
-                        if (we1(i, l1, l1) /= zero) then
-                           notzro = .true.
+                     notzero = .false.
+                     do j = 1, nq
+                        we1(i, :, j) = wrk0(:, j)
+                        if (we1(i, j, j) /= zero) then
+                           notzero = .true.
                         end if
                      end do
                   end if
-                  if (notzro) then
+                  if (notzero) then
                      nnzw = nnzw + 1
                   end if
                end do
@@ -1618,21 +1588,17 @@ contains
          if (ldwd == 1) then
             if (ld2wd == 1) then
                ! WD contains a diagonal matrix
-               do j = 1, m
-                  if (wd(1, 1, j) <= zero) then
-                     info = max(30001, info + 1)
-                     return
-                  end if
-               end do
+               if (any(wd(1, 1, :) <= zero)) then
+                  info = max(30001, info + 1)
+                  return
+               end if
             else
                ! WD contains a full M by M positive definite matrix
-               do j1 = 1, m
-                  do j2 = j1, m
-                     wrk4(j1, j2) = wd(1, j1, j2)
-                  end do
+               do j = 1, m
+                  wrk4(1:j, j) = wd(1, 1:j, j)
                end do
-               call fctr(.false., wrk4, m, m, inf)
-               if (inf /= 0) then
+               call fctr(.false., wrk4, m, m, finfo)
+               if (finfo /= 0) then
                   info = max(30001, info + 1)
                   return
                end if
@@ -1640,24 +1606,18 @@ contains
          else
             if (ld2wd == 1) then
                ! WD contains an array of diagonal matrices
-               do i = 1, n
-                  do j = 1, m
-                     if (wd(i, 1, j) <= zero) then
-                        info = max(30001, info + 1)
-                        return
-                     end if
-                  end do
-               end do
+               if (any(wd(:, 1, :) <= zero)) then
+                  info = max(30001, info + 1)
+                  return
+               end if
             else
                ! WD contains an array of full M by M positive definite matrices
                do i = 1, n
-                  do j1 = 1, m
-                     do j2 = j1, m
-                        wrk4(j1, j2) = wd(i, j1, j2)
-                     end do
+                  do j = 1, m
+                     wrk4(1:j, j) = wd(i, 1:j, j)
                   end do
-                  call fctr(.false., wrk4, m, m, inf)
-                  if (inf /= 0) then
+                  call fctr(.false., wrk4, m, m, finfo)
+                  if (finfo /= 0) then
                      info = max(30001, info + 1)
                      return
                   end if
@@ -1706,26 +1666,7 @@ contains
       integer :: j
 
       ! Variable Definitions (alphabetically)
-      !  ANAJAC:  The variable designating whether the Jacobians are computed by finite differences
-      !           (ANAJAC=FALSE) or not (ANAJAC=TRUE).
-      !  CDJAC:   The variable designating whether the Jacobians are computed by central differences
-      !           (CDJAC=TRUE) or by forward differences (CDJAC=FALSE).
-      !  CHKJAC:  The variable designating whether the user-supplied Jacobians are to be checked
-      !           (CHKJAC=TRUE) or not (CHKJAC=FALSE).
-      !  DOVCV:   The variable designating whether the covariance matrix is to be computed
-      !           (DOVCV=TRUE) or not (DOVCV=FALSE).
-      !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
-      !           or explicit ODR (IMPLCT=FALSE).
-      !  INITD:   The variable designating whether DELTA is to be initialized to zero (INITD=TRUE)
-      !           or to the first N by M elements of array WORK (INITD=FALSE).
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or
-      !           by OLS (ISODR=FALSE).
       !  J:       The value of a specific digit of JOB.
-      !  JOB:     The variable controling problem initialization and computational method.
-      !  REDOJ:   The variable designating whether the Jacobian matrix is to be recomputed for the
-      !           computation of the covariance matrix (REDOJ=TRUE) or not (REDOJ=FALSE).
-      !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or
-      !           not (RESTRT=FALSE).
 
       if (job >= 0) then
 
@@ -1810,16 +1751,6 @@ contains
       integer, intent(in) :: ldstp
          !! The leading dimension of array `stp`.
 
-      ! Variable Definitions (alphabetically)
-      !  I:       An identifier for selecting user supplied step sizes.
-      !  ITYPE:   The finite difference method being used, where
-      !           ITYPE = 0 indicates forward finite differences, and
-      !           ITYPE = 1 indicates central finite differences.
-      !  J:       An identifier for selecting user supplied step sizes.
-      !  LDSTP:   The leading dimension of array STP.
-      !  NETA:    The number of good digits in the function results.
-      !  STP:     The step size for the finite difference derivative.
-
       if (stp(1, 1) <= zero) then
          if (itype == 0) then
             ! Use default forward finite difference step size
@@ -1828,7 +1759,6 @@ contains
             ! Use default central finite difference step size
             res = ten**(-abs(neta)/three)
          end if
-
       elseif (ldstp == 1) then
          res = stp(1, j)
       else
