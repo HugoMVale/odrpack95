@@ -1348,8 +1348,7 @@ contains
    !! Factor the positive (semi)definite matrix `a` using a modified Cholesky factorization.
       ! Adapted from LINPACK subroutine DPOFA.
 
-      use odrpack_kinds, only: zero, ten
-      use blas_interfaces, only: ddot
+      use odrpack_kinds, only: zero
 
       logical, intent(in) :: oksemi
          !! The indicating whether the factored array can be positive semidefinite
@@ -1374,23 +1373,12 @@ contains
       integer j, k
 
       ! Variable Definitions (alphabetically)
-      !  A:       The array to be factored.  Upon return, A contains the upper triangular matrix
-      !           R so that A = trans(R)*R where the strict lower triangle is set to zero.
-      !           If INFO /= 0, the factorization is not complete.
-      !  I:       An indexing variable.
-      !  INFO:    An idicator variable, where if
-      !           INFO = 0  then factorization was completed
-      !           INFO = K  signals an error condition.  The leading minor of order  K  is not
-      !           positive (semi)definite.
       !  J:       An indexing variable.
-      !  LDA:     The leading dimension of array A.
-      !  N:       The number of rows and columns of data in array A.
-      !  OKSEMI:  The indicating whether the factored array can be positive semidefinite
-      !           (OKSEMI=TRUE) or whether it must be found to be positive definite (OKSEMI=FALSE).
+      !  K:       An indexing variable.
       !  XI:      A value used to test for non positive semidefiniteness.
 
       ! Set relative tolerance for detecting non positive semidefiniteness.
-      xi = -ten*epsilon(zero)
+      xi = -10*epsilon(zero)
 
       ! Compute factorization, storing in upper triangular portion of A
       do j = 1, n
@@ -1400,15 +1388,15 @@ contains
             if (a(k, k) == zero) then
                t = zero
             else
-               t = a(k, j) - ddot(k - 1, a(1, k), 1, a(1, j), 1)
+               t = a(k, j) - dot_product(a(1:k - 1, k), a(1:k - 1, j))
                t = t/a(k, k)
             end if
             a(k, j) = t
-            s = s + t*t
+            s = s + t**2
          end do
          s = a(j, j) - s
 
-         ! ...Exit
+         ! Exit
          if (a(j, j) < zero .or. s < xi*abs(a(j, j))) then
             return
          elseif (.not. oksemi .and. s <= zero) then
@@ -1422,10 +1410,8 @@ contains
       info = 0
 
       ! Zero out lower portion of A
-      do j = 2, n
-         do k = 1, j - 1
-            a(j, k) = zero
-         end do
+      do j = 1, n - 1
+         a(j + 1:n, j) = zero
       end do
 
    end subroutine fctr
