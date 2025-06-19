@@ -7,13 +7,13 @@ module example1_model
 contains
 
    pure subroutine fcn( &
-      n, m, np, nq, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+      n, m, np, q, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
    !! User-supplied subroutine for evaluating the model.
 
-      integer, intent(in) :: ideval, ldifx, m, n, np, nq
+      integer, intent(in) :: ideval, ldifx, m, n, np, q
       integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
       real(kind=wp), intent(in) :: beta(np), xplusd(n, m)
-      real(kind=wp), intent(out) :: f(n, nq), fjacb(n, np, nq), fjacd(n, m, nq)
+      real(kind=wp), intent(out) :: f(n, q), fjacb(n, np, q), fjacd(n, m, q)
       integer, intent(out) :: istop
 
       ! Local variables
@@ -29,14 +29,14 @@ contains
 
       ! Compute predicted values
       if (mod(ideval, 10) >= 1) then
-      do i = 1, nq
+      do i = 1, q
          f(:, i) = beta(1) + beta(2)*(exp(beta(3)*xplusd(:, 1)) - one)**2
       end do
       end if
 
       ! Compute derivatives with respect to 'beta'
       if (mod(ideval/10, 10) >= 1) then
-      do i = 1, nq
+      do i = 1, q
          fjacb(:, 1, i) = one
          fjacb(:, 2, i) = (exp(beta(3)*xplusd(:, 1)) - one)**2
          fjacb(:, 3, i) = beta(2)*2*(exp(beta(3)*xplusd(:, 1)) - one)*exp(beta(3)*xplusd(:, 1))*xplusd(:, 1)
@@ -45,7 +45,7 @@ contains
 
       ! Compute derivatives with respect to 'delta'
       if (mod(ideval/100, 10) >= 1) then
-      do i = 1, nq
+      do i = 1, q
          fjacd(:, 1, i) = beta(2)*2*(exp(beta(3)*xplusd(:, 1)) - one)*exp(beta(3)*xplusd(:, 1))*beta(3)
       end do
       end if
@@ -56,14 +56,14 @@ end module example1_model
 
 program example1
 !! Explicit ODR job, with user-supplied analytic derivatives and nondefault `ifixx`.
-    
+
    use odrpack, only: odr
    use odrpack_kinds, only: wp
    use example1_model, only: fcn
    implicit none
 
    ! Variable declarations
-   integer :: i, info, iprint, j, job, lundata, lunrpt, m, n, np, nq
+   integer :: i, info, iprint, j, job, lundata, lunrpt, m, n, np, q
    integer, allocatable :: ifixx(:, :)
    real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :)
 
@@ -72,15 +72,15 @@ program example1
 
    ! Read problem dimensions
    open (newunit=lundata, file='./example/data1.dat')
-   read (lundata, *) n, m, np, nq
+   read (lundata, *) n, m, np, q
 
    ! Allocate arrays
-   allocate (beta(np), x(n, m), y(n, nq), ifixx(n, m))
+   allocate (beta(np), x(n, m), y(n, q), ifixx(n, m))
 
    ! Read problem data and set nondefault value for argument 'ifixx'
    read (lundata, *) (beta(i), i=1, np)
    do i = 1, n
-      read (lundata, *) (x(i, j), j=1, m), (y(i, j), j=1, nq)
+      read (lundata, *) (x(i, j), j=1, m), (y(i, j), j=1, q)
       if (x(i, 1) == 0.0E0_wp .or. x(i, 1) == 100.0E0_wp) then
          ifixx(i, 1) = 0
       else
@@ -102,7 +102,7 @@ program example1
 
    ! Compute solution
    call odr(fcn=fcn, &
-            n=n, m=m, np=np, nq=nq, &
+            n=n, m=m, np=np, q=q, &
             beta=beta, &
             y=y, x=x, &
             ifixx=ifixx, &

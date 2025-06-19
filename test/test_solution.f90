@@ -3,7 +3,7 @@ module test_solution_m
    use odrpack_kinds, only: wp
    implicit none
 
-   integer, parameter :: maxn = 50, maxm = 3, maxnq = 2, maxnp = 10
+   integer, parameter :: maxn = 50, maxm = 3, maxq = 2, maxnp = 10
    real(wp), allocatable :: lower(:), upper(:)
    integer :: setno
 
@@ -27,7 +27,7 @@ contains
 
       ! Local scalars
       integer :: i, info, iprint, itest, job, l, ldstpd, lun, m, maxit, msg, n, ndigit, &
-                 np, nq, ldwd, ld2wd, ldwe, ld2we, lwork, liwork, wssi, wssdei, wssepi
+                 np, q, ldwd, ld2wd, ldwe, ld2we, lwork, liwork, wssi, wssdei, wssepi
       real(wp) :: bnrm, epsmac, ewrt, ewrt2, hundrd, one, p01, p2, partol, sstol, &
                   taufac, three, tsttol, two, wss, wssdel, wsseps, zero
       logical :: failed, fails, isodr, short, wflat
@@ -266,7 +266,7 @@ contains
             setno = 5
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00020
             short = .true.
@@ -285,7 +285,7 @@ contains
             setno = 5
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00002
             short = .true.
@@ -305,7 +305,7 @@ contains
             setno = 3
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             ifixb = [1, 1, 1, 0, 1, 0, 0, 0, 0]
             job = 00042
@@ -329,7 +329,7 @@ contains
             beta_last = beta
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             beta = beta_last
             do i = 1, n
@@ -357,7 +357,7 @@ contains
             setno = 1
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 01020
             scld(:, 1) = two
@@ -381,7 +381,7 @@ contains
             setno = 4
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00020
             sstol = hundrd*epsmac
@@ -420,7 +420,7 @@ contains
             setno = 6
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00210
             taufac = p01
@@ -441,7 +441,7 @@ contains
             setno = 7
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00001
             partol = epsmac**(one/three)
@@ -463,7 +463,7 @@ contains
             wflat = .false.
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
 
             do i = 1, n
@@ -518,7 +518,7 @@ contains
             setno = 6
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00022
 
@@ -536,7 +536,7 @@ contains
             setno = 6
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00020
 
@@ -555,7 +555,7 @@ contains
             setno = 9
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00000
             maxit = 100
@@ -577,7 +577,7 @@ contains
             setno = 9
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00000
             maxit = 100
@@ -598,7 +598,7 @@ contains
             setno = 9
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00000
             maxit = 1000
@@ -621,7 +621,7 @@ contains
             setno = 9
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00000
             maxit = 1000
@@ -643,7 +643,7 @@ contains
             setno = 9
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00000
             maxit = 1000
@@ -666,7 +666,7 @@ contains
             setno = 9
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00010
             maxit = 100
@@ -689,7 +689,7 @@ contains
             setno = 9
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00010
             maxit = 100
@@ -715,7 +715,7 @@ contains
             setno = 9
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00000
             maxit = 100
@@ -740,7 +740,7 @@ contains
             setno = 9
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00000
             maxit = 100
@@ -767,7 +767,7 @@ contains
             setno = 10
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00010
             maxit = 100
@@ -790,7 +790,7 @@ contains
             setno = 10
             call set_inputs( &
                wflat, &
-               title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+               title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
                x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
             job = 00010
             maxit = 100
@@ -804,7 +804,7 @@ contains
             if (allocated(iwork)) deallocate (iwork)
             if (allocated(work)) deallocate (work)
             isodr = (job < 0 .or. mod(job, 10) <= 1)
-            call workspace_dimensions(n, m, np, nq, isodr, lwork, liwork)
+            call workspace_dimensions(n, m, np, q, isodr, lwork, liwork)
             allocate (iwork(liwork), work(lwork))
          end if
 
@@ -815,7 +815,7 @@ contains
 
          if (short) then
             call odr(fcn=fcn, &
-                     n=n, m=m, np=np, nq=nq, &
+                     n=n, m=m, np=np, q=q, &
                      beta=beta, &
                      y=y, x=x, &
                      delta=delta, &
@@ -825,7 +825,7 @@ contains
                      info=info)
          else
             call odr(fcn=fcn, &
-                     n=n, m=m, np=np, nq=nq, &
+                     n=n, m=m, np=np, q=q, &
                      beta=beta, &
                      y=y, x=x, &
                      delta=delta, &
@@ -844,7 +844,7 @@ contains
          ! Compare results with those obtained on the CRAY YMP or the Intel Xeon running
          ! Linux using REAL(8) version of ODRPACK95
 
-         call loc_wsse(n, m, np, nq, ldwe, ld2we, isodr, wssi, wssdei, wssepi)
+         call loc_wsse(n, m, np, q, ldwe, ld2we, isodr, wssi, wssdei, wssepi)
 
          wssdel = work(wssdei)
          wsseps = work(wssepi)
@@ -1018,7 +1018,7 @@ contains
 
    impure subroutine set_inputs( &
       wflat, &
-      title, n, m, np, nq, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
+      title, n, m, np, q, ldwd, ld2wd, ldwe, ld2we, ldstpd, &
       x, y, beta, lower, upper, delta, ifixb, ifixx, wd, we, sclb, scld, stpb, stpd)
    !! Set up input data for odrpack exerciser.
 
@@ -1027,7 +1027,7 @@ contains
       integer, intent(out) :: n
       integer, intent(out) :: m
       integer, intent(out) :: np
-      integer, intent(out) :: nq
+      integer, intent(out) :: q
       integer, intent(out) :: ldwd
       integer, intent(out) :: ld2wd
       integer, intent(out) :: ldwe
@@ -1055,8 +1055,8 @@ contains
       integer :: k
 
       ! Local arrays
-      real(wp) :: bdata(maxnp, maxset), xdata(maxn, maxm, maxset), ydata(maxn, maxnq, maxset)
-      integer :: mdata(maxset), ndata(maxset), npdata(maxset), nqdata(maxset)
+      real(wp) :: bdata(maxnp, maxset), xdata(maxn, maxm, maxset), ydata(maxn, maxq, maxset)
+      integer :: mdata(maxset), ndata(maxset), npdata(maxset), qdata(maxset)
       character(len=80) :: tdata(maxset)
 
       ! Data statements
@@ -1064,7 +1064,7 @@ contains
          tdata(1) &
          /' BOGGS, BYRD AND SCHNABEL, 1985, EXAMPLE 1'/
       data &
-         ndata(1), mdata(1), npdata(1), nqdata(1) &
+         ndata(1), mdata(1), npdata(1), qdata(1) &
          /40, 1, 2, 1/
       data &
          (bdata(k, 1), k=1, 2) &
@@ -1194,7 +1194,7 @@ contains
          tdata(2) &
          /' BOGGS, BYRD AND SCHNABEL, 1985, EXAMPLE 2'/
       data &
-         ndata(2), mdata(2), npdata(2), nqdata(2) &
+         ndata(2), mdata(2), npdata(2), qdata(2) &
          /50, 2, 3, 1/
       data &
          (bdata(k, 2), k=1, 3) &
@@ -1404,7 +1404,7 @@ contains
          tdata(3) &
          /' BOGGS, BYRD AND SCHNABEL, 1985, EXAMPLE 3'/
       data &
-         ndata(3), mdata(3), npdata(3), nqdata(3) &
+         ndata(3), mdata(3), npdata(3), qdata(3) &
          /44, 1, 9, 1/
       data &
          (bdata(k, 3), k=1, 9) &
@@ -1550,7 +1550,7 @@ contains
          tdata(4) &
          /' HIMMELBLAU, 1970, EXAMPLE 6.2-4, PAGE 188'/
       data &
-         ndata(4), mdata(4), npdata(4), nqdata(4) &
+         ndata(4), mdata(4), npdata(4), qdata(4) &
          /13, 2, 3, 1/
       data &
          (bdata(k, 4), k=1, 3) &
@@ -1599,7 +1599,7 @@ contains
          tdata(5) &
          /' DRAPER AND SMITH, 1981, EXERCISE I, PAGE 521-522'/
       data &
-         ndata(5), mdata(5), npdata(5), nqdata(5) &
+         ndata(5), mdata(5), npdata(5), qdata(5) &
          /8, 2, 2, 1/
       data &
          (bdata(k, 5), k=1, 2) &
@@ -1633,7 +1633,7 @@ contains
          tdata(6) &
          /' POWELL AND MACDONALD, 1972, TABLES 7 AND 8, PAGES 153-154'/
       data &
-         ndata(6), mdata(6), npdata(6), nqdata(6) &
+         ndata(6), mdata(6), npdata(6), qdata(6) &
          /14, 1, 3, 1/
       data &
          (bdata(k, 6), k=1, 3) &
@@ -1685,7 +1685,7 @@ contains
          tdata(7) &
          /' FULLER, 1987, TABLE 3.2.10, PAGES 244-245'/
       data &
-         ndata(7), mdata(7), npdata(7), nqdata(7) &
+         ndata(7), mdata(7), npdata(7), qdata(7) &
          /20, 2, 5, 1/
       data &
          (bdata(k, 7), k=1, 5) &
@@ -1755,7 +1755,7 @@ contains
          tdata(8) &
          /' BATES AND WATTS, 1988, TABLE A1.13, PAGES 280-281'/
       data &
-         ndata(8), mdata(8), npdata(8), nqdata(8) &
+         ndata(8), mdata(8), npdata(8), qdata(8) &
          /23, 1, 5, 2/
       data &
          (bdata(k, 8), k=1, 5) &
@@ -1834,7 +1834,7 @@ contains
          tdata(9) &
          /' ZWOLAK, WATSON, AND TYSON, 2004.'/
       data &
-         ndata(9), mdata(9), npdata(9), nqdata(9) &
+         ndata(9), mdata(9), npdata(9), qdata(9) &
          /4, 1, 2, 1/
       data &
          (bdata(k, 9), k=1, 2) &
@@ -1856,7 +1856,7 @@ contains
          tdata(10) &
          /' ZWOLAK, WATSON, AND TYSON, 2005.'/
       data &
-         ndata(10), mdata(10), npdata(10), nqdata(10) &
+         ndata(10), mdata(10), npdata(10), qdata(10) &
          /4, 1, 2, 1/
       data &
          (bdata(k, 10), k=1, 2) &
@@ -1887,7 +1887,7 @@ contains
       !  NDATA:   The number of observations per data set.
       !  NP:      The number of function parameters.
       !  NPDATA:  The number of function parameters in each data set.
-      !  NQDATA:  The number of responses per observation in each data set.
+      !  QDATA:   The number of responses per observation in each data set.
       !  SETNO:   The number of the data set being analyzed.
       !  TDATA:   The reference for the each of the data sets.
       !  TITLE:   The reference for the data set being analyzed.
@@ -1901,7 +1901,7 @@ contains
       n = ndata(setno)
       m = mdata(setno)
       np = npdata(setno)
-      nq = nqdata(setno)
+      q = qdata(setno)
 
       if (wflat) then
          ldstpd = 1
@@ -1914,7 +1914,7 @@ contains
          ldwd = n
          ld2wd = m
          ldwe = n
-         ld2we = nq
+         ld2we = q
       end if
 
       if (allocated(x)) deallocate (x)
@@ -1932,12 +1932,12 @@ contains
       if (allocated(stpb)) deallocate (stpb)
       if (allocated(stpd)) deallocate (stpd)
 
-      allocate (x(n, m), y(n, nq), beta(np), lower(np), upper(np), delta(n, m), &
-                ifixb(np), ifixx(n, m), wd(ldwd, ld2wd, m), we(ldwe, ld2we, nq), &
+      allocate (x(n, m), y(n, q), beta(np), lower(np), upper(np), delta(n, m), &
+                ifixb(np), ifixx(n, m), wd(ldwd, ld2wd, m), we(ldwe, ld2we, q), &
                 sclb(np), scld(n, m), stpb(np), stpd(ldstpd, m))
 
       x = xdata(1:n, 1:m, setno)
-      y = ydata(1:n, 1:nq, setno)
+      y = ydata(1:n, 1:q, setno)
       beta = bdata(1:np, setno)
       lower = -huge(1.0_wp)
       upper = huge(1.0_wp)
@@ -1954,7 +1954,7 @@ contains
    end subroutine set_inputs
 
    pure subroutine fcn( &
-      n, m, np, nq, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+      n, m, np, q, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
    !! Compute model function and jacobian for odrpack exerciser.
 
       use odrpack_kinds, only: zero, one
@@ -1962,16 +1962,16 @@ contains
       integer, intent(in) :: n
       integer, intent(in) :: m
       integer, intent(in) :: np
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
       real(wp), intent(in) :: beta(np)
       real(wp), intent(in) :: xplusd(n, m)
       integer, intent(in) :: ifixb(np)
       integer, intent(in) :: ifixx(ldifx, m)
       integer, intent(in) :: ldifx
       integer, intent(in) :: ideval
-      real(wp), intent(out) :: f(n, nq)
-      real(wp), intent(out) :: fjacb(n, np, nq)
-      real(wp), intent(out) :: fjacd(n, m, nq)
+      real(wp), intent(out) :: f(n, q)
+      real(wp), intent(out) :: fjacb(n, np, q)
+      real(wp), intent(out) :: fjacd(n, m, q)
       integer, intent(out) :: istop
 
       ! Local scalars
@@ -2004,7 +2004,7 @@ contains
       !  M:       The number of columns of data in the explanatory variable.
       !  N:       The number of observations.
       !  NP:      The number of function parameters.
-      !  NQ:      The number of responses per observation.
+      !  Q:       The number of responses per observation.
       !  SETNO:   The number of the data set being analyzed.
       !  XPLUSD:  Current value of explanatory variable, i.e., X + DELTA
 
@@ -2330,12 +2330,12 @@ contains
 
    end subroutine fcn
 
-   subroutine loc_wsse(n, m, np, nq, ldwe, ld2we, isodr, wssi, wssdei, wssepi)
+   subroutine loc_wsse(n, m, np, q, ldwe, ld2we, isodr, wssi, wssdei, wssepi)
    !! Locations of the weighted sum of squares results in the `work` array.
 
       use odrpack_core, only: loc_rwork
 
-      integer, intent(in) :: n, m, np, nq, ldwe, ld2we
+      integer, intent(in) :: n, m, np, q, ldwe, ld2we
       logical, intent(in) :: isodr
       integer, intent(out) :: wssi, wssdei, wssepi
 
@@ -2346,7 +2346,7 @@ contains
                  fjacdi, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, loweri, upperi, &
                  lwkmn
 
-      call loc_rwork(n, m, np, nq, ldwe, ld2we, isodr, &
+      call loc_rwork(n, m, np, q, ldwe, ld2we, isodr, &
                      deltai, epsi, xplusi, fni, sdi, vcvi, &
                      rvari, wssi, wssdei, wssepi, rcondi, etai, &
                      olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &

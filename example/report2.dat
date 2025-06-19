@@ -7,7 +7,7 @@
 
  --- Problem Size:
             N =    20          (number with nonzero weight =    20)
-           NQ =     1
+            Q =     1
             M =     2
            NP =     5          (number unfixed =     5)
 

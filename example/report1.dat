@@ -39,7 +39,7 @@
 
  --- Problem Size:
             N =    12          (number with nonzero weight =    12)
-           NQ =     1
+            Q =     1
             M =     1
            NP =     3          (number unfixed =     3)
 

@@ -10,7 +10,7 @@ This is an adaptation of example 5 from the ODRPACK95 documentation.
 #include "../include/odrpack/odrpack.h"
 
 // User-supplied function for evaluating the model and its partial derivatives
-void fcn(const int *n, const int *m, const int *np, const int *nq,
+void fcn(const int *n, const int *m, const int *np, const int *q,
          const double beta[], const double xplusd[],
          const int ifixb[], const int ifixx[], const int *ldifx, const int *ideval,
          double f[], double fjacb[], double fjacd[], int *istop) {
@@ -43,7 +43,7 @@ int main() {
 #define NP 2
 #define N 4
 #define M 1
-#define NQ 1
+#define Q 1
 #define LDWE 1
 #define LD2WE 1
 #define LDWD 1
@@ -52,16 +52,16 @@ int main() {
 #define LDSTPD 1
 #define LDSCLD 1
 
-    int n = N, m = M, np = NP, nq = NQ;
+    int n = N, m = M, np = NP, q = Q;
     double beta[NP] = {2.0, 0.5};
     double lower[NP] = {0.0, 0.0};
     double upper[NP] = {10.0, 0.9};
     double x[M][N] = {{0.982, 1.998, 4.978, 6.01}};
-    double y[NQ][N] = {{2.7, 7.4, 148.0, 403.0}};
+    double y[Q][N] = {{2.7, 7.4, 148.0, 403.0}};
     double delta[M][N] = {{0.0, 0.0, 0.0, 0.0}};
 
     int ldwe = LDWE, ld2we = LD2WE, ldwd = LDWD, ld2wd = LD2WD;
-    double we[NQ][LD2WE][LDWE] = {{{-1.0}}};
+    double we[Q][LD2WE][LDWE] = {{{-1.0}}};
     double wd[M][LD2WE][LDWD] = {{{-1.0}}};
 
     int ldifx = LDIFX;
@@ -88,7 +88,7 @@ int main() {
 
     // Determine workspace requirements
     int lwork, liwork;
-    workspace_dimensions_c(&n, &m, &np, &nq, &isodr, &lwork, &liwork);
+    workspace_dimensions_c(&n, &m, &np, &q, &isodr, &lwork, &liwork);
     // printf("lwork: %d\n", lwork);
     // printf("liwork: %d\n", liwork);
 
@@ -114,7 +114,7 @@ int main() {
     lunerr = lunrpt;
 
     // Call odr
-    odr_long_c(fcn, &n, &m, &np, &nq,
+    odr_long_c(fcn, &n, &m, &np, &q,
                &ldwe, &ld2we, &ldwd, &ld2wd,
                &ldifx, &ldstpd, &ldscld,
                &lwork, &liwork,
@@ -137,8 +137,8 @@ int main() {
     // Get the variable locations within the integer and real work space
     iworkidx_t iworkidx;
     workidx_t workidx;
-    loc_iwork_c(&m, &np, &nq, &iworkidx);
-    loc_rwork_c(&n, &m, &np, &nq, &ldwe, &ld2we, &isodr, &workidx);
+    loc_iwork_c(&m, &np, &q, &iworkidx);
+    loc_rwork_c(&n, &m, &np, &q, &ldwe, &ld2we, &isodr, &workidx);
 
     // Print some outputs
     printf("info: %d\n", info);

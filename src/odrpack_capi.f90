@@ -8,7 +8,7 @@ module odrpack_capi
 
    abstract interface
       subroutine fcn_tc( &
-         n, m, np, nq, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop) bind(C)
+         n, m, np, q, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop) bind(C)
       !! User-supplied subroutine for evaluating the model.
          import :: c_int, c_double
          implicit none
@@ -18,7 +18,7 @@ module odrpack_capi
             !! Number of columns of data in the independent variable.
          integer(c_int), intent(in) :: np
             !! Number of function parameters.
-         integer(c_int), intent(in) :: nq
+         integer(c_int), intent(in) :: q
             !! Number of responses per observation.
          real(c_double), intent(in) :: beta(np)
             !! Current values of parameters.
@@ -32,11 +32,11 @@ module odrpack_capi
             !! Leading dimension of array `ifixx`.
          integer(c_int), intent(in) :: ideval
             !! Indicator for selecting computation to be performed.
-         real(c_double), intent(out) :: f(n, nq)
+         real(c_double), intent(out) :: f(n, q)
             !! Predicted function values.
-         real(c_double), intent(out) :: fjacb(n, np, nq)
+         real(c_double), intent(out) :: fjacb(n, np, q)
             !! Jacobian with respect to `beta`.
-         real(c_double), intent(out) :: fjacd(n, m, nq)
+         real(c_double), intent(out) :: fjacd(n, m, q)
             !! Jacobian with respect to errors `delta`.
          integer(c_int), intent(out) :: istop
             !! Stopping condition.
@@ -138,7 +138,7 @@ contains
 
    subroutine odr_short_c( &
       fcn, &
-      n, m, np, nq, &
+      n, m, np, q, &
       beta, y, x, &
       delta, &
       lower, upper, &
@@ -153,11 +153,11 @@ contains
          !! Number of columns of data in the independent variable.
       integer(c_int), intent(in) :: np
          !! Number of function parameters.
-      integer(c_int), intent(in) :: nq
+      integer(c_int), intent(in) :: q
          !! Number of responses per observation.
       real(c_double), intent(inout) :: beta(np)
          !! Function parameters.
-      real(c_double), intent(in) :: y(n, nq)
+      real(c_double), intent(in) :: y(n, q)
          !! Dependent variable. Unused when the model is implicit.
       real(c_double), intent(in) :: x(n, m)
          !! Explanatory variable.
@@ -170,7 +170,7 @@ contains
       integer(c_int), intent(in), optional :: job
          !! Variable controlling initialization and computational method.
 
-      call odr(fcn, n, m, np, nq, beta, y, x, &
+      call odr(fcn, n, m, np, q, beta, y, x, &
                delta=delta, &
                lower=lower, upper=upper, &
                job=job)
@@ -179,7 +179,7 @@ contains
 
    subroutine odr_medium_c( &
       fcn, &
-      n, m, np, nq, &
+      n, m, np, q, &
       ldwe, ld2we, &
       ldwd, ld2wd, &
       ldifx, &
@@ -199,12 +199,12 @@ contains
          !! Number of columns of data in the independent variable.
       integer(c_int), intent(in) :: np
          !! Number of function parameters.
-      integer(c_int), intent(in) :: nq
+      integer(c_int), intent(in) :: q
          !! Number of responses per observation.
       integer(c_int), intent(in) :: ldwe
          !! Leading dimension of array `we`, `ldwe ∈ {1, n}`.
       integer(c_int), intent(in) :: ld2we
-         !! Second dimension of array `we`, `ld2we ∈ {1, nq}`.
+         !! Second dimension of array `we`, `ld2we ∈ {1, q}`.
       integer(c_int), intent(in) :: ldwd
          !! Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
       integer(c_int), intent(in) :: ld2wd
@@ -213,11 +213,11 @@ contains
          !! Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.
       real(c_double), intent(inout) :: beta(np)
          !! Function parameters.
-      real(c_double), intent(in) :: y(n, nq)
+      real(c_double), intent(in) :: y(n, q)
          !! Dependent variable. Unused when the model is implicit.
       real(c_double), intent(in) :: x(n, m)
          !! Explanatory variable.
-      real(c_double), intent(in), optional :: we(ldwe, ld2we, nq)
+      real(c_double), intent(in), optional :: we(ldwe, ld2we, q)
          !! `epsilon` weights.
       real(c_double), intent(in), optional :: wd(ldwd, ld2wd, m)
          !! `delta` weights.
@@ -248,7 +248,7 @@ contains
       integer(c_int), intent(out), optional :: info
          !! Logical unit number for computation reports.
 
-      call odr(fcn, n, m, np, nq, beta, y, x, &
+      call odr(fcn, n, m, np, q, beta, y, x, &
                we=we, wd=wd, &
                ifixb=ifixb, ifixx=ifixx, &
                delta=delta, &
@@ -261,7 +261,7 @@ contains
 
    subroutine odr_long_c( &
       fcn, &
-      n, m, np, nq, &
+      n, m, np, q, &
       ldwe, ld2we, &
       ldwd, ld2wd, &
       ldifx, &
@@ -289,12 +289,12 @@ contains
          !! Number of columns of data in the independent variable.
       integer(c_int), intent(in) :: np
          !! Number of function parameters.
-      integer(c_int), intent(in) :: nq
+      integer(c_int), intent(in) :: q
          !! Number of responses per observation.
       integer(c_int), intent(in) :: ldwe
          !! Leading dimension of array `we`, `ldwe ∈ {1, n}`.
       integer(c_int), intent(in) :: ld2we
-         !! Second dimension of array `we`, `ld2we ∈ {1, nq}`.
+         !! Second dimension of array `we`, `ld2we ∈ {1, q}`.
       integer(c_int), intent(in) :: ldwd
          !! Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
       integer(c_int), intent(in) :: ld2wd
@@ -311,11 +311,11 @@ contains
          !! Length of array `iwork`.
       real(c_double), intent(inout) :: beta(np)
          !! Function parameters.
-      real(c_double), intent(in) :: y(n, nq)
+      real(c_double), intent(in) :: y(n, q)
          !! Dependent variable. Unused when the model is implicit.
       real(c_double), intent(in) :: x(n, m)
          !! Explanatory variable.
-      real(c_double), intent(in), optional :: we(ldwe, ld2we, nq)
+      real(c_double), intent(in), optional :: we(ldwe, ld2we, q)
          !! `epsilon` weights.
       real(c_double), intent(in), optional :: wd(ldwd, ld2wd, m)
          !! `delta` weights.
@@ -369,7 +369,7 @@ contains
       integer(c_int), intent(out), optional :: info
          !! Variable designating why the computations were stopped.
 
-      call odr(fcn, n, m, np, nq, beta, y, x, &
+      call odr(fcn, n, m, np, q, beta, y, x, &
                we=we, wd=wd, &
                ifixb=ifixb, ifixx=ifixx, &
                delta=delta, &
@@ -433,14 +433,14 @@ contains
 
    end subroutine close_file
 
-   pure subroutine loc_iwork_c(m, np, nq, iworkidx) bind(C)
+   pure subroutine loc_iwork_c(m, np, q, iworkidx) bind(C)
    !! Get storage locations within integer work space.
 
       integer(c_int), intent(in) :: m
          !! Number of columns of data in the independent variable.
       integer(c_int), intent(in) :: np
          !! Number of function parameters.
-      integer(c_int), intent(in) :: nq
+      integer(c_int), intent(in) :: q
          !! Number of responses per observation.
       type(iworkidx_t), intent(out) :: iworkidx
          !! 0-based indexes of integer work array.
@@ -449,7 +449,7 @@ contains
                  lunrpi, nrowi, ntoli, netai, maxiti, niteri, nfevi, njevi, int2i, iranki, &
                  ldtti, boundi, liwkmn
 
-      call loc_iwork(m, np, nq, &
+      call loc_iwork(m, np, q, &
                      msgbi, msgdi, ifix2i, istopi, &
                      nnzwi, nppi, idfi, &
                      jobi, iprini, luneri, lunrpi, &
@@ -484,7 +484,7 @@ contains
 
    end subroutine loc_iwork_c
 
-   pure subroutine loc_rwork_c(n, m, np, nq, ldwe, ld2we, isodr, workidx) bind(C)
+   pure subroutine loc_rwork_c(n, m, np, q, ldwe, ld2we, isodr, workidx) bind(C)
    !! Get storage locations within real work space.
 
       integer(c_int), intent(in) :: n
@@ -493,7 +493,7 @@ contains
          !! Number of columns of data in the explanatory variable.
       integer(c_int), intent(in) :: np
          !! Number of function parameters.
-      integer(c_int), intent(in) :: nq
+      integer(c_int), intent(in) :: q
          !! Number of responses per observation.
       integer(c_int), intent(in) :: ldwe
          !! Leading dimension of array `we`.
@@ -512,7 +512,7 @@ contains
                  fjacdi, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, loweri, upperi, &
                  lwkmn
 
-      call loc_rwork(n, m, np, nq, ldwe, ld2we, logical(isodr, kind=kind(.true.)), &
+      call loc_rwork(n, m, np, q, ldwe, ld2we, logical(isodr, kind=kind(.true.)), &
                      deltai, epsi, xplusi, fni, sdi, vcvi, &
                      rvari, wssi, wssdei, wssepi, rcondi, etai, &
                      olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
@@ -579,7 +579,7 @@ contains
 
    end subroutine loc_rwork_c
 
-   pure subroutine workspace_dimensions_c(n, m, np, nq, isodr, lwork, liwork) bind(C)
+   pure subroutine workspace_dimensions_c(n, m, np, q, isodr, lwork, liwork) bind(C)
    !! Calculate the dimensions of the workspace arrays.
 
       integer(c_int), intent(in) :: n
@@ -588,7 +588,7 @@ contains
          !! Number of columns of data in the independent variable.
       integer(c_int), intent(in) :: np
          !! Number of function parameters.
-      integer(c_int), intent(in) :: nq
+      integer(c_int), intent(in) :: q
          !! Number of responses per observation.
       logical(c_bool), intent(in) :: isodr
          !! Variable designating whether the solution is by ODR (`isodr = .true.`)
@@ -598,7 +598,7 @@ contains
       integer(c_int), intent(out) :: liwork
          !! Length of integer `iwork` array.
 
-      call workspace_dimensions(n, m, np, nq, logical(isodr, kind=kind(.true.)), &
+      call workspace_dimensions(n, m, np, q, logical(isodr, kind=kind(.true.)), &
                                 lwork, liwork)
 
    end subroutine workspace_dimensions_c

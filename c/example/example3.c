@@ -9,7 +9,7 @@ This is a translation of example 3 from the ODRPACK95 documentation.
 #include "../include/odrpack/odrpack.h"
 
 // User-supplied function for evaluating the model
-void fcn(const int *n, const int *m, const int *np, const int *nq,
+void fcn(const int *n, const int *m, const int *np, const int *q,
          const double beta[], const double xplusd[],
          const int ifixb[], const int ifixx[], const int *ldifx, const int *ideval,
          double f[], double fjacb[], double fjacd[], int *istop) {
@@ -47,12 +47,12 @@ int main() {
 #define NP 5
 #define N 23
 #define M 1
-#define NQ 2
+#define Q 2
 
     // Variable declarations
-    int n = N, m = M, np = NP, nq = NQ;
-    int ldwe = N, ld2we = NQ, ldwd = N, ld2wd = M, ldifx = N;
-    double beta[NP], x[M][N], y[NQ][N], delta[M][N], wd[M][M][N], we[NQ][NQ][N];
+    int n = N, m = M, np = NP, q = Q;
+    int ldwe = N, ld2we = Q, ldwd = N, ld2wd = M, ldifx = N;
+    double beta[NP], x[M][N], y[Q][N], delta[M][N], wd[M][M][N], we[Q][Q][N];
     int ifixx[M][N];
     int ifixb[NP] = {1, 1, 1, 1, 1};
     int iscan = 0;
@@ -85,7 +85,7 @@ int main() {
                 return 1;
             }
         }
-        for (int j = 0; j < nq; j++) {
+        for (int j = 0; j < q; j++) {
             iscan = fscanf(data_file, "%lf", &y[j][i]);
             if (iscan != 1) {
                 fprintf(stderr, "Error reading y values\n");
@@ -144,7 +144,7 @@ int main() {
     int info = 0;
 
     // Compute solution
-    odr_medium_c(fcn, &n, &m, &np, &nq,
+    odr_medium_c(fcn, &n, &m, &np, &q,
                  &ldwe, &ld2we, &ldwd, &ld2wd, &ldifx,
                  beta,
                  (double *)y, (double *)x,

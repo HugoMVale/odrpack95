@@ -8,13 +8,13 @@ module test_error_detection_m
 contains
 
    subroutine fcn( &
-      n, m, np, nq, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+      n, m, np, q, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
    !! User-supplied subroutine for evaluating the model.
 
-      integer, intent(in) :: ideval, ldifx, m, n, np, nq
+      integer, intent(in) :: ideval, ldifx, m, n, np, q
       integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
       real(kind=wp), intent(in) :: beta(np), xplusd(n, m)
-      real(kind=wp), intent(out) :: f(n, nq), fjacb(n, np, nq), fjacd(n, m, nq)
+      real(kind=wp), intent(out) :: f(n, q), fjacb(n, np, q), fjacd(n, m, q)
       integer, intent(out) :: istop
 
       integer :: i
@@ -80,7 +80,7 @@ program test_error_detection
    use test_error_detection_m, only: fcn, lower, upper
    implicit none
 
-   integer :: n, m, nq, np, info, lunerr, lunrpt
+   integer :: n, m, q, np, info, lunerr, lunrpt
    integer, allocatable :: iwork(:)
    real(wp), allocatable :: beta(:), y(:, :), x(:, :), delta(:, :), work(:), &
                             we(:, :, :), wd(:, :, :)
@@ -94,14 +94,14 @@ program test_error_detection
    ! Invalid problem dimensions
    n = 0
    m = 0
-   nq = -1
+   q = -1
    np = 0
-   allocate (beta(np), y(n, nq), x(n, m))
+   allocate (beta(np), y(n, q), x(n, m))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 11111) passed = .false.
@@ -111,15 +111,15 @@ program test_error_detection
    ! Inconsistent dimensions of mandatory arrays X, Y, BETA
    n = 10
    m = 4
-   nq = 2
+   q = 2
    np = 3
    deallocate (beta, y, x)
-   allocate (beta(np + 1), y(n - 1, nq + 1), x(n + 1, m - 1))
+   allocate (beta(np + 1), y(n - 1, q + 1), x(n + 1, m - 1))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 10**5) passed = .false.
@@ -129,15 +129,15 @@ program test_error_detection
    ! Inconsistent dimensions of optional WORK, IWORK
    n = 10
    m = 4
-   nq = 2
+   q = 2
    np = 3
    deallocate (beta, y, x)
-   allocate (beta(np), y(n, nq), x(n, m), iwork(42), work(69))
+   allocate (beta(np), y(n, q), x(n, m), iwork(42), work(69))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, iwork=iwork, work=work, &
+   call odr(fcn, n, m, np, q, beta, y, x, iwork=iwork, work=work, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 10**5) passed = .false.
@@ -147,15 +147,15 @@ program test_error_detection
    ! Inconsistent dimensions of optional arrays DELTA, IFIXB, SCLB, STPB, IFIXX, SCLD, STPD
    n = 10
    m = 4
-   nq = 2
+   q = 2
    np = 3
    deallocate (beta, y, x)
-   allocate (beta(np), y(n, nq), x(n, m), delta(m, n))
+   allocate (beta(np), y(n, q), x(n, m), delta(m, n))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             delta=delta, ifixb=[1, 0], sclb=[1.0_wp, 1.0_wp], stpb=[1.0_wp, 1.0_wp], &
             ifixx=reshape([1, 0, 0, 1], [2, 2]), scld=reshape([1.0_wp, 1.0_wp], [2, 1]), &
             stpd=reshape([1.0_wp, 1.0_wp], [2, 1]), &
@@ -168,15 +168,15 @@ program test_error_detection
    ! Inconsistent dimensions of optional arrays WE, WD
    n = 10
    m = 4
-   nq = 2
+   q = 2
    np = 3
    deallocate (beta, y, x)
-   allocate (beta(np), y(n, nq), x(n, m))
+   allocate (beta(np), y(n, q), x(n, m))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             wd=reshape([-1.0_wp], [1, 1, 1]), we=reshape([-1.0_wp], [1, 1, 1]), &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -187,15 +187,15 @@ program test_error_detection
    ! Inconsistent dimensions of optional arrays LOWER and UPPER
    n = 10
    m = 4
-   nq = 2
+   q = 2
    np = 3
    deallocate (beta, y, x)
-   allocate (beta(np), y(n, nq), x(n, m))
+   allocate (beta(np), y(n, q), x(n, m))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             lower=[1.0_wp, 1.0_wp], upper=[1.0_wp, 1.0_wp, 1.0_wp, 1.0_wp], &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -206,15 +206,15 @@ program test_error_detection
    ! Inconsistent values of optional arrays LOWER > UPPER
    n = 10
    m = 4
-   nq = 2
+   q = 2
    np = 3
    deallocate (beta, y, x)
-   allocate (beta(np), y(n, nq), x(n, m))
+   allocate (beta(np), y(n, q), x(n, m))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             lower=beta + 1e-10_wp, upper=beta - 1e-10_wp, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -225,15 +225,15 @@ program test_error_detection
    ! Inconsistent values of optional arrays BETA < LOWER
    n = 10
    m = 4
-   nq = 2
+   q = 2
    np = 3
    deallocate (beta, y, x)
-   allocate (beta(np), y(n, nq), x(n, m))
+   allocate (beta(np), y(n, q), x(n, m))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             lower=beta + 1e-10_wp, upper=beta + 1.0_wp, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -244,17 +244,17 @@ program test_error_detection
    ! Inconsistent values of optional arrays UPPER - LOWER ~ 0
    n = 10
    m = 4
-   nq = 2
+   q = 2
    np = 3
    deallocate (beta, y, x)
-   allocate (beta(np), y(n, nq), x(n, m), lower(np), upper(np))
+   allocate (beta(np), y(n, q), x(n, m), lower(np), upper(np))
    y = 0.0_wp
    x = 0.0_wp
    beta = 1.0_wp
    lower = beta - 1e-100_wp
    upper = beta + 1e-100_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             lower=lower, upper=upper, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -267,7 +267,7 @@ program test_error_detection
    lower = beta - 1e-10_wp
    upper = beta + 1e-10_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             lower=lower, upper=upper, stpb=beta*1e-5_wp, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -278,15 +278,15 @@ program test_error_detection
    ! Inconsistent values of optional array SCLB
    n = 10
    m = 1
-   nq = 1
+   q = 1
    np = 3
    deallocate (beta, y, x)
-   allocate (beta(np), y(n, nq), x(n, m))
+   allocate (beta(np), y(n, q), x(n, m))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             sclb=[1.0_wp, -1.0_wp, 1.0_wp], &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -297,15 +297,15 @@ program test_error_detection
    ! Inconsistent values of optional array SCLD(n,m)
    n = 3
    m = 1
-   nq = 1
+   q = 1
    np = 2
    deallocate (beta, y, x)
-   allocate (beta(np), y(n, nq), x(n, m))
+   allocate (beta(np), y(n, q), x(n, m))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             scld=reshape([1.0_wp, -1.0_wp, 1.0_wp], [n, m]), &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -316,15 +316,15 @@ program test_error_detection
    ! Inconsistent values of optional arrays SCLD(1,m)
    n = 3
    m = 2
-   nq = 1
+   q = 1
    np = 2
    deallocate (beta, y, x)
-   allocate (beta(np), y(n, nq), x(n, m))
+   allocate (beta(np), y(n, q), x(n, m))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             scld=reshape([1.0_wp, -1.0_wp], [1, m]), &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -335,15 +335,15 @@ program test_error_detection
    ! Inconsistent values of optional array STPB
    n = 10
    m = 1
-   nq = 1
+   q = 1
    np = 3
    deallocate (beta, y, x)
-   allocate (beta(np), y(n, nq), x(n, m))
+   allocate (beta(np), y(n, q), x(n, m))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             stpb=[1.0_wp, -1.0_wp, 1.0_wp], &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -354,15 +354,15 @@ program test_error_detection
    ! Inconsistent values of optional array STPD(n,m)
    n = 3
    m = 1
-   nq = 1
+   q = 1
    np = 2
    deallocate (beta, y, x)
-   allocate (beta(np), y(n, nq), x(n, m))
+   allocate (beta(np), y(n, q), x(n, m))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             stpd=reshape([1.0_wp, -1.0_wp, 1.0_wp], [n, m]), &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -373,15 +373,15 @@ program test_error_detection
    ! Inconsistent values of optional array STPD(1,m)
    n = 3
    m = 2
-   nq = 1
+   q = 1
    np = 2
    deallocate (beta, y, x)
-   allocate (beta(np), y(n, nq), x(n, m))
+   allocate (beta(np), y(n, q), x(n, m))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             stpd=reshape([1.0_wp, -1.0_wp], [1, m]), &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -389,20 +389,20 @@ program test_error_detection
 
    write (lunrpt, *) "INFO = ", info
 
-   ! Inconsistent values of optional array WE(1,1,nq)
+   ! Inconsistent values of optional array WE(1,1,q)
    n = 5
    m = 2
-   nq = 3
+   q = 3
    np = 2
    deallocate (beta, y, x)
-   allocate (beta(np), y(n, nq), x(n, m), we(1, 1, nq))
+   allocate (beta(np), y(n, q), x(n, m), we(1, 1, q))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
    we = -1.0_wp
    we(1, 1, 1) = 1.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             we=we, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -410,20 +410,20 @@ program test_error_detection
 
    write (lunrpt, *) "INFO = ", info
 
-   ! Inconsistent values of optional array WE(1,nq,nq)
+   ! Inconsistent values of optional array WE(1,q,q)
    n = 5
    m = 2
-   nq = 3
+   q = 3
    np = 2
    deallocate (beta, y, x, we)
-   allocate (beta(np), y(n, nq), x(n, m), we(1, nq, nq))
+   allocate (beta(np), y(n, q), x(n, m), we(1, q, q))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
    we = -1.0_wp
    we(1, 1, 1) = 1.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             we=we, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -431,20 +431,20 @@ program test_error_detection
 
    write (lunrpt, *) "INFO = ", info
 
-   ! Inconsistent values of optional array WE(n,1,nq)
+   ! Inconsistent values of optional array WE(n,1,q)
    n = 5
    m = 2
-   nq = 3
+   q = 3
    np = 2
    deallocate (beta, y, x, we)
-   allocate (beta(np), y(n, nq), x(n, m), we(n, 1, nq))
+   allocate (beta(np), y(n, q), x(n, m), we(n, 1, q))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
    we = -1.0_wp
    we(1, 1, 1) = 1.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             we=we, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -452,20 +452,20 @@ program test_error_detection
 
    write (lunrpt, *) "INFO = ", info
 
-   ! Inconsistent values of optional array WE(n,nq,nq)
+   ! Inconsistent values of optional array WE(n,q,q)
    n = 5
    m = 2
-   nq = 3
+   q = 3
    np = 2
    deallocate (beta, y, x, we)
-   allocate (beta(np), y(n, nq), x(n, m), we(n, nq, nq))
+   allocate (beta(np), y(n, q), x(n, m), we(n, q, q))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
    we = -1.0_wp
    we(1, 1, 1) = 1.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             we=we, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -476,17 +476,17 @@ program test_error_detection
    ! Inconsistent values of optional array WD(1,1,m)
    n = 5
    m = 2
-   nq = 3
+   q = 3
    np = 2
    deallocate (beta, y, x)
-   allocate (beta(np), y(n, nq), x(n, m), wd(1, 1, m))
+   allocate (beta(np), y(n, q), x(n, m), wd(1, 1, m))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
    wd = -1.0_wp
    wd(1, 1, 1) = 1.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             wd=wd, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -497,17 +497,17 @@ program test_error_detection
    ! Inconsistent values of optional array WD(1,m,m)
    n = 5
    m = 2
-   nq = 3
+   q = 3
    np = 2
    deallocate (beta, y, x, wd)
-   allocate (beta(np), y(n, nq), x(n, m), wd(1, m, m))
+   allocate (beta(np), y(n, q), x(n, m), wd(1, m, m))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
    wd = -1.0_wp
    wd(1, 1, 1) = 1.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             wd=wd, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -518,17 +518,17 @@ program test_error_detection
    ! Inconsistent values of optional array WD(n,1,m)
    n = 5
    m = 2
-   nq = 3
+   q = 3
    np = 2
    deallocate (beta, y, x, wd)
-   allocate (beta(np), y(n, nq), x(n, m), wd(n, 1, m))
+   allocate (beta(np), y(n, q), x(n, m), wd(n, 1, m))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
    wd = -1.0_wp
    wd(1, 1, 1) = 1.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             wd=wd, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -539,17 +539,17 @@ program test_error_detection
    ! Inconsistent values of optional array WD(n,m,m)
    n = 5
    m = 2
-   nq = 3
+   q = 3
    np = 2
    deallocate (beta, y, x, wd)
-   allocate (beta(np), y(n, nq), x(n, m), wd(n, m, m))
+   allocate (beta(np), y(n, q), x(n, m), wd(n, m, m))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
    wd = -1.0_wp
    wd(1, 1, 1) = 1.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, &
+   call odr(fcn, n, m, np, q, beta, y, x, &
             wd=wd, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -560,15 +560,15 @@ program test_error_detection
    ! ERROR IN JOB SPECIFICATION WITH WORK AND IWORK
    n = 1
    m = 1
-   nq = 1
+   q = 1
    np = 1
    deallocate (beta, y, x)
-   allocate (beta(np), y(n, nq), x(n, m))
+   allocate (beta(np), y(n, q), x(n, m))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, job=10000, &
+   call odr(fcn, n, m, np, q, beta, y, x, iprint=1, info=info, job=10000, &
             lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 70110) passed = .false.
@@ -578,15 +578,15 @@ program test_error_detection
    ! ERROR IN JOB SPECIFICATION WITH DELTA
    n = 1
    m = 1
-   nq = 1
+   q = 1
    np = 1
    deallocate (beta, y, x)
-   allocate (beta(np), y(n, nq), x(n, m))
+   allocate (beta(np), y(n, q), x(n, m))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, job=1000, &
+   call odr(fcn, n, m, np, q, beta, y, x, iprint=1, info=info, job=1000, &
             lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 71000) passed = .false.
@@ -596,10 +596,10 @@ program test_error_detection
    ! BOUNDS TOO SMALL FOR DERIVATIVE CHECKER WHEN DERIVATIVES DON'T AGREE.
    n = 4
    m = 1
-   nq = 1
+   q = 1
    np = 2
    deallocate (beta, y, x, lower, upper)
-   allocate (beta(np), y(n, nq), x(n, m), lower(np), upper(np))
+   allocate (beta(np), y(n, q), x(n, m), lower(np), upper(np))
    beta = [-200.0_wp, -5.0_wp]
    upper = [-200.0_wp, 0.0_wp]
    lower = [-200.000029802322_wp, -5.0_wp]
@@ -607,7 +607,7 @@ program test_error_detection
               148.4131591025766_wp, 403.4287934927353_wp]
    x(:, 1) = [1.0_wp, 2.0_wp, 5.0_wp, 6.0_wp]
 
-   call odr(fcn, n, m, np, nq, beta, y, x, iprint=1, info=info, job=0020, &
+   call odr(fcn, n, m, np, q, beta, y, x, iprint=1, info=info, job=0020, &
             lunrpt=lunrpt, lunerr=lunerr, lower=lower, upper=upper)
 
    if (info /= 1) passed = .false.
@@ -629,10 +629,10 @@ program test_error_detection
 !
 !       N  = 032000000
 !       M  = 1
-!       NQ = 1
+!       Q  = 1
 !       NP = 1
 !       DEALLOCATE(BETA,Y,X)
-!       ALLOCATE(BETA(NP),Y(N,NQ),X(N,M),STAT=STAT)
+!       ALLOCATE(BETA(NP),Y(N,Q),X(N,M),STAT=STAT)
 !       IF (STAT/=0) THEN
 !       WRITE(0,*)
 !       &       "SYSTEM ERROR: COULD NOT ALLOCATE MEMORY, TESTER ",
@@ -643,7 +643,7 @@ program test_error_detection
 !       X(:,:) = 0.0_wp
 !       BETA(:) = 0.0_wp
 !
-!       CALL ODR(FCN,N,M,NP,NQ,BETA,Y,X,IPRINT=1,INFO=INFO,
+!       CALL ODR(FCN,N,M,NP,Q,BETA,Y,X,IPRINT=1,INFO=INFO,
 !       &   LUNRPT=LUN,LUNERR=LUN)
 !
 !       WRITE(LUN,*) "INFO = ", INFO

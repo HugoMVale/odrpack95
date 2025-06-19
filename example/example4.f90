@@ -7,13 +7,13 @@ module example4_model
 contains
 
    pure subroutine fcn( &
-      n, m, np, nq, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+      n, m, np, q, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
    !! User-supplied subroutine for evaluating the model.
 
-      integer, intent(in) :: ideval, ldifx, m, n, np, nq
+      integer, intent(in) :: ideval, ldifx, m, n, np, q
       integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
       real(kind=wp), intent(in) :: beta(np), xplusd(n, m)
-      real(kind=wp), intent(out) :: f(n, nq), fjacb(n, np, nq), fjacd(n, m, nq)
+      real(kind=wp), intent(out) :: f(n, q), fjacb(n, np, q), fjacd(n, m, q)
       integer, intent(out) :: istop
 
       ! Local variables
@@ -30,7 +30,7 @@ contains
                      beta(1), beta(2), beta(3), zero, f(i, 1), xplusd(i, 1)/2)
          end do
       end if
-      
+
    end subroutine fcn
 
    pure subroutine mpf(u, c, kwee, k25, k25p, print_every, tout, root)
@@ -106,29 +106,29 @@ program example4
 !! used the call statement here to solve their problem.
 !!   Curious users are encouraged to remove the bounds in the call statement,
 !! run the code, and compare the results to the current call statement.
-    
+
    use odrpack_kinds, only: wp
    use odrpack, only: odr
    use example4_model, only: fcn, mpf
    implicit none
 
    real(kind=wp) :: beta(3)
-   integer :: n, m, np, nq, lunrpt
+   integer :: n, m, np, q, lunrpt
    ! integer :: i
    ! real (kind=wp) :: u, c, tout
 
    open (newunit=lunrpt, file="./example/report4.dat")
-   
+
    n = 5
    m = 1
    np = 3
-   nq = 1
+   q = 1
 
    beta = [1.1E-0_wp, 3.3E+0_wp, 8.7_wp]
 
-   call odr(fcn, n, m, np, nq, &
+   call odr(fcn, n, m, np, q, &
             beta=beta, &
-            y=reshape([55.0_wp, 45.0_wp, 40.0_wp, 30.0_wp, 20.0_wp], [n, nq]), &
+            y=reshape([55.0_wp, 45.0_wp, 40.0_wp, 30.0_wp, 20.0_wp], [n, q]), &
             x=reshape([0.15_wp, 0.20_wp, 0.25_wp, 0.30_wp, 0.50_wp], [n, m]), &
             lower=[0.0_wp, 0.0_wp, 0.0_wp], &
             upper=[1000.0_wp, 1000.0_wp, 1000.0_wp], &

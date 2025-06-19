@@ -7,13 +7,13 @@ module example3_model
 contains
 
    pure subroutine fcn( &
-      n, m, np, nq, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+      n, m, np, q, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
    !! User-supplied subroutine for evaluating the model.
-                       
-      integer, intent(in) :: ideval, ldifx, m, n, np, nq
+
+      integer, intent(in) :: ideval, ldifx, m, n, np, q
       integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
       real(kind=wp), intent(in) :: beta(np), xplusd(n, m)
-      real(kind=wp), intent(out) :: f(n, nq), fjacb(n, np, nq), fjacd(n, m, nq)
+      real(kind=wp), intent(out) :: f(n, q), fjacb(n, np, q), fjacd(n, m, q)
       integer, intent(out) :: istop
 
       ! Local variables
@@ -60,7 +60,7 @@ program example3
    implicit none
 
    ! Variable declarations
-   integer :: i, info, iprint, j, job, lundata, lunrpt, m, n, np, nq
+   integer :: i, info, iprint, j, job, lundata, lunrpt, m, n, np, q
    integer, allocatable :: ifixx(:, :)
    real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :), wd(:, :, :), we(:, :, :), &
                                  delta(:, :)
@@ -70,15 +70,15 @@ program example3
 
    ! Read problem dimensions
    open (newunit=lundata, file='./example/data3.dat')
-   read (lundata, fmt=*) n, m, np, nq
+   read (lundata, fmt=*) n, m, np, q
 
    ! Allocate arrays
-   allocate (beta(np), x(n, m), y(n, nq), delta(n, m), we(n, nq, nq), wd(n, m, m), ifixx(n, m))
+   allocate (beta(np), x(n, m), y(n, q), delta(n, m), we(n, q, q), wd(n, m, m), ifixx(n, m))
 
    ! Read problem data
    read (lundata, fmt=*) (beta(i), i=1, np)
    do i = 1, n
-      read (lundata, fmt=*) (x(i, j), j=1, m), (y(i, j), j=1, nq)
+      read (lundata, fmt=*) (x(i, j), j=1, m), (y(i, j), j=1, q)
    end do
    close (lundata)
 
@@ -134,7 +134,7 @@ program example3
 
    ! Compute solution
    call odr(fcn=fcn, &
-            n=n, m=m, np=np, nq=nq, &
+            n=n, m=m, np=np, q=q, &
             beta=beta, &
             y=y, x=x, &
             delta=delta, &

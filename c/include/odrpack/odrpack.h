@@ -37,16 +37,16 @@ ODRPACK_EXTERN void close_file(
  * @param n       `==>` Number of observations.
  * @param m       `==>` Number of columns of data in the independent variable.
  * @param np      `==>` Number of function parameters.
- * @param nq      `==>` Number of responses per observation.
+ * @param q       `==>` Number of responses per observation.
  * @param beta    `==>` Array [np] of current parameter values.
  * @param xplusd  `==>` Array [m][ldn] of current explanatory variable values, i.e., `x + delta`.
  * @param ifixb   `==>` Array [np] of indicators for fixing parameters `beta`.
  * @param ifixx   `==>` Array [m][ldifx] of indicators for fixing explanatory variable `x`.
  * @param ldifx   `==>` Leading dimension of array `ifixx`, `ifixx ∈ {1, n}`
  * @param ideval  `==>` Indicator for selecting computation to be performed.
- * @param f       `<==` Array [nq][n] for predicted function values.
- * @param fjacb   `<==` Array [nq][np][n] for Jacobian with respect to `beta`.
- * @param fjacd   `<==` Array [nq][m][n] for Jacobian with respect to errors `delta`.
+ * @param f       `<==` Array [q][n] for predicted function values.
+ * @param fjacb   `<==` Array [q][np][n] for Jacobian with respect to `beta`.
+ * @param fjacd   `<==` Array [q][m][n] for Jacobian with respect to errors `delta`.
  * @param istop   `<==` Integer for stopping condition. Values:
  *                0 - current `beta` and `x + delta` were acceptable and values were computed successfully,
  *                1 - current `beta` and `x + delta` are not acceptable; ODRPACK95 should select values closer to most recently used values if possible,
@@ -56,7 +56,7 @@ typedef void (*odrpack_fcn_t)(
     const int *n,
     const int *m,
     const int *np,
-    const int *nq,
+    const int *q,
     const double beta[],
     const double xplusd[],
     const int ifixb[],
@@ -76,9 +76,9 @@ typedef void (*odrpack_fcn_t)(
  * @param n      `==>` Number of observations.
  * @param m      `==>` Number of columns of data in the independent variable.
  * @param np     `==>` Number of function parameters.
- * @param nq     `==>` Number of responses per observation.
+ * @param q      `==>` Number of responses per observation.
  * @param beta   `<=>` Array [np] of function parameters.
- * @param y      `==>` Array [nq][n] of dependent variable. Unused when the model is implicit.
+ * @param y      `==>` Array [q][n] of dependent variable. Unused when the model is implicit.
  * @param x      `==>` Array [m][n] of explanatory variable.
  * @param delta  `<=>` Optional array [m][n] with initial error in the `x` data.
  * @param lower  `==>` Optional array [np] with lower bound on `beta`.
@@ -90,7 +90,7 @@ ODRPACK_EXTERN void odr_short_c(
     const int *n,
     const int *m,
     const int *np,
-    const int *nq,
+    const int *q,
     double beta[],
     const double y[],
     const double x[],
@@ -107,16 +107,16 @@ ODRPACK_EXTERN void odr_short_c(
  * @param n      `==>` Number of observations.
  * @param m      `==>` Number of columns of data in the independent variable.
  * @param np     `==>` Number of function parameters.
- * @param nq     `==>` Number of responses per observation.
+ * @param q     `==>` Number of responses per observation.
  * @param ldwe   `==>` Leading dimension of array `we`, `ldwe ∈ {1, n}`.
- * @param ld2we  `==>` Second dimension of array `we`, `ld2we ∈ {1, nq}`.
+ * @param ld2we  `==>` Second dimension of array `we`, `ld2we ∈ {1, q}`.
  * @param ldwd   `==>` Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
  * @param ld2wd  `==>` Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
  * @param ldifx  `==>` Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.
  * @param beta   `<=>` Array [np] of function parameters.
- * @param y      `==>` Array [nq][n] of dependent variable. Unused when the model is implicit.
+ * @param y      `==>` Array [q][n] of dependent variable. Unused when the model is implicit.
  * @param x      `==>` Array [m][n] of explanatory variable.
- * @param we     `==>` Optional array [nq][ld2we][ldwe] with `epsilon` weights.
+ * @param we     `==>` Optional array [q][ld2we][ldwe] with `epsilon` weights.
  * @param wd     `==>` Optional array [m][ld2wd][ldwd] with `delta` weights.
  * @param ifixb  `==>` Optional array [np] with values designating whether the elements of `beta` are fixed at their input values or not.
  * @param ifixx  `==>` Optional array [m][ldifx] with values designating whether the elements of `x` are fixed at their input values or not.
@@ -134,7 +134,7 @@ ODRPACK_EXTERN void odr_medium_c(
     const int *n,
     const int *m,
     const int *np,
-    const int *nq,
+    const int *q,
     const int *ldwe,
     const int *ld2we,
     const int *ldwd,
@@ -164,9 +164,9 @@ ODRPACK_EXTERN void odr_medium_c(
  * @param n      `==>` Number of observations.
  * @param m      `==>` Number of columns of data in the independent variable.
  * @param np     `==>` Number of function parameters.
- * @param nq     `==>` Number of responses per observation.
+ * @param q     `==>` Number of responses per observation.
  * @param ldwe   `==>` Leading dimension of array `we`, `ldwe ∈ {1, n}`.
- * @param ld2we  `==>` Second dimension of array `we`, `ld2we ∈ {1, nq}`.
+ * @param ld2we  `==>` Second dimension of array `we`, `ld2we ∈ {1, q}`.
  * @param ldwd   `==>` Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
  * @param ld2wd  `==>` Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
  * @param ldifx  `==>` Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.
@@ -175,9 +175,9 @@ ODRPACK_EXTERN void odr_medium_c(
  * @param lwork  `==>` Length of array `work`.
  * @param liwork `==>` Length of array `iwork`.
  * @param beta   `<=>` Array [np] of function parameters.
- * @param y      `==>` Array [nq][n] of dependent variable. Unused when the model is implicit.
+ * @param y      `==>` Array [q][n] of dependent variable. Unused when the model is implicit.
  * @param x      `==>` Array [m][n] of explanatory variable.
- * @param we     `==>` Optional array [nq][ld2we][ldwe] with `epsilon` weights.
+ * @param we     `==>` Optional array [q][ld2we][ldwe] with `epsilon` weights.
  * @param wd     `==>` Optional array [m][ld2wd][ldwd] with `delta` weights.
  * @param ifixb  `==>` Optional array [np] with values designating whether the elements of `beta` are fixed at their input values or not.
  * @param ifixx  `==>` Optional array [m][ldifx] with values designating whether the elements of `x` are fixed at their input values or not.
@@ -206,7 +206,7 @@ ODRPACK_EXTERN void odr_long_c(
     const int *n,
     const int *m,
     const int *np,
-    const int *nq,
+    const int *q,
     const int *ldwe,
     const int *ld2we,
     const int *ldwd,
@@ -337,13 +337,13 @@ typedef struct
  *
  * @param m        `==>` Number of columns of data in the explanatory variable.
  * @param np       `==>` Number of function parameters.
- * @param nq       `==>` Number of responses per observation.
+ * @param q        `==>` Number of responses per observation.
  * @param iworkidx `<==` 0-based indexes of integer work array.
  */
 ODRPACK_EXTERN void loc_iwork_c(
     const int *m,
     const int *np,
-    const int *nq,
+    const int *q,
     iworkidx_t *iworkidx);
 
 /**
@@ -352,7 +352,7 @@ ODRPACK_EXTERN void loc_iwork_c(
  * @param n       `==>` Number of observations.
  * @param m       `==>` Number of columns of data in the explanatory variable.
  * @param np      `==>` Number of function parameters.
- * @param nq      `==>` Number of responses per observation.
+ * @param q       `==>` Number of responses per observation.
  * @param ldwe    `==>` Leading dimension of array `we`.
  * @param ld2we   `==>` Second dimension of array `we`.
  * @param isodr   `==>` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
@@ -362,7 +362,7 @@ ODRPACK_EXTERN void loc_rwork_c(
     const int *n,
     const int *m,
     const int *np,
-    const int *nq,
+    const int *q,
     const int *ldwe,
     const int *ld2we,
     const bool *isodr,
@@ -374,7 +374,7 @@ ODRPACK_EXTERN void loc_rwork_c(
  * @param n      `==>` Number of observations.
  * @param m      `==>` Number of columns of data in the explanatory variable.
  * @param np     `==>` Number of function parameters.
- * @param nq     `==>` Number of responses per observation.
+ * @param q      `==>` Number of responses per observation.
  * @param isodr  `==>` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
  * @param lwork  `<==` Length of real `work` array.
  * @param liwork `<==` Length of integer `iwork` array.
@@ -383,7 +383,7 @@ ODRPACK_EXTERN void workspace_dimensions_c(
     const int *n,
     const int *m,
     const int *np,
-    const int *nq,
+    const int *q,
     const bool *isodr,
     int *lwork,
     int *liwork);

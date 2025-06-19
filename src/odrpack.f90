@@ -10,7 +10,7 @@ contains
 
    impure subroutine odr &
       (fcn, &
-       n, m, np, nq, &
+       n, m, np, q, &
        beta, &
        y, x, &
        delta, &
@@ -76,19 +76,19 @@ contains
          !! Number of columns of data in the independent variable.
       integer, intent(in) :: np
          !! Number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! Number of responses per observation.
       real(wp), intent(inout) :: beta(:)
          !! Function parameters. `Shape: (np)`.
       real(wp), intent(in) :: y(:, :)
-         !! Dependent variable. `Shape: (n, nq)`. Unused when the model is implicit.
+         !! Dependent variable. `Shape: (n, q)`. Unused when the model is implicit.
       real(wp), intent(in) :: x(:, :)
          !! Explanatory variable. `Shape: (n, m)`.
       real(wp), intent(inout), optional :: delta(:, :)
          !! Error in the `x` data. `Shape: (n, m)`. Initial guess on input and estimated value
          !! on output.
       real(wp), intent(in), optional, target :: we(:, :, :)
-         !! `epsilon` weights. `Shape: ({1,n}, {1,nq}, nq)`. See p. 25.
+         !! `epsilon` weights. `Shape: ({1,n}, {1,q}, q)`. See p. 25.
       real(wp), intent(in), optional, target :: wd(:, :, :)
          !! `delta` weights. `Shape: ({1,n}, {1,m}, m)`. See p. 26.
       integer, intent(in), optional, target :: ifixb(:)
@@ -211,7 +211,7 @@ contains
          info2_ = 1
       end if
 
-      if (nq < 1) then
+      if (q < 1) then
          info5_ = 1
          info1_ = 1
       end if
@@ -222,7 +222,7 @@ contains
             call print_header(head, lunrpt_)
             call print_error_inputs( &
                lunerr_, info_, info5_, info4_, info3_, info2_, info1_, &
-               n, m, nq, &
+               n, m, q, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
                lwork, liwork)
          end if
@@ -261,7 +261,7 @@ contains
             call print_header(head, lunrpt_)
             call print_error_inputs( &
                lunerr_, info_, info5_, info4_, info3_, info2_, info1_, &
-               n, m, nq, &
+               n, m, q, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
                lwork, liwork)
          end if
@@ -273,7 +273,7 @@ contains
 
       ! Determine the size of the work arrays
       isodr = (job_ < 0 .or. mod(job_, 10) <= 1)
-      call workspace_dimensions(n, m, np, nq, isodr, lwork, liwork)
+      call workspace_dimensions(n, m, np, q, isodr, lwork, liwork)
 
       ! Allocate the local work arrays, if not provided by user
       ! The complementary case is treated below, because of the way the info flags are designed
@@ -287,7 +287,7 @@ contains
          work_ => work_local
       end if
 
-      allocate (tempret(max(n, np), max(nq, m)), stat=info4_)
+      allocate (tempret(max(n, np), max(q, m)), stat=info4_)
 
       if (info4_ /= 0 .or. info3_ /= 0 .or. info2_ /= 0) then
          info5_ = 8
@@ -300,7 +300,7 @@ contains
             call print_header(head, lunrpt_)
             call print_error_inputs( &
                lunerr_, info_, info5_, info4_, info3_, info2_, info1_, &
-               n, m, nq, &
+               n, m, q, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
                lwork, liwork)
          end if
@@ -331,7 +331,7 @@ contains
          info1_ = info1_ + 4
       end if
 
-      if (any(shape(y) /= [n, nq])) then
+      if (any(shape(y) /= [n, q])) then
          info1_ = info1_ + 2
       end if
 
@@ -352,8 +352,8 @@ contains
          ldwe = size(we, 1)
          ld2we = size(we, 2)
          if ((ldwe == 1 .or. ldwe == n) .and. &
-             (ld2we == 1 .or. ld2we == nq) .and. &
-             (size(we, 3) == nq)) then
+             (ld2we == 1 .or. ld2we == q) .and. &
+             (size(we, 3) == q)) then
             we_ => we
          else
             info1_ = info1_ + 16
@@ -361,7 +361,7 @@ contains
       else
          ldwe = 1
          ld2we = 1
-         allocate (we_local(ldwe, ld2we, nq))
+         allocate (we_local(ldwe, ld2we, q))
          we_local = negone
          we_ => we_local
       end if
@@ -496,7 +496,7 @@ contains
             call print_header(head, lunrpt_)
             call print_error_inputs( &
                lunerr_, info_, info5_, info4_, info3_, info2_, info1_, &
-               n, m, nq, &
+               n, m, q, &
                ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, lwork, liwork)
          end if
          if (present(info)) then
@@ -545,7 +545,7 @@ contains
       ! Call the driver routine
       call odrdrive( &
          fcn, &
-         n, m, np, nq, &
+         n, m, np, q, &
          beta, y, x, &
          we_, ldwe, ld2we, &
          wd_, ldwd, ld2wd, &
@@ -570,7 +570,7 @@ contains
    end subroutine odr
 
    impure subroutine odrdrive &
-      (fcn, n, m, np, nq, beta, y, x, &
+      (fcn, n, m, np, q, beta, y, x, &
        we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
        job, ndigit, taufac, sstol, partol, maxit, iprint, lunerr, lunrpt, &
        stpb, stpd, ldstpd, sclb, scld, ldscld, &
@@ -590,15 +590,15 @@ contains
          !! The number of columns of data in the independent variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       real(wp), intent(inout) :: beta(np)
          !! The function parameters.
-      real(wp), intent(in) :: y(n, nq)
+      real(wp), intent(in) :: y(n, q)
          !! The dependent variable. Unused when the model is implicit.
       real(wp), intent(in) :: x(n, m)
          !! The independent variable.
-      real(wp), intent(inout) :: we(ldwe, ld2we, nq)
+      real(wp), intent(inout) :: we(ldwe, ld2we, q)
          !! The `epsilon` weights.
       integer, intent(in) :: ldwe
          !! The leading dimension of array `we`.
@@ -727,7 +727,7 @@ contains
       !  N:       The number of observations.
       !  NDIGIT:  The number of accurate digits in the function results, as supplied by the user.
       !  NP:      The number of function parameters.
-      !  NQ:      The number of responses per observation.
+      !  Q:       The number of responses per observation.
       !  PARTOL:  The user supplied parameter convergence stopping tolerance.
       !  PCHECK:  The value designating the minimum penalty parameter allowed before the implicit
       !           problem can be considered solved.
@@ -801,7 +801,7 @@ contains
          do while (.true.)
             call odrstart &
                (head, fstitr, prtpen, &
-                fcn, n, m, np, nq, beta, y, x, &
+                fcn, n, m, np, q, beta, y, x, &
                 pnlty, 1, 1, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
                 jobi, ndigit, taufac, sstol, cnvtol, maxiti, &
                 iprnti, lunerr, lunrpt, &
@@ -836,7 +836,7 @@ contains
          ! Explicit problem
          call odrstart &
             (head, fstitr, prtpen, &
-             fcn, n, m, np, nq, beta, y, x, &
+             fcn, n, m, np, q, beta, y, x, &
              we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
              job, ndigit, taufac, sstol, partol, maxit, &
              iprint, lunerr, lunrpt, &
@@ -849,7 +849,7 @@ contains
 
    impure subroutine odrstart &
       (head, fstitr, prtpen, &
-       fcn, n, m, np, nq, beta, y, x, &
+       fcn, n, m, np, q, beta, y, x, &
        we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
        job, ndigit, taufac, sstol, partol, maxit, &
        iprint, lunerr, lunrpt, &
@@ -883,15 +883,15 @@ contains
          !! Number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! Number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! Number of responses per observation.
       real(wp), intent(inout) :: beta(np)
          !! Function parameters.
-      real(wp), intent(in) :: y(n, nq)
+      real(wp), intent(in) :: y(n, q)
          !! Dependent variable. Unused when the model is implicit.
       real(wp), intent(in) :: x(n, m)
          !! Explanatory variable.
-      real(wp), intent(inout) :: we(ldwe, ld2we, nq)
+      real(wp), intent(inout) :: we(ldwe, ld2we, q)
          !! `epsilon` weights.
       integer, intent(in) :: ldwe
          !! Leading dimension of array `we`.
@@ -1094,7 +1094,7 @@ contains
       call set_flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
 
       ! Set starting locations within integer workspace
-      call loc_iwork(m, np, nq, &
+      call loc_iwork(m, np, q, &
                      msgb, msgd, jpvti, istopi, &
                      nnzwi, nppi, idfi, &
                      jobi, iprini, luneri, lunrpi, &
@@ -1103,7 +1103,7 @@ contains
                      boundi, liwkmn)
 
       ! Set starting locations within REAL work space
-      call loc_rwork(n, m, np, nq, ldwe, ld2we, isodr, &
+      call loc_rwork(n, m, np, q, ldwe, ld2we, isodr, &
                      deltai, fi, xplusi, fni, sdi, vcvi, &
                      rvari, wssi, wssdei, wssepi, rcondi, etai, &
                      olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
@@ -1116,10 +1116,10 @@ contains
 
       if (isodr) then
          wrk = wrk1i
-         lwrk = n*m*nq + n*nq
+         lwrk = n*m*q + n*q
       else
          wrk = wrk2i
-         lwrk = n*nq
+         lwrk = n*q
       end if
 
       ! Update the penalty parameters
@@ -1150,24 +1150,24 @@ contains
          work(olmavi) = work(olmavi)*iwork(niteri)
 
          if (implct) then
-            work(fi:fi + n*nq - 1) = work(fni:fni + n*nq - 1)
+            work(fi:fi + n*q - 1) = work(fni:fni + n*q - 1)
          else
-            work(fi:fi + n*nq - 1) = &
-               work(fni:fni + n*nq - 1) - reshape(y, [n*nq])
+            work(fi:fi + n*q - 1) = &
+               work(fni:fni + n*q - 1) - reshape(y, [n*q])
          end if
 
-         call scale_mat(n, nq, work(we1i:we1i + ldwe*ld2we*nq - 1), &
-                        ldwe, ld2we, work(fi:fi + n*nq - 1), tempret(1:n, 1:nq))
-         work(fi:fi + n*nq - 1) = reshape(tempret(1:n, 1:nq), [n*nq])
+         call scale_mat(n, q, work(we1i:we1i + ldwe*ld2we*q - 1), &
+                        ldwe, ld2we, work(fi:fi + n*q - 1), tempret(1:n, 1:q))
+         work(fi:fi + n*q - 1) = reshape(tempret(1:n, 1:q), [n*q])
 
-         work(wssepi) = ddot(n*nq, work(fi), 1, work(fi), 1)
+         work(wssepi) = ddot(n*q, work(fi), 1, work(fi), 1)
          work(wssi) = work(wssepi) + work(wssdei)
 
       else
 
          ! Perform error checking
          info = 0
-         call check_inputs(n, m, np, nq, &
+         call check_inputs(n, m, np, q, &
                            isodr, anajac, &
                            beta, ifixb, &
                            ldifx, ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
@@ -1180,7 +1180,7 @@ contains
          end if
 
          ! Initialize work vectors as necessary
-         work(n*m + n*nq + 1:lwork) = zero
+         work(n*m + n*q + 1:lwork) = zero
          iwork = 0
          call init_work(n, m, np, &
                         work, lwork, iwork, liwork, &
@@ -1207,7 +1207,7 @@ contains
 
          ! Check that WD is positive definite and WE is positive semidefinite,
          ! saving factorization of WE, and counting number of nonzero weights
-         call fctrw(n, m, nq, npp, &
+         call fctrw(n, m, q, npp, &
                     isodr, &
                     we, ldwe, ld2we, wd, ldwd, ld2wd, &
                     work(wrk2i), work(wrk4i), &
@@ -1223,21 +1223,21 @@ contains
          work(xplusi:xplusi + n*m - 1) = &
             work(deltai:deltai + n*m - 1) + reshape(x, [n*m])
          istop = 0
-         call fcn(n, m, np, nq, beta, work(xplusi), &
+         call fcn(n, m, np, q, beta, work(xplusi), &
                   ifixb, ifixx, ldifx, 002, work(fni), work(wrk6i), work(wrk1i), istop)
          iwork(istopi) = istop
 
          if (istop == 0) then
             iwork(nfevi) = iwork(nfevi) + 1
             if (implct) then
-               work(fi:fi + n*nq - 1) = work(fni:fni + n*nq - 1)
+               work(fi:fi + n*q - 1) = work(fni:fni + n*q - 1)
             else
-               work(fi:fi + n*nq - 1) = &
-                  work(fni:fni + n*nq - 1) - reshape(y, [n*nq])
+               work(fi:fi + n*q - 1) = &
+                  work(fni:fni + n*q - 1) - reshape(y, [n*q])
             end if
-            call scale_mat(n, nq, work(we1i:we1i + ldwe*ld2we*nq - 1), &
-                           ldwe, ld2we, work(fi:fi + n*nq - 1), tempret(1:n, 1:nq))
-            work(fi:fi + n*nq - 1) = reshape(tempret(1:n, 1:nq), [n*nq])
+            call scale_mat(n, q, work(we1i:we1i + ldwe*ld2we*q - 1), &
+                           ldwe, ld2we, work(fi:fi + n*q - 1), tempret(1:n, 1:q))
+            work(fi:fi + n*q - 1) = reshape(tempret(1:n, 1:q), [n*q])
          else
             info = 52000
             goto 50
@@ -1257,7 +1257,7 @@ contains
          end if
 
          ! Compute sum of squares of the weighted EPSILONS and weighted DELTAS
-         work(wssepi) = ddot(n*nq, work(fi), 1, work(fi), 1)
+         work(wssepi) = ddot(n*q, work(fi), 1, work(fi), 1)
          if (isodr) then
             call scale_mat(n, m, wd, ldwd, ld2wd, work(deltai:deltai + n*m), tempret(1:n, 1:m))
             work(wrk:wrk + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
@@ -1278,7 +1278,7 @@ contains
             iwork(netai) = -1
             nfev = iwork(nfevi)
             call eta_fcn(fcn, &
-                         n, m, np, nq, &
+                         n, m, np, q, &
                          work(xplusi), beta, epsmac, nrow, &
                          work(betani), work(fni), &
                          ifixb, ifixx, ldifx, &
@@ -1341,7 +1341,7 @@ contains
 
             ! Check the derivatives
             call check_jac(fcn, &
-                           n, m, np, nq, &
+                           n, m, np, q, &
                            beta, betaj, work(xplusi), &
                            ifixb, ifixx, ldifx, stpb, stpd, ldstpd, &
                            work(ssfi), work(tti), ldtt, &
@@ -1372,7 +1372,7 @@ contains
             if (lunerr /= 0 .and. iprint /= 0) then
                call print_errors &
                   (info, lunerr, &
-                   n, m, np, nq, &
+                   n, m, np, q, &
                    ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
                    lwkmn, liwkmn, &
                    work(fjacbi), work(fjacdi), &
@@ -1403,10 +1403,10 @@ contains
       work(beta0i:beta0i + np - 1) = beta
 
       ! Find least squares solution
-      work(fsi:fsi + n*nq - 1) = work(fni:fni + n*nq - 1)
+      work(fsi:fsi + n*q - 1) = work(fni:fni + n*q - 1)
       ldtt = iwork(ldtti)
       call odrsolve(head, fstitr, prtpen, &
-                    fcn, n, m, np, nq, job, beta, y, x, &
+                    fcn, n, m, np, q, job, beta, y, x, &
                     we, work(we1i), ldwe, ld2we, wd, ldwd, ld2wd, &
                     ifixb, ifixx, ldifx, &
                     work(betaci), work(betani), work(betasi), work(si), &
@@ -1433,7 +1433,7 @@ contains
 
    impure subroutine odrsolve &
       (head, fstitr, prtpen, &
-       fcn, n, m, np, nq, job, beta, y, x, &
+       fcn, n, m, np, q, job, beta, y, x, &
        we, we1, ldwe, ld2we, wd, ldwd, ld2wd, &
        ifixb, ifixx, ldifx, &
        betac, betan, betas, s, delta, deltan, deltas, &
@@ -1467,19 +1467,19 @@ contains
          !! Number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! Number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! Number of responses per observation.
       integer, intent(inout) :: job
          !! Variable controlling problem initialization and computational method.
       real(wp), intent(inout) :: beta(np)
          !! Model parameters.
-      real(wp), intent(in) :: y(n, nq)
+      real(wp), intent(in) :: y(n, q)
          !! Dependent variable. Unused when the model is implicit.
       real(wp), intent(in) :: x(n, m)
          !! Explanatory variable.
-      real(wp), intent(in) :: we(ldwe, ld2we, nq)
+      real(wp), intent(in) :: we(ldwe, ld2we, q)
          !! `epsilon` weights.
-      real(wp), intent(in) :: we1(ldwe, ld2we, nq)
+      real(wp), intent(in) :: we1(ldwe, ld2we, q)
          !! Square root of the `epsilon` weights.
       integer, intent(in) :: ldwe
          !! Leading dimension of arrays `we` and `we1`.
@@ -1519,19 +1519,19 @@ contains
          !! Upper bound for unfixed `beta`s.
       real(wp), intent(out) :: t(n, m)
          !! Step for `delta`.
-      real(wp), intent(inout) :: f(n, nq)
+      real(wp), intent(inout) :: f(n, q)
          !! Weighted estimated values of `epsilon`.
-      real(wp), intent(out) :: fn(n, nq)
+      real(wp), intent(out) :: fn(n, q)
          !! New predicted values from the function.
-      real(wp), intent(out) :: fs(n, nq)
+      real(wp), intent(out) :: fs(n, q)
          !! Saved predicted values from the function.
-      real(wp), intent(out) :: fjacb(n, np, nq)
+      real(wp), intent(out) :: fjacb(n, np, q)
          !! Jacobian with respect to `beta`.
-      integer, intent(in) :: msgb(nq*np + 1)
+      integer, intent(in) :: msgb(q*np + 1)
          !! Error checking results for the Jacobian with respect to `beta`.
-      real(wp), intent(out) :: fjacd(n, m, nq)
+      real(wp), intent(out) :: fjacd(n, m, q)
          !! Jacobian with respect to `delta`.
-      integer, intent(in) :: msgd(nq*m + 1)
+      integer, intent(in) :: msgd(q*m + 1)
          !! Error checking results for the Jacobian with respect to `delta`.
       real(wp), intent(in) :: ssf(np)
          !! Scaling values used for `beta`.
@@ -1700,7 +1700,7 @@ contains
       !  NPP:     The number of function parameters being estimated.
       !  NPR:     The number of times the report is to be written.
       !  NPU:     The number of unfixed parameters.
-      !  NQ:      The number of responses per observation.
+      !  Q:       The number of responses per observation.
       !  OLMAVG:  The average number of Levenberg-Marquardt steps per iteration.
       !  OMEGA:   The starting location in WORK of array OMEGA.
       !  PARTOL:  The parameter convergence stopping tolerance.
@@ -1765,7 +1765,7 @@ contains
       call set_flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
       access = .true.
       call access_workspace( &
-         n, m, np, nq, ldwe, ld2we, &
+         n, m, np, q, ldwe, ld2we, &
          work, lwork, iwork, liwork, &
          access, isodr, &
          jpvt, omega, u, qraux, sd, vcv, &
@@ -1799,7 +1799,7 @@ contains
          do i = 1, npr
             call print_reports(ipr, lunr, &
                                head, prtpen, fstitr, didvcv, iflag, &
-                               n, m, np, nq, npp, nnzw, &
+                               n, m, np, q, npp, nnzw, &
                                msgb, msgd, beta, y, x, delta, &
                                we, ldwe, ld2we, wd, ldwd, ld2wd, &
                                ifixb, ifixx, ldifx, &
@@ -1849,7 +1849,7 @@ contains
       else
          call eval_jac(fcn, &
                        anajac, cdjac, &
-                       n, m, np, nq, &
+                       n, m, np, q, &
                        betac, beta, stpb, &
                        ifixb, ifixx, ldifx, &
                        x, delta, xplusd, stpd, ldstpd, &
@@ -1875,7 +1875,7 @@ contains
          goto 200
       else
          looped = looped + 1
-         call trust_region(n, m, np, nq, npp, &
+         call trust_region(n, m, np, q, npp, &
                            f, fjacb, fjacd, &
                            wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
                            alpha, tau, eta, isodr, &
@@ -1926,7 +1926,7 @@ contains
 
       ! Compute scaled predicted reduction
       iwrk = 0
-      do l = 1, nq
+      do l = 1, q
          do i = 1, n
             iwrk = iwrk + 1
             wrk(iwrk) = ddot(npp, fjacb(i, 1, l), n, s, 1)
@@ -1937,11 +1937,11 @@ contains
       end do
 
       if (isodr) then
-         call scale_mat(n, m, wd, ldwd, ld2wd, t, wrk(n*nq + 1:n*nq + 1 + n*m - 1))
-         temp1 = ddot(n*nq, wrk, 1, wrk, 1) + ddot(n*m, t, 1, wrk(n*nq + 1), 1)
+         call scale_mat(n, m, wd, ldwd, ld2wd, t, wrk(n*q + 1:n*q + 1 + n*m - 1))
+         temp1 = ddot(n*q, wrk, 1, wrk, 1) + ddot(n*m, t, 1, wrk(n*q + 1), 1)
          temp1 = sqrt(temp1)/rnorm
       else
-         temp1 = dnrm2(n*nq, wrk, 1)/rnorm
+         temp1 = dnrm2(n*q, wrk, 1)/rnorm
       end if
       temp2 = sqrt(alpha)*tsnorm/rnorm
       prered = temp1**2 + temp2**2/p5
@@ -1952,7 +1952,7 @@ contains
       call unpack_vec(np, betan, beta, ifixb)
       xplusd = x + deltan
       istop = 0
-      call fcn(n, m, np, nq, beta, xplusd, &
+      call fcn(n, m, np, q, beta, xplusd, &
                ifixb, ifixx, ldifx, 002, fn, work(wrk6), work(wrk1), istop)
       if (istop == 0) then
          nfev = nfev + 1
@@ -1968,18 +1968,18 @@ contains
       else
          ! Compute norm of new weighted EPSILONS and weighted DELTAS (RNORMN)
          if (implct) then
-            wrk(1:n*nq) = reshape(fn, [n*nq])
+            wrk(1:n*q) = reshape(fn, [n*q])
          else
-            wrk(1:n*nq) = reshape(fn - y, [n*nq])
+            wrk(1:n*q) = reshape(fn - y, [n*q])
          end if
-         call scale_mat(n, nq, we1, ldwe, ld2we, wrk, tempret(1:n, 1:nq))
-         wrk(1:n*nq) = reshape(tempret(1:n, 1:nq), [n*nq])
+         call scale_mat(n, q, we1, ldwe, ld2we, wrk, tempret(1:n, 1:q))
+         wrk(1:n*q) = reshape(tempret(1:n, 1:q), [n*q])
          if (isodr) then
-            call scale_mat(n, m, wd, ldwd, ld2wd, deltan, wrk(n*nq + 1:n*nq + 1 + n*m - 1))
-            rnormn = sqrt(ddot(n*nq, wrk, 1, wrk, 1) + &
-                          ddot(n*m, deltan, 1, wrk(n*nq + 1), 1))
+            call scale_mat(n, m, wd, ldwd, ld2wd, deltan, wrk(n*q + 1:n*q + 1 + n*m - 1))
+            rnormn = sqrt(ddot(n*q, wrk, 1, wrk, 1) + &
+                          ddot(n*m, deltan, 1, wrk(n*q + 1), 1))
          else
-            rnormn = dnrm2(n*nq, wrk, 1)
+            rnormn = dnrm2(n*q, wrk, 1)
          end if
       end if
 
@@ -2055,8 +2055,8 @@ contains
          else
             f = fs - y
          end if
-         call scale_mat(n, nq, we1, ldwe, ld2we, f, tempret(1:n, 1:nq))
-         f = tempret(1:n, 1:nq)
+         call scale_mat(n, q, we1, ldwe, ld2we, f, tempret(1:n, 1:q))
+         f = tempret(1:n, 1:q)
          betac(1:npp) = betan(1:npp)
          delta = deltan
          rnorm = rnormn
@@ -2105,7 +2105,7 @@ contains
                do i = 1, npr
                   call print_reports(ipr, lunr, &
                                      head, prtpen, fstitr, didvcv, iflag, &
-                                     n, m, np, nq, npp, nnzw, &
+                                     n, m, np, q, npp, nnzw, &
                                      msgb, msgd, beta, y, x, delta, &
                                      we, ldwe, ld2we, wd, ldwd, ld2wd, &
                                      ifixb, ifixx, ldifx, &
@@ -2168,7 +2168,7 @@ contains
          if (redoj) then
             call eval_jac(fcn, &
                           anajac, cdjac, &
-                          n, m, np, nq, &
+                          n, m, np, q, &
                           betac, beta, stpb, &
                           ifixb, ifixx, ldifx, &
                           x, delta, xplusd, stpd, ldstpd, &
@@ -2187,13 +2187,13 @@ contains
          end if
 
          if (implct) then
-            call scale_mat(n, m, wd, ldwd, ld2wd, delta, wrk(n*nq + 1:n*nq + 1 + n*m - 1))
-            rss = ddot(n*m, delta, 1, wrk(n*nq + 1), 1)
+            call scale_mat(n, m, wd, ldwd, ld2wd, delta, wrk(n*q + 1:n*q + 1 + n*m - 1))
+            rss = ddot(n*m, delta, 1, wrk(n*q + 1), 1)
          else
             rss = rnorm*rnorm
          end if
          if (redoj .or. niter >= 1) then
-            call vcv_beta(n, m, np, nq, npp, &
+            call vcv_beta(n, m, np, q, npp, &
                           f, fjacb, fjacd, &
                           wd, ldwd, ld2wd, ssf, ss, tt, ldtt, delta, &
                           eta, isodr, &
@@ -2248,11 +2248,11 @@ contains
       end if
 
       ! Compute weighted sums of squares for return to user
-      call scale_mat(n, nq, we1, ldwe, ld2we, f, wrk(1:n*nq))
-      wss(3) = ddot(n*nq, wrk, 1, wrk, 1)
+      call scale_mat(n, q, we1, ldwe, ld2we, f, wrk(1:n*q))
+      wss(3) = ddot(n*q, wrk, 1, wrk, 1)
       if (isodr) then
-         call scale_mat(n, m, wd, ldwd, ld2wd, delta, wrk(n*nq + 1:n*nq + 1 + n*m - 1))
-         wss(2) = ddot(n*m, delta, 1, wrk(n*nq + 1), 1)
+         call scale_mat(n, m, wd, ldwd, ld2wd, delta, wrk(n*q + 1:n*q + 1 + n*m - 1))
+         wss(2) = ddot(n*m, delta, 1, wrk(n*q + 1), 1)
       else
          wss(2) = zero
       end if
@@ -2260,7 +2260,7 @@ contains
 
       access = .false.
       call access_workspace( &
-         n, m, np, nq, ldwe, ld2we, &
+         n, m, np, q, ldwe, ld2we, &
          work, lwork, iwork, liwork, &
          access, isodr, &
          jpvt, omega, u, qraux, sd, vcv, &
@@ -2307,7 +2307,7 @@ contains
          do i = 1, npr
             call print_reports(ipr, lunr, &
                                head, prtpen, fstitr, didvcv, iflag, &
-                               n, m, np, nq, npp, nnzw, &
+                               n, m, np, q, npp, nnzw, &
                                msgb, msgd, beta, y, x, delta, &
                                we, ldwe, ld2we, wd, ldwd, ld2wd, &
                                iwork(jpvt), ifixx, ldifx, &
@@ -2328,7 +2328,7 @@ contains
 
    end subroutine odrsolve
 
-   pure subroutine workspace_dimensions(n, m, np, nq, isodr, lwork, liwork)
+   pure subroutine workspace_dimensions(n, m, np, q, isodr, lwork, liwork)
    !! Calculate the dimensions of the workspace arrays.
 
       integer, intent(in) :: n
@@ -2337,7 +2337,7 @@ contains
          !! Number of columns of data in the independent variable.
       integer, intent(in) :: np
          !! Number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! Number of responses per observation.
       logical, intent(in) :: isodr
          !! The variable designating whether the solution is by ODR (`isodr = .true.`)
@@ -2348,14 +2348,14 @@ contains
          !! Length of `iwork` array.
 
       if (isodr) then
-         lwork = 18 + 13*np + np**2 + m + m**2 + 4*n*nq + 6*n*m + 2*n*nq*np + &
-                 2*n*nq*m + nq**2 + 5*nq + nq*(np + m) + n*nq*nq
+         lwork = 18 + 13*np + np**2 + m + m**2 + 4*n*q + 6*n*m + 2*n*q*np + &
+                 2*n*q*m + q**2 + 5*q + q*(np + m) + n*q**2
       else
-         lwork = 18 + 13*np + np**2 + m + m**2 + 4*n*nq + 2*n*m + 2*n*nq*np + &
-                 5*nq + nq*(np + m) + n*nq*nq
+         lwork = 18 + 13*np + np**2 + m + m**2 + 4*n*q + 2*n*m + 2*n*q*np + &
+                 5*q + q*(np + m) + n*q**2
       end if
 
-      liwork = 20 + 2*np + nq*(np + m)
+      liwork = 20 + 2*np + q*(np + m)
 
    end subroutine workspace_dimensions
 

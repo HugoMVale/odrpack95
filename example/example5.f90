@@ -7,13 +7,13 @@ module example5_model
 contains
 
    pure subroutine fcn( &
-      n, m, np, nq, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+      n, m, np, q, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
    !! User-supplied subroutine for evaluating the model.
 
-      integer, intent(in) :: ideval, ldifx, m, n, np, nq
+      integer, intent(in) :: ideval, ldifx, m, n, np, q
       integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
       real(kind=wp), intent(in) :: beta(np), xplusd(n, m)
-      real(kind=wp), intent(out) :: f(n, nq), fjacb(n, np, nq), fjacd(n, m, nq)
+      real(kind=wp), intent(out) :: f(n, q), fjacb(n, np, q), fjacd(n, m, q)
       integer, intent(out) :: istop
 
       istop = 0
@@ -49,7 +49,7 @@ program example5
 
    real(kind=wp), allocatable :: beta(:), lower(:), upper(:), x(:, :), y(:, :), work(:)
    integer, allocatable :: iwork(:)
-   integer :: np, n, m, nq, job
+   integer :: np, n, m, q, job
    integer :: lwork, liwork !, i
 
    job = 20
@@ -57,9 +57,9 @@ program example5
    np = 2
    n = 4
    m = 1
-   nq = 1
+   q = 1
 
-   allocate (beta(np), lower(np), upper(np), x(n, m), y(n, nq))
+   allocate (beta(np), lower(np), upper(np), x(n, m), y(n, q))
 
    beta(1:2) = [2.0_wp, 0.5_wp]
    lower(1:2) = [0.0_wp, 0.0_wp]
@@ -69,11 +69,11 @@ program example5
 
    ! Manual allocation of work arrays
    ! Not required! Just to show it can be done if so desired
-   call workspace_dimensions(n, m, np, nq, .true., lwork, liwork)
+   call workspace_dimensions(n, m, np, q, .true., lwork, liwork)
    allocate (iwork(liwork))
    allocate (work(lwork))
 
-   call odr(fcn, n, m, np, nq, beta, y, x, job=job, iwork=iwork, work=work, &
+   call odr(fcn, n, m, np, q, beta, y, x, job=job, iwork=iwork, work=work, &
             lower=lower, upper=upper)
 
    ! Remove the comments to print out 'iwork'

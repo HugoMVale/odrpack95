@@ -7,13 +7,13 @@ module example2_model
 contains
 
    pure subroutine fcn( &
-      n, m, np, nq, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+      n, m, np, q, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
    !! User-supplied subroutine for evaluating the model.
 
-      integer, intent(in) :: ideval, ldifx, m, n, np, nq
+      integer, intent(in) :: ideval, ldifx, m, n, np, q
       integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
       real(kind=wp), intent(in) :: beta(np), xplusd(n, m)
-      real(kind=wp), intent(out) :: f(n, nq), fjacb(n, np, nq), fjacd(n, m, nq)
+      real(kind=wp), intent(out) :: f(n, q), fjacb(n, np, q), fjacd(n, m, q)
       integer, intent(out) :: istop
 
       ! Local variables
@@ -29,7 +29,7 @@ contains
 
       ! Compute predicted values
       if (mod(ideval, 10) >= 1) then
-         do i = 1, nq
+         do i = 1, q
             f(:, i) = beta(3)*(xplusd(:, 1) - beta(1))**2 + &
                       2*beta(4)*(xplusd(:, 1) - beta(1))*(xplusd(:, 2) - beta(2)) + &
                       beta(5)*(xplusd(:, 2) - beta(2))**2 - one
@@ -42,14 +42,14 @@ end module example2_model
 
 program example2
    !! Implicit ODR job.
-    
+
    use odrpack, only: odr
    use odrpack_kinds, only: wp
    use example2_model, only: fcn
    implicit none
 
    ! Variable declarations
-   integer :: i, info, j, job, lundata, lunrpt, m, n, np, nq
+   integer :: i, info, j, job, lundata, lunrpt, m, n, np, q
    real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :)
 
    ! Set up report files
@@ -57,10 +57,10 @@ program example2
 
    ! Read problem dimensions
    open (newunit=lundata, file='./example/data2.dat')
-   read (lundata, fmt=*) n, m, np, nq
+   read (lundata, fmt=*) n, m, np, q
 
    ! Allocate arrays
-   allocate (beta(np), x(n, m), y(n, nq))
+   allocate (beta(np), x(n, m), y(n, q))
 
    ! Read problem data
    read (lundata, fmt=*) (beta(i), i=1, np)
@@ -78,7 +78,7 @@ program example2
 
    ! Compute solution
    call odr(fcn=fcn, &
-            n=n, m=m, np=np, nq=nq, &
+            n=n, m=m, np=np, q=q, &
             beta=beta, &
             y=y, x=x, &
             job=job, &
