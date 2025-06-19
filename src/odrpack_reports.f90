@@ -33,7 +33,7 @@ contains
    impure subroutine print_reports &
       (ipr, lunrpt, &
        head, prtpen, fstitr, didvcv, iflag, &
-       n, m, np, nq, npp, nnzw, &
+       n, m, np, q, npp, nnzw, &
        msgb, msgd, beta, y, x, delta, &
        we, ldwe, ld2we, wd, ldwd, ld2wd, &
        ifixb, ifixx, ldifx, &
@@ -71,25 +71,25 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       integer, intent(in) :: npp
          !! The number of function parameters being estimated.
       integer, intent(in) :: nnzw
          !! The number of nonzero weighted observations.
-      integer, intent(in) :: msgb(nq*np + 1)
+      integer, intent(in) :: msgb(q*np + 1)
          !! The error checking results for the Jacobian with respect to `beta`.
-      integer, intent(in) :: msgd(nq*m + 1)
+      integer, intent(in) :: msgd(q*m + 1)
          !! The error checking results for the Jacobian with respect to `delta`.
       real(wp), intent(in) :: beta(np)
          !! The function parameters.
-      real(wp), intent(in) :: y(n, nq)
+      real(wp), intent(in) :: y(n, q)
          !! The response variable. Unused when the model is implicit.
       real(wp), intent(in) :: x(n, m)
          !! The explanatory variable.
       real(wp), intent(in) :: delta(n, m)
          !! The estimated errors in the explanatory variables.
-      real(wp), intent(in) :: we(ldwe, ld2we, nq)
+      real(wp), intent(in) :: we(ldwe, ld2we, q)
          !! The `epsilon` weights.
       integer, intent(in) :: ldwe
          !! The leading dimension of array `we`.
@@ -165,7 +165,7 @@ contains
          !! The norm of the scaled estimated parameters.
       real(wp), intent(in) :: alpha
          !! The Levenberg-Marquardt parameter.
-      real(wp), intent(in) :: f(n, nq)
+      real(wp), intent(in) :: f(n, q)
          !! The estimated values of `epsilon`.
       real(wp), intent(in) :: rcond
          !! The approximate reciprocal condition of `tfjacb`.
@@ -222,7 +222,7 @@ contains
          call print_report_initial &
             (ipr, lunrpt, &
              anajac, cdjac, chkjac, initd, restrt, isodr, implct, dovcv, redoj, &
-             msgb(1), msgb(2), msgd(1), msgd(2), n, m, np, nq, npp, nnzw, x, &
+             msgb(1), msgb(2), msgd(1), msgd(2), n, m, np, q, npp, nnzw, x, &
              ifixx, ldifx, delta, wd, ldwd, ld2wd, tt, ldtt, stpd, ldstpd, &
              y, we, ldwe, ld2we, pnlty, beta, ifixb, ssf, stpb, lower, &
              upper, job, neta, taufac, sstol, partol, maxit, wss(1), wss(2), &
@@ -246,7 +246,7 @@ contains
          call print_report_final &
             (ipr, lunrpt, &
              isodr, implct, didvcv, dovcv, redoj, anajac, &
-             n, m, np, nq, npp, &
+             n, m, np, q, npp, &
              info, niter, nfev, njev, irank, rcond, istop, &
              wss(1), wss(2), wss(3), pnlty, rvar, idf, &
              beta, sdbeta, ifixb, f, delta, lower, upper)
@@ -267,7 +267,7 @@ contains
       (ipr, lunrpt, &
        anajac, cdjac, chkjac, initd, restrt, isodr, implct, dovcv, redoj, &
        msgb1, msgb, msgd1, msgd, &
-       n, m, np, nq, npp, nnzw, &
+       n, m, np, q, npp, nnzw, &
        x, ifixx, ldifx, delta, wd, ldwd, ld2wd, tt, ldtt, stpd, ldstpd, &
        y, we, ldwe, ld2we, pnlty, beta, ifixb, ssf, stpb, lower, &
        upper, job, neta, taufac, sstol, partol, maxit, wss, wssdel, wsseps)
@@ -309,11 +309,11 @@ contains
          !! computation of the covariance matrix (`redoj = .true.`) or not (`redoj = .false.`).
       integer, intent(in) :: msgb1
          !! The error checking results for the Jacobian with respect to `beta`.
-      integer, intent(in) :: msgb(nq, np)
+      integer, intent(in) :: msgb(q, np)
          !! The error checking results for the Jacobian with respect to `beta`.
       integer, intent(in) :: msgd1
          !! The error checking results for the Jacobian with respect to `delta`.
-      integer, intent(in) :: msgd(nq, m)
+      integer, intent(in) :: msgd(q, m)
          !! The error checking results for the Jacobian with respect to `delta`.
       integer, intent(in) :: n
          !! The number of observations.
@@ -321,7 +321,7 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       integer, intent(in) :: npp
          !! The number of function parameters being estimated.
@@ -349,9 +349,9 @@ contains
          !! The relative step used for computing finite difference derivatives with respect to `delta`.
       integer, intent(in) :: ldstpd
          !! The leading dimension of array `stpd`.
-      real(wp), intent(in) :: y(n, nq)
+      real(wp), intent(in) :: y(n, q)
          !! The response variable. Unused when the model is implicit.
-      real(wp), intent(in) :: we(ldwe, ld2we, nq)
+      real(wp), intent(in) :: we(ldwe, ld2we, q)
          !! The `epsilon` weights.
       integer, intent(in) :: ldwe
          !! The leading dimension of array `we`.
@@ -420,7 +420,7 @@ contains
       !  TEMP3:   A temporary REAL (wp) value.
 
       ! Print problem size specification
-      write (lunrpt, 1000) n, nnzw, nq, m, np, npp
+      write (lunrpt, 1000) n, nnzw, q, m, np, npp
 
       ! Print control values
       job1 = job/10000
@@ -529,7 +529,7 @@ contains
                    ((msgb1 >= 1) .or. &
                     (msgd1 >= 1))) then
                   itemp = -1
-                  do l = 1, nq
+                  do l = 1, q
                      itemp = max(itemp, msgb(l, j))
                   end do
                   if (itemp <= -1) then
@@ -637,7 +637,7 @@ contains
                            (msgd1 >= 1)) .and. &
                           (i == 1))) then
                         itemp = -1
-                        do l = 1, nq
+                        do l = 1, q
                            itemp = max(itemp, msgd(l, j))
                         end do
                         if (itemp <= -1) then
@@ -704,7 +704,7 @@ contains
          if (.not. implct) then
             write (lunrpt, 3000)
             write (lunrpt, 3100)
-            do l = 1, nq
+            do l = 1, q
                tempc0 = '1,'
                do i = 1, n, n - 1
                   if (we(1, 1, 1) < zero) then
@@ -722,7 +722,7 @@ contains
                         temp1 = we(i, l, l)
                      end if
                   end if
-                  if (nq <= 9) then
+                  if (q <= 9) then
                      write (lunrpt, 5110) &
                         tempc0, l, y(i, l), temp1
                   else
@@ -731,7 +731,7 @@ contains
                   end if
                   tempc0 = 'N,'
                end do
-               if (l < nq) write (lunrpt, 6000)
+               if (l < q) write (lunrpt, 6000)
             end do
          end if
       end if
@@ -742,7 +742,7 @@ contains
          (/' --- Problem Size:'/ &
            '            N = ', I5, &
            '          (number with nonzero weight = ', I5, ')'/ &
-           '           NQ = ', I5/ &
+           '            Q = ', I5/ &
            '            M = ', I5/ &
            '           NP = ', I5, &
            '          (number unfixed = ', I5, ')')
@@ -1064,7 +1064,7 @@ contains
    impure subroutine print_report_final &
       (ipr, lunrpt, &
        isodr, implct, didvcv, dovcv, redoj, anajac, &
-       n, m, np, nq, npp, &
+       n, m, np, q, npp, &
        info, niter, nfev, njev, irank, rcond, istop, &
        wss, wssdel, wsseps, pnlty, rvar, idf, &
        beta, sdbeta, ifixb2, f, delta, &
@@ -1101,7 +1101,7 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       integer, intent(in) :: npp
          !! The number of function parameters being estimated.
@@ -1140,7 +1140,7 @@ contains
       integer, intent(in) :: ifixb2(np)
          !! The values designating whether the elements of `beta` were estimated, fixed, or
          !! dropped because they caused rank deficiency.
-      real(wp), intent(in) :: f(n, nq)
+      real(wp), intent(in) :: f(n, q)
          !! The estimated values of `epsilon`.
       real(wp), intent(in) :: delta(n, m)
          !! The estimated errors in the explanatory variables.
@@ -1327,22 +1327,22 @@ contains
          end do
 
       elseif (isodr .and. &
-              (nq + m <= 4)) then
+              (q + m <= 4)) then
          write (lunrpt, 4110)
-         write (fmt1, 9120) nq, m
-         write (lunrpt, fmt1) (l, l=1, nq), (j, j=1, m)
+         write (fmt1, 9120) q, m
+         write (lunrpt, fmt1) (l, l=1, q), (j, j=1, m)
          do i = 1, n
-            write (lunrpt, 4130) i, (f(i, l), l=1, nq), (delta(i, j), j=1, m)
+            write (lunrpt, 4130) i, (f(i, l), l=1, q), (delta(i, j), j=1, m)
          end do
 
       elseif (.not. isodr .and. &
-              ((nq >= 2) .and. &
-               (nq <= 4))) then
+              ((q >= 2) .and. &
+               (q <= 4))) then
          write (lunrpt, 4120)
-         write (fmt1, 9130) nq
-         write (lunrpt, fmt1) (l, l=1, nq)
+         write (fmt1, 9130) q
+         write (lunrpt, fmt1) (l, l=1, q)
          do i = 1, n
-            write (lunrpt, 4130) i, (f(i, l), l=1, nq)
+            write (lunrpt, 4130) i, (f(i, l), l=1, q)
          end do
       else
 
@@ -1350,7 +1350,7 @@ contains
          if (.not. implct) then
 
             ! Print EPSILON'S
-            do j = 1, nq
+            do j = 1, q
                write (lunrpt, 4200) j
                if (n == 1) then
                   write (lunrpt, 7100)
@@ -1598,7 +1598,7 @@ contains
 
    impure subroutine print_errors &
       (info, lunerr, &
-       n, m, np, nq, &
+       n, m, np, q, &
        ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
        lwkmn, liwkmn, &
        fjacb, fjacd, &
@@ -1616,7 +1616,7 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       integer, intent(in) :: ldscld
          !! The leading dimension of array `scld`.
@@ -1634,19 +1634,19 @@ contains
          !! The minimum acceptable length of array `work`.
       integer, intent(in) :: liwkmn
          !! The minimum acceptable length of array `iwork`.
-      real(wp), intent(in) :: fjacb(n, np, nq)
+      real(wp), intent(in) :: fjacb(n, np, q)
          !! The Jacobian with respect to `beta`.
-      real(wp), intent(in) :: fjacd(n, m, nq)
+      real(wp), intent(in) :: fjacd(n, m, q)
          !! The Jacobian with respect to `delta`.
-      real(wp), intent(in) :: diff(nq, np + m)
+      real(wp), intent(in) :: diff(q, np + m)
          !! The relative differences between the user-supplied and finite difference
          !! derivatives for each derivative checked.
-      integer, intent(in) :: msgb(nq*np + 1)
+      integer, intent(in) :: msgb(q*np + 1)
          !! The error checking results for the Jacobian with respect to `beta`.
       logical, intent(in) :: isodr
          !! The variable designating whether the solution is by ODR (`isodr = .true.`) or
          !! by OLS (`isodr = .false.`).
-      integer, intent(in) :: msgd(nq*m + 1)
+      integer, intent(in) :: msgd(q*m + 1)
          !! The error checking results for the Jacobian with respect to `delta`.
       real(wp), intent(in) :: xplusd(n, m)
          !! The values `x + delta`.
@@ -1692,7 +1692,7 @@ contains
          !         number of good digits in X
          !         weights
          call print_error_inputs(lunerr, info, d1, d2, d3, d4, d5, &
-                                 n, m, nq, &
+                                 n, m, q, &
                                  ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
                                  lwkmn, liwkmn)
 
@@ -1700,7 +1700,7 @@ contains
 
          ! Print appropriate messages for derivative checking
          call print_error_derivative(lunerr, &
-                                     n, m, np, nq, &
+                                     n, m, np, q, &
                                      fjacb, fjacd, &
                                      diff, msgb(1), msgb(2), isodr, msgd(1), msgd(2), &
                                      xplusd, nrow, neta, ntol)
@@ -1725,7 +1725,7 @@ contains
          (//' The correct form of the call statement is '// &
            '       call odr'/ &
            '      +     (fcn,'/ &
-           '      +     n, m, np, nq,'/ &
+           '      +     n, m, np, q,'/ &
            '      +     beta,'/ &
            '      +     y, x,'/ &
            '      +     delta*,'/ &
@@ -1745,7 +1745,7 @@ contains
 
    impure subroutine print_error_inputs &
       (lunerr, info, d1, d2, d3, d4, d5, &
-       n, m, nq, &
+       n, m, q, &
        ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
        lwkmn, liwkmn)
    !! Print error reports.
@@ -1768,7 +1768,7 @@ contains
          !! The number of observations.
       integer, intent(in) :: m
          !! The number of columns of data in the explanatory variable.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       integer, intent(in) :: ldscld
          !! The leading dimension of array `scld`.
@@ -1886,13 +1886,13 @@ contains
          if (d4 /= 0) then
             if (d4 == 1) then
                if (ldwe >= n) then
-                  if (ld2we >= nq) then
+                  if (ld2we >= q) then
                      write (lunerr, 3310)
                   else
                      write (lunerr, 3320)
                   end if
                else
-                  if (ld2we >= nq) then
+                  if (ld2we >= q) then
                      write (lunerr, 3410)
                   else
                      write (lunerr, 3420)
@@ -2056,7 +2056,7 @@ contains
 1300  format &
          (/' ERROR :  NP is less than one or NP is greater than N.')
 1400  format &
-         (/' ERROR :  NQ is less than one.')
+         (/' ERROR :  Q is less than one.')
 2110  format &
          (/' ERROR :  SIZE(X, 1) is different from N.')
 2120  format &
@@ -2069,7 +2069,7 @@ contains
          (/' ERROR :  LDSTPD is less than N and LDSTPD is not equal to one.')
 2310  format &
          (/' ERROR :  LDWE is less than N and LDWE is not equal to one or'/ &
-           '          or LD2WE is less than NQ and LD2WE is not equal to one.')
+           '          or LD2WE is less than Q and LD2WE is not equal to one.')
 2320  format &
          (/' ERROR :  LDWD is less than N and LDWD is not equal to one.')
 2410  format &
@@ -2101,23 +2101,23 @@ contains
          (/' ERROR :  STPB(K) <= 0 for some K = 1, ..., NP.'/ &
            '          All NP elements of STPB must be greater than zero.')
 3310  format &
-         (/' ERROR :  At least one of the (NQ by NQ) arrays starting'/ &
+         (/' ERROR :  At least one of the (Q by Q) arrays starting'/ &
            '          in WE(I,1,1), I = 1, ..., N, is not positive semidefinite.'/ &
-           '          When WE(1,1,1) >= 0 and LDWE = N and LD2WE = NQ, then each of'/ &
-           '          the (NQ by NQ) arrays in WE must be positive semidefinite.')
+           '          When WE(1,1,1) >= 0 and LDWE = N and LD2WE = Q, then each of'/ &
+           '          the (Q by Q) arrays in WE must be positive semidefinite.')
 3320  format &
-         (/' ERROR :  At least one of the (1 by NQ) arrays starting'/ &
+         (/' ERROR :  At least one of the (1 by Q) arrays starting'/ &
            '          in WE(I,1,1), I = 1, ..., N, has a negative element.'/ &
            '          When WE(1,1,1) >= 0 and LDWE = N and LD2WE = 1, then each of'/ &
-           '          the (1 by NQ) arrays in WE must have only non-negative elements.')
+           '          the (1 by Q) arrays in WE must have only non-negative elements.')
 3410  format &
-         (/' ERROR :  The (NQ by NQ) array starting in WE(1,1,1) is not positive semidefinite.'/ &
-           '          When WE(1,1,1) >= 0 and LDWE = 1 and LD2WE = NQ, then'/ &
-           '          the (NQ by NQ) array in WE must be positive semidefinite.')
+         (/' ERROR :  The (Q by Q) array starting in WE(1,1,1) is not positive semidefinite.'/ &
+           '          When WE(1,1,1) >= 0 and LDWE = 1 and LD2WE = Q, then'/ &
+           '          the (Q by Q) array in WE must be positive semidefinite.')
 3420  format &
-         (/' ERROR :  The (1 by NQ) array starting in WE(1,1,1) has a negative element.'/ &
+         (/' ERROR :  The (1 by Q) array starting in WE(1,1,1) has a negative element.'/ &
            '          When WE(1,1,1) >= 0 and LDWE = 1 and LD2WE = 1, then'/ &
-           '          the (1 by NQ) array in WE must have only nonnegative elements.')
+           '          the (1 by Q) array in WE must have only nonnegative elements.')
 3500  format &
          (/' ERROR :  The number of nonzero arrays in array WE is less than NP.')
 4310  format &
@@ -2203,7 +2203,7 @@ contains
 
    impure subroutine print_error_derivative &
       (lunerr, &
-       n, m, np, nq, &
+       n, m, np, q, &
        fjacb, fjacd, &
        diff, msgb1, msgb, isodr, msgd1, msgd, &
        xplusd, nrow, neta, ntol)
@@ -2217,25 +2217,25 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
-      real(wp), intent(in) :: fjacb(n, np, nq)
+      real(wp), intent(in) :: fjacb(n, np, q)
          !! The Jacobian with respect to `beta`.
-      real(wp), intent(in) :: fjacd(n, m, nq)
+      real(wp), intent(in) :: fjacd(n, m, q)
          !! The Jacobian with respect to `delta`.
-      real(wp), intent(in) :: diff(nq, np + m)
+      real(wp), intent(in) :: diff(q, np + m)
          !! The relative differences between the user-supplied and finite difference derivatives
          !! for each derivative checked.
       integer, intent(in) :: msgb1
          !! The error checking results for the Jacobian with respect to `beta`.
-      integer, intent(in) :: msgb(nq, np)
+      integer, intent(in) :: msgb(q, np)
          !! The error checking results for the Jacobian with respect to `beta`.
       logical, intent(in) :: isodr
          !! The variable designating whether the solution is by ODR (`isodr = .true.`) or by
          !! OLS (`isodr = .false.`).
       integer, intent(in) :: msgd1
          !! The error checking results for the Jacobian with respect to `delta`.
-      integer, intent(in) :: msgd(nq, m)
+      integer, intent(in) :: msgd(q, m)
          !! The error checking results for the Jacobian with respect to `delta`.
       real(wp), intent(in) :: xplusd(n, m)
          !! The values of `x` + `delta`.
@@ -2269,7 +2269,7 @@ contains
 
       ftnote = .false.
 
-      do l = 1, nq
+      do l = 1, q
          if (msgb1 >= 1) then
             do i = 1, np
                if (msgb(l, i) >= 1) then
@@ -2298,7 +2298,7 @@ contains
       end if
       write (lunerr, 1000) typ
 
-      do l = 1, nq
+      do l = 1, q
 
          write (lunerr, 2100) l, nrow
          write (lunerr, 2200)
