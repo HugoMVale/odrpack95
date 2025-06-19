@@ -6,7 +6,7 @@ module odrpack_core
 
    abstract interface
       subroutine fcn_t( &
-         n, m, np, nq, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+         n, m, np, q, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
       !! User-supplied subroutine for evaluating the model.
          import :: wp
          implicit none
@@ -16,7 +16,7 @@ module odrpack_core
             !! Number of columns of data in the independent variable.
          integer, intent(in) :: np
             !! Number of function parameters.
-         integer, intent(in) :: nq
+         integer, intent(in) :: q
             !! Number of responses per observation.
          real(wp), intent(in) :: beta(np)
             !! Current values of parameters.
@@ -30,11 +30,11 @@ module odrpack_core
             !! Leading dimension of array `ifixx`.
          integer, intent(in) :: ideval
             !! Indicator for selecting computation to be performed.
-         real(wp), intent(out) :: f(n, nq)
+         real(wp), intent(out) :: f(n, q)
             !! Predicted function values.
-         real(wp), intent(out) :: fjacb(n, np, nq)
+         real(wp), intent(out) :: fjacb(n, np, q)
             !! Jacobian with respect to `beta`.
-         real(wp), intent(out) :: fjacd(n, m, nq)
+         real(wp), intent(out) :: fjacd(n, m, q)
             !! Jacobian with respect to errors `delta`.
          integer, intent(out) :: istop
             !! Stopping condition, with meaning as follows. 0 means current `beta` and
@@ -48,7 +48,7 @@ module odrpack_core
 contains
 
    subroutine trust_region &
-      (n, m, np, nq, npp, &
+      (n, m, np, q, npp, &
        f, fjacb, fjacd, &
        wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
        alpha2, tau, epsfcn, isodr, &
@@ -67,15 +67,15 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       integer, intent(in) :: npp
          !! The number of function parameters being estimated.
-      real(wp), intent(in) :: f(n, nq)
+      real(wp), intent(in) :: f(n, q)
          !! The (weighted) estimated values of `epsilon`.
-      real(wp), intent(in) :: fjacb(n, np, nq)
+      real(wp), intent(in) :: fjacb(n, np, q)
          !! The Jacobian with respect to `beta`.
-      real(wp), intent(in) :: fjacd(n, m, nq)
+      real(wp), intent(in) :: fjacd(n, m, q)
          !! The Jacobian with respect to `delta`.
       real(wp), intent(in) :: wd(ldwd, ld2wd, m)
          !! The `delta` weights.
@@ -100,9 +100,9 @@ contains
       logical, intent(in) :: isodr
          !! The variable designating whether the solution is by ODR (`isodr = .true.`)
          !! or by OLS (`isodr = .false.`).
-      real(wp), intent(out) :: tfjacb(n, nq, np)
+      real(wp), intent(out) :: tfjacb(n, q, np)
          !! The array `omega*fjacb`.
-      real(wp), intent(out) :: omega(nq, nq)
+      real(wp), intent(out) :: omega(q, q)
          !! The array `(I-fjacd*inv(p)*trans(fjacd))**(-1/2)`.
       real(wp), intent(out) :: u(np)
          !! The approximate null vector for tfjacb.
@@ -120,10 +120,10 @@ contains
          !! The approximate reciprocal condition of `tfjacb`.
       integer, intent(out) :: irank
          !! The rank deficiency of the Jacobian wrt `beta`.
-      real(wp), intent(out) :: wrk1(n, nq, m)
-         !! A work array of `(n, nq, m)` elements.
-      real(wp), intent(out) :: wrk2(n, nq)
-         !! A work array of `(n, nq)` elements.
+      real(wp), intent(out) :: wrk1(n, q, m)
+         !! A work array of `(n, q, m)` elements.
+      real(wp), intent(out) :: wrk2(n, q)
+         !! A work array of `(n, q)` elements.
       real(wp), intent(out) :: wrk3(np)
          !! A work array of `(np)` elements.
       real(wp), intent(out) :: wrk4(m, m)
@@ -166,7 +166,7 @@ contains
 
       ! Compute full Gauss-Newton step (ALPHA=0)
       alpha1 = zero
-      call lcstep(n, m, np, nq, npp, &
+      call lcstep(n, m, np, q, npp, &
                   f, fjacb, fjacd, &
                   wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
                   alpha1, epsfcn, isodr, &
@@ -196,8 +196,8 @@ contains
       bot = zero
 
       do k = 1, npp
-         tfjacb(1:n, 1:nq, k) = fjacb(1:n, k, 1:nq)
-         wrk(k) = ddot(n*nq, tfjacb(1, 1, k), 1, f(1, 1), 1)
+         tfjacb(1:n, 1:q, k) = fjacb(1:n, k, 1:q)
+         wrk(k) = ddot(n*q, tfjacb(1, 1, k), 1, f(1, 1), 1)
       end do
 
       call scale_vec(npp, 1, ss, npp, wrk, npp, wrk, npp) ! work is input (as t) and output (as sclt)
@@ -208,7 +208,7 @@ contains
          do j = 1, m
             do i = 1, n
                iwrk = iwrk + 1
-               wrk(iwrk) = wrk(iwrk) + ddot(nq, fjacd(i, j, 1), n*m, f(i, 1), n)
+               wrk(iwrk) = wrk(iwrk) + ddot(q, fjacd(i, j, 1), n*m, f(i, 1), n)
             end do
          end do
          call scale_vec(n, m, tt, ldtt, wrk(npp + 1), n, wrk(npp + 1), n)
@@ -226,7 +226,7 @@ contains
       do i = 1, 10
 
          ! Compute locally constrained steps S and T and PHI(ALPHA) for current value of ALPHA
-         call lcstep(n, m, np, nq, npp, &
+         call lcstep(n, m, np, q, npp, &
                      f, fjacb, fjacd, &
                      wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
                      alpha2, epsfcn, isodr, &
@@ -281,7 +281,7 @@ contains
    end subroutine trust_region
 
    pure subroutine access_workspace &
-      (n, m, np, nq, ldwe, ld2we, &
+      (n, m, np, q, ldwe, ld2we, &
        work, lwork, iwork, liwork, &
        access, isodr, &
        jpvt, omega, u, qraux, sd, vcv, wrk1, wrk2, wrk3, wrk4, wrk5, wrk6, &
@@ -299,7 +299,7 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       integer, intent(in) :: ldwe
          !! The leading dimension of array `we`.
@@ -462,7 +462,7 @@ contains
       !  NJEVI:   The location in array IWORK of variable NJEV.
       !  NNZWI:   The location in array IWORK of variable NNZW.
       !  NPPI:    The location in array IWORK of variable NPP.
-      !  NQ:      The number of responses per observation.
+      !  Q:      The number of responses per observation.
       !  NROWI:   The location in array IWORK of variable NROW.
       !  NTOLI:   The location in array IWORK of variable NTOL.
       !  OLMAVI:  The location in array WORK of variable OLMAVG.
@@ -498,7 +498,7 @@ contains
       !  XPLUSI:  The starting location in array WORK of array XPLUSD.
 
       ! Find starting locations within integer workspace
-      call loc_iwork(m, np, nq, &
+      call loc_iwork(m, np, q, &
                      msgb, msgd, jpvti, istopi, &
                      nnzwi, nppi, idfi, &
                      jobi, iprini, luneri, lunrpi, &
@@ -508,7 +508,7 @@ contains
                      liwkmn)
 
       ! Find starting locations within REAL work space
-      call loc_rwork(n, m, np, nq, ldwe, ld2we, isodr, &
+      call loc_rwork(n, m, np, q, ldwe, ld2we, isodr, &
                      deltai, epsi, xplusi, fni, sdi, vcvi, &
                      rvari, wssi, wssdei, wssepi, rcondi, etai, &
                      olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
@@ -758,7 +758,7 @@ contains
 
    subroutine eta_fcn &
       (fcn, &
-       n, m, np, nq, &
+       n, m, np, q, &
        xplusd, beta, epsmac, nrow, &
        partmp, pv0, &
        ifixb, ifixx, ldifx, &
@@ -779,7 +779,7 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       real(wp), intent(in) :: xplusd(n, m)
          !! The values of `x + delta`.
@@ -791,7 +791,7 @@ contains
          !! The row number at which the derivative is to be checked.
       real(wp), intent(out) :: partmp(np)
          !! The model parameters.
-      real(wp), intent(in) :: pv0(n, nq)
+      real(wp), intent(in) :: pv0(n, q)
          !! The original predicted values.
       integer, intent(in) :: ifixb(np)
          !! The values designating whether the elements of `beta` are fixed at their input values or not.
@@ -808,14 +808,14 @@ contains
          !! The noise in the model results.
       integer, intent(out) :: neta
          !! The number of accurate digits in the model results.
-      real(wp), intent(out) :: wrk1(n, m, nq)
-         !! A work array of `(n, m, nq)` elements.
-      real(wp), intent(out) :: wrk2(n, nq)
-         !! A work array of `(n, nq)` elements.
-      real(wp), intent(out) :: wrk6(n, np, nq)
-         !! A work array of `(n, np, nq)` elements.
-      real(wp), intent(out) :: wrk7(-2:2, nq)
-         !! A work array of `(5, nq)` elements.
+      real(wp), intent(out) :: wrk1(n, m, q)
+         !! A work array of `(n, m, q)` elements.
+      real(wp), intent(out) :: wrk2(n, q)
+         !! A work array of `(n, q)` elements.
+      real(wp), intent(out) :: wrk6(n, np, q)
+         !! A work array of `(n, np, q)` elements.
+      real(wp), intent(out) :: wrk7(-2:2, q)
+         !! A work array of `(5, q)` elements.
       integer, intent(out) :: info
          !! The variable indicating the status of the computation.
       real(wp), intent(in) :: lower(np)
@@ -895,7 +895,7 @@ contains
          else
             partmp = parpts(j, :)
             istop = 0
-            call fcn(n, m, np, nq, partmp, xplusd, &
+            call fcn(n, m, np, q, partmp, xplusd, &
                      ifixb, ifixx, ldifx, 003, wrk2, wrk6, wrk1, istop)
             if (istop /= 0) then
                return
@@ -907,7 +907,7 @@ contains
       end do
 
       ! Calculate ETA and NETA
-      do k = 1, nq
+      do k = 1, q
          a = zero
          b = zero
          do j = -2, 2
@@ -933,7 +933,7 @@ contains
    subroutine eval_jac &
       (fcn, &
        anajac, cdjac, &
-       n, m, np, nq, &
+       n, m, np, q, &
        betac, beta, stpb, &
        ifixb, ifixx, ldifx, &
        x, delta, xplusd, stpd, ldstpd, &
@@ -961,7 +961,7 @@ contains
          !! The number of columns of data in the independent variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       real(wp), intent(in) :: betac(np)
          !! The current estimated values of the unfixed `beta`s.
@@ -993,28 +993,28 @@ contains
          !! The leading dimension of array `tt`.
       integer, intent(in) :: neta
          !! The number of accurate digits in the function results.
-      real(wp), intent(in) :: fn(n, nq)
+      real(wp), intent(in) :: fn(n, q)
          !! The predicted values of the function at the current point.
       real(wp), intent(out) :: stp(n)
          !! The step used for computing finite difference derivatives with respect to `delta`.
-      real(wp), intent(out) :: wrk1(n, m, nq)
-         !! A work array of `(n, m, nq)` elements.
-      real(wp), intent(out) :: wrk2(n, nq)
-         !! A work array of `(n, nq)` elements.
+      real(wp), intent(out) :: wrk1(n, m, q)
+         !! A work array of `(n, m, q)` elements.
+      real(wp), intent(out) :: wrk2(n, q)
+         !! A work array of `(n, q)` elements.
       real(wp), intent(out) :: wrk3(np)
          !! A work array of `(np)` elements.
-      real(wp), intent(out) :: wrk6(n, np, nq)
-         !! A work array of `(n, np, nq)` elements.
+      real(wp), intent(out) :: wrk6(n, np, q)
+         !! A work array of `(n, np, q)` elements.
       real(wp), intent(inout) :: tempret(:, :)
          !! Temporary work array for holding return values before copying to a lower rank array.
-      real(wp), intent(out) :: fjacb(n, np, nq)
+      real(wp), intent(out) :: fjacb(n, np, q)
          !! The Jacobian with respect to `beta`.
       logical, intent(in) :: isodr
          !! The variable designating whether the solution is by ODR (`isodr = .true.`) or
          !! by OLS (`isodr = .false.`).
-      real(wp), intent(out) :: fjacd(n, m, nq)
+      real(wp), intent(out) :: fjacd(n, m, q)
          !! The Jacobian with respect to `delta`.
-      real(wp), intent(in) :: we1(ldwe, ld2we, nq)
+      real(wp), intent(in) :: we1(ldwe, ld2we, q)
          !! The square roots of the `epsilon` weights in array `we`.
       integer, intent(in) :: ldwe
          !! The leading dimension of arrays `we` and `we1`.
@@ -1060,7 +1060,7 @@ contains
          ideval = 010
       end if
       if (anajac) then
-         call fcn(n, m, np, nq, beta, xplusd, &
+         call fcn(n, m, np, q, beta, xplusd, &
                   ifixb, ifixx, ldifx, ideval, wrk2, fjacb, fjacd, istop)
          if (istop /= 0) then
             return
@@ -1069,13 +1069,13 @@ contains
          end if
          ! Make sure fixed elements of FJACD are zero
          if (isodr) then
-            do j = 1, nq
+            do j = 1, q
                call set_ifix(n, m, ifixx, ldifx, fjacd(1, 1, j), n, fjacd(1, 1, j), n)
             end do
          end if
       elseif (cdjac) then
          call jac_cdiff(fcn, &
-                        n, m, np, nq, &
+                        n, m, np, q, &
                         beta, x, delta, xplusd, ifixb, ifixx, ldifx, &
                         stpb, stpd, ldstpd, &
                         ssf, tt, ldtt, neta, fn, stp, wrk1, wrk2, wrk3, wrk6, &
@@ -1083,7 +1083,7 @@ contains
                         lower, upper)
       else
          call jac_fwdiff(fcn, &
-                         n, m, np, nq, &
+                         n, m, np, q, &
                          beta, x, delta, xplusd, ifixb, ifixx, ldifx, &
                          stpb, stpd, ldstpd, &
                          ssf, tt, ldtt, neta, fn, stp, wrk1, wrk2, wrk3, wrk6, &
@@ -1104,20 +1104,20 @@ contains
       ! Weight the Jacobian wrt the estimated BETAS
       if (ifixb(1) < 0) then
          do j = 1, np
-            call scale_mat(n, nq, we1, ldwe, ld2we, &
-                           reshape(fjacb(:, j, :), [n, nq]), &
-                           tempret(1:n, 1:nq))
-            fjacb(:, j, :) = tempret(1:n, 1:nq)
+            call scale_mat(n, q, we1, ldwe, ld2we, &
+                           reshape(fjacb(:, j, :), [n, q]), &
+                           tempret(1:n, 1:q))
+            fjacb(:, j, :) = tempret(1:n, 1:q)
          end do
       else
          j1 = 0
          do j = 1, np
             if (ifixb(j) >= 1) then
                j1 = j1 + 1
-               call scale_mat(n, nq, we1, ldwe, ld2we, &
-                              reshape(fjacb(:, j, :), [n, nq]), &
-                              tempret(1:n, 1:nq))
-               fjacb(:, j1, :) = tempret(1:n, 1:nq)
+               call scale_mat(n, q, we1, ldwe, ld2we, &
+                              reshape(fjacb(:, j, :), [n, q]), &
+                              tempret(1:n, 1:q))
+               fjacb(:, j1, :) = tempret(1:n, 1:q)
             end if
          end do
       end if
@@ -1125,10 +1125,10 @@ contains
       ! Weight the Jacobian's wrt DELTA as appropriate
       if (isodr) then
          do j = 1, m
-            call scale_mat(n, nq, we1, ldwe, ld2we, &
-                           reshape(fjacd(:, j, :), [n, nq]), &
-                           tempret(1:n, 1:nq))
-            fjacd(:, j, :) = tempret(1:n, 1:nq)
+            call scale_mat(n, q, we1, ldwe, ld2we, &
+                           reshape(fjacd(:, j, :), [n, q]), &
+                           tempret(1:n, 1:q))
+            fjacd(:, j, :) = tempret(1:n, 1:q)
          end do
       end if
 
@@ -1207,7 +1207,7 @@ contains
    end subroutine fctr
 
    pure subroutine fctrw &
-      (n, m, nq, npp, &
+      (n, m, q, npp, &
        isodr, &
        we, ldwe, ld2we, wd, ldwd, ld2wd, &
        wrk0, wrk4, &
@@ -1221,14 +1221,14 @@ contains
          !! The number of observations.
       integer, intent(in) :: m
          !! The number of columns of data in the explanatory variable.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       integer, intent(in) :: npp
          !! The number of function parameters being estimated.
       logical, intent(in) :: isodr
          !! The variable designating whether the solution is by ODR (`isodr = .true`) or
          !! by OLS (`isodr = .false`).
-      real(wp), intent(in) :: we(ldwe, ld2we, nq)
+      real(wp), intent(in) :: we(ldwe, ld2we, q)
          !! The (squared) `epsilon` weights.
       integer, intent(in) :: ldwe
          !! The leading dimension of array `we`.
@@ -1240,11 +1240,11 @@ contains
       ! The leading dimension of array `wd`.
       integer, intent(in) :: ld2wd
          !! The second dimension of array `wd`.
-      real(wp), intent(out) :: wrk0(nq, nq)
-         !! A work array of `(nq, nq)` elements.
+      real(wp), intent(out) :: wrk0(q, q)
+         !! A work array of `(q, q)` elements.
       real(wp), intent(out) :: wrk4(m, m)
          !! A work array of `(m, m)` elements.
-      real(wp), intent(out) :: we1(ldwe, ld2we, nq)
+      real(wp), intent(out) :: we1(ldwe, ld2we, q)
          !! The factored `epsilon` weights, such that `trans(we1)*we1 = we`.
       integer, intent(out) :: nnzw
          !! The number of nonzero weighted observations.
@@ -1275,7 +1275,7 @@ contains
          if (ldwe == 1) then
             if (ld2we == 1) then
                ! WE contains a diagonal matrix
-               do j = 1, nq
+               do j = 1, q
                   if (we(1, 1, j) > zero) then
                      nnzw = n
                      we1(1, 1, j) = sqrt(we(1, 1, j))
@@ -1286,16 +1286,16 @@ contains
                   end if
                end do
             else
-               ! WE contains a full NQ by NQ semidefinite matrix
-               do j = 1, nq
+               ! WE contains a full Q by Q semidefinite matrix
+               do j = 1, q
                   wrk0(1:j, j) = we(1, 1:j, j)
                end do
-               call fctr(.true., wrk0, nq, nq, finfo)
+               call fctr(.true., wrk0, q, q, finfo)
                if (finfo /= 0) then
                   info = 30010
                   exited = .true.
                else
-                  do j = 1, nq
+                  do j = 1, q
                      we1(1, :, j) = wrk0(:, j)
                      if (we1(1, j, j) /= zero) then
                         nnzw = n
@@ -1308,7 +1308,7 @@ contains
                ! WE contains an array of  diagonal matrix
                do i = 1, n
                   notzero = .false.
-                  do j = 1, nq
+                  do j = 1, q
                      if (we(i, 1, j) > zero) then
                         notzero = .true.
                         we1(i, 1, j) = sqrt(we(i, 1, j))
@@ -1324,19 +1324,19 @@ contains
                   end if
                end do
             else
-               ! WE contains an array of full NQ by NQ semidefinite matrices
+               ! WE contains an array of full Q by Q semidefinite matrices
                do i = 1, n
-                  do j = 1, nq
+                  do j = 1, q
                      wrk0(1:j, j) = we(i, 1:j, j)
                   end do
-                  call fctr(.true., wrk0, nq, nq, finfo)
+                  call fctr(.true., wrk0, q, q, finfo)
                   if (finfo /= 0) then
                      info = 30010
                      exited = .true.
                      exit
                   else
                      notzero = .false.
-                     do j = 1, nq
+                     do j = 1, q
                         we1(i, :, j) = wrk0(:, j)
                         if (we1(i, j, j) /= zero) then
                            notzero = .true.
@@ -1594,7 +1594,7 @@ contains
    end subroutine set_ifix
 
    pure subroutine loc_iwork &
-      (m, np, nq, &
+      (m, np, q, &
        msgbi, msgdi, ifix2i, istopi, &
        nnzwi, nppi, idfi, &
        jobi, iprini, luneri, lunrpi, &
@@ -1608,7 +1608,7 @@ contains
          !! The number of columns of data in the independent variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       integer, intent(out) :: msgbi
          !! The starting location in array `iwork` of array `msgb`.
@@ -1659,8 +1659,8 @@ contains
 
       if (np >= 1 .and. m >= 1) then
          msgbi = 1
-         msgdi = msgbi + nq*np + 1
-         ifix2i = msgdi + nq*m + 1
+         msgdi = msgbi + q*np + 1
+         ifix2i = msgdi + q*m + 1
          istopi = ifix2i + np
          nnzwi = istopi + 1
          nppi = nnzwi + 1
@@ -1710,7 +1710,7 @@ contains
    end subroutine loc_iwork
 
    pure subroutine loc_rwork &
-      (n, m, np, nq, ldwe, ld2we, isodr, &
+      (n, m, np, q, ldwe, ld2we, isodr, &
        deltai, epsi, xplusi, fni, sdi, vcvi, &
        rvari, wssi, wssdei, wssepi, rcondi, etai, &
        olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
@@ -1729,7 +1729,7 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       integer, intent(in) :: ldwe
          !! The leading dimension of array `we`.
@@ -1848,14 +1848,14 @@ contains
       ! Variable Definitions (alphabetically)
       !  NEXT:    The next available location with WORK.
 
-      if (n >= 1 .and. m >= 1 .and. np >= 1 .and. nq >= 1 .and. ldwe >= 1 &
+      if (n >= 1 .and. m >= 1 .and. np >= 1 .and. q >= 1 .and. ldwe >= 1 &
           .and. ld2we >= 1) then
 
          deltai = 1
          epsi = deltai + n*m
-         xplusi = epsi + n*nq
+         xplusi = epsi + n*q
          fni = xplusi + n*m
-         sdi = fni + n*nq
+         sdi = fni + n*q
          vcvi = sdi + np
          rvari = vcvi + np*np
 
@@ -1888,13 +1888,13 @@ contains
          ui = qrauxi + np
          fsi = ui + np
 
-         fjacbi = fsi + n*nq
+         fjacbi = fsi + n*q
 
-         we1i = fjacbi + n*np*nq
+         we1i = fjacbi + n*np*q
 
-         diffi = we1i + ldwe*ld2we*nq
+         diffi = we1i + ldwe*ld2we*q
 
-         next = diffi + nq*(np + m)
+         next = diffi + q*(np + m)
 
          if (isodr) then
             deltsi = next
@@ -1902,9 +1902,9 @@ contains
             ti = deltni + n*m
             tti = ti + n*m
             omegai = tti + n*m
-            fjacdi = omegai + nq*nq
-            wrk1i = fjacdi + n*m*nq
-            next = wrk1i + n*m*nq
+            fjacdi = omegai + q**2
+            wrk1i = fjacdi + n*m*q
+            next = wrk1i + n*m*q
          else
             deltsi = deltai
             deltni = deltai
@@ -1916,12 +1916,12 @@ contains
          end if
 
          wrk2i = next
-         wrk3i = wrk2i + n*nq
+         wrk3i = wrk2i + n*q
          wrk4i = wrk3i + np
          wrk5i = wrk4i + m*m
          wrk6i = wrk5i + m
-         wrk7i = wrk6i + n*nq*np
-         loweri = wrk7i + 5*nq
+         wrk7i = wrk6i + n*q*np
+         loweri = wrk7i + 5*q
          upperi = loweri + np
          next = upperi + np
 
@@ -2224,7 +2224,7 @@ contains
 
    subroutine jac_cdiff &
       (fcn, &
-       n, m, np, nq, &
+       n, m, np, q, &
        beta, x, delta, xplusd, ifixb, ifixx, ldifx, &
        stpb, stpd, ldstpd, &
        ssf, tt, ldtt, neta, fn, stp, wrk1, wrk2, wrk3, wrk6, &
@@ -2243,7 +2243,7 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       real(wp), intent(inout) :: beta(np)
          !! The function parameters.
@@ -2273,24 +2273,24 @@ contains
          !! The leading dimension of array `tt`.
       integer, intent(in) :: neta
          !! The number of good digits in the function results.
-      real(wp), intent(in) :: fn(n, nq)
+      real(wp), intent(in) :: fn(n, q)
          !! The new predicted values from the function. Used when parameter is on a boundary.
       real(wp), intent(out) :: stp(n)
          !! The step used for computing finite difference derivatives with respect to each `delta`.
-      real(wp), intent(out) :: wrk1(n, m, nq)
-         !! A work array of `(n, m, nq)` elements.
-      real(wp), intent(out) :: wrk2(n, nq)
-         !! A work array of `(n, nq)` elements.
+      real(wp), intent(out) :: wrk1(n, m, q)
+         !! A work array of `(n, m, q)` elements.
+      real(wp), intent(out) :: wrk2(n, q)
+         !! A work array of `(n, q)` elements.
       real(wp), intent(out) :: wrk3(np)
          !! A work array of `(np)` elements.
-      real(wp), intent(out) :: wrk6(n, np, nq)
-         !! A work array of `(n, np, nq)` elements.
-      real(wp), intent(out) :: fjacb(n, np, nq)
+      real(wp), intent(out) :: wrk6(n, np, q)
+         !! A work array of `(n, np, q)` elements.
+      real(wp), intent(out) :: fjacb(n, np, q)
          !! The Jacobian with respect to `beta`.
       logical, intent(in) :: isodr
          !! The variable designating whether the solution is by ODR (`isodr = .true.`) or
          !! by OLS (`isodr = .false.`).
-      real(wp), intent(out) :: fjacd(n, m, nq)
+      real(wp), intent(out) :: fjacd(n, m, q)
          !! The Jacobian with respect to `delta`.
       integer, intent(inout) :: nfev
          !! The number of function evaluations.
@@ -2359,7 +2359,7 @@ contains
             if (beta(k) == betak) then
                wrk2 = fn
             else
-               call fcn(n, m, np, nq, beta, xplusd, &
+               call fcn(n, m, np, q, beta, xplusd, &
                         ifixb, ifixx, ldifx, 001, wrk2, wrk6, wrk1, istop)
                if (istop /= 0) then
                   return
@@ -2382,7 +2382,7 @@ contains
             if (beta(k) == betak) then
                wrk2 = fn
             else
-               call fcn(n, m, np, nq, beta, xplusd, &
+               call fcn(n, m, np, q, beta, xplusd, &
                         ifixb, ifixx, ldifx, 001, wrk2, wrk6, wrk1, istop)
                if (istop /= 0) then
                   return
@@ -2440,7 +2440,7 @@ contains
                end do
 
                istop = 0
-               call fcn(n, m, np, nq, beta, xplusd, &
+               call fcn(n, m, np, q, beta, xplusd, &
                         ifixb, ifixx, ldifx, 001, wrk2, wrk6, wrk1, istop)
                if (istop /= 0) then
                   return
@@ -2452,7 +2452,7 @@ contains
                xplusd(:, j) = x(:, j) + delta(:, j) - stp
 
                istop = 0
-               call fcn(n, m, np, nq, beta, xplusd, &
+               call fcn(n, m, np, q, beta, xplusd, &
                         ifixb, ifixx, ldifx, 001, wrk2, wrk6, wrk1, istop)
                if (istop /= 0) then
                   return
@@ -2469,7 +2469,7 @@ contains
                      end if
                   end do
                else
-                  do l = 1, nq
+                  do l = 1, q
                      fjacd(:, j, l) = (fjacd(:, j, l) - wrk2(:, l))/(2*stp(:))
                   end do
                end if
@@ -2485,7 +2485,7 @@ contains
 
    subroutine jac_fwdiff &
       (fcn, &
-       n, m, np, nq, &
+       n, m, np, q, &
        beta, x, delta, xplusd, ifixb, ifixx, ldifx, &
        stpb, stpd, ldstpd, &
        ssf, tt, ldtt, neta, fn, stp, wrk1, wrk2, wrk3, wrk6, &
@@ -2504,7 +2504,7 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       real(wp), intent(inout) :: beta(np)
          !! The function parameters.
@@ -2534,24 +2534,24 @@ contains
          !! The leading dimension of array `tt`.
       integer, intent(in) :: neta
          !! The number of good digits in the function results.
-      real(wp), intent(in) :: fn(n, nq)
+      real(wp), intent(in) :: fn(n, q)
          !! The new predicted values from the function. Used when parameter is on a boundary.
       real(wp), intent(out) :: stp(n)
          !! The step used for computing finite difference derivatives with respect to each `delta`.
-      real(wp), intent(out) :: wrk1(n, m, nq)
-         !! A work array of `(n, m, nq)` elements.
-      real(wp), intent(out) :: wrk2(n, nq)
-         !! A work array of `(n, nq)` elements.
+      real(wp), intent(out) :: wrk1(n, m, q)
+         !! A work array of `(n, m, q)` elements.
+      real(wp), intent(out) :: wrk2(n, q)
+         !! A work array of `(n, q)` elements.
       real(wp), intent(out) :: wrk3(np)
          !! A work array of `(np)` elements.
-      real(wp), intent(out) :: wrk6(n, np, nq)
-         !! A work array of `(n, np, nq)` elements.
-      real(wp), intent(out) :: fjacb(n, np, nq)
+      real(wp), intent(out) :: wrk6(n, np, q)
+         !! A work array of `(n, np, q)` elements.
+      real(wp), intent(out) :: fjacb(n, np, q)
          !! The Jacobian with respect to `beta`.
       logical, intent(in) :: isodr
          !! The variable designating whether the solution is by ODR (`isodr = .true.`) or
          !! by OLS (`isodr = .false.`).
-      real(wp), intent(out) :: fjacd(n, m, nq)
+      real(wp), intent(out) :: fjacd(n, m, q)
          !! The Jacobian with respect to `delta`.
       integer, intent(inout) :: nfev
          !! The number of function evaluations.
@@ -2618,7 +2618,7 @@ contains
                end if
             end if
             istop = 0
-            call fcn(n, m, np, nq, beta, xplusd, &
+            call fcn(n, m, np, q, beta, xplusd, &
                      ifixb, ifixx, ldifx, 001, wrk2, wrk6, wrk1, istop)
             if (istop /= 0) then
                return
@@ -2674,7 +2674,7 @@ contains
                end do
 
                istop = 0
-               call fcn(n, m, np, nq, beta, xplusd, &
+               call fcn(n, m, np, q, beta, xplusd, &
                         ifixb, ifixx, ldifx, 001, wrk2, wrk6, wrk1, istop)
                if (istop /= 0) then
                   return
@@ -2692,7 +2692,7 @@ contains
                      end if
                   end do
                else
-                  do l = 1, nq
+                  do l = 1, q
                      fjacd(:, j, l) = (fjacd(:, j, l) - fn(:, l))/stp(:)
                   end do
                end if
@@ -2708,7 +2708,7 @@ contains
 
    subroutine check_jac &
       (fcn, &
-       n, m, np, nq, &
+       n, m, np, q, &
        beta, betaj, xplusd, &
        ifixb, ifixx, ldifx, stpb, stpd, ldstpd, &
        ssf, tt, ldtt, &
@@ -2730,7 +2730,7 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       real(wp), intent(inout) :: beta(np)
          !! The function parameters.
@@ -2770,17 +2770,17 @@ contains
          !! by OLS (`isodr = .false.`).
       real(wp), intent(in) :: epsmac
          !! The value of machine precision.
-      real(wp), intent(in) :: pv0i(n, nq)
+      real(wp), intent(in) :: pv0i(n, q)
          !! The predicted values using the user supplied parameter estimates.
-      real(wp), intent(out) :: fjacb(n, np, nq)
+      real(wp), intent(out) :: fjacb(n, np, q)
          !! The Jacobian with respect to `beta`.
-      real(wp), intent(out) :: fjacd(n, m, nq)
+      real(wp), intent(out) :: fjacd(n, m, q)
          !! The Jacobian with respect to `delta`.
-      integer, intent(out) :: msgb(1 + nq*np)
+      integer, intent(out) :: msgb(1 + q*np)
          !! The error checking results for the Jacobian wrt `beta`.
-      integer, intent(out) :: msgd(1 + nq*m)
+      integer, intent(out) :: msgd(1 + q*m)
          !! The error checking results for the Jacobian wrt `delta`.
-      real(wp), intent(out) :: diff(nq, np + m)
+      real(wp), intent(out) :: diff(q, np + m)
          !! The relative differences between the user supplied and finite difference derivatives
          !! for each derivative checked.
       integer, intent(out) :: istop
@@ -2790,12 +2790,12 @@ contains
          !! The number of function evaluations.
       integer, intent(inout) :: njev
          !! The number of Jacobian evaluations.
-      real(wp), intent(out) :: wrk1(n, m, nq)
-         !! A work array of `(n, m, nq)` elements.
-      real(wp), intent(out) :: wrk2(n, nq)
-         !! A work array of `(n, nq)` elements.
-      real(wp), intent(out) :: wrk6(n, np, nq)
-         !! A work array of `(n, np, nq)` elements.
+      real(wp), intent(out) :: wrk1(n, m, q)
+         !! A work array of `(n, m, q)` elements.
+      real(wp), intent(out) :: wrk2(n, q)
+         !! A work array of `(n, q)` elements.
+      real(wp), intent(out) :: wrk6(n, np, q)
+         !! A work array of `(n, np, q)` elements.
       integer, intent(in) :: interval(np)
          !! Specifies which checks can be performed when checking derivatives based on the
          !! interval of the bound constraints.
@@ -2806,7 +2806,7 @@ contains
       logical :: isfixd, iswrtb
 
       ! Local arrays
-      real(wp) :: pv0(n, nq)
+      real(wp) :: pv0(n, q)
 
       ! Variable Definitions (alphabetically)
       !  DIFFJ:    The relative differences between the user supplied and finite difference
@@ -2838,7 +2838,7 @@ contains
       if (any(beta /= betaj)) then
          istop = 0
          ideval = 001
-         call fcn(n, m, np, nq, betaj, xplusd, &
+         call fcn(n, m, np, q, betaj, xplusd, &
                   ifixb, ifixx, ldifx, ideval, pv0, fjacb, fjacd, istop)
          if (istop /= 0) then
             return
@@ -2854,7 +2854,7 @@ contains
       else
          ideval = 010
       end if
-      call fcn(n, m, np, nq, betaj, xplusd, &
+      call fcn(n, m, np, q, betaj, xplusd, &
                ifixb, ifixx, ldifx, ideval, wrk2, fjacb, fjacd, istop)
       if (istop /= 0) then
          return
@@ -2866,7 +2866,7 @@ contains
       msgb1 = 0
       msgd1 = 0
 
-      do lq = 1, nq
+      do lq = 1, q
 
          ! Set predicted value of model at current parameter estimates
          pv = pv0(nrow, lq)
@@ -2883,7 +2883,7 @@ contains
             end if
 
             if (isfixd) then
-               msgb(1 + lq + (j - 1)*nq) = -1
+               msgb(1 + lq + (j - 1)*q) = -1
             else
                if (beta(j) == zero) then
                   if (ssf(1) < zero) then
@@ -2901,7 +2901,7 @@ contains
                ! Check derivative wrt the J-th parameter at the NROW-th row
                if (interval(j) >= 1) then
                   call check_jac_value(fcn, &
-                                       n, m, np, nq, &
+                                       n, m, np, q, &
                                        betaj, xplusd, &
                                        ifixb, ifixx, ldifx, &
                                        eta, tol, nrow, epsmac, j, lq, typj, h0, hc0, &
@@ -2940,7 +2940,7 @@ contains
                end if
 
                if (isfixd) then
-                  msgd(1 + lq + (j - 1)*nq) = -1
+                  msgd(1 + lq + (j - 1)*q) = -1
                else
                   if (xplusd(nrow, j) == zero) then
                      if (tt(1, 1) < zero) then
@@ -2959,7 +2959,7 @@ contains
 
                   ! Check derivative wrt the J-th column of DELTA at row NROW
                   call check_jac_value(fcn, &
-                                       n, m, np, nq, &
+                                       n, m, np, q, &
                                        betaj, xplusd, &
                                        ifixb, ifixx, ldifx, &
                                        eta, tol, nrow, epsmac, j, lq, typj, h0, hc0, &
@@ -2987,7 +2987,7 @@ contains
 
    subroutine check_jac_curv &
       (fcn, &
-       n, m, np, nq, &
+       n, m, np, q, &
        beta, xplusd, ifixb, ifixx, ldifx, &
        eta, tol, nrow, epsmac, j, lq, hc, iswrtb, &
        fd, typj, pvpstp, stp0, &
@@ -3008,7 +3008,7 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       real(wp), intent(inout) :: beta(np)
          !! The function parameters.
@@ -3053,19 +3053,19 @@ contains
       real(wp), intent(out) :: diffj
          !! The relative differences between the user supplied and finite difference derivatives
          !! for the derivative being checked.
-      integer, intent(out) :: msg(nq, j)
+      integer, intent(out) :: msg(q, j)
          !! The error checking results.
       integer, intent(out) :: istop
          !! The variable designating whether there are problems computing the function at the
          !! current `beta` and `delta`.
       integer, intent(inout) :: nfev
          !! The number of function evaluations.
-      real(wp), intent(out) :: wrk1(n, m, nq)
-         !! A work array of `(n, m, nq)` elements.
-      real(wp), intent(out) :: wrk2(n, nq)
-         !! A work array of `(n, nq)` elements.
-      real(wp), intent(out) :: wrk6(n, np, nq)
-         !! A work array of `(n, np, nq)` elements.
+      real(wp), intent(out) :: wrk1(n, m, q)
+         !! A work array of `(n, m, q)` elements.
+      real(wp), intent(out) :: wrk2(n, q)
+         !! A work array of `(n, q)` elements.
+      real(wp), intent(out) :: wrk6(n, np, q)
+         !! A work array of `(n, np, q)` elements.
 
       ! Local scalars
       real(wp), parameter :: p01 = 0.01_wp
@@ -3085,7 +3085,7 @@ contains
          ! Perform central difference computations for derivatives wrt BETA
          stpcrv = (hc*typj*sign(one, beta(j)) + beta(j)) - beta(j)
          call fpvb(fcn, &
-                   n, m, np, nq, &
+                   n, m, np, q, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, stpcrv, &
                    istop, nfev, pvpcrv, &
@@ -3094,7 +3094,7 @@ contains
             return
          end if
          call fpvb(fcn, &
-                   n, m, np, nq, &
+                   n, m, np, q, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, -stpcrv, &
                    istop, nfev, pvmcrv, &
@@ -3107,7 +3107,7 @@ contains
          ! Perform central difference computations for derivatives wrt DELTA
          stpcrv = (hc*typj*sign(one, xplusd(nrow, j)) + xplusd(nrow, j)) - xplusd(nrow, j)
          call fpvd(fcn, &
-                   n, m, np, nq, &
+                   n, m, np, q, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, stpcrv, &
                    istop, nfev, pvpcrv, &
@@ -3116,7 +3116,7 @@ contains
             return
          end if
          call fpvd(fcn, &
-                   n, m, np, nq, &
+                   n, m, np, q, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, -stpcrv, &
                    istop, nfev, pvmcrv, &
@@ -3132,7 +3132,7 @@ contains
 
       ! Check if finite precision arithmetic could be the culprit.
       call check_jac_fp(fcn, &
-                        n, m, np, nq, &
+                        n, m, np, q, &
                         beta, xplusd, ifixb, ifixx, ldifx, &
                         eta, tol, nrow, j, lq, iswrtb, &
                         fd, typj, pvpstp, stp0, curve, pv, d, &
@@ -3155,7 +3155,7 @@ contains
          ! Perform computations for derivatives wrt BETA
          stp = (stp*sign(one, beta(j)) + beta(j)) - beta(j)
          call fpvb(fcn, &
-                   n, m, np, nq, &
+                   n, m, np, q, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, stp, &
                    istop, nfev, pvpstp, &
@@ -3168,7 +3168,7 @@ contains
          ! Perform computations for derivatives wrt DELTA
          stp = (stp*sign(one, xplusd(nrow, j)) + xplusd(nrow, j)) - xplusd(nrow, j)
          call fpvd(fcn, &
-                   n, m, np, nq, &
+                   n, m, np, q, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, stp, &
                    istop, nfev, pvpstp, &
@@ -3196,7 +3196,7 @@ contains
 
    subroutine check_jac_fp &
       (fcn, &
-       n, m, np, nq, &
+       n, m, np, q, &
        beta, xplusd, ifixb, ifixx, ldifx, &
        eta, tol, nrow, j, lq, iswrtb, &
        fd, typj, pvpstp, stp0, curve, pv, d, &
@@ -3216,7 +3216,7 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       real(wp), intent(inout) :: beta(np)
          !! The function parameters.
@@ -3259,19 +3259,19 @@ contains
       real(wp), intent(out) :: diffj
          !! The relative differences between the user supplied and finite difference derivatives
          !! for the derivative being checked.
-      integer, intent(out) :: msg(nq, j)
+      integer, intent(out) :: msg(q, j)
          !! The error checking results.
       integer, intent(out) :: istop
          !! The variable designating whether there are problems computing the function at the
          !! current `beta` and `delta`.
       integer, intent(inout) :: nfev
          !! The number of function evaluations.
-      real(wp), intent(out) :: wrk1(n, m, nq)
-         !! A work array of `(n, m, nq)` elements.
-      real(wp), intent(out) :: wrk2(n, nq)
-         !! A work array of `(n, nq)` elements.
-      real(wp), intent(out) :: wrk6(n, np, nq)
-         !! A work array of `(n, np, nq)` elements.
+      real(wp), intent(out) :: wrk1(n, m, q)
+         !! A work array of `(n, m, q)` elements.
+      real(wp), intent(out) :: wrk2(n, q)
+         !! A work array of `(n, q)` elements.
+      real(wp), intent(out) :: wrk6(n, np, q)
+         !! A work array of `(n, np, q)` elements.
 
       ! Local scalars
       real(wp), parameter :: p1 = 0.1_wp
@@ -3300,7 +3300,7 @@ contains
          ! Perform computations for derivatives wrt BETA
          stp = (stp*sign(one, beta(j)) + beta(j)) - beta(j)
          call fpvb(fcn, &
-                   n, m, np, nq, &
+                   n, m, np, q, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, stp, &
                    istop, nfev, pvpstp, &
@@ -3309,7 +3309,7 @@ contains
          ! Perform computations for derivatives wrt DELTA
          stp = (stp*sign(one, xplusd(nrow, j)) + xplusd(nrow, j)) - xplusd(nrow, j)
          call fpvd(fcn, &
-                   n, m, np, nq, &
+                   n, m, np, q, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, stp, &
                    istop, nfev, pvpstp, &
@@ -3340,7 +3340,7 @@ contains
 
    subroutine check_jac_value &
       (fcn, &
-       n, m, np, nq, &
+       n, m, np, q, &
        beta, xplusd, ifixb, ifixx, ldifx, &
        eta, tol, nrow, epsmac, j, lq, typj, h0, hc0, &
        iswrtb, pv, d, &
@@ -3359,7 +3359,7 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       real(wp), intent(inout) :: beta(np)
          !! The function parameters.
@@ -3401,19 +3401,19 @@ contains
          !! for the derivative being checked.
       integer, intent(out) :: msg1
          !! The first set of error checking results.
-      integer, intent(out) :: msg(nq, j)
+      integer, intent(out) :: msg(q, j)
          !! The error checking results.
       integer, intent(out) :: istop
          !! The variable designating whether there are problems computing the function at the
          !! current `beta` and `delta`.
       integer, intent(inout) :: nfev
          !! The number of function evaluations.
-      real(wp), intent(out) :: wrk1(n, m, nq)
-         !! A work array of `(n, m, nq)` elements.
-      real(wp), intent(out) :: wrk2(n, nq)
-         !! A work array of `(n, nq)` elements.
-      real(wp), intent(out) :: wrk6(n, np, nq)
-         !! A work array of `(n, np, nq)` elements.
+      real(wp), intent(out) :: wrk1(n, m, q)
+         !! A work array of `(n, m, q)` elements.
+      real(wp), intent(out) :: wrk2(n, q)
+         !! A work array of `(n, q)` elements.
+      real(wp), intent(out) :: wrk6(n, np, q)
+         !! A work array of `(n, np, q)` elements.
       integer, intent(in) :: interval(np)
          !! Specifies which checks can be performed when checking derivatives based on the
          !! interval of the bound constraints.
@@ -3465,7 +3465,7 @@ contains
             ! Perform computations for derivatives wrt BETA
             stp0 = (h*typj*sign(one, beta(j)) + beta(j)) - beta(j)
             call fpvb(fcn, &
-                      n, m, np, nq, &
+                      n, m, np, q, &
                       beta, xplusd, ifixb, ifixx, ldifx, &
                       nrow, j, lq, stp0, &
                       istop, nfev, pvpstp, &
@@ -3474,7 +3474,7 @@ contains
             ! Perform computations for derivatives wrt DELTA
             stp0 = (h*typj*sign(one, xplusd(nrow, j)) + xplusd(nrow, j)) - xplusd(nrow, j)
             call fpvd(fcn, &
-                      n, m, np, nq, &
+                      n, m, np, q, &
                       beta, xplusd, ifixb, ifixx, ldifx, &
                       nrow, j, lq, stp0, &
                       istop, nfev, pvpstp, &
@@ -3513,7 +3513,7 @@ contains
             if ((d == zero) .or. (fd == zero)) then
                if (interval(j) >= 10 .or. .not. iswrtb) then
                   call check_jac_zero(fcn, &
-                                      n, m, np, nq, &
+                                      n, m, np, q, &
                                       beta, xplusd, ifixb, ifixx, ldifx, &
                                       nrow, epsmac, j, lq, iswrtb, &
                                       tol, d, fd, typj, pvpstp, stp0, pv, &
@@ -3525,7 +3525,7 @@ contains
             else
                if (interval(j) >= 100 .or. .not. iswrtb) then
                   call check_jac_curv(fcn, &
-                                      n, m, np, nq, &
+                                      n, m, np, q, &
                                       beta, xplusd, ifixb, ifixx, ldifx, &
                                       eta, tol, nrow, epsmac, j, lq, hc, iswrtb, &
                                       fd, typj, pvpstp, stp0, pv, d, &
@@ -3557,7 +3557,7 @@ contains
 
    subroutine check_jac_zero &
       (fcn, &
-       n, m, np, nq, &
+       n, m, np, q, &
        beta, xplusd, ifixb, ifixx, ldifx, &
        nrow, epsmac, j, lq, iswrtb, &
        tol, d, fd, typj, pvpstp, stp0, pv, &
@@ -3577,7 +3577,7 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       real(wp), intent(inout) :: beta(np)
          !! The function parameters.
@@ -3618,19 +3618,19 @@ contains
       real(wp), intent(out) :: diffj
          !! The relative differences between the user supplied and finite difference derivatives
          !! for the derivative being checked.
-      integer, intent(out) :: msg(nq, j)
+      integer, intent(out) :: msg(q, j)
          !! The error checking results.
       integer, intent(out) :: istop
          !! The variable designating whether there are problems computing the function at the
          !! current `beta` and `delta`.
       integer, intent(inout) :: nfev
          !! The number of function evaluations.
-      real(wp), intent(out) :: wrk1(n, m, nq)
-         !! A work array of `(n, m, nq)` elements.
-      real(wp), intent(out) :: wrk2(n, nq)
-         !! A work array of `(n, nq)` elements.
-      real(wp), intent(out) :: wrk6(n, np, nq)
-         !! A work array of `(n, np, nq)` elements.
+      real(wp), intent(out) :: wrk1(n, m, q)
+         !! A work array of `(n, m, q)` elements.
+      real(wp), intent(out) :: wrk2(n, q)
+         !! A work array of `(n, q)` elements.
+      real(wp), intent(out) :: wrk6(n, np, q)
+         !! A work array of `(n, np, q)` elements.
 
       ! Local scalars
       real(wp) :: cd, pvmstp
@@ -3644,7 +3644,7 @@ contains
       if (iswrtb) then
          ! Perform computations for derivatives wrt BETA
          call fpvb(fcn, &
-                   n, m, np, nq, &
+                   n, m, np, q, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, -stp0, &
                    istop, nfev, pvmstp, &
@@ -3652,7 +3652,7 @@ contains
       else
          ! Perform computations for derivatives wrt DELTA
          call fpvd(fcn, &
-                   n, m, np, nq, &
+                   n, m, np, q, &
                    beta, xplusd, ifixb, ifixx, ldifx, &
                    nrow, j, lq, -stp0, &
                    istop, nfev, pvmstp, &
@@ -3685,7 +3685,7 @@ contains
    end subroutine check_jac_zero
 
    pure subroutine check_inputs &
-      (n, m, np, nq, &
+      (n, m, np, q, &
        isodr, anajac, &
        beta, ifixb, &
        ldifx, ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
@@ -3703,7 +3703,7 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       logical, intent(in) :: isodr
          !! The variable designating whether the solution is by ODR (`isodr = .true.`) or
@@ -3767,7 +3767,7 @@ contains
       end if
 
       ! Check problem specification parameters
-      if ((n <= 0) .or. (m <= 0) .or. (npp <= 0 .or. npp > n) .or. (nq <= 0)) then
+      if ((n <= 0) .or. (m <= 0) .or. (npp <= 0 .or. npp > n) .or. (q <= 0)) then
          info = 10000
          if (n <= 0) then
             info = info + 1000
@@ -3778,7 +3778,7 @@ contains
          if (npp <= 0 .or. npp > n) then
             info = info + 10
          end if
-         if (nq <= 0) then
+         if (q <= 0) then
             info = info + 1
          end if
          return
@@ -3786,7 +3786,7 @@ contains
 
       ! Check dimension specification parameters
       if (((ldwe /= 1) .and. (ldwe < n)) .or. &
-          ((ld2we /= 1) .and. (ld2we < nq)) .or. &
+          ((ld2we /= 1) .and. (ld2we < q)) .or. &
           (isodr .and. ((ldwd /= 1) .and. (ldwd < n))) .or. &
           (isodr .and. ((ld2wd /= 1) .and. (ld2wd < m))) .or. &
           (isodr .and. ((ldifx /= 1) .and. (ldifx < n))) .or. &
@@ -3797,7 +3797,7 @@ contains
 
          info = 20000
 
-         if ((ldwe /= 1 .and. ldwe < n) .or. (ld2we /= 1 .and. ld2we < nq)) then
+         if ((ldwe /= 1 .and. ldwe < n) .or. (ld2we /= 1 .and. ld2we < q)) then
             info = info + 100
          end if
 
@@ -3899,7 +3899,7 @@ contains
    end subroutine check_inputs
 
    subroutine lcstep &
-      (n, m, np, nq, npp, &
+      (n, m, np, q, npp, &
        f, fjacb, fjacd, &
        wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
        alpha, epsfcn, isodr, &
@@ -3919,15 +3919,15 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       integer, intent(in) :: npp
          !! The number of function parameters being estimated.
-      real(wp), intent(in) :: f(n, nq)
+      real(wp), intent(in) :: f(n, q)
          !! The (weighted) estimated values of `epsilon`.
-      real(wp), intent(in) :: fjacb(n, np, nq)
+      real(wp), intent(in) :: fjacb(n, np, q)
          !! The Jacobian with respect to `beta`.
-      real(wp), intent(in) :: fjacd(n, m, nq)
+      real(wp), intent(in) :: fjacd(n, m, q)
          !! The Jacobian with respect to `delta`.
       real(wp), intent(in) :: wd(ldwd, ld2wd, m)
          !! The (squared) `delta` weights.
@@ -3950,9 +3950,9 @@ contains
       logical, intent(in) :: isodr
          !! The variable designating whether the solution is by ODR (`isodr = .true.`) or
          !! by OLS (`isodr = .false.`).
-      real(wp), intent(out) :: tfjacb(n, nq, np)
+      real(wp), intent(out) :: tfjacb(n, q, np)
          !! The array `omega*fjacb`.
-      real(wp), intent(out) :: omega(nq, nq)
+      real(wp), intent(out) :: omega(q, q)
          !! The array defined such that:
          !! `omega*trans(omega) = inv(I + fjacd*inv(e)*trans(fjacd))
          !! = (I - fjacd*inv(p)*trans(fjacd))`
@@ -3977,10 +3977,10 @@ contains
       logical, intent(in) :: forvcv
          !! The variable designating whether this subroutine was called to set up for the
          !! covariance matrix computations (`forvcv = .true.`) or not (`forvcv = .false.`).
-      real(wp), intent(out) :: wrk1(n, nq, m)
-         !! A work array of `(n, nq, m)` elements.
-      real(wp), intent(out) :: wrk2(n, nq)
-         !! A work array of `(n, nq)` elements.
+      real(wp), intent(out) :: wrk1(n, q, m)
+         !! A work array of `(n, q, m)` elements.
+      real(wp), intent(out) :: wrk2(n, q)
+         !! A work array of `(n, q)` elements.
       real(wp), intent(out) :: wrk3(np)
          !! A work array of `(np)` elements.
       real(wp), intent(out) :: wrk4(m, m)
@@ -4052,11 +4052,11 @@ contains
             ! Compute OMEGA, such that
             ! trans(OMEGA)*OMEGA = I+FJACD*inv(E)*trans(FJACD)
             ! inv(trans(OMEGA)*OMEGA) = I-FJACD*inv(P)*trans(FJACD)
-            call vevtr(m, nq, i, fjacd, n, m, wrk4, m, wrk1, n, nq, omega, nq, wrk5)
-            do l = 1, nq
+            call vevtr(m, q, i, fjacd, n, m, wrk4, m, wrk1, n, q, omega, q, wrk5)
+            do l = 1, q
                omega(l, l) = one + omega(l, l)
             end do
-            call fctr(.false., omega, nq, nq, inf)
+            call fctr(.false., omega, q, q, inf)
             if (inf /= 0) then
                istopc = 60000
                return
@@ -4065,8 +4065,8 @@ contains
             !              = trans(FJACD)*inv(trans(OMEGA)*OMEGA)
             do j = 1, m
                wrk1(i, :, j) = fjacd(i, j, :)
-               call solve_trl(nq, omega, nq, wrk1(i, 1:nq, j), 4)
-               call solve_trl(nq, omega, nq, wrk1(i, 1:nq, j), 2)
+               call solve_trl(q, omega, q, wrk1(i, 1:q, j), 4)
+               call solve_trl(q, omega, q, wrk1(i, 1:q, j), 2)
             end do
 
             ! Compute WRK5 = inv(E)*D*G2
@@ -4077,7 +4077,7 @@ contains
             ! Compute TFJACB = inv(trans(OMEGA))*FJACB
             do k = 1, kp
                tfjacb(i, :, k) = fjacb(i, kpvt(k), :)
-               call solve_trl(nq, omega, nq, tfjacb(i, 1:nq, k), 4)
+               call solve_trl(q, omega, q, tfjacb(i, 1:q, k), 4)
                if (ss(1) > zero) then
                   tfjacb(i, :, k) = tfjacb(i, :, k)/ss(kpvt(k))
                else
@@ -4086,17 +4086,17 @@ contains
             end do
 
             ! Compute WRK2 = (V*inv(E)*D**2*G2 - G1)
-            do l = 1, nq
+            do l = 1, q
                wrk2(i, l) = dot_product(fjacd(i, :, l), wrk5) - f(i, l)
             end do
 
             ! Compute WRK2 = inv(trans(OMEGA))*(V*inv(E)*D**2*G2 - G1)
-            call solve_trl(nq, omega, nq, wrk2(i, 1:nq), 4)
+            call solve_trl(q, omega, q, wrk2(i, 1:q), 4)
 
          end do
 
       else
-         do l = 1, nq
+         do l = 1, q
             do i = 1, n
                do k = 1, kp
                   tfjacb(i, l, k) = fjacb(i, kpvt(k), l)
@@ -4120,8 +4120,8 @@ contains
          ipvt = 0
       end if
 
-      call dqrdc(tfjacb, n*nq, n*nq, kp, qraux, kpvt, wrk3, ipvt)
-      call dqrsl(tfjacb, n*nq, n*nq, kp, qraux, wrk2, dum, wrk2, dum, dum, dum, 1000, inf)
+      call dqrdc(tfjacb, n*q, n*q, kp, qraux, kpvt, wrk3, ipvt)
+      call dqrsl(tfjacb, n*q, n*q, kp, qraux, wrk2, dum, wrk2, dum, dum, dum, 1000, inf)
       if (inf /= 0) then
          istopc = 60000
          return
@@ -4136,7 +4136,7 @@ contains
             do k2 = k1, kp
                call drotg(tfjacb(k2, 1, k2), wrk3(k2), co, si)
                if (kp - k2 >= 1) then
-                  call drot(kp - k2, tfjacb(k2, 1, k2 + 1), n*nq, wrk3(k2 + 1), 1, co, si)
+                  call drot(kp - k2, tfjacb(k2, 1, k2 + 1), n*q, wrk3(k2 + 1), 1, co, si)
                end if
                temp = co*wrk2(k2, 1) + si*s(kpvt(k1))
                s(kpvt(k1)) = -si*wrk2(k2, 1) + co*s(kpvt(k1))
@@ -4152,13 +4152,13 @@ contains
             elim = .true.
             do while (elim .and. kp >= 1)
                ! Estimate RCOND - U will contain approx null vector
-               call dtrco(tfjacb, n*nq, kp, rcond, u, 1)
+               call dtrco(tfjacb, n*q, kp, rcond, u, 1)
                if (rcond <= epsfcn) then
                   elim = .true.
                   imax = maxloc(u(1:kp), dim=1)
                   ! IMAX is the column to remove - use DCHEX and fix KPVT
                   if (imax /= kp) then
-                     call dchex(tfjacb, n*nq, kp, imax, kp, wrk2, n*nq, 1, qraux, wrk3, 2)
+                     call dchex(tfjacb, n*q, kp, imax, kp, wrk2, n*q, 1, qraux, wrk3, 2)
                      k = kpvt(imax)
                      do i = imax, kp - 1
                         kpvt(i) = kpvt(i + 1)
@@ -4182,7 +4182,7 @@ contains
             wrk2(i, 1) = zero
          end do
          if (kp >= 1) then
-            call dtrsl(tfjacb, n*nq, kp, wrk2, 01, inf)
+            call dtrsl(tfjacb, n*q, kp, wrk2, 01, inf)
             if (inf /= 0) then
                istopc = 60000
                return
@@ -4216,7 +4216,7 @@ contains
             call solve_trl(m, wrk4, m, wrk5, 4)
             call solve_trl(m, wrk4, m, wrk5, 2)
 
-            do l = 1, nq
+            do l = 1, q
                wrk2(i, l) = f(i, l) &
                             + dot_product(fjacb(i, 1:npp, l), s(1:npp)) &
                             - dot_product(fjacd(i, :, l), wrk5)
@@ -4246,7 +4246,7 @@ contains
    end subroutine lcstep
 
    subroutine vcv_beta &
-      (n, m, np, nq, npp, &
+      (n, m, np, q, npp, &
        f, fjacb, fjacd, &
        wd, ldwd, ld2wd, ssf, ss, tt, ldtt, delta, &
        epsfcn, isodr, &
@@ -4265,15 +4265,15 @@ contains
          !! The number of columns of data in the explanatory variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       integer, intent(in) :: npp
          !! The number of function parameters being estimated.
-      real(wp), intent(in) :: f(n, nq)
+      real(wp), intent(in) :: f(n, q)
          !! The (weighted) estimated values of `epsilon`.
-      real(wp), intent(in) :: fjacb(n, np, nq)
+      real(wp), intent(in) :: fjacb(n, np, q)
          !! The Jacobian with respect to `beta`.
-      real(wp), intent(in) :: fjacd(n, m, nq)
+      real(wp), intent(in) :: fjacd(n, m, q)
          !! The Jacobian with respect to `delta`.
       real(wp), intent(in) :: wd(ldwd, ld2wd, m)
          !! The `delta` weights.
@@ -4300,9 +4300,9 @@ contains
          !! The covariance matrix of the estimated `beta`s.
       real(wp), intent(out) :: sd(np)
          !! The standard deviations of the estimated `beta`s.
-      real(wp), intent(out) :: wrk6(n*nq, np)
-         !! A work array of `(n*nq, np)` elements.
-      real(wp), intent(out) :: omega(nq, nq)
+      real(wp), intent(out) :: wrk6(n*q, np)
+         !! A work array of `(n*q, np)` elements.
+      real(wp), intent(out) :: omega(q, q)
          !! The array defined such that `omega*trans(omega) = inv(I + fjacd*inv(e)*trans(fjacd))
          !! = (I - fjacd*inv(p)*trans(fjacd))`.
       real(wp), intent(out) :: u(np)
@@ -4328,10 +4328,10 @@ contains
          !! The residual variance.
       integer, intent(in) :: ifixb(np)
          !! The values designating whether the elements of `beta` are fixed at their input values or not.
-      real(wp), intent(out) :: wrk1(n, nq, m)
-         !! A work array of `(n, nq, m)` elements.
-      real(wp), intent(out) :: wrk2(n, nq)
-         !! A work array of `(n, nq)` elements.
+      real(wp), intent(out) :: wrk1(n, q, m)
+         !! A work array of `(n, q, m)` elements.
+      real(wp), intent(out) :: wrk2(n, q)
+         !! A work array of `(n, q)` elements.
       real(wp), intent(out) :: wrk3(np)
          !! A work array of `(np)` elements.
       real(wp), intent(out) :: wrk4(m, m)
@@ -4364,7 +4364,7 @@ contains
       forvcv = .true.
       istopc = 0
 
-      call lcstep(n, m, np, nq, npp, &
+      call lcstep(n, m, np, q, npp, &
                   f, fjacb, fjacd, &
                   wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
                   zero, epsfcn, isodr, &
@@ -4376,7 +4376,7 @@ contains
       end if
 
       kp = npp - irank
-      call dpodi(wrk6, n*nq, kp, wrk3, 1)
+      call dpodi(wrk6, n*q, kp, wrk3, 1)
 
       idf = 0
       do i = 1, n
@@ -4830,7 +4830,7 @@ contains
 
    subroutine fpvb &
       (fcn, &
-       n, m, np, nq, &
+       n, m, np, q, &
        beta, xplusd, ifixb, ifixx, ldifx, &
        nrow, j, lq, stp, &
        istop, nfev, pvb, &
@@ -4845,7 +4845,7 @@ contains
          !! The number of columns of data in the independent variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       real(wp), intent(inout) :: beta(np)
          !! The function parameters.
@@ -4872,11 +4872,11 @@ contains
          !! The number of function evaluations.
       real(wp), intent(out) :: pvb
          !! The function value for the selected observation & response.
-      real(wp), intent(out) :: wrk1(n, m, nq)
+      real(wp), intent(out) :: wrk1(n, m, q)
          !! Work array.
-      real(wp), intent(out) :: wrk2(n, nq)
+      real(wp), intent(out) :: wrk2(n, q)
          !! Work array.
-      real(wp), intent(out) :: wrk6(n, np, nq)
+      real(wp), intent(out) :: wrk6(n, np, q)
          !! Work array.
 
       ! Local scalars
@@ -4889,7 +4889,7 @@ contains
       beta(j) = beta(j) + stp
 
       istop = 0
-      call fcn(n, m, np, nq, beta, xplusd, &
+      call fcn(n, m, np, q, beta, xplusd, &
                ifixb, ifixx, ldifx, 003, wrk2, wrk6, wrk1, istop)
       if (istop == 0) then
          nfev = nfev + 1
@@ -4904,7 +4904,7 @@ contains
 
    subroutine fpvd &
       (fcn, &
-       n, m, np, nq, &
+       n, m, np, q, &
        beta, xplusd, ifixb, ifixx, ldifx, &
        nrow, j, lq, stp, &
        istop, nfev, pvd, &
@@ -4919,7 +4919,7 @@ contains
          !! The number of columns of data in the independent variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       real(wp), intent(in) :: beta(np)
          !! The function parameters.
@@ -4946,11 +4946,11 @@ contains
          !! The number of function evaluations.
       real(wp), intent(out) :: pvd
          !! The function value for the selected observation & response.
-      real(wp), intent(out) :: wrk1(n, m, nq)
+      real(wp), intent(out) :: wrk1(n, m, q)
          !! Work array.
-      real(wp), intent(out) :: wrk2(n, nq)
+      real(wp), intent(out) :: wrk2(n, q)
          !! Work array.
-      real(wp), intent(out) :: wrk6(n, np, nq)
+      real(wp), intent(out) :: wrk6(n, np, q)
          !! Work array.
 
       ! Local scalars
@@ -4963,7 +4963,7 @@ contains
       xplusd(nrow, j) = xplusd(nrow, j) + stp
 
       istop = 0
-      call fcn(n, m, np, nq, beta, xplusd, &
+      call fcn(n, m, np, q, beta, xplusd, &
                ifixb, ifixx, ldifx, 003, wrk2, wrk6, wrk1, istop)
       if (istop == 0) then
          nfev = nfev + 1
@@ -5304,17 +5304,15 @@ contains
    end subroutine solve_trl
 
    pure subroutine vevtr &
-      (m, nq, indx, &
-       v, ldv, ld2v, e, lde, ve, ldve, ld2ve, vev, ldvev, &
-       wrk5)
-   !! Compute `v*e*trans(v)` for the (`indx`)th `m` by `nq` array in `v`.
+      (m, q, indx, v, ldv, ld2v, e, lde, ve, ldve, ld2ve, vev, ldvev, wrk5)
+   !! Compute `v*e*trans(v)` for the (`indx`)th `m` by `q` array in `v`.
 
       integer, intent(in) :: m
          !! The number of columns of data in the independent variable.
-      integer, intent(in) :: nq
+      integer, intent(in) :: q
          !! The number of responses per observation.
       integer, intent(in) :: indx
-         !! The row in `v` in which the `m` by `nq` array is stored.
+         !! The row in `v` in which the `m` by `q` array is stored.
       integer, intent(in) :: ldv
          !! The leading dimension of array `v`.
       integer, intent(in) :: ld2v
@@ -5327,14 +5325,14 @@ contains
          !! The leading dimension of array `vev`.
       integer, intent(in) :: ld2ve
          !! The second dimension of array `ve`.
-      real(wp), intent(in) :: v(ldv, ld2v, nq)
-         !! An array of `nq` by `m` matrices.
+      real(wp), intent(in) :: v(ldv, ld2v, q)
+         !! An array of `q` by `m` matrices.
       real(wp), intent(in) :: e(lde, m)
          !! The `m` by `m` matrix of the factors, so `ete = (d**2 + alpha*t**2)`.
       real(wp), intent(out) :: ve(ldve, ld2ve, m)
-         !! The `nq` by `m` array `ve = v * inv(e)`.
-      real(wp), intent(out) :: vev(ldvev, nq)
-         !! The `nq` by `nq` array `vev = v * inv(ete) * trans(v)`.
+         !! The `q` by `m` array `ve = v * inv(e)`.
+      real(wp), intent(out) :: vev(ldvev, q)
+         !! The `q` by `q` array `vev = v * inv(ete) * trans(v)`.
       real(wp), intent(out) :: wrk5(m)
          !! An `m` work vector.
 
@@ -5346,15 +5344,15 @@ contains
       !  L1:      An indexing variable.
       !  L2:      An indexing variable.
 
-      if (nq == 0 .or. m == 0) return
+      if (q == 0 .or. m == 0) return
 
-      do l1 = 1, nq
+      do l1 = 1, q
          wrk5 = v(indx, 1:m, l1)
          call solve_trl(m, e, lde, wrk5, 4)
          ve(indx, l1, :) = wrk5
       end do
 
-      do l1 = 1, nq
+      do l1 = 1, q
          do l2 = 1, l1
             vev(l1, l2) = dot_product(ve(indx, l1, :), ve(indx, l2, :))
             vev(l2, l1) = vev(l1, l2)
