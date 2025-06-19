@@ -59,6 +59,10 @@ int main() {
 
     // Read problem data
     FILE *data_file = fopen("./data3.dat", "r");
+    if (data_file == NULL) {
+        fprintf(stderr, "Error: Unable to open `./data3.dat`\n");
+        return 1;
+    }
 
     for (int i = 0; i < NP; i++) {
         iscan = fscanf(data_file, "%lf", &beta[i]);
