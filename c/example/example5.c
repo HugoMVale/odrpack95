@@ -137,8 +137,8 @@ int main() {
     // Get the variable locations within the integer and real work space
     iworkidx_t iworkidx;
     workidx_t workidx;
-    iwinfo_c(&m, &np, &nq, &iworkidx);
-    rwinfo_c(&n, &m, &np, &nq, &ldwe, &ld2we, &isodr, &workidx);
+    loc_iwork_c(&m, &np, &nq, &iworkidx);
+    loc_rwork_c(&n, &m, &np, &nq, &ldwe, &ld2we, &isodr, &workidx);
 
     // Print some outputs
     printf("info: %d\n", info);

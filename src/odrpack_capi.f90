@@ -433,7 +433,7 @@ contains
 
    end subroutine close_file
 
-   pure subroutine iwinfo_c(m, np, nq, iworkidx) bind(C)
+   pure subroutine loc_iwork_c(m, np, nq, iworkidx) bind(C)
    !! Get storage locations within integer work space.
 
       integer(c_int), intent(in) :: m
@@ -482,9 +482,9 @@ contains
       iworkidx%bound = boundi - 1
       iworkidx%liwkmn = liwkmn
 
-   end subroutine iwinfo_c
+   end subroutine loc_iwork_c
 
-   pure subroutine rwinfo_c(n, m, np, nq, ldwe, ld2we, isodr, workidx) bind(C)
+   pure subroutine loc_rwork_c(n, m, np, nq, ldwe, ld2we, isodr, workidx) bind(C)
    !! Get storage locations within real work space.
 
       integer(c_int), intent(in) :: n
@@ -577,7 +577,7 @@ contains
       workidx%upper = upperi - 1
       workidx%lwkmn = lwkmn
 
-   end subroutine rwinfo_c
+   end subroutine loc_rwork_c
 
    pure subroutine workspace_dimensions_c(n, m, np, nq, isodr, lwork, liwork) bind(C)
    !! Calculate the dimensions of the workspace arrays.
