@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(odrpack95 VERSION 1.0.1 LANGUAGES C Fortran)
+project(odrpack95 VERSION 2.0.1 LANGUAGES C Fortran)
 
 # Enable testing
 enable_testing()
