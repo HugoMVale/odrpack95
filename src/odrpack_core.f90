@@ -1105,7 +1105,7 @@ contains
       if (ifixb(1) < 0) then
          do j = 1, np
             call scale_mat(n, nq, we1, ldwe, ld2we, &
-                           reshape(fjacb(:, j, :), [n, nq]), & ! this reshape should not be required. probably compiler bug
+                           reshape(fjacb(:, j, :), [n, nq]), &
                            tempret(1:n, 1:nq))
             fjacb(:, j, :) = tempret(1:n, 1:nq)
          end do
@@ -1114,7 +1114,9 @@ contains
          do j = 1, np
             if (ifixb(j) >= 1) then
                j1 = j1 + 1
-               call scale_mat(n, nq, we1, ldwe, ld2we, fjacb(:, j, :), tempret(1:n, 1:nq))
+               call scale_mat(n, nq, we1, ldwe, ld2we, &
+                              reshape(fjacb(:, j, :), [n, nq]), &
+                              tempret(1:n, 1:nq))
                fjacb(:, j1, :) = tempret(1:n, 1:nq)
             end if
          end do
@@ -1123,7 +1125,9 @@ contains
       ! Weight the Jacobian's wrt DELTA as appropriate
       if (isodr) then
          do j = 1, m
-            call scale_mat(n, nq, we1, ldwe, ld2we, fjacd(:, j, :), tempret(1:n, 1:nq))
+            call scale_mat(n, nq, we1, ldwe, ld2we, &
+                           reshape(fjacd(:, j, :), [n, nq]), &
+                           tempret(1:n, 1:nq))
             fjacd(:, j, :) = tempret(1:n, 1:nq)
          end do
       end if
@@ -5369,17 +5373,17 @@ contains
       integer, intent(in) :: m
          !! Number of columns of data in `t`.
       real(wp), intent(in), target :: wt(..)
-         !! Array of shape `(ldwt,ld2wt,m)` holding the weights.
+         !! Array of shape conformable to `(ldwt,ld2wt,m)` holding the weights.
       integer, intent(in) :: ldwt
          !! Leading dimension of array `wt`.
       integer, intent(in) :: ld2wt
          !! Second dimension of array `wt`.
       real(wp), intent(in), target :: t(..)
-         !! Array of shape `(n,m)` being scaled by `wt`.
+         !! Array of shape conformable to `(n,m)` being scaled by `wt`.
       real(wp), intent(out), target :: wtt(..)
-         !! Array of shape `(n,m)` holding the result of weighting array `t` by `wt`. Array
-         !! `wtt` can be the same as `t` only if the arrays in `wt` are upper triangular with
-         !! zeros below the diagonal.
+         !! Array of shape conformable to `(n,m)` holding the result of weighting array `t` by
+         !! array `wt`. Array `wtt` can be the same as `t` only if the arrays in `wt` are upper
+         !! triangular with zeros below the diagonal.
 
       ! Local scalars
       integer :: i, j
@@ -5391,6 +5395,13 @@ contains
 
       if (n == 0 .or. m == 0) return
 
+      select rank (wt)
+      rank (1); wt_(1:ldwt, 1:ld2wt, 1:m) => wt
+      rank (2); wt_(1:ldwt, 1:ld2wt, 1:m) => wt
+      rank (3); wt_(1:ldwt, 1:ld2wt, 1:m) => wt
+      rank default; error stop "Invalid rank of `wt`."
+      end select
+
       select rank (t)
       rank (1); t_(1:n, 1:m) => t
       rank (2); t_(1:n, 1:m) => t
@@ -5400,14 +5411,7 @@ contains
       select rank (wtt)
       rank (1); wtt_(1:n, 1:m) => wtt
       rank (2); wtt_(1:n, 1:m) => wtt
-      rank default; error stop "Invalid rank of `wt`."
-      end select
-
-      select rank (wt)
-      rank (1); wt_(1:ldwt, 1:ld2wt, 1:m) => wt
-      rank (2); wt_(1:ldwt, 1:ld2wt, 1:m) => wt
-      rank (3); wt_(1:ldwt, 1:ld2wt, 1:m) => wt
-      rank default; error stop "Invalid rank of `wt`."
+      rank default; error stop "Invalid rank of `wtt`."
       end select
 
       if (wt_(1, 1, 1) >= zero) then
