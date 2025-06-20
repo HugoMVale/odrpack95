@@ -498,7 +498,7 @@ contains
       !  XPLUSI:  The starting location in array WORK of array XPLUSD.
 
       ! Find starting locations within integer workspace
-      call loc_iwork(m, np, q, &
+      call loc_iwork(m, q, np, &
                      msgb, msgd, jpvti, istopi, &
                      nnzwi, nppi, idfi, &
                      jobi, iprini, luneri, lunrpi, &
@@ -508,7 +508,7 @@ contains
                      liwkmn)
 
       ! Find starting locations within REAL work space
-      call loc_rwork(n, m, np, q, ldwe, ld2we, isodr, &
+      call loc_rwork(n, m, q, np, ldwe, ld2we, isodr, &
                      deltai, epsi, xplusi, fni, sdi, vcvi, &
                      rvari, wssi, wssdei, wssepi, rcondi, etai, &
                      olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
@@ -1594,7 +1594,7 @@ contains
    end subroutine set_ifix
 
    pure subroutine loc_iwork &
-      (m, np, q, &
+      (m, q, np, &
        msgbi, msgdi, ifix2i, istopi, &
        nnzwi, nppi, idfi, &
        jobi, iprini, luneri, lunrpi, &
@@ -1606,10 +1606,10 @@ contains
 
       integer, intent(in) :: m
          !! The number of columns of data in the independent variable.
-      integer, intent(in) :: np
-         !! The number of function parameters.
       integer, intent(in) :: q
          !! The number of responses per observation.
+      integer, intent(in) :: np
+         !! The number of function parameters.
       integer, intent(out) :: msgbi
          !! The starting location in array `iwork` of array `msgb`.
       integer, intent(out) :: msgdi
@@ -1710,7 +1710,7 @@ contains
    end subroutine loc_iwork
 
    pure subroutine loc_rwork &
-      (n, m, np, q, ldwe, ld2we, isodr, &
+      (n, m, q, np, ldwe, ld2we, isodr, &
        deltai, epsi, xplusi, fni, sdi, vcvi, &
        rvari, wssi, wssdei, wssepi, rcondi, etai, &
        olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
@@ -1727,10 +1727,10 @@ contains
          !! The number of observations.
       integer, intent(in) :: m
          !! The number of columns of data in the explanatory variable.
-      integer, intent(in) :: np
-         !! The number of function parameters.
       integer, intent(in) :: q
          !! The number of responses per observation.
+      integer, intent(in) :: np
+         !! The number of function parameters.
       integer, intent(in) :: ldwe
          !! The leading dimension of array `we`.
       integer, intent(in) :: ld2we

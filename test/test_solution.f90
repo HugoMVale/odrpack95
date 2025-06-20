@@ -2346,7 +2346,7 @@ contains
                  fjacdi, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, loweri, upperi, &
                  lwkmn
 
-      call loc_rwork(n, m, np, q, ldwe, ld2we, isodr, &
+      call loc_rwork(n, m, q, np, ldwe, ld2we, isodr, &
                      deltai, epsi, xplusi, fni, sdi, vcvi, &
                      rvari, wssi, wssdei, wssepi, rcondi, etai, &
                      olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &

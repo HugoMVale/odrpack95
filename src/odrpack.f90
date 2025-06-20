@@ -1097,7 +1097,7 @@ contains
       call set_flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
 
       ! Set starting locations within integer workspace
-      call loc_iwork(m, np, q, &
+      call loc_iwork(m, q, np, &
                      msgb, msgd, jpvti, istopi, &
                      nnzwi, nppi, idfi, &
                      jobi, iprini, luneri, lunrpi, &
@@ -1106,7 +1106,7 @@ contains
                      boundi, liwkmn)
 
       ! Set starting locations within REAL work space
-      call loc_rwork(n, m, np, q, ldwe, ld2we, isodr, &
+      call loc_rwork(n, m, q, np, ldwe, ld2we, isodr, &
                      deltai, fi, xplusi, fni, sdi, vcvi, &
                      rvari, wssi, wssdei, wssepi, rcondi, etai, &
                      olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &

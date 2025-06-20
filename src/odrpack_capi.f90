@@ -433,15 +433,15 @@ contains
 
    end subroutine close_file
 
-   pure subroutine loc_iwork_c(m, np, q, iworkidx) bind(C)
+   pure subroutine loc_iwork_c(m, q, np, iworkidx) bind(C)
    !! Get storage locations within integer work space.
 
       integer(c_int), intent(in) :: m
          !! Number of columns of data in the independent variable.
-      integer(c_int), intent(in) :: np
-         !! Number of function parameters.
       integer(c_int), intent(in) :: q
          !! Number of responses per observation.
+      integer(c_int), intent(in) :: np
+         !! Number of function parameters.
       type(iworkidx_t), intent(out) :: iworkidx
          !! 0-based indexes of integer work array.
 
@@ -449,7 +449,7 @@ contains
                  lunrpi, nrowi, ntoli, netai, maxiti, niteri, nfevi, njevi, int2i, iranki, &
                  ldtti, boundi, liwkmn
 
-      call loc_iwork(m, np, q, &
+      call loc_iwork(m, q, np, &
                      msgbi, msgdi, ifix2i, istopi, &
                      nnzwi, nppi, idfi, &
                      jobi, iprini, luneri, lunrpi, &
@@ -484,17 +484,17 @@ contains
 
    end subroutine loc_iwork_c
 
-   pure subroutine loc_rwork_c(n, m, np, q, ldwe, ld2we, isodr, workidx) bind(C)
+   pure subroutine loc_rwork_c(n, m, q, np, ldwe, ld2we, isodr, workidx) bind(C)
    !! Get storage locations within real work space.
 
       integer(c_int), intent(in) :: n
          !! Number of observations.
       integer(c_int), intent(in) :: m
          !! Number of columns of data in the explanatory variable.
-      integer(c_int), intent(in) :: np
-         !! Number of function parameters.
       integer(c_int), intent(in) :: q
          !! Number of responses per observation.
+      integer(c_int), intent(in) :: np
+         !! Number of function parameters.
       integer(c_int), intent(in) :: ldwe
          !! Leading dimension of array `we`.
       integer(c_int), intent(in) :: ld2we
@@ -512,7 +512,7 @@ contains
                  fjacdi, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, loweri, upperi, &
                  lwkmn
 
-      call loc_rwork(n, m, np, q, ldwe, ld2we, logical(isodr, kind=kind(.true.)), &
+      call loc_rwork(n, m, q, np, ldwe, ld2we, logical(isodr, kind=kind(.true.)), &
                      deltai, epsi, xplusi, fni, sdi, vcvi, &
                      rvari, wssi, wssdei, wssepi, rcondi, etai, &
                      olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
@@ -579,17 +579,17 @@ contains
 
    end subroutine loc_rwork_c
 
-   pure subroutine workspace_dimensions_c(n, m, np, q, isodr, lwork, liwork) bind(C)
+   pure subroutine workspace_dimensions_c(n, m, q, np, isodr, lwork, liwork) bind(C)
    !! Calculate the dimensions of the workspace arrays.
 
       integer(c_int), intent(in) :: n
          !! Number of observations.
       integer(c_int), intent(in) :: m
          !! Number of columns of data in the independent variable.
-      integer(c_int), intent(in) :: np
-         !! Number of function parameters.
       integer(c_int), intent(in) :: q
          !! Number of responses per observation.
+      integer(c_int), intent(in) :: np
+         !! Number of function parameters.
       logical(c_bool), intent(in) :: isodr
          !! Variable designating whether the solution is by ODR (`isodr = .true.`)
          !! or by OLS (`isodr = .false.`).
@@ -598,7 +598,7 @@ contains
       integer(c_int), intent(out) :: liwork
          !! Length of integer `iwork` array.
 
-      call workspace_dimensions(n, m, np, q, logical(isodr, kind=kind(.true.)), &
+      call workspace_dimensions(n, m, q, np, logical(isodr, kind=kind(.true.)), &
                                 lwork, liwork)
 
    end subroutine workspace_dimensions_c

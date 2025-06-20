@@ -336,14 +336,14 @@ typedef struct
  * @brief Get storage locations within integer work space.
  *
  * @param m        `==>` Number of columns of data in the explanatory variable.
- * @param np       `==>` Number of function parameters.
  * @param q        `==>` Number of responses per observation.
+ * @param np       `==>` Number of function parameters.
  * @param iworkidx `<==` 0-based indexes of integer work array.
  */
 ODRPACK_EXTERN void loc_iwork_c(
     const int *m,
-    const int *np,
     const int *q,
+    const int *np,
     iworkidx_t *iworkidx);
 
 /**
@@ -351,8 +351,8 @@ ODRPACK_EXTERN void loc_iwork_c(
  *
  * @param n       `==>` Number of observations.
  * @param m       `==>` Number of columns of data in the explanatory variable.
- * @param np      `==>` Number of function parameters.
  * @param q       `==>` Number of responses per observation.
+ * @param np      `==>` Number of function parameters.
  * @param ldwe    `==>` Leading dimension of array `we`.
  * @param ld2we   `==>` Second dimension of array `we`.
  * @param isodr   `==>` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
@@ -361,8 +361,8 @@ ODRPACK_EXTERN void loc_iwork_c(
 ODRPACK_EXTERN void loc_rwork_c(
     const int *n,
     const int *m,
-    const int *np,
     const int *q,
+    const int *np,
     const int *ldwe,
     const int *ld2we,
     const bool *isodr,
