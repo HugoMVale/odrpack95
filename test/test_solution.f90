@@ -804,7 +804,7 @@ contains
             if (allocated(iwork)) deallocate (iwork)
             if (allocated(work)) deallocate (work)
             isodr = (job < 0 .or. mod(job, 10) <= 1)
-            call workspace_dimensions(n, m, np, q, isodr, lwork, liwork)
+            call workspace_dimensions(n, m, q, np, isodr, lwork, liwork)
             allocate (iwork(liwork), work(lwork))
          end if
 

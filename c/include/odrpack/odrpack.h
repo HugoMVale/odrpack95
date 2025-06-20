@@ -373,8 +373,8 @@ ODRPACK_EXTERN void loc_rwork_c(
  *
  * @param n      `==>` Number of observations.
  * @param m      `==>` Number of columns of data in the explanatory variable.
- * @param np     `==>` Number of function parameters.
  * @param q      `==>` Number of responses per observation.
+ * @param np     `==>` Number of function parameters.
  * @param isodr  `==>` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
  * @param lwork  `<==` Length of real `work` array.
  * @param liwork `<==` Length of integer `iwork` array.
@@ -382,8 +382,8 @@ ODRPACK_EXTERN void loc_rwork_c(
 ODRPACK_EXTERN void workspace_dimensions_c(
     const int *n,
     const int *m,
-    const int *np,
     const int *q,
+    const int *np,
     const bool *isodr,
     int *lwork,
     int *liwork);

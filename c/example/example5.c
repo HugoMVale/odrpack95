@@ -88,7 +88,7 @@ int main() {
 
     // Determine workspace requirements
     int lwork, liwork;
-    workspace_dimensions_c(&n, &m, &np, &q, &isodr, &lwork, &liwork);
+    workspace_dimensions_c(&n, &m, &q, &np, &isodr, &lwork, &liwork);
     // printf("lwork: %d\n", lwork);
     // printf("liwork: %d\n", liwork);
 

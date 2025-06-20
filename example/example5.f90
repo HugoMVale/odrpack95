@@ -69,7 +69,7 @@ program example5
 
    ! Manual allocation of work arrays
    ! Not required! Just to show it can be done if so desired
-   call workspace_dimensions(n, m, np, q, .true., lwork, liwork)
+   call workspace_dimensions(n, m, q, np, .true., lwork, liwork)
    allocate (iwork(liwork))
    allocate (work(lwork))
 

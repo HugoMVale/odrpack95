@@ -273,7 +273,7 @@ contains
 
       ! Determine the size of the work arrays
       isodr = (job_ < 0 .or. mod(job_, 10) <= 1)
-      call workspace_dimensions(n, m, np, q, isodr, lwork, liwork)
+      call workspace_dimensions(n, m, q, np, isodr, lwork, liwork)
 
       ! Allocate the local work arrays, if not provided by user
       ! The complementary case is treated below, because of the way the info flags are designed
@@ -2328,17 +2328,17 @@ contains
 
    end subroutine odrsolve
 
-   pure subroutine workspace_dimensions(n, m, np, q, isodr, lwork, liwork)
+   pure subroutine workspace_dimensions(n, m, q, np, isodr, lwork, liwork)
    !! Calculate the dimensions of the workspace arrays.
 
       integer, intent(in) :: n
          !! Number of observations.
       integer, intent(in) :: m
          !! Number of columns of data in the independent variable.
-      integer, intent(in) :: np
-         !! Number of function parameters.
       integer, intent(in) :: q
          !! Number of responses per observation.
+      integer, intent(in) :: np
+         !! Number of function parameters.
       logical, intent(in) :: isodr
          !! The variable designating whether the solution is by ODR (`isodr = .true.`)
          !! or by OLS (`isodr = .false.`).
