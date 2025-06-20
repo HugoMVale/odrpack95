@@ -14,10 +14,10 @@ module odrpack_core
             !! Number of observations.
          integer, intent(in) :: m
             !! Number of columns of data in the independent variable.
-         integer, intent(in) :: np
-            !! Number of function parameters.
          integer, intent(in) :: q
             !! Number of responses per observation.
+         integer, intent(in) :: np
+            !! Number of function parameters.
          real(wp), intent(in) :: beta(np)
             !! Current values of parameters.
          real(wp), intent(in) :: xplusd(n, m)
@@ -895,7 +895,7 @@ contains
          else
             partmp = parpts(j, :)
             istop = 0
-            call fcn(n, m, np, q, partmp, xplusd, &
+            call fcn(n, m, q, np, partmp, xplusd, &
                      ifixb, ifixx, ldifx, 003, wrk2, wrk6, wrk1, istop)
             if (istop /= 0) then
                return
@@ -1060,7 +1060,7 @@ contains
          ideval = 010
       end if
       if (anajac) then
-         call fcn(n, m, np, q, beta, xplusd, &
+         call fcn(n, m, q, np, beta, xplusd, &
                   ifixb, ifixx, ldifx, ideval, wrk2, fjacb, fjacd, istop)
          if (istop /= 0) then
             return
@@ -2359,7 +2359,7 @@ contains
             if (beta(k) == betak) then
                wrk2 = fn
             else
-               call fcn(n, m, np, q, beta, xplusd, &
+               call fcn(n, m, q, np, beta, xplusd, &
                         ifixb, ifixx, ldifx, 001, wrk2, wrk6, wrk1, istop)
                if (istop /= 0) then
                   return
@@ -2382,7 +2382,7 @@ contains
             if (beta(k) == betak) then
                wrk2 = fn
             else
-               call fcn(n, m, np, q, beta, xplusd, &
+               call fcn(n, m, q, np, beta, xplusd, &
                         ifixb, ifixx, ldifx, 001, wrk2, wrk6, wrk1, istop)
                if (istop /= 0) then
                   return
@@ -2440,7 +2440,7 @@ contains
                end do
 
                istop = 0
-               call fcn(n, m, np, q, beta, xplusd, &
+               call fcn(n, m, q, np, beta, xplusd, &
                         ifixb, ifixx, ldifx, 001, wrk2, wrk6, wrk1, istop)
                if (istop /= 0) then
                   return
@@ -2452,7 +2452,7 @@ contains
                xplusd(:, j) = x(:, j) + delta(:, j) - stp
 
                istop = 0
-               call fcn(n, m, np, q, beta, xplusd, &
+               call fcn(n, m, q, np, beta, xplusd, &
                         ifixb, ifixx, ldifx, 001, wrk2, wrk6, wrk1, istop)
                if (istop /= 0) then
                   return
@@ -2618,7 +2618,7 @@ contains
                end if
             end if
             istop = 0
-            call fcn(n, m, np, q, beta, xplusd, &
+            call fcn(n, m, q, np, beta, xplusd, &
                      ifixb, ifixx, ldifx, 001, wrk2, wrk6, wrk1, istop)
             if (istop /= 0) then
                return
@@ -2674,7 +2674,7 @@ contains
                end do
 
                istop = 0
-               call fcn(n, m, np, q, beta, xplusd, &
+               call fcn(n, m, q, np, beta, xplusd, &
                         ifixb, ifixx, ldifx, 001, wrk2, wrk6, wrk1, istop)
                if (istop /= 0) then
                   return
@@ -2838,7 +2838,7 @@ contains
       if (any(beta /= betaj)) then
          istop = 0
          ideval = 001
-         call fcn(n, m, np, q, betaj, xplusd, &
+         call fcn(n, m, q, np, betaj, xplusd, &
                   ifixb, ifixx, ldifx, ideval, pv0, fjacb, fjacd, istop)
          if (istop /= 0) then
             return
@@ -2854,7 +2854,7 @@ contains
       else
          ideval = 010
       end if
-      call fcn(n, m, np, q, betaj, xplusd, &
+      call fcn(n, m, q, np, betaj, xplusd, &
                ifixb, ifixx, ldifx, ideval, wrk2, fjacb, fjacd, istop)
       if (istop /= 0) then
          return
@@ -4889,7 +4889,7 @@ contains
       beta(j) = beta(j) + stp
 
       istop = 0
-      call fcn(n, m, np, q, beta, xplusd, &
+      call fcn(n, m, q, np, beta, xplusd, &
                ifixb, ifixx, ldifx, 003, wrk2, wrk6, wrk1, istop)
       if (istop == 0) then
          nfev = nfev + 1
@@ -4963,7 +4963,7 @@ contains
       xplusd(nrow, j) = xplusd(nrow, j) + stp
 
       istop = 0
-      call fcn(n, m, np, q, beta, xplusd, &
+      call fcn(n, m, q, np, beta, xplusd, &
                ifixb, ifixx, ldifx, 003, wrk2, wrk6, wrk1, istop)
       if (istop == 0) then
          nfev = nfev + 1

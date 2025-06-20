@@ -8,7 +8,7 @@ module test_error_detection_m
 contains
 
    subroutine fcn( &
-      n, m, np, q, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+      n, m, q, np, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
    !! User-supplied subroutine for evaluating the model.
 
       integer, intent(in) :: ideval, ldifx, m, n, np, q
@@ -101,7 +101,7 @@ program test_error_detection
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 11111) passed = .false.
@@ -119,7 +119,7 @@ program test_error_detection
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 10**5) passed = .false.
@@ -137,7 +137,7 @@ program test_error_detection
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, iwork=iwork, work=work, &
+   call odr(fcn, n, m, q, np, beta, y, x, iwork=iwork, work=work, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 10**5) passed = .false.
@@ -155,7 +155,7 @@ program test_error_detection
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             delta=delta, ifixb=[1, 0], sclb=[1.0_wp, 1.0_wp], stpb=[1.0_wp, 1.0_wp], &
             ifixx=reshape([1, 0, 0, 1], [2, 2]), scld=reshape([1.0_wp, 1.0_wp], [2, 1]), &
             stpd=reshape([1.0_wp, 1.0_wp], [2, 1]), &
@@ -176,7 +176,7 @@ program test_error_detection
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             wd=reshape([-1.0_wp], [1, 1, 1]), we=reshape([-1.0_wp], [1, 1, 1]), &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -195,7 +195,7 @@ program test_error_detection
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             lower=[1.0_wp, 1.0_wp], upper=[1.0_wp, 1.0_wp, 1.0_wp, 1.0_wp], &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -214,7 +214,7 @@ program test_error_detection
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             lower=beta + 1e-10_wp, upper=beta - 1e-10_wp, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -233,7 +233,7 @@ program test_error_detection
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             lower=beta + 1e-10_wp, upper=beta + 1.0_wp, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -254,7 +254,7 @@ program test_error_detection
    lower = beta - 1e-100_wp
    upper = beta + 1e-100_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             lower=lower, upper=upper, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -267,7 +267,7 @@ program test_error_detection
    lower = beta - 1e-10_wp
    upper = beta + 1e-10_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             lower=lower, upper=upper, stpb=beta*1e-5_wp, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -286,7 +286,7 @@ program test_error_detection
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             sclb=[1.0_wp, -1.0_wp, 1.0_wp], &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -305,7 +305,7 @@ program test_error_detection
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             scld=reshape([1.0_wp, -1.0_wp, 1.0_wp], [n, m]), &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -324,7 +324,7 @@ program test_error_detection
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             scld=reshape([1.0_wp, -1.0_wp], [1, m]), &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -343,7 +343,7 @@ program test_error_detection
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             stpb=[1.0_wp, -1.0_wp, 1.0_wp], &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -362,7 +362,7 @@ program test_error_detection
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             stpd=reshape([1.0_wp, -1.0_wp, 1.0_wp], [n, m]), &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -381,7 +381,7 @@ program test_error_detection
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             stpd=reshape([1.0_wp, -1.0_wp], [1, m]), &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -402,7 +402,7 @@ program test_error_detection
    we = -1.0_wp
    we(1, 1, 1) = 1.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             we=we, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -423,7 +423,7 @@ program test_error_detection
    we = -1.0_wp
    we(1, 1, 1) = 1.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             we=we, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -444,7 +444,7 @@ program test_error_detection
    we = -1.0_wp
    we(1, 1, 1) = 1.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             we=we, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -465,7 +465,7 @@ program test_error_detection
    we = -1.0_wp
    we(1, 1, 1) = 1.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             we=we, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -486,7 +486,7 @@ program test_error_detection
    wd = -1.0_wp
    wd(1, 1, 1) = 1.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             wd=wd, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -507,7 +507,7 @@ program test_error_detection
    wd = -1.0_wp
    wd(1, 1, 1) = 1.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             wd=wd, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -528,7 +528,7 @@ program test_error_detection
    wd = -1.0_wp
    wd(1, 1, 1) = 1.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             wd=wd, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -549,7 +549,7 @@ program test_error_detection
    wd = -1.0_wp
    wd(1, 1, 1) = 1.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             wd=wd, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -568,7 +568,7 @@ program test_error_detection
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, iprint=1, info=info, job=10000, &
+   call odr(fcn, n, m, q, np, beta, y, x, iprint=1, info=info, job=10000, &
             lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 70110) passed = .false.
@@ -586,7 +586,7 @@ program test_error_detection
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, np, q, beta, y, x, iprint=1, info=info, job=1000, &
+   call odr(fcn, n, m, q, np, beta, y, x, iprint=1, info=info, job=1000, &
             lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 71000) passed = .false.
@@ -607,7 +607,7 @@ program test_error_detection
               148.4131591025766_wp, 403.4287934927353_wp]
    x(:, 1) = [1.0_wp, 2.0_wp, 5.0_wp, 6.0_wp]
 
-   call odr(fcn, n, m, np, q, beta, y, x, iprint=1, info=info, job=0020, &
+   call odr(fcn, n, m, q, np, beta, y, x, iprint=1, info=info, job=0020, &
             lunrpt=lunrpt, lunerr=lunerr, lower=lower, upper=upper)
 
    if (info /= 1) passed = .false.
@@ -643,7 +643,7 @@ program test_error_detection
 !       X(:,:) = 0.0_wp
 !       BETA(:) = 0.0_wp
 !
-!       CALL ODR(FCN,N,M,NP,Q,BETA,Y,X,IPRINT=1,INFO=INFO,
+!       CALL ODR(FCN,N,M,Q,NP,BETA,Y,X,IPRINT=1,INFO=INFO,
 !       &   LUNRPT=LUN,LUNERR=LUN)
 !
 !       WRITE(LUN,*) "INFO = ", INFO

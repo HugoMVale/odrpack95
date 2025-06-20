@@ -7,7 +7,7 @@ module example5_model
 contains
 
    pure subroutine fcn( &
-      n, m, np, q, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+      n, m, q, np, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
    !! User-supplied subroutine for evaluating the model.
 
       integer, intent(in) :: ideval, ldifx, m, n, np, q
@@ -73,7 +73,7 @@ program example5
    allocate (iwork(liwork))
    allocate (work(lwork))
 
-   call odr(fcn, n, m, np, q, beta, y, x, job=job, iwork=iwork, work=work, &
+   call odr(fcn, n, m, q, np, beta, y, x, job=job, iwork=iwork, work=work, &
             lower=lower, upper=upper)
 
    ! Remove the comments to print out 'iwork'

@@ -10,7 +10,7 @@ This is an adaptation of example 5 from the ODRPACK95 documentation.
 #include "../include/odrpack/odrpack.h"
 
 // User-supplied function for evaluating the model and its partial derivatives
-void fcn(const int *n, const int *m, const int *np, const int *q,
+void fcn(const int *n, const int *m, const int *q, const int *np,
          const double beta[], const double xplusd[],
          const int ifixb[], const int ifixx[], const int *ldifx, const int *ideval,
          double f[], double fjacb[], double fjacd[], int *istop) {
@@ -114,7 +114,7 @@ int main() {
     lunerr = lunrpt;
 
     // Call odr
-    odr_long_c(fcn, &n, &m, &np, &q,
+    odr_long_c(fcn, &n, &m, &q, &np,
                &ldwe, &ld2we, &ldwd, &ld2wd,
                &ldifx, &ldstpd, &ldscld,
                &lwork, &liwork,

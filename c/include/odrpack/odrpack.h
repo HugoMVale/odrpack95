@@ -36,8 +36,8 @@ ODRPACK_EXTERN void close_file(
  *
  * @param n       `==>` Number of observations.
  * @param m       `==>` Number of columns of data in the independent variable.
- * @param np      `==>` Number of function parameters.
  * @param q       `==>` Number of responses per observation.
+ * @param np      `==>` Number of function parameters.
  * @param beta    `==>` Array [np] of current parameter values.
  * @param xplusd  `==>` Array [m][ldn] of current explanatory variable values, i.e., `x + delta`.
  * @param ifixb   `==>` Array [np] of indicators for fixing parameters `beta`.
@@ -55,8 +55,8 @@ ODRPACK_EXTERN void close_file(
 typedef void (*odrpack_fcn_t)(
     const int *n,
     const int *m,
-    const int *np,
     const int *q,
+    const int *np,
     const double beta[],
     const double xplusd[],
     const int ifixb[],
@@ -75,8 +75,8 @@ typedef void (*odrpack_fcn_t)(
  * @param fcn    `==>` User-supplied subroutine for evaluating the model.
  * @param n      `==>` Number of observations.
  * @param m      `==>` Number of columns of data in the independent variable.
- * @param np     `==>` Number of function parameters.
  * @param q      `==>` Number of responses per observation.
+ * @param np     `==>` Number of function parameters.
  * @param beta   `<=>` Array [np] of function parameters.
  * @param y      `==>` Array [q][n] of dependent variable. Unused when the model is implicit.
  * @param x      `==>` Array [m][n] of explanatory variable.
@@ -89,8 +89,8 @@ ODRPACK_EXTERN void odr_short_c(
     odrpack_fcn_t fcn,
     const int *n,
     const int *m,
-    const int *np,
     const int *q,
+    const int *np,
     double beta[],
     const double y[],
     const double x[],
@@ -106,8 +106,8 @@ ODRPACK_EXTERN void odr_short_c(
  * @param fcn    `==>` User-supplied subroutine for evaluating the model.
  * @param n      `==>` Number of observations.
  * @param m      `==>` Number of columns of data in the independent variable.
- * @param np     `==>` Number of function parameters.
  * @param q     `==>` Number of responses per observation.
+ * @param np     `==>` Number of function parameters.
  * @param ldwe   `==>` Leading dimension of array `we`, `ldwe ∈ {1, n}`.
  * @param ld2we  `==>` Second dimension of array `we`, `ld2we ∈ {1, q}`.
  * @param ldwd   `==>` Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
@@ -133,8 +133,8 @@ ODRPACK_EXTERN void odr_medium_c(
     odrpack_fcn_t fcn,
     const int *n,
     const int *m,
-    const int *np,
     const int *q,
+    const int *np,
     const int *ldwe,
     const int *ld2we,
     const int *ldwd,
@@ -163,8 +163,8 @@ ODRPACK_EXTERN void odr_medium_c(
  * @param fcn    `==>` User-supplied subroutine for evaluating the model.
  * @param n      `==>` Number of observations.
  * @param m      `==>` Number of columns of data in the independent variable.
- * @param np     `==>` Number of function parameters.
  * @param q     `==>` Number of responses per observation.
+ * @param np     `==>` Number of function parameters.
  * @param ldwe   `==>` Leading dimension of array `we`, `ldwe ∈ {1, n}`.
  * @param ld2we  `==>` Second dimension of array `we`, `ld2we ∈ {1, q}`.
  * @param ldwd   `==>` Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
@@ -205,8 +205,8 @@ ODRPACK_EXTERN void odr_long_c(
     odrpack_fcn_t fcn,
     const int *n,
     const int *m,
-    const int *np,
     const int *q,
+    const int *np,
     const int *ldwe,
     const int *ld2we,
     const int *ldwd,

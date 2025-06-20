@@ -815,7 +815,7 @@ contains
 
          if (short) then
             call odr(fcn=fcn, &
-                     n=n, m=m, np=np, q=q, &
+                     n=n, m=m, q=q, np=np, &
                      beta=beta, &
                      y=y, x=x, &
                      delta=delta, &
@@ -825,7 +825,7 @@ contains
                      info=info)
          else
             call odr(fcn=fcn, &
-                     n=n, m=m, np=np, q=q, &
+                     n=n, m=m, q=q, np=np, &
                      beta=beta, &
                      y=y, x=x, &
                      delta=delta, &
@@ -1954,15 +1954,15 @@ contains
    end subroutine set_inputs
 
    pure subroutine fcn( &
-      n, m, np, q, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+      n, m, q, np, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
    !! Compute model function and jacobian for odrpack exerciser.
 
       use odrpack_kinds, only: zero, one
 
       integer, intent(in) :: n
       integer, intent(in) :: m
-      integer, intent(in) :: np
       integer, intent(in) :: q
+      integer, intent(in) :: np
       real(wp), intent(in) :: beta(np)
       real(wp), intent(in) :: xplusd(n, m)
       integer, intent(in) :: ifixb(np)

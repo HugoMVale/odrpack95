@@ -7,7 +7,7 @@ module example4_model
 contains
 
    pure subroutine fcn( &
-      n, m, np, q, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+      n, m, q, np, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
    !! User-supplied subroutine for evaluating the model.
 
       integer, intent(in) :: ideval, ldifx, m, n, np, q
@@ -126,7 +126,7 @@ program example4
 
    beta = [1.1E-0_wp, 3.3E+0_wp, 8.7_wp]
 
-   call odr(fcn, n, m, np, q, &
+   call odr(fcn, n, m, q, np, &
             beta=beta, &
             y=reshape([55.0_wp, 45.0_wp, 40.0_wp, 30.0_wp, 20.0_wp], [n, q]), &
             x=reshape([0.15_wp, 0.20_wp, 0.25_wp, 0.30_wp, 0.50_wp], [n, m]), &

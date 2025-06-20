@@ -9,7 +9,7 @@ This is a translation of example 3 from the ODRPACK95 documentation.
 #include "../include/odrpack/odrpack.h"
 
 // User-supplied function for evaluating the model
-void fcn(const int *n, const int *m, const int *np, const int *q,
+void fcn(const int *n, const int *m, const int *q, const int *np,
          const double beta[], const double xplusd[],
          const int ifixb[], const int ifixx[], const int *ldifx, const int *ideval,
          double f[], double fjacb[], double fjacd[], int *istop) {
@@ -144,7 +144,7 @@ int main() {
     int info = 0;
 
     // Compute solution
-    odr_medium_c(fcn, &n, &m, &np, &q,
+    odr_medium_c(fcn, &n, &m, &q, &np,
                  &ldwe, &ld2we, &ldwd, &ld2wd, &ldifx,
                  beta,
                  (double *)y, (double *)x,

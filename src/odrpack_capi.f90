@@ -8,7 +8,7 @@ module odrpack_capi
 
    abstract interface
       subroutine fcn_tc( &
-         n, m, np, q, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop) bind(C)
+         n, m, q, np, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop) bind(C)
       !! User-supplied subroutine for evaluating the model.
          import :: c_int, c_double
          implicit none
@@ -16,10 +16,10 @@ module odrpack_capi
             !! Number of observations.
          integer(c_int), intent(in) :: m
             !! Number of columns of data in the independent variable.
-         integer(c_int), intent(in) :: np
-            !! Number of function parameters.
          integer(c_int), intent(in) :: q
             !! Number of responses per observation.
+         integer(c_int), intent(in) :: np
+            !! Number of function parameters.
          real(c_double), intent(in) :: beta(np)
             !! Current values of parameters.
          real(c_double), intent(in) :: xplusd(n, m)
@@ -138,7 +138,7 @@ contains
 
    subroutine odr_short_c( &
       fcn, &
-      n, m, np, q, &
+      n, m, q, np, &
       beta, y, x, &
       delta, &
       lower, upper, &
@@ -151,10 +151,10 @@ contains
          !! Number of observations.
       integer(c_int), intent(in) :: m
          !! Number of columns of data in the independent variable.
-      integer(c_int), intent(in) :: np
-         !! Number of function parameters.
       integer(c_int), intent(in) :: q
          !! Number of responses per observation.
+      integer(c_int), intent(in) :: np
+         !! Number of function parameters.
       real(c_double), intent(inout) :: beta(np)
          !! Function parameters.
       real(c_double), intent(in) :: y(n, q)
@@ -170,7 +170,7 @@ contains
       integer(c_int), intent(in), optional :: job
          !! Variable controlling initialization and computational method.
 
-      call odr(fcn, n, m, np, q, beta, y, x, &
+      call odr(fcn, n, m, q, np, beta, y, x, &
                delta=delta, &
                lower=lower, upper=upper, &
                job=job)
@@ -179,7 +179,7 @@ contains
 
    subroutine odr_medium_c( &
       fcn, &
-      n, m, np, q, &
+      n, m, q, np, &
       ldwe, ld2we, &
       ldwd, ld2wd, &
       ldifx, &
@@ -197,10 +197,10 @@ contains
          !! Number of observations.
       integer(c_int), intent(in) :: m
          !! Number of columns of data in the independent variable.
-      integer(c_int), intent(in) :: np
-         !! Number of function parameters.
       integer(c_int), intent(in) :: q
          !! Number of responses per observation.
+      integer(c_int), intent(in) :: np
+         !! Number of function parameters.
       integer(c_int), intent(in) :: ldwe
          !! Leading dimension of array `we`, `ldwe ∈ {1, n}`.
       integer(c_int), intent(in) :: ld2we
@@ -248,7 +248,7 @@ contains
       integer(c_int), intent(out), optional :: info
          !! Logical unit number for computation reports.
 
-      call odr(fcn, n, m, np, q, beta, y, x, &
+      call odr(fcn, n, m, q, np, beta, y, x, &
                we=we, wd=wd, &
                ifixb=ifixb, ifixx=ifixx, &
                delta=delta, &
@@ -261,7 +261,7 @@ contains
 
    subroutine odr_long_c( &
       fcn, &
-      n, m, np, q, &
+      n, m, q, np, &
       ldwe, ld2we, &
       ldwd, ld2wd, &
       ldifx, &
@@ -287,10 +287,10 @@ contains
          !! Number of observations.
       integer(c_int), intent(in) :: m
          !! Number of columns of data in the independent variable.
-      integer(c_int), intent(in) :: np
-         !! Number of function parameters.
       integer(c_int), intent(in) :: q
          !! Number of responses per observation.
+      integer(c_int), intent(in) :: np
+         !! Number of function parameters.
       integer(c_int), intent(in) :: ldwe
          !! Leading dimension of array `we`, `ldwe ∈ {1, n}`.
       integer(c_int), intent(in) :: ld2we
@@ -369,7 +369,7 @@ contains
       integer(c_int), intent(out), optional :: info
          !! Variable designating why the computations were stopped.
 
-      call odr(fcn, n, m, np, q, beta, y, x, &
+      call odr(fcn, n, m, q, np, beta, y, x, &
                we=we, wd=wd, &
                ifixb=ifixb, ifixx=ifixx, &
                delta=delta, &

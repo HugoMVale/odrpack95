@@ -10,7 +10,7 @@ contains
 
    impure subroutine odr &
       (fcn, &
-       n, m, np, q, &
+       n, m, q, np, &
        beta, &
        y, x, &
        delta, &
@@ -74,10 +74,10 @@ contains
          !! Number of observations.
       integer, intent(in) :: m
          !! Number of columns of data in the independent variable.
-      integer, intent(in) :: np
-         !! Number of function parameters.
       integer, intent(in) :: q
          !! Number of responses per observation.
+      integer, intent(in) :: np
+         !! Number of function parameters.
       real(wp), intent(inout) :: beta(:)
          !! Function parameters. `Shape: (np)`.
       real(wp), intent(in) :: y(:, :)
@@ -1223,7 +1223,7 @@ contains
          work(xplusi:xplusi + n*m - 1) = &
             work(deltai:deltai + n*m - 1) + reshape(x, [n*m])
          istop = 0
-         call fcn(n, m, np, q, beta, work(xplusi), &
+         call fcn(n, m, q, np, beta, work(xplusi), &
                   ifixb, ifixx, ldifx, 002, work(fni), work(wrk6i), work(wrk1i), istop)
          iwork(istopi) = istop
 
@@ -1952,7 +1952,7 @@ contains
       call unpack_vec(np, betan, beta, ifixb)
       xplusd = x + deltan
       istop = 0
-      call fcn(n, m, np, q, beta, xplusd, &
+      call fcn(n, m, q, np, beta, xplusd, &
                ifixb, ifixx, ldifx, 002, fn, work(wrk6), work(wrk1), istop)
       if (istop == 0) then
          nfev = nfev + 1
