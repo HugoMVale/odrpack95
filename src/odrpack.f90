@@ -5,6 +5,9 @@ module odrpack
    use odrpack_kinds, only: wp
    use, intrinsic :: iso_fortran_env, only: output_unit
    implicit none
+   private
+
+   public :: odr, workspace_dimensions
 
 contains
 
