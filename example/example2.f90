@@ -49,7 +49,7 @@ program example2
    implicit none
 
    ! Variable declarations
-   integer :: i, info, j, job, lundata, lunrpt, m, n, np, q
+   integer :: i, info, iprint, j, job, lundata, lunrpt, m, n, np, q
    real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :)
 
    ! Set up report files
@@ -75,6 +75,7 @@ program example2
    !       DELTA initialized to zero
    !       Not a restart
    job = 00001
+   iprint = 2002
 
    ! Compute solution
    call odr(fcn=fcn, &
@@ -82,7 +83,7 @@ program example2
             beta=beta, &
             y=y, x=x, &
             job=job, &
-            lunerr=lunrpt, lunrpt=lunrpt, &
+            lunerr=lunrpt, lunrpt=lunrpt, iprint=iprint, &
             info=info)
 
    close (lunrpt)
