@@ -34,19 +34,17 @@ contains
    end subroutine fcn
 
    pure subroutine mpf(u, c, kwee, k25, k25p, print_every, tout, root)
-   !! If ROOT is not zero then returns value of time when U==ROOT in TOUT.  Else,
-   !! runs until TOUT and returns value in M.  If PRINT_EVERY is non-zero then
-   !! the solution is printed every PRINT_EVERY time units or every H (which ever
-   !! is greater).
+   !! If `root` is not zero, then it returns value of time when `u=root` in `tout`. Else, runs
+   !! until `tout` and returns the value in `u`. If `print_every` is non-zero then the solution
+   !! is printed every `print_every` time units or every `h` (which ever is greater).
    !!
-   !! This routine is not meant to be precise, it is only intended to be good
-   !! enough for providing a working example of ODRPACK95 with bounds.  4th order
-   !! Runge Kutta and linear interpolation are used for numerical integration and
-   !! root finding, respectively.
+   !! This routine is not meant to be precise, it is only intended to be good enough for
+   !! providing a working example of ODRPACK95 with bounds. 4th order Runge Kutta and linear
+   !! interpolation are used for numerical integration and root finding, respectively.
    !!
-   !! M - MPF
-   !! C - Total Cyclin
-   !! KWEE, K25, K25P - Model parameters (BETA(1:3))
+   !! `u`: MPF
+   !! `c`: Total Cyclin
+   !! `kwee`, `k25`, `k25p`: Model parameters corresponding to `beta(1:3)`
 
       real(kind=wp), intent(out) :: u
       real(kind=wp), intent(in) :: c, kwee, k25, k25p, print_every, root
