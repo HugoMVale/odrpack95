@@ -278,58 +278,58 @@ typedef struct
  */
 typedef struct
 {
-    int delta; /**< Starting location of array `delta`. */
-    int eps;   /**< Starting location of array `eps`. */
-    int xplus; /**< Starting location of array `xplusd`. */
-    int fn;    /**< Starting location of array `fn`. */
-    int sd;    /**< Starting location of array `sd`. */
-    int vcv;   /**< Starting location of array `vcv`. */
-    int rvar;  /**< Location of variable `rvar`. */
-    int wss;   /**< Location of variable `wss`. */
-    int wssde; /**< Location of variable `wssdel`. */
-    int wssep; /**< Location of variable `wsep`. */
-    int rcond; /**< Location of variable `rcond`. */
-    int eta;   /**< Location of variable `eta`. */
-    int olmav; /**< Location of variable `olmavg`. */
-    int tau;   /**< Location of variable `tau`. */
-    int alpha; /**< Location of variable `alpha`. */
-    int actrs; /**< Location of variable `actrs`. */
-    int pnorm; /**< Location of variable `pnorm`. */
-    int rnors; /**< Location of variable `rnorms`. */
-    int prers; /**< Location of variable `prers`. */
-    int partl; /**< Location of variable `partol`. */
-    int sstol; /**< Location of variable `sstol`. */
-    int taufc; /**< Location of variable `taufac`. */
-    int epsma; /**< Location of variable `epsmac`. */
-    int beta0; /**< Starting location of array `beta0`. */
-    int betac; /**< Starting location of array `betac`. */
-    int betas; /**< Starting location of array `betas`. */
-    int betan; /**< Starting location of array `betan`. */
-    int s;     /**< Starting location of array `s`. */
-    int ss;    /**< Starting location of array `ss`. */
-    int ssf;   /**< Starting location of array `ssf`. */
-    int qraux; /**< Starting location of array `qraux`. */
-    int u;     /**< Starting location of array `u`. */
-    int fs;    /**< Starting location of array `fs`. */
-    int fjacb; /**< Starting location of array `fjacb`. */
-    int we1;   /**< Location of variable `we1`. */
-    int diff;  /**< Starting location of array `diff`. */
-    int delts; /**< Starting location of array `deltas`. */
-    int deltn; /**< Starting location of array `deltan`. */
-    int t;     /**< Starting location of array `t`. */
-    int tt;    /**< Starting location of array `tt`. */
-    int omega; /**< Starting location of array `omega`. */
-    int fjacd; /**< Starting location of array `fjacd`. */
-    int wrk1;  /**< Starting location of array `wrk1`. */
-    int wrk2;  /**< Starting location of array `wrk2`. */
-    int wrk3;  /**< Starting location of array `wrk3`. */
-    int wrk4;  /**< Starting location of array `wrk4`. */
-    int wrk5;  /**< Starting location of array `wrk5`. */
-    int wrk6;  /**< Starting location of array `wrk6`. */
-    int wrk7;  /**< Starting location of array `wrk7`. */
-    int lower; /**< Starting location of array `lower`. */
-    int upper; /**< Starting location of array `upper`. */
-    int lwkmn; /**< Minimum acceptable length of vector `rwork`. */
+    int delta;  /**< Starting location of array `delta`. */
+    int eps;    /**< Starting location of array `eps`. */
+    int xplus;  /**< Starting location of array `xplusd`. */
+    int fn;     /**< Starting location of array `fn`. */
+    int sd;     /**< Starting location of array `sd`. */
+    int vcv;    /**< Starting location of array `vcv`. */
+    int rvar;   /**< Location of variable `rvar`. */
+    int wss;    /**< Location of variable `wss`. */
+    int wssde;  /**< Location of variable `wssdel`. */
+    int wssep;  /**< Location of variable `wsep`. */
+    int rcond;  /**< Location of variable `rcond`. */
+    int eta;    /**< Location of variable `eta`. */
+    int olmav;  /**< Location of variable `olmavg`. */
+    int tau;    /**< Location of variable `tau`. */
+    int alpha;  /**< Location of variable `alpha`. */
+    int actrs;  /**< Location of variable `actrs`. */
+    int pnorm;  /**< Location of variable `pnorm`. */
+    int rnors;  /**< Location of variable `rnorms`. */
+    int prers;  /**< Location of variable `prers`. */
+    int partl;  /**< Location of variable `partol`. */
+    int sstol;  /**< Location of variable `sstol`. */
+    int taufc;  /**< Location of variable `taufac`. */
+    int epsma;  /**< Location of variable `epsmac`. */
+    int beta0;  /**< Starting location of array `beta0`. */
+    int betac;  /**< Starting location of array `betac`. */
+    int betas;  /**< Starting location of array `betas`. */
+    int betan;  /**< Starting location of array `betan`. */
+    int s;      /**< Starting location of array `s`. */
+    int ss;     /**< Starting location of array `ss`. */
+    int ssf;    /**< Starting location of array `ssf`. */
+    int qraux;  /**< Starting location of array `qraux`. */
+    int u;      /**< Starting location of array `u`. */
+    int fs;     /**< Starting location of array `fs`. */
+    int fjacb;  /**< Starting location of array `fjacb`. */
+    int we1;    /**< Location of variable `we1`. */
+    int diff;   /**< Starting location of array `diff`. */
+    int delts;  /**< Starting location of array `deltas`. */
+    int deltn;  /**< Starting location of array `deltan`. */
+    int t;      /**< Starting location of array `t`. */
+    int tt;     /**< Starting location of array `tt`. */
+    int omega;  /**< Starting location of array `omega`. */
+    int fjacd;  /**< Starting location of array `fjacd`. */
+    int wrk1;   /**< Starting location of array `wrk1`. */
+    int wrk2;   /**< Starting location of array `wrk2`. */
+    int wrk3;   /**< Starting location of array `wrk3`. */
+    int wrk4;   /**< Starting location of array `wrk4`. */
+    int wrk5;   /**< Starting location of array `wrk5`. */
+    int wrk6;   /**< Starting location of array `wrk6`. */
+    int wrk7;   /**< Starting location of array `wrk7`. */
+    int lower;  /**< Starting location of array `lower`. */
+    int upper;  /**< Starting location of array `upper`. */
+    int lrwkmn; /**< Minimum acceptable length of vector `rwork`. */
 } rworkidx_t;
 
 /**
