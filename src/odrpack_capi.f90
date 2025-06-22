@@ -104,7 +104,7 @@ module odrpack_capi
       integer(c_int) :: wrk7
       integer(c_int) :: lower
       integer(c_int) :: upper
-      integer(c_int) :: lwkmn
+      integer(c_int) :: lrwkmn
    end type rworkidx_t
 
    type, bind(C) :: iworkidx_t
@@ -510,7 +510,7 @@ contains
                  sstoli, taufci, epsmai, beta0i, betaci, betasi, betani, si, ssi, ssfi, &
                  qrauxi, ui, fsi, fjacbi, we1i, diffi, deltsi, deltni, ti, tti, omegai, &
                  fjacdi, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, loweri, upperi, &
-                 lwkmn
+                 lrwkmn
 
       call loc_rwork(n, m, q, np, ldwe, ld2we, logical(isodr, kind=kind(.true.)), &
                      deltai, epsi, xplusi, fni, sdi, vcvi, &
@@ -522,7 +522,7 @@ contains
                      deltsi, deltni, ti, tti, omegai, fjacdi, &
                      wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
                      loweri, upperi, &
-                     lwkmn)
+                     lrwkmn)
 
       rwi%delta = deltai - 1
       rwi%eps = epsi - 1
@@ -575,7 +575,7 @@ contains
       rwi%wrk7 = wrk7i - 1
       rwi%lower = loweri - 1
       rwi%upper = upperi - 1
-      rwi%lwkmn = lwkmn
+      rwi%lrwkmn = lrwkmn
 
    end subroutine loc_rwork_c
 
