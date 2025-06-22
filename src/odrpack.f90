@@ -1538,7 +1538,7 @@ contains
                   prers, ratio, rcond, rnorm, rnormn, rnorms, rss, rvar, sstol, tau, &
                   taufac, temp, temp1, temp2, tsnorm
 
-      integer, parameter :: ludflt = 6
+      integer, parameter :: ludflt = output_unit
       integer :: i, idf, iflag, int2, ipr, ipr1, ipr2, ipr2f, ipr3, irank, istop, istopc, &
                  iwrk, j, jpvt, l, looped, lunr, lunrpt, maxit, neta, nfev, niter, njev, &
                  nlms, nnzw, npp, npr, npu, omega, qraux, sd, u, vcv, wrk1, wrk2, wrk3, &
