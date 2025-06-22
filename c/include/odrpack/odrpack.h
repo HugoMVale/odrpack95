@@ -172,7 +172,7 @@ ODRPACK_EXTERN void odr_medium_c(
  * @param ldifx  `==>` Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.
  * @param ldstpd `==>` Leading dimension of array `stpd`, `ldstpd ∈ {1, n}`.
  * @param ldscld `==>` Leading dimension of array `scld`, `ldscld ∈ {1, n}`.
- * @param lwork  `==>` Length of array `work`.
+ * @param lrwork `==>` Length of array `rwork`.
  * @param liwork `==>` Length of array `iwork`.
  * @param beta   `<=>` Array [np] of function parameters.
  * @param y      `==>` Array [q][n] of dependent variable. Unused when the model is implicit.
@@ -188,7 +188,7 @@ ODRPACK_EXTERN void odr_medium_c(
  * @param delta  `<=>` Optional array [m][n] with initial error in the `x` data.
  * @param lower  `==>` Optional array [np] with lower bound on `beta`.
  * @param upper  `==>` Optional array [np] with upper bound on `beta`.
- * @param work   `<=>` Optional real work space.
+ * @param rwork  `<=>` Optional real work space.
  * @param iwork  `<=>` Optional integer work space.
  * @param job    `==>` Optional variable controlling initialization and computational method.
  * @param ndigit `==>` Optional number of accurate digits in the function results, as supplied by the user.
@@ -214,7 +214,7 @@ ODRPACK_EXTERN void odr_long_c(
     const int *ldifx,
     const int *ldstpd,
     const int *ldscld,
-    const int *lwork,
+    const int *lrwork,
     const int *liwork,
     double beta[],
     const double y[],
@@ -230,7 +230,7 @@ ODRPACK_EXTERN void odr_long_c(
     double delta[],
     const double lower[],
     const double upper[],
-    double work[],
+    double rwork[],
     int iwork[],
     const int *job,
     const int *ndigit,
@@ -329,34 +329,34 @@ typedef struct
     int wrk7;  /**< Starting location of array `wrk7`. */
     int lower; /**< Starting location of array `lower`. */
     int upper; /**< Starting location of array `upper`. */
-    int lwkmn; /**< Minimum acceptable length of vector `work`. */
-} workidx_t;
+    int lwkmn; /**< Minimum acceptable length of vector `rwork`. */
+} rworkidx_t;
 
 /**
  * @brief Get storage locations within integer work space.
  *
- * @param m        `==>` Number of columns of data in the explanatory variable.
- * @param q        `==>` Number of responses per observation.
- * @param np       `==>` Number of function parameters.
- * @param iworkidx `<==` 0-based indexes of integer work array.
+ * @param m   `==>` Number of columns of data in the explanatory variable.
+ * @param q   `==>` Number of responses per observation.
+ * @param np  `==>` Number of function parameters.
+ * @param iwi `<==` 0-based indexes of integer work array.
  */
 ODRPACK_EXTERN void loc_iwork_c(
     const int *m,
     const int *q,
     const int *np,
-    iworkidx_t *iworkidx);
+    iworkidx_t *iwi);
 
 /**
  * @brief Get storage locations within real work space.
  *
- * @param n       `==>` Number of observations.
- * @param m       `==>` Number of columns of data in the explanatory variable.
- * @param q       `==>` Number of responses per observation.
- * @param np      `==>` Number of function parameters.
- * @param ldwe    `==>` Leading dimension of array `we`.
- * @param ld2we   `==>` Second dimension of array `we`.
- * @param isodr   `==>` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
- * @param workidx `<==` 0-based indexes of real work array.
+ * @param n     `==>` Number of observations.
+ * @param m     `==>` Number of columns of data in the explanatory variable.
+ * @param q     `==>` Number of responses per observation.
+ * @param np    `==>` Number of function parameters.
+ * @param ldwe  `==>` Leading dimension of array `we`.
+ * @param ld2we `==>` Second dimension of array `we`.
+ * @param isodr `==>` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
+ * @param rwi   `<==` 0-based indexes of real work array.
  */
 ODRPACK_EXTERN void loc_rwork_c(
     const int *n,
@@ -366,7 +366,7 @@ ODRPACK_EXTERN void loc_rwork_c(
     const int *ldwe,
     const int *ld2we,
     const bool *isodr,
-    workidx_t *workidx);
+    rworkidx_t *rwi);
 
 /**
  * @brief Calculate the dimensions of the workspace arrays.
@@ -376,7 +376,7 @@ ODRPACK_EXTERN void loc_rwork_c(
  * @param q      `==>` Number of responses per observation.
  * @param np     `==>` Number of function parameters.
  * @param isodr  `==>` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
- * @param lwork  `<==` Length of real `work` array.
+ * @param lrwork `<==` Length of real `rwork` array.
  * @param liwork `<==` Length of integer `iwork` array.
  */
 ODRPACK_EXTERN void workspace_dimensions_c(
@@ -385,7 +385,7 @@ ODRPACK_EXTERN void workspace_dimensions_c(
     const int *q,
     const int *np,
     const bool *isodr,
-    int *lwork,
+    int *lrwork,
     int *liwork);
 
 #endif  // ODRPACK_H

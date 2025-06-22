@@ -82,7 +82,7 @@ program test_error_detection
 
    integer :: n, m, q, np, info, lunerr, lunrpt
    integer, allocatable :: iwork(:)
-   real(wp), allocatable :: beta(:), y(:, :), x(:, :), delta(:, :), work(:), &
+   real(wp), allocatable :: beta(:), y(:, :), x(:, :), delta(:, :), rwork(:), &
                             we(:, :, :), wd(:, :, :)
    logical :: passed
 
@@ -126,18 +126,18 @@ program test_error_detection
 
    write (lunrpt, *) "INFO = ", info
 
-   ! Inconsistent dimensions of optional WORK, IWORK
+   ! Inconsistent dimensions of optional RWORK, IWORK
    n = 10
    m = 4
    q = 2
    np = 3
    deallocate (beta, y, x)
-   allocate (beta(np), y(n, q), x(n, m), iwork(42), work(69))
+   allocate (beta(np), y(n, q), x(n, m), iwork(42), rwork(69))
    y = 0.0_wp
    x = 0.0_wp
    beta = 0.0_wp
 
-   call odr(fcn, n, m, q, np, beta, y, x, iwork=iwork, work=work, &
+   call odr(fcn, n, m, q, np, beta, y, x, iwork=iwork, rwork=rwork, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 10**5) passed = .false.
@@ -557,7 +557,7 @@ program test_error_detection
 
    write (lunrpt, *) "INFO = ", info
 
-   ! ERROR IN JOB SPECIFICATION WITH WORK AND IWORK
+   ! ERROR IN JOB SPECIFICATION WITH RWORK AND IWORK
    n = 1
    m = 1
    q = 1

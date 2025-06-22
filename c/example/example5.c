@@ -87,15 +87,15 @@ int main() {
     int info = 0;
 
     // Determine workspace requirements
-    int lwork, liwork;
-    workspace_dimensions_c(&n, &m, &q, &np, &isodr, &lwork, &liwork);
-    // printf("lwork: %d\n", lwork);
+    int lrwork, liwork;
+    workspace_dimensions_c(&n, &m, &q, &np, &isodr, &lrwork, &liwork);
+    // printf("lrwork: %d\n", lrwork);
     // printf("liwork: %d\n", liwork);
 
-    // Allocate memory for array `work`
-    double *work = (double *)malloc(lwork * sizeof(double));
-    if (work == NULL) {
-        fprintf(stderr, "Failed to allocate memory for 'work' array\n");
+    // Allocate memory for array `rwork`
+    double *rwork = (double *)malloc(lrwork * sizeof(double));
+    if (rwork == NULL) {
+        fprintf(stderr, "Failed to allocate memory for 'rwork' array\n");
     }
 
     // Allocate memory for array `iwork`
@@ -117,7 +117,7 @@ int main() {
     odr_long_c(fcn, &n, &m, &q, &np,
                &ldwe, &ld2we, &ldwd, &ld2wd,
                &ldifx, &ldstpd, &ldscld,
-               &lwork, &liwork,
+               &lrwork, &liwork,
                beta,
                (double *)y, (double *)x,
                (double *)we, (double *)wd,
@@ -126,7 +126,7 @@ int main() {
                sclb, (double *)scld,
                (double *)delta,
                lower, upper,
-               work, iwork,
+               rwork, iwork,
                &job, &ndigit, &taufac, &sstol, &partol, &maxit,
                &iprint, &lunerr, &lunrpt,
                &info);
@@ -135,10 +135,10 @@ int main() {
     // printf("Error code (ierr): %d\n", ierr);
 
     // Get the variable locations within the integer and real work space
-    iworkidx_t iworkidx;
-    workidx_t workidx;
-    loc_iwork_c(&m, &q, &np, &iworkidx);
-    loc_rwork_c(&n, &m, &q, &np, &ldwe, &ld2we, &isodr, &workidx);
+    iworkidx_t iwi;
+    rworkidx_t rwi;
+    loc_iwork_c(&m, &q, &np, &iwi);
+    loc_rwork_c(&n, &m, &q, &np, &ldwe, &ld2we, &isodr, &rwi);
 
     // Print some outputs
     printf("info: %d\n", info);
@@ -153,19 +153,19 @@ int main() {
         }
     }
 
-    printf("nfev: %d\n", iwork[iworkidx.nfev]);
-    printf("rcond : %f\n", work[workidx.rcond]);
+    printf("nfev: %d\n", iwork[iwi.nfev]);
+    printf("rcond : %f\n", rwork[rwi.rcond]);
 
     printf("\n");
     for (int i = 0; i < liwork; i++) {
         printf("iwork[%d] = %d\n", i, iwork[i]);
     }
     printf("\n");
-    for (int i = 0; i < lwork; i++) {
-        printf("work[%d] = %f\n", i, work[i]);
+    for (int i = 0; i < lrwork; i++) {
+        printf("rwork[%d] = %f\n", i, rwork[i]);
     }
 
-    free(work);
+    free(rwork);
     free(iwork);
 
     return 0;

@@ -47,10 +47,10 @@ program example5
    use example5_model, only: fcn
    implicit none
 
-   real(kind=wp), allocatable :: beta(:), lower(:), upper(:), x(:, :), y(:, :), work(:)
+   real(kind=wp), allocatable :: beta(:), lower(:), upper(:), x(:, :), y(:, :), rwork(:)
    integer, allocatable :: iwork(:)
    integer :: np, n, m, q, job
-   integer :: lwork, liwork !, i
+   integer :: lrwork, liwork !, i
 
    job = 20
 
@@ -69,11 +69,11 @@ program example5
 
    ! Manual allocation of work arrays
    ! Not required! Just to show it can be done if so desired
-   call workspace_dimensions(n, m, q, np, .true., lwork, liwork)
+   call workspace_dimensions(n, m, q, np, .true., lrwork, liwork)
    allocate (iwork(liwork))
-   allocate (work(lwork))
+   allocate (rwork(lrwork))
 
-   call odr(fcn, n, m, q, np, beta, y, x, job=job, iwork=iwork, work=work, &
+   call odr(fcn, n, m, q, np, beta, y, x, job=job, iwork=iwork, rwork=rwork, &
             lower=lower, upper=upper)
 
    ! Remove the comments to print out 'iwork'

@@ -27,7 +27,7 @@ contains
 
       ! Local scalars
       integer :: i, info, iprint, itest, job, l, ldstpd, lun, m, maxit, msg, n, ndigit, &
-                 np, q, ldwd, ld2wd, ldwe, ld2we, lwork, liwork, wssi, wssdei, wssepi
+                 np, q, ldwd, ld2wd, ldwe, ld2we, lrwork, liwork, wssi, wssdei, wssepi
       real(wp) :: bnrm, epsmac, ewrt, ewrt2, hundrd, one, p01, p2, partol, sstol, &
                   taufac, three, tsttol, two, wss, wssdel, wsseps, zero
       logical :: failed, fails, isodr, short, wflat
@@ -39,7 +39,7 @@ contains
       real(wp) :: dpymp(2, ntests)
       real(wp), allocatable :: delta(:, :), beta(:), x(:, :), y(:, :), sclb(:), scld(:, :), &
                                stpb(:), stpd(:, :), we(:, :, :), wd(:, :, :), beta_last(:), &
-                               work(:)
+                               rwork(:)
 
       ! Data statements
       data &
@@ -187,7 +187,7 @@ contains
       !  LUNERR:  The logical unit number used for error messages.
       !  LUNRPT:  The logical unit number used for computation reports.
       !  LUNSUM:  The logical unit number used for a summary report.
-      !  LWORK:   The length of vector WORK.
+      !  LRWORK:  The length of vector RWORK.
       !  M:       The number of columns of data in the explanatory variable.
       !  MAXIT:   The maximum number of iterations allowed.
       !  MSG:     The variable designating which message is to be printed as
@@ -217,8 +217,8 @@ contains
       !           purposes of determining proper installation.
       !  WD:      The DELTA weights.
       !  WE:      The EPSILON weights.
-      !  WORK:    The REAL (wp) work space.
-      !  WRK:     The REAL (wp) work space for computing test results.
+      !  RWORK:   The REAL work space.
+      !  WRK:     The REAL work space for computing test results.
       !  WSS:     The sum of the squared weighted errors.
       !  WSSDEL:  The sum of the squared weighted errors in X.
       !  WSSEPS:  The sum of the squared weighted errors in Y.
@@ -802,10 +802,10 @@ contains
          ! Allocate work arrays
          if (job < 10000) then
             if (allocated(iwork)) deallocate (iwork)
-            if (allocated(work)) deallocate (work)
+            if (allocated(rwork)) deallocate (rwork)
             isodr = (job < 0 .or. mod(job, 10) <= 1)
-            call workspace_dimensions(n, m, q, np, isodr, lwork, liwork)
-            allocate (iwork(liwork), work(lwork))
+            call workspace_dimensions(n, m, q, np, isodr, lrwork, liwork)
+            allocate (iwork(liwork), rwork(lrwork))
          end if
 
          ! Compute solution
@@ -821,7 +821,7 @@ contains
                      delta=delta, &
                      job=job, &
                      iprint=iprint, lunerr=lunerr, lunrpt=lunrpt, &
-                     work=work, iwork=iwork, &
+                     rwork=rwork, iwork=iwork, &
                      info=info)
          else
             call odr(fcn=fcn, &
@@ -836,7 +836,7 @@ contains
                      iprint=iprint, lunerr=lunerr, lunrpt=lunrpt, &
                      stpb=stpb, stpd=stpd, &
                      sclb=sclb, scld=scld, &
-                     work=work, iwork=iwork, &
+                     rwork=rwork, iwork=iwork, &
                      lower=lower, upper=upper, &
                      info=info)
          end if
@@ -846,9 +846,9 @@ contains
 
          call loc_wsse(n, m, np, q, ldwe, ld2we, isodr, wssi, wssdei, wssepi)
 
-         wssdel = work(wssdei)
-         wsseps = work(wssepi)
-         wss = work(wssi)
+         wssdel = rwork(wssdei)
+         wsseps = rwork(wssepi)
+         wss = rwork(wssi)
 
          bnrm = norm2(beta)
 
@@ -2331,7 +2331,7 @@ contains
    end subroutine fcn
 
    subroutine loc_wsse(n, m, np, q, ldwe, ld2we, isodr, wssi, wssdei, wssepi)
-   !! Locations of the weighted sum of squares results in the `work` array.
+   !! Locations of the weighted sum of squares results in the `rwork` array.
 
       use odrpack_core, only: loc_rwork
 

@@ -282,7 +282,7 @@ contains
 
    pure subroutine access_workspace &
       (n, m, np, q, ldwe, ld2we, &
-       work, lwork, iwork, liwork, &
+       rwork, lrwork, iwork, liwork, &
        access, isodr, &
        jpvt, omega, u, qraux, sd, vcv, wrk1, wrk2, wrk3, wrk4, wrk5, wrk6, &
        nnzw, npp, &
@@ -305,10 +305,10 @@ contains
          !! The leading dimension of array `we`.
       integer, intent(in) :: ld2we
          !! The second dimension of array `we`.
-      real(wp), intent(inout) :: work(lwork)
+      real(wp), intent(inout) :: rwork(lrwork)
          !! The real work space.
-      integer, intent(in) :: lwork
-         !! The length of vector `work`.
+      integer, intent(in) :: lrwork
+         !! The length of vector `rwork`.
       integer, intent(inout) :: iwork(liwork)
          !! The integer work space.
       integer, intent(in) :: liwork
@@ -322,27 +322,27 @@ contains
       integer, intent(out) :: jpvt
          !! The pivot vector.
       integer, intent(out) :: omega
-         !! The starting location in array `work` of array `omega`.
+         !! The starting location in array `rwork` of array `omega`.
       integer, intent(out) :: u
-         !! The starting location in array `work` of array `u`.
+         !! The starting location in array `rwork` of array `u`.
       integer, intent(out) :: qraux
-         !! The starting location in array `work` of array `qraux`.
+         !! The starting location in array `rwork` of array `qraux`.
       integer, intent(out) :: sd
-         !! The starting location in array `work` of array `sd`.
+         !! The starting location in array `rwork` of array `sd`.
       integer, intent(out) :: vcv
-         !! The starting location in array `work` of array `vcv`.
+         !! The starting location in array `rwork` of array `vcv`.
       integer, intent(out) :: wrk1
-         !! The starting location in array `work` of array `wrk1`.
+         !! The starting location in array `rwork` of array `wrk1`.
       integer, intent(out) :: wrk2
-         !! The starting location in array `work` of array `wrk2`.
+         !! The starting location in array `rwork` of array `wrk2`.
       integer, intent(out) :: wrk3
-         !! The starting location in array `work` of array `wrk3`.
+         !! The starting location in array `rwork` of array `wrk3`.
       integer, intent(out) :: wrk4
-         !! The starting location in array `work` of array `wrk4`.
+         !! The starting location in array `rwork` of array `wrk4`.
       integer, intent(out) :: wrk5
-         !! The starting location in array `work` of array `wrk5`.
+         !! The starting location in array `rwork` of array `wrk5`.
       integer, intent(out) :: wrk6
-         !! The starting location in array `work` of array `wrk6`.
+         !! The starting location in array `rwork` of array `wrk6`.
       integer, intent(out) :: nnzw
          !! The number of nonzero weighted observations.
       integer, intent(out) :: npp
@@ -417,30 +417,30 @@ contains
       integer :: actrsi, alphai, betaci, betani, betasi, beta0i, boundi, deltai, deltni, &
                  deltsi, diffi, epsi, epsmai, etai, fjacbi, fjacdi, fni, fsi, idfi, int2i, &
                  iprini, iprint, iranki, istopi, jobi, jpvti, ldtti, liwkmn, loweri, luneri, &
-                 lunrpi, lwkmn, maxiti, msgb, msgd, netai, nfevi, niteri, njevi, nnzwi, nppi, &
+                 lunrpi, lrwkmn, maxiti, msgb, msgd, netai, nfevi, niteri, njevi, nnzwi, nppi, &
                  nrowi, ntoli, olmavi, omegai, partli, pnormi, prersi, qrauxi, rcondi, rnorsi, &
                  rvari, sdi, si, ssfi, ssi, sstoli, taufci, taui, ti, tti, ui, upperi, vcvi, &
                  we1i, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, wssi, wssdei, wssepi, &
                  xplusi
 
       ! Variable Definitions (alphabetically)
-      !  ACTRSI:  The location in array WORK of variable ACTRS.
-      !  ALPHAI:  The location in array WORK of variable ALPHA.
-      !  BETACI:  The starting location in array WORK of array BETAC.
-      !  BETANI:  The starting location in array WORK of array BETAN.
-      !  BETASI:  The starting location in array WORK of array BETAS.
-      !  BETA0I:  The starting location in array WORK of array BETA0.
-      !  DELTAI:  The starting location in array WORK of array DELTA.
-      !  DELTNI:  The starting location in array WORK of array DELTAN.
-      !  DELTSI:  The starting location in array WORK of array DELTAS.
-      !  DIFFI:   The starting location in array WORK of array DIFF.
-      !  EPSI:    The starting location in array WORK of array EPS.
-      !  EPSMAI:  The location in array WORK of variable EPSMAC.
-      !  ETAI:    The location in array WORK of variable ETA.
-      !  FJACBI:  The starting location in array WORK of array FJACB.
-      !  FJACDI:  The starting location in array WORK of array FJACD.
-      !  FNI:     The starting location in array WORK of array FN.
-      !  FSI:     The starting location in array WORK of array FS.
+      !  ACTRSI:  The location in array RWORK of variable ACTRS.
+      !  ALPHAI:  The location in array RWORK of variable ALPHA.
+      !  BETACI:  The starting location in array RWORK of array BETAC.
+      !  BETANI:  The starting location in array RWORK of array BETAN.
+      !  BETASI:  The starting location in array RWORK of array BETAS.
+      !  BETA0I:  The starting location in array RWORK of array BETA0.
+      !  DELTAI:  The starting location in array RWORK of array DELTA.
+      !  DELTNI:  The starting location in array RWORK of array DELTAN.
+      !  DELTSI:  The starting location in array RWORK of array DELTAS.
+      !  DIFFI:   The starting location in array RWORK of array DIFF.
+      !  EPSI:    The starting location in array RWORK of array EPS.
+      !  EPSMAI:  The location in array RWORK of variable EPSMAC.
+      !  ETAI:    The location in array RWORK of variable ETA.
+      !  FJACBI:  The starting location in array RWORK of array FJACB.
+      !  FJACDI:  The starting location in array RWORK of array FJACD.
+      !  FNI:     The starting location in array RWORK of array FN.
+      !  FSI:     The starting location in array RWORK of array FS.
       !  IDFI:    The starting location in array IWORK of variable IDF.
       !  INT2I:   The location in array IWORK of variable INT2.
       !  IPRINI:  The location in array IWORK of variable IPRINT.
@@ -452,7 +452,7 @@ contains
       !  LDTTI:   The starting location in array IWORK of variable LDTT.
       !  LUNERI:  The location in array IWORK of variable LUNERR.
       !  LUNRPI:  The location in array IWORK of variable LUNRPT.
-      !  LWKMN:   The minimum acceptable length of array WORK.
+      !  LRWKMN:  The minimum acceptable length of array RWORK.
       !  MAXITI:  The location in array IWORK of variable MAXIT.
       !  MSGB:    The starting location in array IWORK of array MSGB.
       !  MSGD:    The starting location in array IWORK of array MSGD.
@@ -462,40 +462,39 @@ contains
       !  NJEVI:   The location in array IWORK of variable NJEV.
       !  NNZWI:   The location in array IWORK of variable NNZW.
       !  NPPI:    The location in array IWORK of variable NPP.
-      !  Q:      The number of responses per observation.
       !  NROWI:   The location in array IWORK of variable NROW.
       !  NTOLI:   The location in array IWORK of variable NTOL.
-      !  OLMAVI:  The location in array WORK of variable OLMAVG.
-      !  OMEGAI:  The starting location in array WORK of array OMEGA.
+      !  OLMAVI:  The location in array RWORK of variable OLMAVG.
+      !  OMEGAI:  The starting location in array RWORK of array OMEGA.
       !  PARTLI:  The location in array work of variable PARTOL.
-      !  PNORMI:  The location in array WORK of variable PNORM.
-      !  PRERSI:  The location in array WORK of variable PRERS.
-      !  QRAUXI:  The starting location in array WORK of array QRAUX.
-      !  RCONDI:  The location in array WORK of variable RCOND.
-      !  RNORSI:  The location in array WORK of variable RNORMS.
-      !  RVARI:   The location in array WORK of variable RVAR.
-      !  SDI:     The starting location in array WORK of array SD.
-      !  SSFI:    The starting location in array WORK of array SSF.
-      !  SSI:     The starting location in array WORK of array SS.
-      !  SSTOLI:  The location in array WORK of variable SSTOL.
-      !  TAUFCI:  The location in array WORK of variable TAUFAC.
-      !  TAUI:    the location in array WORK of variable TAU.
-      !  TI:      The starting location in array WORK of array T.
-      !  TTI:     The starting location in array WORK of array TT.
-      !  UI:      The starting location in array WORK of array U.
-      !  VCVI:    The starting location in array WORK of array VCV.
-      !  WE1I:    The starting location in array WORK of array WE1.
-      !  WRK1I:   The starting location in array WORK of array WRK1.
-      !  WRK2I:   The starting location in array WORK of array WRK2.
-      !  WRK3I:   The starting location in array WORK of array wrk3.
-      !  WRK4I:   The starting location in array WORK of array wrk4.
-      !  WRK5I:   The starting location in array WORK of array wrk5.
-      !  WRK6I:   The starting location in array WORK of array wrk6.
-      !  WRK7I:   The starting location in array WORK of array wrk7.
-      !  WSSI:    The starting location in array WORK of variable WSS(1).
-      !  WSSDEI:  The starting location in array WORK of variable WSS(2).
-      !  WSSEPI:  The starting location in array WORK of variable WSS(3).
-      !  XPLUSI:  The starting location in array WORK of array XPLUSD.
+      !  PNORMI:  The location in array RWORK of variable PNORM.
+      !  PRERSI:  The location in array RWORK of variable PRERS.
+      !  QRAUXI:  The starting location in array RWORK of array QRAUX.
+      !  RCONDI:  The location in array RWORK of variable RCOND.
+      !  RNORSI:  The location in array RWORK of variable RNORMS.
+      !  RVARI:   The location in array RWORK of variable RVAR.
+      !  SDI:     The starting location in array RWORK of array SD.
+      !  SSFI:    The starting location in array RWORK of array SSF.
+      !  SSI:     The starting location in array RWORK of array SS.
+      !  SSTOLI:  The location in array RWORK of variable SSTOL.
+      !  TAUFCI:  The location in array RWORK of variable TAUFAC.
+      !  TAUI:    the location in array RWORK of variable TAU.
+      !  TI:      The starting location in array RWORK of array T.
+      !  TTI:     The starting location in array RWORK of array TT.
+      !  UI:      The starting location in array RWORK of array U.
+      !  VCVI:    The starting location in array RWORK of array VCV.
+      !  WE1I:    The starting location in array RWORK of array WE1.
+      !  WRK1I:   The starting location in array RWORK of array WRK1.
+      !  WRK2I:   The starting location in array RWORK of array WRK2.
+      !  WRK3I:   The starting location in array RWORK of array wrk3.
+      !  WRK4I:   The starting location in array RWORK of array wrk4.
+      !  WRK5I:   The starting location in array RWORK of array wrk5.
+      !  WRK6I:   The starting location in array RWORK of array wrk6.
+      !  WRK7I:   The starting location in array RWORK of array wrk7.
+      !  WSSI:    The starting location in array RWORK of variable WSS(1).
+      !  WSSDEI:  The starting location in array RWORK of variable WSS(2).
+      !  WSSEPI:  The starting location in array RWORK of variable WSS(3).
+      !  XPLUSI:  The starting location in array RWORK of array XPLUSD.
 
       ! Find starting locations within integer workspace
       call loc_iwork(m, q, np, &
@@ -518,7 +517,7 @@ contains
                      deltsi, deltni, ti, tti, omegai, fjacdi, &
                      wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
                      loweri, upperi, &
-                     lwkmn)
+                     lrwkmn)
 
       if (access) then
          ! Set starting locations for work vectors
@@ -535,22 +534,22 @@ contains
          wrk5 = wrk5i
          wrk6 = wrk6i
          ! Access values from the work vectors
-         actrs = work(actrsi)
-         alpha = work(alphai)
-         eta = work(etai)
-         olmavg = work(olmavi)
-         partol = work(partli)
-         pnorm = work(pnormi)
-         prers = work(prersi)
-         rcond = work(rcondi)
-         wss(1) = work(wssi)
-         wss(2) = work(wssdei)
-         wss(3) = work(wssepi)
-         rvar = work(rvari)
-         rnorms = work(rnorsi)
-         sstol = work(sstoli)
-         tau = work(taui)
-         taufac = work(taufci)
+         actrs = rwork(actrsi)
+         alpha = rwork(alphai)
+         eta = rwork(etai)
+         olmavg = rwork(olmavi)
+         partol = rwork(partli)
+         pnorm = rwork(pnormi)
+         prers = rwork(prersi)
+         rcond = rwork(rcondi)
+         wss(1) = rwork(wssi)
+         wss(2) = rwork(wssdei)
+         wss(3) = rwork(wssepi)
+         rvar = rwork(rvari)
+         rnorms = rwork(rnorsi)
+         sstol = rwork(sstoli)
+         tau = rwork(taui)
+         taufac = rwork(taufci)
 
          neta = iwork(netai)
          irank = iwork(iranki)
@@ -574,20 +573,20 @@ contains
 
       else
          ! Store values into the work vectors
-         work(actrsi) = actrs
-         work(alphai) = alpha
-         work(olmavi) = olmavg
-         work(partli) = partol
-         work(pnormi) = pnorm
-         work(prersi) = prers
-         work(rcondi) = rcond
-         work(wssi) = wss(1)
-         work(wssdei) = wss(2)
-         work(wssepi) = wss(3)
-         work(rvari) = rvar
-         work(rnorsi) = rnorms
-         work(sstoli) = sstol
-         work(taui) = tau
+         rwork(actrsi) = actrs
+         rwork(alphai) = alpha
+         rwork(olmavi) = olmavg
+         rwork(partli) = partol
+         rwork(pnormi) = pnorm
+         rwork(prersi) = prers
+         rwork(rcondi) = rcond
+         rwork(wssi) = wss(1)
+         rwork(wssdei) = wss(2)
+         rwork(wssepi) = wss(3)
+         rwork(rvari) = rvar
+         rwork(rnorsi) = rnorms
+         rwork(sstoli) = sstol
+         rwork(taui) = tau
 
          iwork(iranki) = irank
          iwork(istopi) = istop
@@ -1415,7 +1414,7 @@ contains
          !! or not (`restrt = .false.`).
       logical, intent(out) :: initd
          !! The variable designating whether `delta` is to be initialized to zero (`initd = .true.`)
-         !! or to the first `n` by `m` elements of array `work` (`initd = .false.`).
+         !! or to the first `n` by `m` elements of array `rwork` (`initd = .false.`).
       logical, intent(out) :: dovcv
          !! The variable designating whether the covariance matrix is to be computed
          !! (`dovcv = .true.`) or not (`dovcv = .false.`).
@@ -1720,7 +1719,7 @@ contains
        deltsi, deltni, ti, tti, omegai, fjacdi, &
        wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
        loweri, upperi, &
-       lwkmn)
+       lrwkmn)
    !! Get storage locations within real work space.
 
       integer, intent(in) :: n
@@ -1738,115 +1737,115 @@ contains
       logical, intent(in) :: isodr
          !! The variable designating whether the solution is by ODR (`isodr`=.true.) or by OLS (`isodr`=.false.).
       integer, intent(out) :: deltai
-         !! The starting location in array `work` of array `delta`.
+         !! The starting location in array `rwork` of array `delta`.
       integer, intent(out) :: epsi
-         !! The starting location in array `work` of array `eps`.
+         !! The starting location in array `rwork` of array `eps`.
       integer, intent(out) :: xplusi
-         !! The starting location in array `work` of array `xplusd`.
+         !! The starting location in array `rwork` of array `xplusd`.
       integer, intent(out) :: fni
-         !! The starting location in array `work` of array `fn`.
+         !! The starting location in array `rwork` of array `fn`.
       integer, intent(out) :: sdi
-         !! The starting location in array `work` of array `sd`.
+         !! The starting location in array `rwork` of array `sd`.
       integer, intent(out) :: vcvi
-         !! The starting location in array `work` of array `vcv`.
+         !! The starting location in array `rwork` of array `vcv`.
       integer, intent(out) :: rvari
-         !! The location in array `work` of variable `rvar`.
+         !! The location in array `rwork` of variable `rvar`.
       integer, intent(out) :: wssi
-         !! The location in array `work` of variable `wss`.
+         !! The location in array `rwork` of variable `wss`.
       integer, intent(out) :: wssdei
-         !! The location in array `work` of variable `wssdel`.
+         !! The location in array `rwork` of variable `wssdel`.
       integer, intent(out) :: wssepi
-         !! The location in array `work` of variable `wsseps`.
+         !! The location in array `rwork` of variable `wsseps`.
       integer, intent(out) :: rcondi
-         !! The location in array `work` of variable `rcondi`.
+         !! The location in array `rwork` of variable `rcondi`.
       integer, intent(out) :: etai
-         !! The location in array `work` of variable `eta`.
+         !! The location in array `rwork` of variable `eta`.
       integer, intent(out) :: olmavi
-         !! The location in array `work` of variable `olmavg`.
+         !! The location in array `rwork` of variable `olmavg`.
       integer, intent(out) :: taui
-         !! The location in array `work` of variable `tau`.
+         !! The location in array `rwork` of variable `tau`.
       integer, intent(out) :: alphai
-         !! The location in array `work` of variable `alpha`.
+         !! The location in array `rwork` of variable `alpha`.
       integer, intent(out) :: actrsi
-         !! The location in array `work` of variable `actrs`.
+         !! The location in array `rwork` of variable `actrs`.
       integer, intent(out) :: pnormi
-         !! The location in array `work` of variable `pnorm`.
+         !! The location in array `rwork` of variable `pnorm`.
       integer, intent(out) :: rnorsi
-         !! The location in array `work` of variable `rnorms`.
+         !! The location in array `rwork` of variable `rnorms`.
       integer, intent(out) :: prersi
-         !! The location in array `work` of variable `prers`.
+         !! The location in array `rwork` of variable `prers`.
       integer, intent(out) :: partli
-         !! The location in array `work` of variable `partol`.
+         !! The location in array `rwork` of variable `partol`.
       integer, intent(out) :: sstoli
-         !! The location in array `work` of variable `sstol`.
+         !! The location in array `rwork` of variable `sstol`.
       integer, intent(out) :: taufci
-         !! The location in array `work` of variable `taufac`.
+         !! The location in array `rwork` of variable `taufac`.
       integer, intent(out) :: epsmai
-         !! The location in array `work` of variable `epsmac`.
+         !! The location in array `rwork` of variable `epsmac`.
       integer, intent(out) :: beta0i
-         !! The starting location in array `work` of array `beta0`.
+         !! The starting location in array `rwork` of array `beta0`.
       integer, intent(out) :: betaci
-         !! The starting location in array `work` of array `betac`.
+         !! The starting location in array `rwork` of array `betac`.
       integer, intent(out) :: betasi
-         !! The starting location in array `work` of array `betas`.
+         !! The starting location in array `rwork` of array `betas`.
       integer, intent(out) :: betani
-         !! The starting location in array `work` of array `betan`.
+         !! The starting location in array `rwork` of array `betan`.
       integer, intent(out) :: si
-         !! The starting location in array `work` of array `s`.
+         !! The starting location in array `rwork` of array `s`.
       integer, intent(out) :: ssi
-         !! The starting location in array `work` of array `ss`.
+         !! The starting location in array `rwork` of array `ss`.
       integer, intent(out) :: ssfi
-         !! The starting location in array `work` of array `ssf`.
+         !! The starting location in array `rwork` of array `ssf`.
       integer, intent(out) :: qrauxi
-         !! The starting location in array `work` of array `qraux`.
+         !! The starting location in array `rwork` of array `qraux`.
       integer, intent(out) :: ui
-         !! The starting location in array `work` of array `u`.
+         !! The starting location in array `rwork` of array `u`.
       integer, intent(out) :: fsi
-         !! The starting location in array `work` of array `fs`.
+         !! The starting location in array `rwork` of array `fs`.
       integer, intent(out) :: fjacbi
-         !! The starting location in array `work` of array `fjacb`.
+         !! The starting location in array `rwork` of array `fjacb`.
       integer, intent(out) :: we1i
-         !! The starting location in array `work` of array `we1`.
+         !! The starting location in array `rwork` of array `we1`.
       integer, intent(out) :: diffi
-         !! The starting location in array `work` of array `diff`.
+         !! The starting location in array `rwork` of array `diff`.
       integer, intent(out) :: deltsi
-         !! The starting location in array `work` of array `deltas`.
+         !! The starting location in array `rwork` of array `deltas`.
       integer, intent(out) :: deltni
-         !! The starting location in array `work` of array `deltan`.
+         !! The starting location in array `rwork` of array `deltan`.
       integer, intent(out) :: ti
-         !! The starting location in array `work` of array `t`.
+         !! The starting location in array `rwork` of array `t`.
       integer, intent(out) :: tti
-         !! The starting location in array `work` of array `tt`.
+         !! The starting location in array `rwork` of array `tt`.
       integer, intent(out) :: omegai
-         !! The starting location in array `work` of array `omega`.
+         !! The starting location in array `rwork` of array `omega`.
       integer, intent(out) :: fjacdi
-         !! The starting location in array `work` of array `fjacd`.
+         !! The starting location in array `rwork` of array `fjacd`.
       integer, intent(out) :: wrk1i
-         !! The starting location in array `work` of array `wrk1`.
+         !! The starting location in array `rwork` of array `wrk1`.
       integer, intent(out) :: wrk2i
-         !! The starting location in array `work` of array `wrk2`.
+         !! The starting location in array `rwork` of array `wrk2`.
       integer, intent(out) :: wrk3i
-         !! The starting location in array `work` of array `wrk3`.
+         !! The starting location in array `rwork` of array `wrk3`.
       integer, intent(out) :: wrk4i
-         !! The starting location in array `work` of array `wrk4`.
+         !! The starting location in array `rwork` of array `wrk4`.
       integer, intent(out) :: wrk5i
-         !! The starting location in array `work` of array `wrk5`.
+         !! The starting location in array `rwork` of array `wrk5`.
       integer, intent(out) :: wrk6i
-         !! The starting location in array `work` of array `wrk6`.
+         !! The starting location in array `rwork` of array `wrk6`.
       integer, intent(out) :: wrk7i
-         !! The starting location in array `work` of array `wrk7`.
+         !! The starting location in array `rwork` of array `wrk7`.
       integer, intent(out) :: loweri
-         !! The starting location in array `work` of array `lower`.
+         !! The starting location in array `rwork` of array `lower`.
       integer, intent(out) :: upperi
-         !! The starting location in array `work` of array `upper`.
-      integer, intent(out) :: lwkmn
-         !! The minimum acceptable length of vector `work`.
+         !! The starting location in array `rwork` of array `upper`.
+      integer, intent(out) :: lrwkmn
+         !! The minimum acceptable length of vector `rwork`.
 
       ! Local scalars
       integer :: next
 
       ! Variable Definitions (alphabetically)
-      !  NEXT:    The next available location with WORK.
+      !  NEXT:    The next available location with RWORK.
 
       if (n >= 1 .and. m >= 1 .and. np >= 1 .and. q >= 1 .and. ldwe >= 1 &
           .and. ld2we >= 1) then
@@ -1925,7 +1924,7 @@ contains
          upperi = loweri + np
          next = upperi + np
 
-         lwkmn = next
+         lrwkmn = next
       else
          deltai = 1
          epsi = 1
@@ -1978,13 +1977,13 @@ contains
          wrk7i = 1
          loweri = 1
          upperi = 1
-         lwkmn = 1
+         lrwkmn = 1
       end if
 
    end subroutine loc_rwork
 
    pure subroutine init_work &
-      (n, m, np, work, lwork, iwork, liwork, &
+      (n, m, np, rwork, lrwork, iwork, liwork, &
        x, ifixx, ldifx, scld, ldscld, &
        beta, sclb, &
        sstol, partol, maxit, taufac, &
@@ -2004,10 +2003,10 @@ contains
          !! The number of columns of data in the independent variable.
       integer, intent(in) :: np
          !! The number of function parameters.
-      real(wp), intent(out) :: work(lwork)
+      real(wp), intent(out) :: rwork(lrwork)
          !! The real work space.
-      integer, intent(in) :: lwork
-         !! The length of vector `work`.
+      integer, intent(in) :: lrwork
+         !! The length of vector `rwork`.
       integer, intent(out) :: iwork(liwork)
          !! The integer work space.
       integer, intent(in) :: liwork
@@ -2047,15 +2046,15 @@ contains
       real(wp), intent(in) :: upper(np)
          !! The upper bounds for the function parameters.
       integer, intent(in) :: epsmai
-         !! The location in array `work` of variable `epsmac`.
+         !! The location in array `rwork` of variable `epsmac`.
       integer, intent(in) :: sstoli
-         !! The location in array `work` of variable `sstol`.
+         !! The location in array `rwork` of variable `sstol`.
       integer, intent(in) :: partli
-         !! The location in array `work` of variable `partol`.
+         !! The location in array `rwork` of variable `partol`.
       integer, intent(in) :: maxiti
          !! The location in array `iwork` of variable `maxit`.
       integer, intent(in) :: taufci
-         !! The location in array `work` of variable `taufac`.
+         !! The location in array `rwork` of variable `taufac`.
       integer, intent(in) :: jobi
          !! The location in array `iwork` of variable `job`.
       integer, intent(in) :: iprini
@@ -2065,13 +2064,13 @@ contains
       integer, intent(in) :: lunrpi
          !! The location in array `iwork` of variable `lunrpt`.
       integer, intent(in) :: ssfi
-         !! The starting location in array `work` of array `ssf`.
+         !! The starting location in array `rwork` of array `ssf`.
       integer, intent(in) :: tti
-         !! The starting location in array `work` of the array `tt`.
+         !! The starting location in array `rwork` of the array `tt`.
       integer, intent(in) :: ldtti
          !! The leading dimension of array `tt`.
       integer, intent(in) :: deltai
-         !! The starting location in array `work` of array `delta`.
+         !! The starting location in array `rwork` of array `delta`.
       integer, intent(in) :: loweri
          !! The starting location in array `iwork` of array `lower`.
       integer, intent(in) :: upperi
@@ -2096,7 +2095,7 @@ contains
       !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE) or
       !           explicit ODR (IMPLCT=FALSE).
       !  INITD:   The variable designating whether DELTA is to be initialized to zero (INITD=TRUE) or
-      !           to the values in the first N by M elements of array WORK (INITD=FALSE).
+      !           to the values in the first N by M elements of array RWORK (INITD=FALSE).
       !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by OLS
       !           ISODR=FALSE).
       !  J:       An indexing variable.
@@ -2108,29 +2107,29 @@ contains
       call set_flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
 
       ! Store value of machine precision in work vector
-      work(epsmai) = epsilon(zero)
+      rwork(epsmai) = epsilon(zero)
 
       ! Set tolerance for stopping criteria based on the change in the parameters (see also
       ! subprogram DODCNT)
       if (partol < zero) then
-         work(partli) = work(epsmai)**(two/three)
+         rwork(partli) = rwork(epsmai)**(two/three)
       else
-         work(partli) = min(partol, one)
+         rwork(partli) = min(partol, one)
       end if
 
       ! Set tolerance for stopping criteria based on the change in the sum of squares of the
       ! weighted observational errors
       if (sstol < zero) then
-         work(sstoli) = sqrt(work(epsmai))
+         rwork(sstoli) = sqrt(rwork(epsmai))
       else
-         work(sstoli) = min(sstol, one)
+         rwork(sstoli) = min(sstol, one)
       end if
 
       ! Set factor for computing trust region diameter at first iteration
       if (taufac <= zero) then
-         work(taufci) = one
+         rwork(taufci) = one
       else
-         work(taufci) = min(taufac, one)
+         rwork(taufci) = min(taufac, one)
       end if
 
       ! Set maximum number of iterations
@@ -2162,24 +2161,24 @@ contains
 
       ! Compute scaling for BETA's and DELTA's
       if (sclb(1) <= zero) then
-         call scale_beta(np, beta, work(ssfi))
+         call scale_beta(np, beta, rwork(ssfi))
       else
-         work(ssfi:ssfi + (np - 1)) = sclb
+         rwork(ssfi:ssfi + (np - 1)) = sclb
       end if
 
       if (isodr) then
          if (scld(1, 1) <= zero) then
             iwork(ldtti) = n
-            call scale_delta(n, m, x, work(tti), iwork(ldtti))
+            call scale_delta(n, m, x, rwork(tti), iwork(ldtti))
          else
             if (ldscld == 1) then
                iwork(ldtti) = 1
-               work(tti:tti + (m - 1)) = scld(1:m, 1)
+               rwork(tti:tti + (m - 1)) = scld(1:m, 1)
             else
                iwork(ldtti) = n
                do j = 1, m
                   istart = tti + (j - 1)*iwork(ldtti)
-                  work(istart:istart + (n - 1)) = scld(1:n, j)
+                  rwork(istart:istart + (n - 1)) = scld(1:n, j)
                end do
             end if
          end if
@@ -2188,21 +2187,21 @@ contains
       ! Initialize DELTA's as necessary
       if (isodr) then
          if (initd) then
-            work(deltai:deltai + (n*m - 1)) = zero
+            rwork(deltai:deltai + (n*m - 1)) = zero
          else
             if (ifixx(1, 1) >= 0) then
                if (ldifx == 1) then
                   do j = 1, m
                      if (ifixx(1, j) == 0) then
                         istart = deltai + (j - 1)*n
-                        work(istart:istart + (n - 1)) = zero
+                        rwork(istart:istart + (n - 1)) = zero
                      end if
                   end do
                else
                   do j = 1, m
                      do i = 1, n
                         if (ifixx(i, j) == 0) then
-                           work(deltai - 1 + i + (j - 1)*n) = zero
+                           rwork(deltai - 1 + i + (j - 1)*n) = zero
                         end if
                      end do
                   end do
@@ -2210,12 +2209,12 @@ contains
             end if
          end if
       else
-         work(deltai:deltai + (n*m - 1)) = zero
+         rwork(deltai:deltai + (n*m - 1)) = zero
       end if
 
-      ! Copy bounds into WORK
-      work(loweri:loweri + np - 1) = lower
-      work(upperi:upperi + np - 1) = upper
+      ! Copy bounds into RWORK
+      rwork(loweri:loweri + np - 1) = lower
+      rwork(upperi:upperi + np - 1) = upper
 
       ! Initialize parameters on bounds in IWORK
       iwork(boundi:boundi + np - 1) = 0
@@ -3689,7 +3688,7 @@ contains
        isodr, anajac, &
        beta, ifixb, &
        ldifx, ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-       lwork, lwkmn, liwork, liwkmn, &
+       lrwork, lrwkmn, liwork, liwkmn, &
        sclb, scld, stpb, stpd, &
        info, &
        lower, upper)
@@ -3729,10 +3728,10 @@ contains
          !! The leading dimension of array `wd`.
       integer, intent(in) :: ld2wd
          !! The second dimension of array `wd`.
-      integer, intent(in) :: lwork
-         !! The length of vector `work`.
-      integer, intent(in) :: lwkmn
-         !! The minimum acceptable length of array `work`.
+      integer, intent(in) :: lrwork
+         !! The length of vector `rwork`.
+      integer, intent(in) :: lrwkmn
+         !! The minimum acceptable length of array `rwork`.
       integer, intent(in) :: liwork
          !! The length of vector `iwork`.
       integer, intent(in) :: liwkmn
@@ -3792,7 +3791,7 @@ contains
           (isodr .and. ((ldifx /= 1) .and. (ldifx < n))) .or. &
           (isodr .and. ((ldstpd /= 1) .and. (ldstpd < n))) .or. &
           (isodr .and. ((ldscld /= 1) .and. (ldscld < n))) .or. &
-          (lwork < lwkmn) .or. &
+          (lrwork < lrwkmn) .or. &
           (liwork < liwkmn)) then
 
          info = 20000
@@ -3819,7 +3818,7 @@ contains
             info = info + 40
          end if
 
-         if (lwork < lwkmn) then
+         if (lrwork < lrwkmn) then
             info = info + 1
          end if
 

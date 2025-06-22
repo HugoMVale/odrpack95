@@ -194,7 +194,7 @@ contains
       !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
       !           or explicit ODR (IMPLCT=FALSE).
       !  INITD:   The variable designating whether DELTA is initialized to zero (INITD=TRUE) or
-      !           to the values in the first N by M elements of array WORK (INITD=FALSE).
+      !           to the values in the first N by M elements of array RWORK (INITD=FALSE).
       !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by
       !           OLS (ISODR=FALSE).
       !  PNLTY:   The penalty parameter for an implicit model.
@@ -291,7 +291,7 @@ contains
          !! (`chkjac = .true.`) or not (`chkjac = .false.`).
       logical, intent(in) :: initd
          !! The variable designating whether `delta` is initialized to zero (`initd = .true.`)
-         !! or to the values in the first `n` by `m` elements of array `work` (`initd = .false.`).
+         !! or to the values in the first `n` by `m` elements of array `rwork` (`initd = .false.`).
       logical, intent(in) :: restrt
          !! The variable designating whether the call is a restart (`restrt = .true.`) or
          !! not (`restrt = .false.`).
@@ -1600,7 +1600,7 @@ contains
       (info, lunerr, &
        n, m, np, q, &
        ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-       lwkmn, liwkmn, &
+       lrwkmn, liwkmn, &
        fjacb, fjacd, &
        diff, msgb, isodr, msgd, &
        xplusd, nrow, neta, ntol)
@@ -1630,8 +1630,8 @@ contains
          !! The leading dimension of array `wd`.
       integer, intent(in) :: ld2wd
          !! The second dimension of array `wd`.
-      integer, intent(in) :: lwkmn
-         !! The minimum acceptable length of array `work`.
+      integer, intent(in) :: lrwkmn
+         !! The minimum acceptable length of array `rwork`.
       integer, intent(in) :: liwkmn
          !! The minimum acceptable length of array `iwork`.
       real(wp), intent(in) :: fjacb(n, np, q)
@@ -1694,7 +1694,7 @@ contains
          call print_error_inputs(lunerr, info, d1, d2, d3, d4, d5, &
                                  n, m, q, &
                                  ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-                                 lwkmn, liwkmn)
+                                 lrwkmn, liwkmn)
 
       elseif ((d1 == 4) .or. (msgb(1) >= 0)) then
 
@@ -1725,7 +1725,7 @@ contains
          (//' The correct form of the call statement is '// &
            '       call odr'/ &
            '      +     (fcn,'/ &
-           '      +     n, m, np, q,'/ &
+           '      +     n, m, q, np,'/ &
            '      +     beta,'/ &
            '      +     y, x,'/ &
            '      +     delta*,'/ &
@@ -1736,7 +1736,7 @@ contains
            '      +     iprint*, lunerr*, lunrpt*,'/ &
            '      +     stpb*, stpd*,'/ &
            '      +     sclb*, scld*,'/ &
-           '      +     work*, iwork*,'/ &
+           '      +     rwork*, iwork*,'/ &
            '      +     info*,'/ &
            '      +     lower*, upper*)'/ &
            ' * optional argument')
@@ -1747,7 +1747,7 @@ contains
       (lunerr, info, d1, d2, d3, d4, d5, &
        n, m, q, &
        ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-       lwkmn, liwkmn)
+       lrwkmn, liwkmn)
    !! Print error reports.
 
       integer, intent(in) :: lunerr
@@ -1782,8 +1782,8 @@ contains
          !! The leading dimension of array `wd`.
       integer, intent(in) :: ld2wd
          !! The second dimension of array `wd`.
-      integer, intent(in) :: lwkmn
-         !! The minimum acceptable length of array `work`.
+      integer, intent(in) :: lrwkmn
+         !! The minimum acceptable length of array `rwork`.
       integer, intent(in) :: liwkmn
          !! The minimum acceptable length of array `iwork`.
 
@@ -1842,7 +1842,7 @@ contains
 
          if (d5 /= 0) then
             if (d5 == 1 .or. d5 == 3) then
-               write (lunerr, 2410) lwkmn
+               write (lunerr, 2410) lrwkmn
             end if
             if (d5 == 2 .or. d5 == 3) then
                write (lunerr, 2420) liwkmn
@@ -2073,8 +2073,8 @@ contains
 2320  format &
          (/' ERROR :  LDWD is less than N and LDWD is not equal to one.')
 2410  format &
-         (/' ERROR :  LWORK is less than ', I7, ','/ &
-           '          the smallest acceptable dimension of array WORK.')
+         (/' ERROR :  LRWORK is less than ', I7, ','/ &
+           '          the smallest acceptable dimension of array RWORK.')
 2420  format &
          (/' ERROR :  LIWORK is less than ', I7, ','/ &
            '          the smallest acceptable dimension of array IWORK.')
@@ -2141,7 +2141,7 @@ contains
 5000  format &
          (/' ERROR :  JOB requires the optional argument DELTA and DELTA is not present.')
 5100  format &
-         (/' ERROR :  JOB requires the optional argument WORK and WORK is not present.')
+         (/' ERROR :  JOB requires the optional argument RWORK and RWORK is not present.')
 5200  format &
          (/' ERROR :  JOB requires the optional argument IWORK and IWORK is not present.')
 6000  format &
@@ -2163,7 +2163,7 @@ contains
 7200  format &
          (/' ERROR :  DELTA could not be allocated. ')
 7300  format &
-         (/' ERROR :  WORK could not be allocated. ')
+         (/' ERROR :  RWORK could not be allocated. ')
 7400  format &
          (/' ERROR :  IWORK could not be allocated. ')
 8000  format &
@@ -2191,7 +2191,7 @@ contains
 8011  format &
          (/' ERROR :  SCLD has incorrect shape. ')
 8012  format &
-         (/' ERROR :  WORK has incorrect size. ')
+         (/' ERROR :  RWORK has incorrect size. ')
 8013  format &
          (/' ERROR :  IWORK has incorrect size. ')
 8014  format &

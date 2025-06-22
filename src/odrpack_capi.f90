@@ -51,7 +51,7 @@ module odrpack_capi
       end function
    end interface
 
-   type, bind(C) :: workidx_t
+   type, bind(C) :: rworkidx_t
    !! 0-based indices of the variables stored in the real work array.
       integer(c_int) :: delta
       integer(c_int) :: eps
@@ -105,7 +105,7 @@ module odrpack_capi
       integer(c_int) :: lower
       integer(c_int) :: upper
       integer(c_int) :: lwkmn
-   end type workidx_t
+   end type rworkidx_t
 
    type, bind(C) :: iworkidx_t
    !! 0-based indices of the variables stored in the integer work array.
@@ -266,7 +266,7 @@ contains
       ldwd, ld2wd, &
       ldifx, &
       ldstpd, ldscld, &
-      lwork, liwork, &
+      lrwork, liwork, &
       beta, y, x, &
       we, wd, &
       ifixb, ifixx, &
@@ -274,7 +274,7 @@ contains
       sclb, scld, &
       delta, &
       lower, upper, &
-      work, iwork, &
+      rwork, iwork, &
       job, ndigit, taufac, &
       sstol, partol, maxit, &
       iprint, lunerr, lunrpt, &
@@ -305,8 +305,8 @@ contains
          !! Leading dimension of array `stpd`, `ldstpd ∈ {1, n}`.
       integer(c_int), intent(in) :: ldscld
          !! Leading dimension of array `scld`, `ldscld ∈ {1, n}`.
-      integer(c_int), intent(in) :: lwork
-         !! Length of array `work`.
+      integer(c_int), intent(in) :: lrwork
+         !! Length of array `rwork`.
       integer(c_int), intent(in) :: liwork
          !! Length of array `iwork`.
       real(c_double), intent(inout) :: beta(np)
@@ -338,7 +338,7 @@ contains
          !! Lower bound on `beta`.
       real(c_double), intent(in), optional :: upper(np)
          !! Upper bound on `beta`.
-      real(c_double), intent(inout), optional :: work(lwork)
+      real(c_double), intent(inout), optional :: rwork(lrwork)
          !! Real work space.
       integer(c_int), intent(inout), optional :: iwork(liwork)
          !! Integer work space.
@@ -380,7 +380,7 @@ contains
                stpb=stpb, stpd=stpd, &
                sclb=sclb, scld=scld, &
                info=info, &
-               work=work, iwork=iwork)
+               rwork=rwork, iwork=iwork)
 
    end subroutine odr_long_c
 
@@ -433,7 +433,7 @@ contains
 
    end subroutine close_file
 
-   pure subroutine loc_iwork_c(m, q, np, iworkidx) bind(C)
+   pure subroutine loc_iwork_c(m, q, np, iwi) bind(C)
    !! Get storage locations within integer work space.
 
       integer(c_int), intent(in) :: m
@@ -442,7 +442,7 @@ contains
          !! Number of responses per observation.
       integer(c_int), intent(in) :: np
          !! Number of function parameters.
-      type(iworkidx_t), intent(out) :: iworkidx
+      type(iworkidx_t), intent(out) :: iwi
          !! 0-based indexes of integer work array.
 
       integer :: msgbi, msgdi, ifix2i, istopi, nnzwi, nppi, idfi, jobi, iprini, luneri, &
@@ -458,33 +458,33 @@ contains
                      boundi, &
                      liwkmn)
 
-      iworkidx%msgb = msgbi - 1
-      iworkidx%msgd = msgdi - 1
-      iworkidx%ifix2 = ifix2i - 1
-      iworkidx%istop = istopi - 1
-      iworkidx%nnzw = nnzwi - 1
-      iworkidx%npp = nppi - 1
-      iworkidx%idf = idfi - 1
-      iworkidx%job = jobi - 1
-      iworkidx%iprin = iprini - 1
-      iworkidx%luner = luneri - 1
-      iworkidx%lunrp = lunrpi - 1
-      iworkidx%nrow = nrowi - 1
-      iworkidx%ntol = ntoli - 1
-      iworkidx%neta = netai - 1
-      iworkidx%maxit = maxiti - 1
-      iworkidx%niter = niteri - 1
-      iworkidx%nfev = nfevi - 1
-      iworkidx%njev = njevi - 1
-      iworkidx%int2 = int2i - 1
-      iworkidx%irank = iranki - 1
-      iworkidx%ldtt = ldtti - 1
-      iworkidx%bound = boundi - 1
-      iworkidx%liwkmn = liwkmn
+      iwi%msgb = msgbi - 1
+      iwi%msgd = msgdi - 1
+      iwi%ifix2 = ifix2i - 1
+      iwi%istop = istopi - 1
+      iwi%nnzw = nnzwi - 1
+      iwi%npp = nppi - 1
+      iwi%idf = idfi - 1
+      iwi%job = jobi - 1
+      iwi%iprin = iprini - 1
+      iwi%luner = luneri - 1
+      iwi%lunrp = lunrpi - 1
+      iwi%nrow = nrowi - 1
+      iwi%ntol = ntoli - 1
+      iwi%neta = netai - 1
+      iwi%maxit = maxiti - 1
+      iwi%niter = niteri - 1
+      iwi%nfev = nfevi - 1
+      iwi%njev = njevi - 1
+      iwi%int2 = int2i - 1
+      iwi%irank = iranki - 1
+      iwi%ldtt = ldtti - 1
+      iwi%bound = boundi - 1
+      iwi%liwkmn = liwkmn
 
    end subroutine loc_iwork_c
 
-   pure subroutine loc_rwork_c(n, m, q, np, ldwe, ld2we, isodr, workidx) bind(C)
+   pure subroutine loc_rwork_c(n, m, q, np, ldwe, ld2we, isodr, rwi) bind(C)
    !! Get storage locations within real work space.
 
       integer(c_int), intent(in) :: n
@@ -502,7 +502,7 @@ contains
       logical(c_bool), intent(in) :: isodr
          !! Variable designating whether the solution is by ODR (`isodr = .true.`) or
          !! by OLS (`isodr = .false.`).
-      type(workidx_t), intent(out) :: workidx
+      type(rworkidx_t), intent(out) :: rwi
          !! 0-based indexes of real work array.
 
       integer :: deltai, epsi, xplusi, fni, sdi, vcvi, rvari, wssi, wssdei, wssepi, &
@@ -524,62 +524,62 @@ contains
                      loweri, upperi, &
                      lwkmn)
 
-      workidx%delta = deltai - 1
-      workidx%eps = epsi - 1
-      workidx%xplus = xplusi - 1
-      workidx%fn = fni - 1
-      workidx%sd = sdi - 1
-      workidx%vcv = vcvi - 1
-      workidx%rvar = rvari - 1
-      workidx%wss = wssi - 1
-      workidx%wssde = wssdei - 1
-      workidx%wssep = wssepi - 1
-      workidx%rcond = rcondi - 1
-      workidx%eta = etai - 1
-      workidx%olmav = olmavi - 1
-      workidx%tau = taui - 1
-      workidx%alpha = alphai - 1
-      workidx%actrs = actrsi - 1
-      workidx%pnorm = pnormi - 1
-      workidx%rnors = rnorsi - 1
-      workidx%prers = prersi - 1
-      workidx%partl = partli - 1
-      workidx%sstol = sstoli - 1
-      workidx%taufc = taufci - 1
-      workidx%epsma = epsmai - 1
-      workidx%beta0 = beta0i - 1
-      workidx%betac = betaci - 1
-      workidx%betas = betasi - 1
-      workidx%betan = betani - 1
-      workidx%s = si - 1
-      workidx%ss = ssi - 1
-      workidx%ssf = ssfi - 1
-      workidx%qraux = qrauxi - 1
-      workidx%u = ui - 1
-      workidx%fs = fsi - 1
-      workidx%fjacb = fjacbi - 1
-      workidx%we1 = we1i - 1
-      workidx%diff = diffi - 1
-      workidx%delts = deltsi - 1
-      workidx%deltn = deltni - 1
-      workidx%t = ti - 1
-      workidx%tt = tti - 1
-      workidx%omega = omegai - 1
-      workidx%fjacd = fjacdi - 1
-      workidx%wrk1 = wrk1i - 1
-      workidx%wrk2 = wrk2i - 1
-      workidx%wrk3 = wrk3i - 1
-      workidx%wrk4 = wrk4i - 1
-      workidx%wrk5 = wrk5i - 1
-      workidx%wrk6 = wrk6i - 1
-      workidx%wrk7 = wrk7i - 1
-      workidx%lower = loweri - 1
-      workidx%upper = upperi - 1
-      workidx%lwkmn = lwkmn
+      rwi%delta = deltai - 1
+      rwi%eps = epsi - 1
+      rwi%xplus = xplusi - 1
+      rwi%fn = fni - 1
+      rwi%sd = sdi - 1
+      rwi%vcv = vcvi - 1
+      rwi%rvar = rvari - 1
+      rwi%wss = wssi - 1
+      rwi%wssde = wssdei - 1
+      rwi%wssep = wssepi - 1
+      rwi%rcond = rcondi - 1
+      rwi%eta = etai - 1
+      rwi%olmav = olmavi - 1
+      rwi%tau = taui - 1
+      rwi%alpha = alphai - 1
+      rwi%actrs = actrsi - 1
+      rwi%pnorm = pnormi - 1
+      rwi%rnors = rnorsi - 1
+      rwi%prers = prersi - 1
+      rwi%partl = partli - 1
+      rwi%sstol = sstoli - 1
+      rwi%taufc = taufci - 1
+      rwi%epsma = epsmai - 1
+      rwi%beta0 = beta0i - 1
+      rwi%betac = betaci - 1
+      rwi%betas = betasi - 1
+      rwi%betan = betani - 1
+      rwi%s = si - 1
+      rwi%ss = ssi - 1
+      rwi%ssf = ssfi - 1
+      rwi%qraux = qrauxi - 1
+      rwi%u = ui - 1
+      rwi%fs = fsi - 1
+      rwi%fjacb = fjacbi - 1
+      rwi%we1 = we1i - 1
+      rwi%diff = diffi - 1
+      rwi%delts = deltsi - 1
+      rwi%deltn = deltni - 1
+      rwi%t = ti - 1
+      rwi%tt = tti - 1
+      rwi%omega = omegai - 1
+      rwi%fjacd = fjacdi - 1
+      rwi%wrk1 = wrk1i - 1
+      rwi%wrk2 = wrk2i - 1
+      rwi%wrk3 = wrk3i - 1
+      rwi%wrk4 = wrk4i - 1
+      rwi%wrk5 = wrk5i - 1
+      rwi%wrk6 = wrk6i - 1
+      rwi%wrk7 = wrk7i - 1
+      rwi%lower = loweri - 1
+      rwi%upper = upperi - 1
+      rwi%lwkmn = lwkmn
 
    end subroutine loc_rwork_c
 
-   pure subroutine workspace_dimensions_c(n, m, q, np, isodr, lwork, liwork) bind(C)
+   pure subroutine workspace_dimensions_c(n, m, q, np, isodr, lrwork, liwork) bind(C)
    !! Calculate the dimensions of the workspace arrays.
 
       integer(c_int), intent(in) :: n
@@ -593,13 +593,13 @@ contains
       logical(c_bool), intent(in) :: isodr
          !! Variable designating whether the solution is by ODR (`isodr = .true.`)
          !! or by OLS (`isodr = .false.`).
-      integer(c_int), intent(out) :: lwork
-         !! Length of real `work` array.
+      integer(c_int), intent(out) :: lrwork
+         !! Length of real `rwork` array.
       integer(c_int), intent(out) :: liwork
          !! Length of integer `iwork` array.
 
       call workspace_dimensions(n, m, q, np, logical(isodr, kind=kind(.true.)), &
-                                lwork, liwork)
+                                lrwork, liwork)
 
    end subroutine workspace_dimensions_c
 
