@@ -6,14 +6,12 @@ module example4_model
 
 contains
 
-   pure subroutine fcn( &
-      n, m, q, np, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+   pure subroutine fcn(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
    !! User-supplied subroutine for evaluating the model.
 
-      integer, intent(in) :: ideval, ldifx, m, n, np, q
-      integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
-      real(kind=wp), intent(in) :: beta(np), xplusd(n, m)
-      real(kind=wp), intent(out) :: f(n, q), fjacb(n, np, q), fjacd(n, m, q)
+      integer, intent(in) :: ideval, ifixb(:), ifixx(:, :)
+      real(kind=wp), intent(in) :: beta(:), xplusd(:, :)
+      real(kind=wp), intent(out) :: f(:, :), fjacb(:, :, :), fjacd(:, :, :)
       integer, intent(out) :: istop
 
       ! Local variables
@@ -24,10 +22,9 @@ contains
       fjacb = zero
       fjacd = zero
       if (mod(ideval, 10) >= 1) then
-         do i = 1, n
+         do i = 1, ubound(f, 1)
             f(i, 1) = 1440.0_wp
-            call mpf(uout, xplusd(i, 1), &
-                     beta(1), beta(2), beta(3), zero, f(i, 1), xplusd(i, 1)/2)
+            call mpf(uout, xplusd(i, 1), beta(1), beta(2), beta(3), zero, f(i, 1), xplusd(i, 1)/2)
          end do
       end if
 

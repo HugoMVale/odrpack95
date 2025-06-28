@@ -1953,30 +1953,24 @@ contains
 
    end subroutine set_inputs
 
-   pure subroutine fcn( &
-      n, m, q, np, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+   pure subroutine fcn(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
    !! Compute model function and jacobian for odrpack exerciser.
 
       use odrpack_kinds, only: zero, one
 
-      integer, intent(in) :: n
-      integer, intent(in) :: m
-      integer, intent(in) :: q
-      integer, intent(in) :: np
-      real(wp), intent(in) :: beta(np)
-      real(wp), intent(in) :: xplusd(n, m)
-      integer, intent(in) :: ifixb(np)
-      integer, intent(in) :: ifixx(ldifx, m)
-      integer, intent(in) :: ldifx
+      real(wp), intent(in) :: beta(:)
+      real(wp), intent(in) :: xplusd(:, :)
+      integer, intent(in) :: ifixb(:)
+      integer, intent(in) :: ifixx(:, :)
       integer, intent(in) :: ideval
-      real(wp), intent(out) :: f(n, q)
-      real(wp), intent(out) :: fjacb(n, np, q)
-      real(wp), intent(out) :: fjacd(n, m, q)
+      real(wp), intent(out) :: f(:, :)
+      real(wp), intent(out) :: fjacb(:, :, :)
+      real(wp), intent(out) :: fjacd(:, :, :)
       integer, intent(out) :: istop
 
       ! Local scalars
       real(wp) :: ctheta, fac1, fac2, fac3, fac4, freq, omega, phi, pi, r, stheta, theta
-      integer :: i, j, k
+      integer :: i, j, k, n
 
       ! Variable definitions (alphabetically)
       !  BETA:    Current values of parameters
@@ -2019,6 +2013,8 @@ contains
          istop = -2
          return
       end if
+
+      n = ubound(xplusd, 1)
 
       if (setno == 1) then
 

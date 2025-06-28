@@ -6,14 +6,12 @@ module example5_model
 
 contains
 
-   pure subroutine fcn( &
-      n, m, q, np, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+   pure subroutine fcn(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
    !! User-supplied subroutine for evaluating the model.
 
-      integer, intent(in) :: ideval, ldifx, m, n, np, q
-      integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
-      real(kind=wp), intent(in) :: beta(np), xplusd(n, m)
-      real(kind=wp), intent(out) :: f(n, q), fjacb(n, np, q), fjacd(n, m, q)
+      integer, intent(in) :: ideval, ifixb(:), ifixx(:, :)
+      real(kind=wp), intent(in) :: beta(:), xplusd(:, :)
+      real(kind=wp), intent(out) :: f(:, :), fjacb(:, :, :), fjacd(:, :, :)
       integer, intent(out) :: istop
 
       istop = 0

@@ -6,14 +6,12 @@ module example1_model
 
 contains
 
-   pure subroutine fcn( &
-      n, m, q, np, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+   pure subroutine fcn(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
    !! User-supplied subroutine for evaluating the model.
 
-      integer, intent(in) :: ideval, ldifx, m, n, np, q
-      integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
-      real(kind=wp), intent(in) :: beta(np), xplusd(n, m)
-      real(kind=wp), intent(out) :: f(n, q), fjacb(n, np, q), fjacd(n, m, q)
+      integer, intent(in) :: ideval, ifixb(:), ifixx(:, :)
+      real(kind=wp), intent(in) :: beta(:), xplusd(:, :)
+      real(kind=wp), intent(out) :: f(:, :), fjacb(:, :, :), fjacd(:, :, :)
       integer, intent(out) :: istop
 
       ! Local variables
@@ -29,23 +27,23 @@ contains
 
       ! Compute predicted values
       if (mod(ideval, 10) >= 1) then
-      do i = 1, q
-         f(:, i) = beta(1) + beta(2)*(exp(beta(3)*xplusd(:, 1)) - one)**2
-      end do
+         do i = 1, ubound(f, 2)
+            f(:, i) = beta(1) + beta(2)*(exp(beta(3)*xplusd(:, 1)) - one)**2
+         end do
       end if
 
       ! Compute derivatives with respect to 'beta'
       if (mod(ideval/10, 10) >= 1) then
-      do i = 1, q
-         fjacb(:, 1, i) = one
-         fjacb(:, 2, i) = (exp(beta(3)*xplusd(:, 1)) - one)**2
-         fjacb(:, 3, i) = beta(2)*2*(exp(beta(3)*xplusd(:, 1)) - one)*exp(beta(3)*xplusd(:, 1))*xplusd(:, 1)
-      end do
+         do i = 1, ubound(f, 2)
+            fjacb(:, 1, i) = one
+            fjacb(:, 2, i) = (exp(beta(3)*xplusd(:, 1)) - one)**2
+            fjacb(:, 3, i) = beta(2)*2*(exp(beta(3)*xplusd(:, 1)) - one)*exp(beta(3)*xplusd(:, 1))*xplusd(:, 1)
+         end do
       end if
 
       ! Compute derivatives with respect to 'delta'
       if (mod(ideval/100, 10) >= 1) then
-      do i = 1, q
+      do i = 1, ubound(f, 2)
          fjacd(:, 1, i) = beta(2)*2*(exp(beta(3)*xplusd(:, 1)) - one)*exp(beta(3)*xplusd(:, 1))*beta(3)
       end do
       end if
