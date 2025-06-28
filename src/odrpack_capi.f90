@@ -117,9 +117,9 @@ module odrpack_capi
       integer(c_int) :: npp
       integer(c_int) :: idf
       integer(c_int) :: job
-      integer(c_int) :: iprin
-      integer(c_int) :: luner
-      integer(c_int) :: lunrp
+      integer(c_int) :: iprint
+      integer(c_int) :: lunerr
+      integer(c_int) :: lunrpt
       integer(c_int) :: nrow
       integer(c_int) :: ntol
       integer(c_int) :: neta
@@ -498,14 +498,14 @@ contains
       type(iworkidx_t), intent(out) :: iwi
          !! 0-based indexes of integer work array.
 
-      integer :: msgbi, msgdi, ifix2i, istopi, nnzwi, nppi, idfi, jobi, iprini, luneri, &
-                 lunrpi, nrowi, ntoli, netai, maxiti, niteri, nfevi, njevi, int2i, iranki, &
+      integer :: msgbi, msgdi, ifix2i, istopi, nnzwi, nppi, idfi, jobi, iprinti, lunerri, &
+                 lunrpti, nrowi, ntoli, netai, maxiti, niteri, nfevi, njevi, int2i, iranki, &
                  ldtti, boundi, liwkmn
 
       call loc_iwork(m, q, np, &
                      msgbi, msgdi, ifix2i, istopi, &
                      nnzwi, nppi, idfi, &
-                     jobi, iprini, luneri, lunrpi, &
+                     jobi, iprinti, lunerri, lunrpti, &
                      nrowi, ntoli, netai, &
                      maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
                      boundi, &
@@ -519,9 +519,9 @@ contains
       iwi%npp = nppi - 1
       iwi%idf = idfi - 1
       iwi%job = jobi - 1
-      iwi%iprin = iprini - 1
-      iwi%luner = luneri - 1
-      iwi%lunrp = lunrpi - 1
+      iwi%iprint = iprinti - 1
+      iwi%lunerr = lunerri - 1
+      iwi%lunrpt = lunrpti - 1
       iwi%nrow = nrowi - 1
       iwi%ntol = ntoli - 1
       iwi%neta = netai - 1

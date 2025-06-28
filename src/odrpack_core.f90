@@ -405,8 +405,8 @@ contains
       ! Local scalars
       integer :: actrsi, alphai, betaci, betani, betasi, beta0i, boundi, deltai, deltni, &
                  deltsi, diffi, epsi, epsmai, etai, fjacbi, fjacdi, fni, fsi, idfi, int2i, &
-                 iprini, iprint, iranki, istopi, jobi, jpvti, ldtti, liwkmn, loweri, luneri, &
-                 lunrpi, lrwkmn, maxiti, msgb, msgd, netai, nfevi, niteri, njevi, nnzwi, nppi, &
+                 iprinti, iprint, iranki, istopi, jobi, jpvti, ldtti, liwkmn, loweri, lunerri, &
+                 lunrpti, lrwkmn, maxiti, msgb, msgd, netai, nfevi, niteri, njevi, nnzwi, nppi, &
                  nrowi, ntoli, olmavi, omegai, partli, pnormi, prersi, qrauxi, rcondi, rnorsi, &
                  rvari, sdi, si, ssfi, ssi, sstoli, taufci, taui, ti, tti, ui, upperi, vcvi, &
                  we1i, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, wssi, wssdei, wssepi, &
@@ -432,15 +432,15 @@ contains
       !  FSI:     The starting location in array RWORK of array FS.
       !  IDFI:    The starting location in array IWORK of variable IDF.
       !  INT2I:   The location in array IWORK of variable INT2.
-      !  IPRINI:  The location in array IWORK of variable IPRINT.
+      !  IPRINTI: The location in array IWORK of variable IPRINT.
       !  IPRINT:  The print control variable.
       !  IRANKI:  The location in array IWORK of variable IRANK.
       !  ISTOPI:  The location in array IWORK of variable ISTOP.
       !  JOBI:    The location in array IWORK of variable JOB.
       !  JPVTI:   The starting location in array IWORK of variable JPVT.
       !  LDTTI:   The starting location in array IWORK of variable LDTT.
-      !  LUNERI:  The location in array IWORK of variable LUNERR.
-      !  LUNRPI:  The location in array IWORK of variable LUNRPT.
+      !  LUNERRI: The location in array IWORK of variable LUNERR.
+      !  LUNRPTI: The location in array IWORK of variable LUNRPT.
       !  LRWKMN:  The minimum acceptable length of array RWORK.
       !  MAXITI:  The location in array IWORK of variable MAXIT.
       !  MSGB:    The starting location in array IWORK of array MSGB.
@@ -489,7 +489,7 @@ contains
       call loc_iwork(m, q, np, &
                      msgb, msgd, jpvti, istopi, &
                      nnzwi, nppi, idfi, &
-                     jobi, iprini, luneri, lunrpi, &
+                     jobi, iprinti, lunerri, lunrpti, &
                      nrowi, ntoli, netai, &
                      maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
                      boundi, &
@@ -522,6 +522,7 @@ contains
          wrk4 = wrk4i
          wrk5 = wrk5i
          wrk6 = wrk6i
+
          ! Access values from the work vectors
          actrs = rwork(actrsi)
          alpha = rwork(alphai)
@@ -543,7 +544,7 @@ contains
          neta = iwork(netai)
          irank = iwork(iranki)
          job = iwork(jobi)
-         lunrpt = iwork(lunrpi)
+         lunrpt = iwork(lunrpti)
          maxit = iwork(maxiti)
          nfev = iwork(nfevi)
          niter = iwork(niteri)
@@ -554,7 +555,7 @@ contains
          int2 = iwork(int2i)
 
          ! Set up print control variables
-         iprint = iwork(iprini)
+         iprint = iwork(iprinti)
          ipr1 = mod(iprint, 10000)/1000
          ipr2 = mod(iprint, 1000)/100
          ipr2f = mod(iprint, 100)/10
@@ -1582,7 +1583,7 @@ contains
       (m, q, np, &
        msgbi, msgdi, ifix2i, istopi, &
        nnzwi, nppi, idfi, &
-       jobi, iprini, luneri, lunrpi, &
+       jobi, iprinti, lunerri, lunrpti, &
        nrowi, ntoli, netai, &
        maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
        boundi, &
@@ -1611,11 +1612,11 @@ contains
          !! Location in array `iwork` of variable `idf`.
       integer, intent(out) :: jobi
          !! Location in array `iwork` of variable `job`.
-      integer, intent(out) :: iprini
+      integer, intent(out) :: iprinti
          !! Location in array `iwork` of variable `iprint`.
-      integer, intent(out) :: luneri
+      integer, intent(out) :: lunerri
          !! Location in array `iwork` of variable `lunerr`.
-      integer, intent(out) :: lunrpi
+      integer, intent(out) :: lunrpti
          !! Location in array `iwork` of variable `lunrpt`.
       integer, intent(out) :: nrowi
          !! Location in array `iwork` of variable `nrow`.
@@ -1651,10 +1652,10 @@ contains
          nppi = nnzwi + 1
          idfi = nppi + 1
          jobi = idfi + 1
-         iprini = jobi + 1
-         luneri = iprini + 1
-         lunrpi = luneri + 1
-         nrowi = lunrpi + 1
+         iprinti = jobi + 1
+         lunerri = iprinti + 1
+         lunrpti = lunerri + 1
+         nrowi = lunrpti + 1
          ntoli = nrowi + 1
          netai = ntoli + 1
          maxiti = netai + 1
@@ -1675,9 +1676,9 @@ contains
          nppi = 1
          idfi = 1
          jobi = 1
-         iprini = 1
-         luneri = 1
-         lunrpi = 1
+         iprinti = 1
+         lunerri = 1
+         lunrpti = 1
          nrowi = 1
          ntoli = 1
          netai = 1

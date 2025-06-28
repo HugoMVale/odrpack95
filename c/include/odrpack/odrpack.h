@@ -256,9 +256,9 @@ typedef struct
     int npp;    /**< The location in array `iwork` of variable `npp`. */
     int idf;    /**< The location in array `iwork` of variable `idf`. */
     int job;    /**< The location in array `iwork` of variable `job`. */
-    int iprin;  /**< The location in array `iwork` of variable `iprint`. */
-    int luner;  /**< The location in array `iwork` of variable `lunerr`. */
-    int lunrp;  /**< The location in array `iwork` of variable `lunrpt`. */
+    int iprint; /**< The location in array `iwork` of variable `iprint`. */
+    int lunerr; /**< The location in array `iwork` of variable `lunerr`. */
+    int lunrpt; /**< The location in array `iwork` of variable `lunrpt`. */
     int nrow;   /**< The location in array `iwork` of variable `nrow`. */
     int ntol;   /**< The location in array `iwork` of variable `ntol`. */
     int neta;   /**< The location in array `iwork` of variable `neta`. */
