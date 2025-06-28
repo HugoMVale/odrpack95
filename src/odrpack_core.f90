@@ -304,10 +304,10 @@ contains
          !! Length of vector `iwork`.
       logical, intent(in) :: access
          !! Variable designating whether information is to be accessed from the work
-         !! arrays (`access = .true.`) or stored in them (`access = .false.`).
+         !! arrays (`.true.`) or stored in them (`.false.`).
       logical, intent(in) :: isodr
-         !! Variable designating whether the solution is to be found by ODR (`isodr = .true.`)
-         !! or by OLS (`isodr = .false.`).
+         !! Variable designating whether the solution is to be found by ODR (`.true.`)
+         !! or by OLS (`.false.`).
       integer, intent(out) :: jpvt
          !! Pivot vector.
       integer, intent(out) :: omega
@@ -403,14 +403,14 @@ contains
          !! current `beta` and `delta`.
 
       ! Local scalars
-      integer :: actrsi, alphai, betaci, betani, betasi, beta0i, boundi, deltai, deltni, &
-                 deltsi, diffi, epsi, epsmai, etai, fjacbi, fjacdi, fni, fsi, idfi, int2i, &
+      integer :: actrsi, alphai, betaci, betani, betasi, beta0i, boundi, deltai, deltani, &
+                 deltasi, diffi, epsi, epsmaci, etai, fjacbi, fjacdi, fni, fsi, idfi, int2i, &
                  iprinti, iprint, iranki, istopi, jobi, jpvti, ldtti, liwkmn, loweri, lunerri, &
-                 lunrpti, lrwkmn, maxiti, msgb, msgd, netai, nfevi, niteri, njevi, nnzwi, nppi, &
-                 nrowi, ntoli, olmavi, omegai, partli, pnormi, prersi, qrauxi, rcondi, rnorsi, &
-                 rvari, sdi, si, ssfi, ssi, sstoli, taufci, taui, ti, tti, ui, upperi, vcvi, &
-                 we1i, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, wssi, wssdei, wssepi, &
-                 xplusi
+                 lunrpti, lrwkmin, maxiti, msgb, msgd, netai, nfevi, niteri, njevi, nnzwi, nppi, &
+                 nrowi, ntoli, olmavgi, omegai, partoli, pnormi, prersi, qrauxi, rcondi, rnormsi, &
+                 rvari, sdi, si, ssfi, ssi, sstoli, taufaci, taui, ti, tti, ui, upperi, vcvi, &
+                 we1i, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, wssi, wssdeli, wssepsi, &
+                 xplusdi
 
       ! Variable Definitions (alphabetically)
       !  ACTRSI:  The location in array RWORK of variable ACTRS.
@@ -420,11 +420,11 @@ contains
       !  BETASI:  The starting location in array RWORK of array BETAS.
       !  BETA0I:  The starting location in array RWORK of array BETA0.
       !  DELTAI:  The starting location in array RWORK of array DELTA.
-      !  DELTNI:  The starting location in array RWORK of array DELTAN.
-      !  DELTSI:  The starting location in array RWORK of array DELTAS.
+      !  DELTANI: The starting location in array RWORK of array DELTAN.
+      !  DELTASI: The starting location in array RWORK of array DELTAS.
       !  DIFFI:   The starting location in array RWORK of array DIFF.
       !  EPSI:    The starting location in array RWORK of array EPS.
-      !  EPSMAI:  The location in array RWORK of variable EPSMAC.
+      !  EPSMACI: The location in array RWORK of variable EPSMAC.
       !  ETAI:    The location in array RWORK of variable ETA.
       !  FJACBI:  The starting location in array RWORK of array FJACB.
       !  FJACDI:  The starting location in array RWORK of array FJACD.
@@ -441,7 +441,7 @@ contains
       !  LDTTI:   The starting location in array IWORK of variable LDTT.
       !  LUNERRI: The location in array IWORK of variable LUNERR.
       !  LUNRPTI: The location in array IWORK of variable LUNRPT.
-      !  LRWKMN:  The minimum acceptable length of array RWORK.
+      !  LRWKMIN: The minimum acceptable length of array RWORK.
       !  MAXITI:  The location in array IWORK of variable MAXIT.
       !  MSGB:    The starting location in array IWORK of array MSGB.
       !  MSGD:    The starting location in array IWORK of array MSGD.
@@ -453,20 +453,20 @@ contains
       !  NPPI:    The location in array IWORK of variable NPP.
       !  NROWI:   The location in array IWORK of variable NROW.
       !  NTOLI:   The location in array IWORK of variable NTOL.
-      !  OLMAVI:  The location in array RWORK of variable OLMAVG.
+      !  OLMAVGI: The location in array RWORK of variable OLMAVG.
       !  OMEGAI:  The starting location in array RWORK of array OMEGA.
-      !  PARTLI:  The location in array work of variable PARTOL.
+      !  PARTOLI: The location in array work of variable PARTOL.
       !  PNORMI:  The location in array RWORK of variable PNORM.
       !  PRERSI:  The location in array RWORK of variable PRERS.
       !  QRAUXI:  The starting location in array RWORK of array QRAUX.
       !  RCONDI:  The location in array RWORK of variable RCOND.
-      !  RNORSI:  The location in array RWORK of variable RNORMS.
+      !  RNORMSI: The location in array RWORK of variable RNORMS.
       !  RVARI:   The location in array RWORK of variable RVAR.
       !  SDI:     The starting location in array RWORK of array SD.
       !  SSFI:    The starting location in array RWORK of array SSF.
       !  SSI:     The starting location in array RWORK of array SS.
       !  SSTOLI:  The location in array RWORK of variable SSTOL.
-      !  TAUFCI:  The location in array RWORK of variable TAUFAC.
+      !  TAUFACI: The location in array RWORK of variable TAUFAC.
       !  TAUI:    the location in array RWORK of variable TAU.
       !  TI:      The starting location in array RWORK of array T.
       !  TTI:     The starting location in array RWORK of array TT.
@@ -481,9 +481,9 @@ contains
       !  WRK6I:   The starting location in array RWORK of array wrk6.
       !  WRK7I:   The starting location in array RWORK of array wrk7.
       !  WSSI:    The starting location in array RWORK of variable WSS(1).
-      !  WSSDEI:  The starting location in array RWORK of variable WSS(2).
-      !  WSSEPI:  The starting location in array RWORK of variable WSS(3).
-      !  XPLUSI:  The starting location in array RWORK of array XPLUSD.
+      !  WSSDELI: The starting location in array RWORK of variable WSS(2).
+      !  WSSEPSI: The starting location in array RWORK of variable WSS(3).
+      !  XPLUSDI: The starting location in array RWORK of array XPLUSD.
 
       ! Find starting locations within integer workspace
       call loc_iwork(m, q, np, &
@@ -497,16 +497,16 @@ contains
 
       ! Find starting locations within REAL work space
       call loc_rwork(n, m, q, np, ldwe, ld2we, isodr, &
-                     deltai, epsi, xplusi, fni, sdi, vcvi, &
-                     rvari, wssi, wssdei, wssepi, rcondi, etai, &
-                     olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
-                     partli, sstoli, taufci, epsmai, &
+                     deltai, epsi, xplusdi, fni, sdi, vcvi, &
+                     rvari, wssi, wssdeli, wssepsi, rcondi, etai, &
+                     olmavgi, taui, alphai, actrsi, pnormi, rnormsi, prersi, &
+                     partoli, sstoli, taufaci, epsmaci, &
                      beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
                      fsi, fjacbi, we1i, diffi, &
-                     deltsi, deltni, ti, tti, omegai, fjacdi, &
+                     deltasi, deltani, ti, tti, omegai, fjacdi, &
                      wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
                      loweri, upperi, &
-                     lrwkmn)
+                     lrwkmin)
 
       if (access) then
          ! Set starting locations for work vectors
@@ -527,19 +527,19 @@ contains
          actrs = rwork(actrsi)
          alpha = rwork(alphai)
          eta = rwork(etai)
-         olmavg = rwork(olmavi)
-         partol = rwork(partli)
+         olmavg = rwork(olmavgi)
+         partol = rwork(partoli)
          pnorm = rwork(pnormi)
          prers = rwork(prersi)
          rcond = rwork(rcondi)
          wss(1) = rwork(wssi)
-         wss(2) = rwork(wssdei)
-         wss(3) = rwork(wssepi)
+         wss(2) = rwork(wssdeli)
+         wss(3) = rwork(wssepsi)
          rvar = rwork(rvari)
-         rnorms = rwork(rnorsi)
+         rnorms = rwork(rnormsi)
          sstol = rwork(sstoli)
          tau = rwork(taui)
-         taufac = rwork(taufci)
+         taufac = rwork(taufaci)
 
          neta = iwork(netai)
          irank = iwork(iranki)
@@ -565,16 +565,16 @@ contains
          ! Store values into the work vectors
          rwork(actrsi) = actrs
          rwork(alphai) = alpha
-         rwork(olmavi) = olmavg
-         rwork(partli) = partol
+         rwork(olmavgi) = olmavg
+         rwork(partoli) = partol
          rwork(pnormi) = pnorm
          rwork(prersi) = prers
          rwork(rcondi) = rcond
          rwork(wssi) = wss(1)
-         rwork(wssdei) = wss(2)
-         rwork(wssepi) = wss(3)
+         rwork(wssdeli) = wss(2)
+         rwork(wssepsi) = wss(3)
          rwork(rvari) = rvar
-         rwork(rnorsi) = rnorms
+         rwork(rnormsi) = rnorms
          rwork(sstoli) = sstol
          rwork(taui) = tau
 
@@ -1697,16 +1697,16 @@ contains
 
    pure subroutine loc_rwork &
       (n, m, q, np, ldwe, ld2we, isodr, &
-       deltai, epsi, xplusi, fni, sdi, vcvi, &
-       rvari, wssi, wssdei, wssepi, rcondi, etai, &
-       olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
-       partli, sstoli, taufci, epsmai, &
+       deltai, epsi, xplusdi, fni, sdi, vcvi, &
+       rvari, wssi, wssdeli, wssepsi, rcondi, etai, &
+       olmavgi, taui, alphai, actrsi, pnormi, rnormsi, prersi, &
+       partoli, sstoli, taufaci, epsmaci, &
        beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
        fsi, fjacbi, we1i, diffi, &
-       deltsi, deltni, ti, tti, omegai, fjacdi, &
+       deltasi, deltani, ti, tti, omegai, fjacdi, &
        wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
        loweri, upperi, &
-       lrwkmn)
+       lrwkmin)
    !! Get storage locations within real work space.
 
       integer, intent(in) :: n
@@ -1722,12 +1722,12 @@ contains
       integer, intent(in) :: ld2we
          !! Second dimension of array `we`.
       logical, intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr`=.true.) or by OLS (`isodr`=.false.).
+         !! Variable designating whether the solution is by ODR (`.true.`) or by OLS (`.false.`).
       integer, intent(out) :: deltai
          !! Starting location in array `rwork` of array `delta(n, m)`.
       integer, intent(out) :: epsi
          !! Starting location in array `rwork` of array `eps(n, q)`.
-      integer, intent(out) :: xplusi
+      integer, intent(out) :: xplusdi
          !! Starting location in array `rwork` of array `xplusd(n, m)`.
       integer, intent(out) :: fni
          !! Starting location in array `rwork` of array `fn(n, q)`.
@@ -1739,15 +1739,15 @@ contains
          !! Location in array `rwork` of variable `rvar`.
       integer, intent(out) :: wssi
          !! Location in array `rwork` of variable `wss`.
-      integer, intent(out) :: wssdei
+      integer, intent(out) :: wssdeli
          !! Location in array `rwork` of variable `wssdel`.
-      integer, intent(out) :: wssepi
+      integer, intent(out) :: wssepsi
          !! Location in array `rwork` of variable `wsseps`.
       integer, intent(out) :: rcondi
          !! Location in array `rwork` of variable `rcondi`.
       integer, intent(out) :: etai
          !! Location in array `rwork` of variable `eta`.
-      integer, intent(out) :: olmavi
+      integer, intent(out) :: olmavgi
          !! Location in array `rwork` of variable `olmavg`.
       integer, intent(out) :: taui
          !! Location in array `rwork` of variable `tau`.
@@ -1757,17 +1757,17 @@ contains
          !! Location in array `rwork` of variable `actrs`.
       integer, intent(out) :: pnormi
          !! Location in array `rwork` of variable `pnorm`.
-      integer, intent(out) :: rnorsi
+      integer, intent(out) :: rnormsi
          !! Location in array `rwork` of variable `rnorms`.
       integer, intent(out) :: prersi
          !! Location in array `rwork` of variable `prers`.
-      integer, intent(out) :: partli
+      integer, intent(out) :: partoli
          !! Location in array `rwork` of variable `partol`.
       integer, intent(out) :: sstoli
          !! Location in array `rwork` of variable `sstol`.
-      integer, intent(out) :: taufci
+      integer, intent(out) :: taufaci
          !! Location in array `rwork` of variable `taufac`.
-      integer, intent(out) :: epsmai
+      integer, intent(out) :: epsmaci
          !! Location in array `rwork` of variable `epsmac`.
       integer, intent(out) :: beta0i
          !! Starting location in array `rwork` of array `beta0(np)`.
@@ -1795,9 +1795,9 @@ contains
          !! Starting location in array `rwork` of array `we1(ldwe, ldwe2, q)`.
       integer, intent(out) :: diffi
          !! Starting location in array `rwork` of array `diff(q*(np + m))`.
-      integer, intent(out) :: deltsi
+      integer, intent(out) :: deltasi
          !! Starting location in array `rwork` of array `deltas(n, m)`.
-      integer, intent(out) :: deltni
+      integer, intent(out) :: deltani
          !! Starting location in array `rwork` of array `deltan(n, m)`.
       integer, intent(out) :: ti
          !! Starting location in array `rwork` of array `t(n, m)`.
@@ -1825,7 +1825,7 @@ contains
          !! Starting location in array `rwork` of array `lower(np)`.
       integer, intent(out) :: upperi
          !! Starting location in array `rwork` of array `upper(np)`.
-      integer, intent(out) :: lrwkmn
+      integer, intent(out) :: lrwkmin
          !! Minimum acceptable length of vector `rwork`.
 
       ! Local scalars
@@ -1839,30 +1839,30 @@ contains
 
          deltai = 1
          epsi = deltai + n*m
-         xplusi = epsi + n*q
-         fni = xplusi + n*m
+         xplusdi = epsi + n*q
+         fni = xplusdi + n*m
          sdi = fni + n*q
          vcvi = sdi + np
          rvari = vcvi + np*np
 
          wssi = rvari + 1
-         wssdei = wssi + 1
-         wssepi = wssdei + 1
-         rcondi = wssepi + 1
+         wssdeli = wssi + 1
+         wssepsi = wssdeli + 1
+         rcondi = wssepsi + 1
          etai = rcondi + 1
-         olmavi = etai + 1
+         olmavgi = etai + 1
 
-         taui = olmavi + 1
+         taui = olmavgi + 1
          alphai = taui + 1
          actrsi = alphai + 1
          pnormi = actrsi + 1
-         rnorsi = pnormi + 1
-         prersi = rnorsi + 1
-         partli = prersi + 1
-         sstoli = partli + 1
-         taufci = sstoli + 1
-         epsmai = taufci + 1
-         beta0i = epsmai + 1
+         rnormsi = pnormi + 1
+         prersi = rnormsi + 1
+         partoli = prersi + 1
+         sstoli = partoli + 1
+         taufaci = sstoli + 1
+         epsmaci = taufaci + 1
+         beta0i = epsmaci + 1
 
          betaci = beta0i + np
          betasi = betaci + np
@@ -1883,17 +1883,17 @@ contains
          next = diffi + q*(np + m)
 
          if (isodr) then
-            deltsi = next
-            deltni = deltsi + n*m
-            ti = deltni + n*m
+            deltasi = next
+            deltani = deltasi + n*m
+            ti = deltani + n*m
             tti = ti + n*m
             omegai = tti + n*m
             fjacdi = omegai + q**2
             wrk1i = fjacdi + n*m*q
             next = wrk1i + n*m*q
          else
-            deltsi = deltai
-            deltni = deltai
+            deltasi = deltai
+            deltani = deltai
             ti = deltai
             tti = deltai
             omegai = deltai
@@ -1911,31 +1911,31 @@ contains
          upperi = loweri + np
          next = upperi + np
 
-         lrwkmn = next
+         lrwkmin = next
       else
          deltai = 1
          epsi = 1
-         xplusi = 1
+         xplusdi = 1
          fni = 1
          sdi = 1
          vcvi = 1
          rvari = 1
          wssi = 1
-         wssdei = 1
-         wssepi = 1
+         wssdeli = 1
+         wssepsi = 1
          rcondi = 1
          etai = 1
-         olmavi = 1
+         olmavgi = 1
          taui = 1
          alphai = 1
          actrsi = 1
          pnormi = 1
-         rnorsi = 1
+         rnormsi = 1
          prersi = 1
-         partli = 1
+         partoli = 1
          sstoli = 1
-         taufci = 1
-         epsmai = 1
+         taufaci = 1
+         epsmaci = 1
          beta0i = 1
          betaci = 1
          betasi = 1
@@ -1949,8 +1949,8 @@ contains
          fjacbi = 1
          we1i = 1
          diffi = 1
-         deltsi = 1
-         deltni = 1
+         deltasi = 1
+         deltani = 1
          ti = 1
          tti = 1
          fjacdi = 1
@@ -1964,7 +1964,7 @@ contains
          wrk7i = 1
          loweri = 1
          upperi = 1
-         lrwkmn = 1
+         lrwkmin = 1
       end if
 
    end subroutine loc_rwork

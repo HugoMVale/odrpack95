@@ -2326,33 +2326,33 @@ contains
 
    end subroutine fcn
 
-   subroutine loc_wsse(n, m, np, q, ldwe, ld2we, isodr, wssi, wssdei, wssepi)
+   subroutine loc_wsse(n, m, np, q, ldwe, ld2we, isodr, wssi, wssdeli, wssepsi)
    !! Locations of the weighted sum of squares results in the `rwork` array.
 
       use odrpack_core, only: loc_rwork
 
       integer, intent(in) :: n, m, np, q, ldwe, ld2we
       logical, intent(in) :: isodr
-      integer, intent(out) :: wssi, wssdei, wssepi
+      integer, intent(out) :: wssi, wssdeli, wssepsi
 
-      integer :: deltai, epsi, xplusi, fni, sdi, vcvi, rvari, &
-                 rcondi, etai, olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, partli, &
-                 sstoli, taufci, epsmai, beta0i, betaci, betasi, betani, si, ssi, ssfi, &
-                 qrauxi, ui, fsi, fjacbi, we1i, diffi, deltsi, deltni, ti, tti, omegai, &
+      integer :: deltai, epsi, xplusdi, fni, sdi, vcvi, rvari, &
+                 rcondi, etai, olmavgi, taui, alphai, actrsi, pnormi, rnormsi, prersi, partoli, &
+                 sstoli, taufaci, epsmaci, beta0i, betaci, betasi, betani, si, ssi, ssfi, &
+                 qrauxi, ui, fsi, fjacbi, we1i, diffi, deltasi, deltani, ti, tti, omegai, &
                  fjacdi, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, loweri, upperi, &
-                 lwkmn
+                 lwkmin
 
       call loc_rwork(n, m, q, np, ldwe, ld2we, isodr, &
-                     deltai, epsi, xplusi, fni, sdi, vcvi, &
-                     rvari, wssi, wssdei, wssepi, rcondi, etai, &
-                     olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
-                     partli, sstoli, taufci, epsmai, &
+                     deltai, epsi, xplusdi, fni, sdi, vcvi, &
+                     rvari, wssi, wssdeli, wssepsi, rcondi, etai, &
+                     olmavgi, taui, alphai, actrsi, pnormi, rnormsi, prersi, &
+                     partoli, sstoli, taufaci, epsmaci, &
                      beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
                      fsi, fjacbi, we1i, diffi, &
-                     deltsi, deltni, ti, tti, omegai, fjacdi, &
+                     deltasi, deltani, ti, tti, omegai, fjacdi, &
                      wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
                      loweri, upperi, &
-                     lwkmn)
+                     lwkmin)
 
    end subroutine loc_wsse
 

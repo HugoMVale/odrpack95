@@ -55,27 +55,27 @@ module odrpack_capi
    !! 0-based indices of the variables stored in the real work array.
       integer(c_int) :: delta
       integer(c_int) :: eps
-      integer(c_int) :: xplus
+      integer(c_int) :: xplusd
       integer(c_int) :: fn
       integer(c_int) :: sd
       integer(c_int) :: vcv
       integer(c_int) :: rvar
       integer(c_int) :: wss
-      integer(c_int) :: wssde
-      integer(c_int) :: wssep
+      integer(c_int) :: wssdel
+      integer(c_int) :: wsseps
       integer(c_int) :: rcond
       integer(c_int) :: eta
-      integer(c_int) :: olmav
+      integer(c_int) :: olmavg
       integer(c_int) :: tau
       integer(c_int) :: alpha
       integer(c_int) :: actrs
       integer(c_int) :: pnorm
-      integer(c_int) :: rnors
+      integer(c_int) :: rnorms
       integer(c_int) :: prers
-      integer(c_int) :: partl
+      integer(c_int) :: partol
       integer(c_int) :: sstol
-      integer(c_int) :: taufc
-      integer(c_int) :: epsma
+      integer(c_int) :: taufac
+      integer(c_int) :: epsmac
       integer(c_int) :: beta0
       integer(c_int) :: betac
       integer(c_int) :: betas
@@ -89,8 +89,8 @@ module odrpack_capi
       integer(c_int) :: fjacb
       integer(c_int) :: we1
       integer(c_int) :: diff
-      integer(c_int) :: delts
-      integer(c_int) :: deltn
+      integer(c_int) :: deltas
+      integer(c_int) :: deltan
       integer(c_int) :: t
       integer(c_int) :: tt
       integer(c_int) :: omega
@@ -104,7 +104,7 @@ module odrpack_capi
       integer(c_int) :: wrk7
       integer(c_int) :: lower
       integer(c_int) :: upper
-      integer(c_int) :: lrwkmn
+      integer(c_int) :: lrwkmin
    end type rworkidx_t
 
    type, bind(C) :: iworkidx_t
@@ -558,48 +558,48 @@ contains
       type(rworkidx_t), intent(out) :: rwi
          !! 0-based indexes of real work array.
 
-      integer :: deltai, epsi, xplusi, fni, sdi, vcvi, rvari, wssi, wssdei, wssepi, &
-                 rcondi, etai, olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, partli, &
-                 sstoli, taufci, epsmai, beta0i, betaci, betasi, betani, si, ssi, ssfi, &
-                 qrauxi, ui, fsi, fjacbi, we1i, diffi, deltsi, deltni, ti, tti, omegai, &
+      integer :: deltai, epsi, xplusdi, fni, sdi, vcvi, rvari, wssi, wssdeli, wssepsi, &
+                 rcondi, etai, olmavgi, taui, alphai, actrsi, pnormi, rnormsi, prersi, partoli, &
+                 sstoli, taufaci, epsmaci, beta0i, betaci, betasi, betani, si, ssi, ssfi, &
+                 qrauxi, ui, fsi, fjacbi, we1i, diffi, deltasi, deltani, ti, tti, omegai, &
                  fjacdi, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, loweri, upperi, &
-                 lrwkmn
+                 lrwkmin
 
       call loc_rwork(n, m, q, np, ldwe, ld2we, logical(isodr, kind=kind(.true.)), &
-                     deltai, epsi, xplusi, fni, sdi, vcvi, &
-                     rvari, wssi, wssdei, wssepi, rcondi, etai, &
-                     olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
-                     partli, sstoli, taufci, epsmai, &
+                     deltai, epsi, xplusdi, fni, sdi, vcvi, &
+                     rvari, wssi, wssdeli, wssepsi, rcondi, etai, &
+                     olmavgi, taui, alphai, actrsi, pnormi, rnormsi, prersi, &
+                     partoli, sstoli, taufaci, epsmaci, &
                      beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
                      fsi, fjacbi, we1i, diffi, &
-                     deltsi, deltni, ti, tti, omegai, fjacdi, &
+                     deltasi, deltani, ti, tti, omegai, fjacdi, &
                      wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
                      loweri, upperi, &
-                     lrwkmn)
+                     lrwkmin)
 
       rwi%delta = deltai - 1
       rwi%eps = epsi - 1
-      rwi%xplus = xplusi - 1
+      rwi%xplusd = xplusdi - 1
       rwi%fn = fni - 1
       rwi%sd = sdi - 1
       rwi%vcv = vcvi - 1
       rwi%rvar = rvari - 1
       rwi%wss = wssi - 1
-      rwi%wssde = wssdei - 1
-      rwi%wssep = wssepi - 1
+      rwi%wssdel = wssdeli - 1
+      rwi%wsseps = wssepsi - 1
       rwi%rcond = rcondi - 1
       rwi%eta = etai - 1
-      rwi%olmav = olmavi - 1
+      rwi%olmavg = olmavgi - 1
       rwi%tau = taui - 1
       rwi%alpha = alphai - 1
       rwi%actrs = actrsi - 1
       rwi%pnorm = pnormi - 1
-      rwi%rnors = rnorsi - 1
+      rwi%rnorms = rnormsi - 1
       rwi%prers = prersi - 1
-      rwi%partl = partli - 1
+      rwi%partol = partoli - 1
       rwi%sstol = sstoli - 1
-      rwi%taufc = taufci - 1
-      rwi%epsma = epsmai - 1
+      rwi%taufac = taufaci - 1
+      rwi%epsmac = epsmaci - 1
       rwi%beta0 = beta0i - 1
       rwi%betac = betaci - 1
       rwi%betas = betasi - 1
@@ -613,8 +613,8 @@ contains
       rwi%fjacb = fjacbi - 1
       rwi%we1 = we1i - 1
       rwi%diff = diffi - 1
-      rwi%delts = deltsi - 1
-      rwi%deltn = deltni - 1
+      rwi%deltas = deltasi - 1
+      rwi%deltan = deltani - 1
       rwi%t = ti - 1
       rwi%tt = tti - 1
       rwi%omega = omegai - 1
@@ -628,7 +628,7 @@ contains
       rwi%wrk7 = wrk7i - 1
       rwi%lower = loweri - 1
       rwi%upper = upperi - 1
-      rwi%lrwkmn = lrwkmn
+      rwi%lrwkmin = lrwkmin
 
    end subroutine loc_rwork_c
 
