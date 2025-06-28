@@ -12,19 +12,19 @@ module odrpack_core
          real(wp), intent(in) :: beta(:)
             !! Current values of parameters.
          real(wp), intent(in) :: xplusd(:, :)
-            !! Current value of explanatory variable, i.e., `x + delta`. Shape is `(n, m)`.
+            !! Current value of explanatory variable, i.e., `x + delta`. Shape: `(n, m)`.
          integer, intent(in) :: ifixb(:)
             !! Indicators for "fixing" parameters (`beta`).
          integer, intent(in) :: ifixx(:, :)
-            !! Indicators for "fixing" explanatory variable (`x`). Shape is `(ldifx, m)`.
+            !! Indicators for "fixing" explanatory variable (`x`). Shape: `(ldifx, m)`.
          integer, intent(in) :: ideval
             !! Indicator for selecting computation to be performed.
          real(wp), intent(out) :: f(:, :)
-            !! Predicted function values. Shape is `(n, q)`.
+            !! Predicted function values. Shape: `(n, q)`.
          real(wp), intent(out) :: fjacb(:, :, :)
-            !! Jacobian with respect to `beta`. Shape is `(n, np, q)`.
+            !! Jacobian with respect to `beta`. Shape: `(n, np, q)`.
          real(wp), intent(out) :: fjacd(:, :, :)
-            !! Jacobian with respect to errors `delta`. Shape is `(n, m, q)`.
+            !! Jacobian with respect to errors `delta`. Shape: `(n, m, q)`.
          integer, intent(out) :: istop
             !! Stopping condition, with meaning as follows. 0 means current `beta` and
             !! `x + delta` were acceptable and values were computed successfully. 1 means current
