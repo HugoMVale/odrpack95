@@ -248,29 +248,29 @@ ODRPACK_EXTERN void odr_long_c(
  */
 typedef struct
 {
-    int msgb;   /**< The starting location in array `iwork` of array `msgb`. */
-    int msgd;   /**< The starting location in array `iwork` of array `msgd`. */
-    int ifix2;  /**< The starting location in array `iwork` of array `ifix2`. */
-    int istop;  /**< The location in array `iwork` of variable `istop`. */
-    int nnzw;   /**< The location in array `iwork` of variable `nnzw`. */
-    int npp;    /**< The location in array `iwork` of variable `npp`. */
-    int idf;    /**< The location in array `iwork` of variable `idf`. */
-    int job;    /**< The location in array `iwork` of variable `job`. */
-    int iprint; /**< The location in array `iwork` of variable `iprint`. */
-    int lunerr; /**< The location in array `iwork` of variable `lunerr`. */
-    int lunrpt; /**< The location in array `iwork` of variable `lunrpt`. */
-    int nrow;   /**< The location in array `iwork` of variable `nrow`. */
-    int ntol;   /**< The location in array `iwork` of variable `ntol`. */
-    int neta;   /**< The location in array `iwork` of variable `neta`. */
-    int maxit;  /**< The location in array `iwork` of variable `maxit`. */
-    int niter;  /**< The location in array `iwork` of variable `niter`. */
-    int nfev;   /**< The location in array `iwork` of variable `nfev`. */
-    int njev;   /**< The location in array `iwork` of variable `njev`. */
-    int int2;   /**< The location in array `iwork` of variable `int2`. */
-    int irank;  /**< The location in array `iwork` of variable `irank`. */
-    int ldtt;   /**< The location in array `iwork` of variable `ldtt`. */
-    int bound;  /**< The location in array `iwork` of variable `bound`. */
-    int liwkmn; /**< The minimum acceptable length of array `iwork`. */
+    int msgb;    /**< The starting location in array `iwork` of array `msgb`. */
+    int msgd;    /**< The starting location in array `iwork` of array `msgd`. */
+    int ifix2;   /**< The starting location in array `iwork` of array `ifix2`. */
+    int istop;   /**< The location in array `iwork` of variable `istop`. */
+    int nnzw;    /**< The location in array `iwork` of variable `nnzw`. */
+    int npp;     /**< The location in array `iwork` of variable `npp`. */
+    int idf;     /**< The location in array `iwork` of variable `idf`. */
+    int job;     /**< The location in array `iwork` of variable `job`. */
+    int iprint;  /**< The location in array `iwork` of variable `iprint`. */
+    int lunerr;  /**< The location in array `iwork` of variable `lunerr`. */
+    int lunrpt;  /**< The location in array `iwork` of variable `lunrpt`. */
+    int nrow;    /**< The location in array `iwork` of variable `nrow`. */
+    int ntol;    /**< The location in array `iwork` of variable `ntol`. */
+    int neta;    /**< The location in array `iwork` of variable `neta`. */
+    int maxit;   /**< The location in array `iwork` of variable `maxit`. */
+    int niter;   /**< The location in array `iwork` of variable `niter`. */
+    int nfev;    /**< The location in array `iwork` of variable `nfev`. */
+    int njev;    /**< The location in array `iwork` of variable `njev`. */
+    int int2;    /**< The location in array `iwork` of variable `int2`. */
+    int irank;   /**< The location in array `iwork` of variable `irank`. */
+    int ldtt;    /**< The location in array `iwork` of variable `ldtt`. */
+    int bound;   /**< The location in array `iwork` of variable `bound`. */
+    int liwkmin; /**< The minimum acceptable length of array `iwork`. */
 } iworkidx_t;
 
 /**

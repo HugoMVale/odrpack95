@@ -405,7 +405,7 @@ contains
       ! Local scalars
       integer :: actrsi, alphai, betaci, betani, betasi, beta0i, boundi, deltai, deltani, &
                  deltasi, diffi, epsi, epsmaci, etai, fjacbi, fjacdi, fni, fsi, idfi, int2i, &
-                 iprinti, iprint, iranki, istopi, jobi, jpvti, ldtti, liwkmn, loweri, lunerri, &
+                 iprinti, iprint, iranki, istopi, jobi, jpvti, ldtti, liwkmin, loweri, lunerri, &
                  lunrpti, lrwkmin, maxiti, msgb, msgd, netai, nfevi, niteri, njevi, nnzwi, nppi, &
                  nrowi, ntoli, olmavgi, omegai, partoli, pnormi, prersi, qrauxi, rcondi, rnormsi, &
                  rvari, sdi, si, ssfi, ssi, sstoli, taufaci, taui, ti, tti, ui, upperi, vcvi, &
@@ -493,7 +493,7 @@ contains
                      nrowi, ntoli, netai, &
                      maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
                      boundi, &
-                     liwkmn)
+                     liwkmin)
 
       ! Find starting locations within REAL work space
       call loc_rwork(n, m, q, np, ldwe, ld2we, isodr, &
@@ -1587,7 +1587,7 @@ contains
        nrowi, ntoli, netai, &
        maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
        boundi, &
-       liwkmn)
+       liwkmin)
    !! Get storage locations within integer work space.
 
       integer, intent(in) :: m
@@ -1640,7 +1640,7 @@ contains
          !! Location in array `iwork` of variable `ldtt`.
       integer, intent(out) :: boundi
          !! Location in array `iwork` of variable `bound`.
-      integer, intent(out) :: liwkmn
+      integer, intent(out) :: liwkmin
          !! Minimum acceptable length of array `iwork`.
 
       if (np >= 1 .and. m >= 1) then
@@ -1666,7 +1666,7 @@ contains
          iranki = int2i + 1
          ldtti = iranki + 1
          boundi = ldtti + 1
-         liwkmn = boundi + np - 1
+         liwkmin = boundi + np - 1
       else
          msgbi = 1
          msgdi = 1
@@ -1690,7 +1690,7 @@ contains
          iranki = 1
          ldtti = 1
          boundi = 1
-         liwkmn = 1
+         liwkmin = 1
       end if
 
    end subroutine loc_iwork

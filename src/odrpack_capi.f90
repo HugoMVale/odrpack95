@@ -131,7 +131,7 @@ module odrpack_capi
       integer(c_int) :: irank
       integer(c_int) :: ldtt
       integer(c_int) :: bound
-      integer(c_int) :: liwkmn
+      integer(c_int) :: liwkmin
    end type iworkidx_t
 
 contains
@@ -500,7 +500,7 @@ contains
 
       integer :: msgbi, msgdi, ifix2i, istopi, nnzwi, nppi, idfi, jobi, iprinti, lunerri, &
                  lunrpti, nrowi, ntoli, netai, maxiti, niteri, nfevi, njevi, int2i, iranki, &
-                 ldtti, boundi, liwkmn
+                 ldtti, boundi, liwkmin
 
       call loc_iwork(m, q, np, &
                      msgbi, msgdi, ifix2i, istopi, &
@@ -509,7 +509,7 @@ contains
                      nrowi, ntoli, netai, &
                      maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
                      boundi, &
-                     liwkmn)
+                     liwkmin)
 
       iwi%msgb = msgbi - 1
       iwi%msgd = msgdi - 1
@@ -533,7 +533,7 @@ contains
       iwi%irank = iranki - 1
       iwi%ldtt = ldtti - 1
       iwi%bound = boundi - 1
-      iwi%liwkmn = liwkmn
+      iwi%liwkmin = liwkmin
 
    end subroutine loc_iwork_c
 
