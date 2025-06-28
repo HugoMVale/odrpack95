@@ -588,132 +588,132 @@ contains
       procedure(fcn_t) :: fcn
          !! User-supplied subroutine for evaluating the model.
       integer, intent(in) :: n
-         !! The number of observations.
+         !! Number of observations.
       integer, intent(in) :: m
-         !! The number of columns of data in the independent variable.
+         !! Number of columns of data in the independent variable.
       integer, intent(in) :: np
-         !! The number of function parameters.
+         !! Number of function parameters.
       integer, intent(in) :: q
-         !! The number of responses per observation.
+         !! Number of responses per observation.
       real(wp), intent(inout) :: beta(np)
-         !! The function parameters.
+         !! Function parameters.
       real(wp), intent(in) :: y(n, q)
-         !! The dependent variable. Unused when the model is implicit.
+         !! Dependent variable. Unused when the model is implicit.
       real(wp), intent(in) :: x(n, m)
-         !! The independent variable.
+         !! Independent variable.
       real(wp), intent(inout) :: we(ldwe, ld2we, q)
-         !! The `epsilon` weights.
+         !! `epsilon` weights.
       integer, intent(in) :: ldwe
-         !! The leading dimension of array `we`.
+         !! Leading dimension of array `we`.
       integer, intent(in) :: ld2we
-         !! The second dimension of array `we`.
+         !! Second dimension of array `we`.
       real(wp), intent(in) :: wd(ldwd, ld2wd, m)
-         !! The `delta` weights.
+         !! `delta` weights.
       integer, intent(in) :: ldwd
-         !! The leading dimension of array `wd`.
+         !! Leading dimension of array `wd`.
       integer, intent(in) :: ld2wd
-         !! The second dimension of array `wd`.
+         !! Second dimension of array `wd`.
       integer, intent(in) :: ifixb(np)
-         !! The values designating whether the elements of `beta` are fixed at their input
+         !! Values designating whether the elements of `beta` are fixed at their input
          !! values or not.
       integer, intent(in) :: ifixx(ldifx, m)
-         !! The values designating whether the elements of `x` are fixed at their input values
+         !! Values designating whether the elements of `x` are fixed at their input values
          !! or not.
       integer, intent(in) :: ldifx
-         !! The leading dimension of array `ifixx`.
+         !! Leading dimension of array `ifixx`.
       integer, intent(inout) :: job
-         !! The variable controlling problem initialization and computational method.
+         !! Variable controlling problem initialization and computational method.
       integer, intent(in) :: ndigit
-         !! The number of accurate digits in the function results, as supplied by the user.
+         !! Number of accurate digits in the function results, as supplied by the user.
       real(wp), intent(in) :: taufac
-         !! The factor used to compute the initial trust region diameter.
+         !! Factor used to compute the initial trust region diameter.
       real(wp), intent(in) :: sstol
-         !! The sum-of-squares convergence stopping tolerance.
+         !! Sum-of-squares convergence stopping tolerance.
       real(wp), intent(in) :: partol
-         !! The user-supplied parameter convergence stopping tolerance.
+         !! User-supplied parameter convergence stopping tolerance.
       integer, intent(in) :: maxit
-         !! The maximum number of iterations allowed.
+         !! Maximum number of iterations allowed.
       integer, intent(in) :: iprint
-         !! The print control variables.
+         !! Print control variables.
       integer, intent(in) :: lunerr
-         !! The logical unit number used for error messages.
+         !! Logical unit number used for error messages.
       integer, intent(in) :: lunrpt
-         !! The logical unit number used for computation reports.
+         !! Logical unit number used for computation reports.
       real(wp), intent(in) :: stpb(np)
-         !! The relative step for computing finite difference derivatives with respect to `beta`.
+         !! Relative step for computing finite difference derivatives with respect to `beta`.
       real(wp), intent(in) :: stpd(ldstpd, m)
-         !! The relative step for computing finite difference derivatives with respect to `delta`.
+         !! Relative step for computing finite difference derivatives with respect to `delta`.
       integer, intent(in) :: ldstpd
-         !! The leading dimension of array `stpd`.
+         !! Leading dimension of array `stpd`.
       real(wp), intent(in) :: sclb(np)
-         !! The scaling values for `beta`.
+         !! Scaling values for `beta`.
       real(wp), intent(in) :: scld(ldscld, m)
-         !! The scaling value for `delta`.
+         !! Scaling value for `delta`.
       integer, intent(in) :: ldscld
-         !! The leading dimension of array `scld`.
+         !! Leading dimension of array `scld`.
       real(wp), intent(inout) :: rwork(lrwork)
-         !! The real work space.
+         !! Real work space.
       integer, intent(in) :: lrwork
-         !! The length of vector `rwork`.
+         !! Length of vector `rwork`.
       real(wp), intent(inout) :: tempret(:, :)
          !! Temporary work array for holding return values before copying to a lower rank array.
       integer, intent(inout) :: iwork(liwork)
-         !! The integer work space.
+         !! Integer work space.
       integer, intent(in) :: liwork
-         !! The length of vector `iwork`.
+         !! Length of vector `iwork`.
       integer, intent(out) :: info
-         !! The variable designating why the computations were stopped.
+         !! Variable designating why the computations were stopped.
       real(wp), intent(in) :: lower(np)
-         !! The lower bound on `beta`.
+         !! Lower bound on `beta`.
       real(wp), intent(in) :: upper(np)
-         !! The upper bound on `beta`.
+         !! Upper bound on `beta`.
 
       ! Local scalars
       real(wp), parameter :: pcheck = 1.0E3_wp, pstart = 1.0E1_wp, pfac = 1.0E1_wp
       real(wp) :: cnvtol, tstimp
       integer :: iprnti, ipr1, ipr2, ipr2f, ipr3, jobi, job1, job2, job3, job4, job5, &
                  maxiti, maxit1
-      logical :: done, fstitr, head, implct, prtpen
+      logical :: done, firstitr, head, implicit, printpen
 
       ! Local arrays
-      real(wp) :: pnlty(1, 1, 1)
+      real(wp) :: penalty(1, 1, 1)
 
       ! Variable Definitions (alphabetically)
-      !  CNVTOL:  The convergence tolerance for implicit models.
-      !  DONE:    The variable designating whether the inplicit solution has been found (DONE=TRUE)
-      !           or not (DONE=FALSE).
-      !  FSTITR:  The variable designating whether this is the first iteration (FSTITR=TRUE)
-      !           or not (FSTITR=FALSE).
-      !  HEAD:    The variable designating whether the heading is to be printed (HEAD=TRUE)
-      !           or not (HEAD=FALSE).
-      !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
-      !           or explicit ODR (IMPLCT=FALSE).
-      !  IPRNTI:  The print control variables.
-      !  IPR1:    The 1st digit of the print control variable.
-      !  IPR2:    The 2nd digit of the print control variable.
-      !  IPR3:    The 3rd digit of the print control variable.
-      !  IPR4:    The 4th digit of the print control variable.
-      !  JOBI:    The variable controling problem initialization and computational method.
-      !  JOB1:    The 1st digit of the variable JOB.
-      !  JOB2:    The 2nd digit of the variable JOB.
-      !  JOB3:    The 3rd digit of the variable JOB.
-      !  JOB4:    The 4th digit of the variable JOB.
-      !  JOB5:    The 5th digit of the variable JOB.
-      !  MAXITI:  For implicit models, the number of iterations allowed for the current penalty
-      !           parameter value.
-      !  MAXIT1:  For implicit models, the number of iterations allowed for the next penalty
-      !           parameter value.
-      !  PNLTY:   The penalty parameter for an implicit model.
-      !  PRTPEN:  The value designating whether the penalty parameter is to be printed in the
-      !           iteration report (PRTPEN=TRUE) or not (PRTPEN=FALSE).
-      !  TSTIMP:  The relative change in the parameters between the initial values and the solution.
+      !  CNVTOL:    The convergence tolerance for implicit models.
+      !  DONE:      The variable designating whether the inplicit solution has been found (DONE=TRUE)
+      !             or not (DONE=FALSE).
+      !  FIRSTITR:  The variable designating whether this is the first iteration (FSTITR=TRUE)
+      !             or not (FSTITR=FALSE).
+      !  HEAD:      The variable designating whether the heading is to be printed (HEAD=TRUE)
+      !             or not (HEAD=FALSE).
+      !  IMPLICIT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
+      !             or explicit ODR (IMPLCT=FALSE).
+      !  IPRNTI:    The print control variables.
+      !  IPR1:      The 1st digit of the print control variable.
+      !  IPR2:      The 2nd digit of the print control variable.
+      !  IPR3:      The 3rd digit of the print control variable.
+      !  IPR4:      The 4th digit of the print control variable.
+      !  JOBI:      The variable controling problem initialization and computational method.
+      !  JOB1:      The 1st digit of the variable JOB.
+      !  JOB2:      The 2nd digit of the variable JOB.
+      !  JOB3:      The 3rd digit of the variable JOB.
+      !  JOB4:      The 4th digit of the variable JOB.
+      !  JOB5:      The 5th digit of the variable JOB.
+      !  MAXITI:    For implicit models, the number of iterations allowed for the current penalty
+      !             parameter value.
+      !  MAXIT1:    For implicit models, the number of iterations allowed for the next penalty
+      !             parameter value.
+      !  PENALTY:   The penalty parameter for an implicit model.
+      !  PRINTPEN:  The value designating whether the penalty parameter is to be printed in the
+      !             iteration report (PRTPEN=TRUE) or not (PRTPEN=FALSE).
+      !  TSTIMP:    The relative change in the parameters between the initial values and the solution.
 
-      implct = mod(job, 10) == 1
-      fstitr = .true.
+      implicit = mod(job, 10) == 1
+      firstitr = .true.
       head = .true.
-      prtpen = .false.
+      printpen = .false.
 
-      if (implct) then
+      if (implicit) then
          !  Set up for implicit problem
          if (iprint >= 0) then
             ipr1 = mod(iprint, 10000)/1000
@@ -736,9 +736,9 @@ contains
          jobi = job5*10000 + job4*1000 + job3*100 + job2*10 + job1
 
          if (we(1, 1, 1) <= zero) then
-            pnlty(1, 1, 1) = -pstart
+            penalty(1, 1, 1) = -pstart
          else
-            pnlty(1, 1, 1) = -we(1, 1, 1)
+            penalty(1, 1, 1) = -we(1, 1, 1)
          end if
 
          if (partol < zero) then
@@ -754,13 +754,14 @@ contains
          end if
 
          done = maxiti == 0
-         prtpen = .true.
+         printpen = .true.
 
          do while (.true.)
+
             call odrstart &
-               (head, fstitr, prtpen, &
+               (head, firstitr, printpen, &
                 fcn, n, m, np, q, beta, y, x, &
-                pnlty, 1, 1, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
+                penalty, 1, 1, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
                 jobi, ndigit, taufac, sstol, cnvtol, maxiti, &
                 iprnti, lunerr, lunrpt, &
                 stpb, stpd, ldstpd, sclb, scld, ldscld, &
@@ -770,7 +771,7 @@ contains
             if (done) then
                return
             else
-               done = maxit1 <= 0 .or. (abs(pnlty(1, 1, 1)) >= pcheck .and. tstimp <= cnvtol)
+               done = maxit1 <= 0 .or. (abs(penalty(1, 1, 1)) >= pcheck .and. tstimp <= cnvtol)
             end if
 
             if (done) then
@@ -783,17 +784,19 @@ contains
                maxiti = 0
                iprnti = ipr3
             else
-               prtpen = .true.
-               pnlty(1, 1, 1) = pfac*pnlty(1, 1, 1)
+               printpen = .true.
+               penalty(1, 1, 1) = pfac*penalty(1, 1, 1)
                jobi = 10000 + 1000 + 000 + job2*10 + job1
                maxiti = maxit1
                iprnti = 0000 + ipr2*100 + ipr2f*10
             end if
+
          end do
+
       else
          ! Explicit problem
          call odrstart &
-            (head, fstitr, prtpen, &
+            (head, firstitr, printpen, &
              fcn, n, m, np, q, beta, y, x, &
              we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
              job, ndigit, taufac, sstol, partol, maxit, &
@@ -806,7 +809,7 @@ contains
    end subroutine odrdrive
 
    impure subroutine odrstart &
-      (head, fstitr, prtpen, &
+      (head, firstitr, printpen, &
        fcn, n, m, np, q, beta, y, x, &
        we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
        job, ndigit, taufac, sstol, partol, maxit, &
@@ -827,12 +830,12 @@ contains
       logical, intent(inout) :: head
          !! Variable designating whether the heading is to be printed (`head = .true.`)
          !! or not (`head = .false.`).
-      logical, intent(inout) :: fstitr
-         !! Variable designating whether this is the first iteration (`fstitr = .true.`)
-         !! or not (`fstitr = .false.`).
-      logical, intent(inout) :: prtpen
+      logical, intent(inout) :: firstitr
+         !! Variable designating whether this is the first iteration (`.true.`)
+         !! or not (`.false.`).
+      logical, intent(inout) :: printpen
          !! Variable designating whether the penalty parameter is to be printed in the
-         !! iteration report (`prtpen = .true.`) or not (`prtpen = .false.`).
+         !! iteration report (`.true.`) or not (`.false.`).
       procedure(fcn_t) :: fcn
          !! User-supplied subroutine for evaluating the model.
       integer, intent(in) :: n
@@ -870,7 +873,7 @@ contains
       integer, intent(in) :: ldifx
          !! Leading dimension of array `ifixx`.
       integer, intent(inout) :: job
-         !! The variable controlling problem initialization and computational method.
+         !! Variable controlling problem initialization and computational method.
       integer, intent(in) :: ndigit
          !! Number of accurate digits in the function results, as supplied by the user.
       real(wp), intent(in) :: taufac
@@ -899,7 +902,7 @@ contains
          !! Scaling values for `delta`.
       integer, intent(in) :: ldscld
          !! Leading dimension of array `scld`.
-      real(wp), intent(inout) :: rwork(lrwork)
+      real(wp), intent(inout), target :: rwork(lrwork)
          !! Real work space.
       integer, intent(in) :: lrwork
          !! Length of array `rwork`.
@@ -923,19 +926,22 @@ contains
       ! Local scalars
       real(wp) :: epsmac, eta
       integer :: actrsi, alphai, betaci, betani, betasi, beta0i, boundi, deltai, &
-                 deltni, deltsi, diffi, epsmai, etai, fi, fjacbi, fjacdi, fni, fsi, &
-                 idfi, int2i, iprini, iranki, istop, istopi, jobi, jpvti, k, ldtt, &
+                 deltni, deltsi, diffi, epsmaci, etai, fi, fjacbi, fjacdi, fni, fsi, &
+                 idfi, int2i, iprini, iranki, istop, istopi, jobi, jpvti, k, &
                  ldtti, liwkmn, loweri, luneri, lunrpi, lrwkmn, lwrk, maxiti, msgb, &
                  msgd, neta, netai, nfev, nfevi, niteri, njev, njevi, nnzw, nnzwi, &
                  npp, nppi, nrow, nrowi, ntol, ntoli, olmavi, omegai, partli, pnormi, &
                  prersi, qrauxi, rcondi, rnorsi, rvari, sdi, si, ssfi, ssi, sstoli, &
                  taufci, taui, ti, tti, ui, upperi, vcvi, we1i, wrk1i, wrk2i, wrk3i, &
-                 wrk4i, wrk5i, wrk6i, wrk7i, wrk, wssi, wssdei, wssepi, xplusi
-      logical :: anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
+                 wrk4i, wrk5i, wrk6i, wrk7i, wrki, wssi, wssdei, wssepi, xplusdi
+      logical :: anajac, cdjac, chkjac, dovcv, implicit, initd, isodr, redoj, restart
 
       ! Local arrays
       real(wp) :: betaj(np)
       integer :: interval(np)
+      real(wp), pointer :: beta0_(:), delta_(:, :), f_(:, :), fn_(:, :), fs_(:, :), &
+                           ssf_(:), we1_(:, :, :), wrk1_(:, :, :), wrk6_(:, :, :), &
+                           xplusd_(:, :)
 
       ! Variable Definitions (alphabetically)
       !  ACTRSI:   The location in array work of variable ACTRS.
@@ -957,7 +963,7 @@ contains
       !  DIFFI:    The starting location in array RWORK of array DIFF.
       !  DOVCV:    The variable designating whether the covariance matrix is to be computed
       !            (DOVCV=TRUE) or not (DOVCV=FALSE).
-      !  EPSMAI:   The location in array RWORK of variable EPSMAC.
+      !  EPSMACI:  The location in array RWORK of variable EPSMAC.
       !  ETA:      The relative noise in the function results.
       !  ETAI:     The location in array RWORK of variable ETA.
       !  FI:       The starting location in array RWORK of array F.
@@ -966,7 +972,7 @@ contains
       !  FNI:      The starting location in array RWORK of array FN.
       !  FSI:      The starting location in array RWORK of array FS.
       !  IDFI:     The location in array iwork of variable IDF.
-      !  IMPLCT:   The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
+      !  IMPLICIT: The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
       !            or explicit ODR (IMPLCT=FALSE).
       !  INITD:    The variable designating whether DELTA is to be initialized to zero (INITD=TRUE)
       !            or to the values in the first N by M elements of array RWORK (INITD=FALSE).
@@ -1019,7 +1025,7 @@ contains
       !  RCONDI:   The location in array RWORK of variable RCOND.
       !  REDOJ:    The variable designating whether the Jacobian matrix is to be recomputed for
       !            the computation of the covariance matrix (REDOJ=TRUE) or not (REDOJ=FALSE).
-      !  RESTRT:   The variable designating whether the call is a restart (RESTRT=TRUE) or
+      !  RESTART:  The variable designating whether the call is a restart (RESTRT=TRUE) or
       !            not (RESTRT=FALSE).
       !  RNORSI:   The location in array RWORK of variable RNORMS.
       !  RVARI:    The location in array RWORK of variable RVAR.
@@ -1035,7 +1041,7 @@ contains
       !  UI:       The starting location in array RWORK of array U.
       !  VCVI:     The starting location in array RWORK of array VCV.
       !  WE1I:     The starting location in array RWORK of array WE1.
-      !  WRK:      The starting location in array RWORK of array WRK, equivalenced to WRK1 and WRK2.
+      !  WRKI:     The starting location in array RWORK of array WRK, equivalenced to WRK1 and WRK2.
       !  WRK1I:    The starting location in array RWORK of array WRK1.
       !  WRK2I:    The starting location in array RWORK of array WRK2.
       !  WRK3I:    The starting location in array RWORK of array WRK3.
@@ -1043,15 +1049,15 @@ contains
       !  WRK5I:    The starting location in array RWORK of array WRK5.
       !  WRK6I:    The starting location in array RWORK of array WRK6.
       !  WRK7I:    The starting location in array RWORK of array WRK7.
-      !  WSSI:     The location in array RWORK of variable wss.
+      !  WSSI:     The location in array RWORK of variable WSS.
       !  WSSDEI:   The location in array RWORK of variable WSSDEL.
       !  WSSEPI:   The location in array RWORK of variable WSSEPS.
-      !  XPLUSI:   The starting location in array RWORK of array XPLUSD.
+      !  XPLUSDI:  The starting location in array RWORK of array XPLUSD.
 
       ! Initialize necessary variables
-      call set_flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
+      call set_flags(job, restart, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implicit)
 
-      ! Set starting locations within integer workspace
+      ! Get starting locations within integer workspace
       call loc_iwork(m, q, np, &
                      msgb, msgd, jpvti, istopi, &
                      nnzwi, nppi, idfi, &
@@ -1060,12 +1066,12 @@ contains
                      maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
                      boundi, liwkmn)
 
-      ! Set starting locations within REAL work space
+      ! Get starting locations within REAL work space
       call loc_rwork(n, m, q, np, ldwe, ld2we, isodr, &
-                     deltai, fi, xplusi, fni, sdi, vcvi, &
+                     deltai, fi, xplusdi, fni, sdi, vcvi, &
                      rvari, wssi, wssdei, wssepi, rcondi, etai, &
                      olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
-                     partli, sstoli, taufci, epsmai, &
+                     partli, sstoli, taufci, epsmaci, &
                      beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
                      fsi, fjacbi, we1i, diffi, &
                      deltsi, deltni, ti, tti, omegai, fjacdi, &
@@ -1073,21 +1079,33 @@ contains
                      loweri, upperi, lrwkmn)
 
       if (isodr) then
-         wrk = wrk1i
+         wrki = wrk1i
          lwrk = n*m*q + n*q
       else
-         wrk = wrk2i
+         wrki = wrk2i
          lwrk = n*q
       end if
 
+      ! Get subarray views
+      beta0_(1:np) => rwork(beta0i:beta0i + np - 1)
+      ssf_(1:np) => rwork(ssfi:ssfi + np - 1)
+      f_(1:n, 1:q) => rwork(fi:fi + n*q - 1)
+      fn_(1:n, 1:q) => rwork(fni:fni + n*q - 1)
+      fs_(1:n, 1:q) => rwork(fsi:fsi + n*q - 1)
+      xplusd_(1:n, 1:m) => rwork(xplusdi:xplusdi + n*m - 1)
+      delta_(1:n, 1:m) => rwork(deltai:deltai + n*m - 1)
+      wrk1_(1:n, 1:m, 1:q) => rwork(wrk1i:wrk1i + n*m*q - 1)
+      wrk6_(1:n, 1:np, 1:q) => rwork(wrk6i:wrk6i + n*np*q - 1)
+      we1_(1:ldwe, 1:ld2we, 1:q) => rwork(we1i:we1i + ldwe*ld2we*q - 1)
+
       ! Update the penalty parameters
       ! (WE(1,1,1) is not a user supplied array in this case)
-      if (restrt .and. implct) then
+      if (restart .and. implicit) then
          we(1, 1, 1) = max(rwork(we1i)**2, abs(we(1, 1, 1)))
          rwork(we1i) = -sqrt(abs(we(1, 1, 1)))
       end if
 
-      if (restrt) then
+      if (restart) then
 
          ! Reset maximum number of iterations
          if (maxit >= 0) then
@@ -1107,16 +1125,14 @@ contains
 
          rwork(olmavi) = rwork(olmavi)*iwork(niteri)
 
-         if (implct) then
-            rwork(fi:fi + n*q - 1) = rwork(fni:fni + n*q - 1)
+         if (implicit) then
+            f_ = fn_
          else
-            rwork(fi:fi + n*q - 1) = &
-               rwork(fni:fni + n*q - 1) - reshape(y, [n*q])
+            f_ = fn_ - y
          end if
 
-         call scale_mat(n, q, rwork(we1i:we1i + ldwe*ld2we*q - 1), &
-                        ldwe, ld2we, rwork(fi:fi + n*q - 1), tempret(1:n, 1:q))
-         rwork(fi:fi + n*q - 1) = reshape(tempret(1:n, 1:q), [n*q])
+         call scale_mat(n, q, we1_, ldwe, ld2we, f_, tempret(1:n, 1:q))
+         f_ = tempret(1:n, 1:q)
 
          rwork(wssepi) = ddot(n*q, rwork(fi), 1, rwork(fi), 1)
          rwork(wssi) = rwork(wssepi) + rwork(wssdei)
@@ -1147,7 +1163,7 @@ contains
                         sstol, partol, maxit, taufac, &
                         job, iprint, lunerr, lunrpt, &
                         lower, upper, &
-                        epsmai, sstoli, partli, maxiti, taufci, &
+                        epsmaci, sstoli, partli, maxiti, taufci, &
                         jobi, iprini, luneri, lunrpi, &
                         ssfi, tti, ldtti, deltai, &
                         loweri, upperi, boundi)
@@ -1178,24 +1194,21 @@ contains
 
          ! Evaluate the predicted values and weighted EPSILONS at the starting point
          call unpack_vec(np, rwork(betaci), beta, ifixb)
-         rwork(xplusi:xplusi + n*m - 1) = &
-            rwork(deltai:deltai + n*m - 1) + reshape(x, [n*m])
+         xplusd_ = x + delta_
+
          istop = 0
-         call fcn(n, m, q, np, beta, rwork(xplusi), &
-                  ifixb, ifixx, ldifx, 002, rwork(fni), rwork(wrk6i), rwork(wrk1i), istop)
+         call fcn(beta, xplusd_, ifixb, ifixx, 002, fn_, wrk6_, wrk1_, istop)
          iwork(istopi) = istop
 
          if (istop == 0) then
             iwork(nfevi) = iwork(nfevi) + 1
-            if (implct) then
-               rwork(fi:fi + n*q - 1) = rwork(fni:fni + n*q - 1)
+            if (implicit) then
+               f_ = fn_
             else
-               rwork(fi:fi + n*q - 1) = &
-                  rwork(fni:fni + n*q - 1) - reshape(y, [n*q])
+               f_ = fn_ - y
             end if
-            call scale_mat(n, q, rwork(we1i:we1i + ldwe*ld2we*q - 1), &
-                           ldwe, ld2we, rwork(fi:fi + n*q - 1), tempret(1:n, 1:q))
-            rwork(fi:fi + n*q - 1) = reshape(tempret(1:n, 1:q), [n*q])
+            call scale_mat(n, q, we1_, ldwe, ld2we, f_, tempret(1:n, 1:q))
+            f_ = tempret(1:n, 1:q)
          else
             info = 52000
             goto 50
@@ -1204,22 +1217,23 @@ contains
          ! Compute norm of the initial estimates
          call scale_mat(npp, 1, rwork(ssi:ssi + npp - 1), &
                         npp, 1, rwork(betaci:betaci + npp - 1), tempret(1:npp, 1:1))
-         rwork(wrk:wrk + npp - 1) = tempret(1:npp, 1)
+         rwork(wrki:wrki + npp - 1) = tempret(1:npp, 1)
+
          if (isodr) then
             call scale_mat(n, m, rwork(tti:tti + iwork(ldtti)*1*m - 1), &
-                           iwork(ldtti), 1, rwork(deltai:deltai + n*m - 1), tempret(1:n, 1:m))
-            rwork(wrk + npp:wrk + npp + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
-            rwork(pnormi) = dnrm2(npp + n*m, rwork(wrk), 1)
+                           iwork(ldtti), 1, delta_, tempret(1:n, 1:m))
+            rwork(wrki + npp:wrki + npp + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
+            rwork(pnormi) = dnrm2(npp + n*m, rwork(wrki), 1)
          else
-            rwork(pnormi) = dnrm2(npp, rwork(wrk), 1)
+            rwork(pnormi) = dnrm2(npp, rwork(wrki), 1)
          end if
 
          ! Compute sum of squares of the weighted EPSILONS and weighted DELTAS
          rwork(wssepi) = ddot(n*q, rwork(fi), 1, rwork(fi), 1)
          if (isodr) then
             call scale_mat(n, m, wd, ldwd, ld2wd, rwork(deltai:deltai + n*m), tempret(1:n, 1:m))
-            rwork(wrk:wrk + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
-            rwork(wssdei) = ddot(n*m, rwork(deltai), 1, rwork(wrk), 1)
+            rwork(wrki:wrki + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
+            rwork(wssdei) = ddot(n*m, rwork(deltai), 1, rwork(wrki), 1)
          else
             rwork(wssdei) = zero
          end if
@@ -1227,17 +1241,17 @@ contains
 
          ! Select first row of X + DELTA that contains no zeros
          nrow = -1
-         call select_row(n, m, rwork(xplusi), nrow)
+         call select_row(n, m, rwork(xplusdi), nrow)
          iwork(nrowi) = nrow
 
          ! Set number of good digits in function results
-         epsmac = rwork(epsmai)
+         epsmac = rwork(epsmaci)
          if (ndigit < 2) then
             iwork(netai) = -1
             nfev = iwork(nfevi)
             call eta_fcn(fcn, &
                          n, m, np, q, &
-                         rwork(xplusi), beta, epsmac, nrow, &
+                         rwork(xplusdi), beta, epsmac, nrow, &
                          rwork(betani), rwork(fni), &
                          ifixb, ifixx, ldifx, &
                          istop, nfev, eta, neta, &
@@ -1289,9 +1303,8 @@ contains
             nfev = iwork(nfevi)
             njev = iwork(njevi)
             neta = iwork(netai)
-            ldtt = iwork(ldtti)
             eta = rwork(etai)
-            epsmac = rwork(epsmai)
+            epsmac = rwork(epsmaci)
 
             ! Ensure beta is not too close to bounds for the derivative check
             betaj = beta
@@ -1300,9 +1313,9 @@ contains
             ! Check the derivatives
             call check_jac(fcn, &
                            n, m, np, q, &
-                           beta, betaj, rwork(xplusi), &
+                           beta, betaj, rwork(xplusdi), &
                            ifixb, ifixx, ldifx, stpb, stpd, ldstpd, &
-                           rwork(ssfi), rwork(tti), ldtt, &
+                           rwork(ssfi), rwork(tti), iwork(ldtti), &
                            eta, neta, ntol, nrow, isodr, epsmac, &
                            rwork(fni), rwork(fjacbi), rwork(fjacdi), &
                            iwork(msgb), iwork(msgd), rwork(diffi), &
@@ -1335,7 +1348,7 @@ contains
                    lrwkmn, liwkmn, &
                    rwork(fjacbi), rwork(fjacdi), &
                    rwork(diffi), iwork(msgb), isodr, iwork(msgd), &
-                   rwork(xplusi), iwork(nrowi), iwork(netai), iwork(ntoli))
+                   rwork(xplusdi), iwork(nrowi), iwork(netai), iwork(ntoli))
             end if
 
             ! Set INFO to reflect errors in the user supplied Jacobians
@@ -1358,12 +1371,11 @@ contains
       end if
 
       ! Save the initial values of BETA
-      rwork(beta0i:beta0i + np - 1) = beta
+      beta0_ = beta
 
       ! Find least squares solution
-      rwork(fsi:fsi + n*q - 1) = rwork(fni:fni + n*q - 1)
-      ldtt = iwork(ldtti)
-      call odrsolve(head, fstitr, prtpen, &
+      fs_ = fn_
+      call odrsolve(head, firstitr, printpen, &
                     fcn, n, m, np, q, job, beta, y, x, &
                     we, rwork(we1i), ldwe, ld2we, wd, ldwd, ld2wd, &
                     ifixb, ifixx, ldifx, &
@@ -1372,18 +1384,20 @@ contains
                     rwork(loweri), rwork(upperi), &
                     rwork(ti), rwork(fi), rwork(fni), rwork(fsi), &
                     rwork(fjacbi), iwork(msgb), rwork(fjacdi), iwork(msgd), &
-                    rwork(ssfi), rwork(ssi), rwork(tti), ldtt, &
+                    rwork(ssfi), rwork(ssi), rwork(tti), iwork(ldtti), &
                     stpb, stpd, ldstpd, &
-                    rwork(xplusi), rwork(wrk), lwrk, &
+                    rwork(xplusdi), rwork(wrki), lwrk, &
                     rwork, lrwork, tempret, iwork, liwork, info, &
                     iwork(boundi))
+
       maxit1 = iwork(maxiti) - iwork(niteri)
+
       tstimp = zero
       do k = 1, np
          if (beta(k) == zero) then
-            tstimp = max(tstimp, abs(beta(k) - rwork(beta0i - 1 + k))/rwork(ssfi - 1 + k))
+            tstimp = max(tstimp, abs(beta(k) - beta0_(k))/ssf_(k))
          else
-            tstimp = max(tstimp, abs(beta(k) - rwork(beta0i - 1 + k))/abs(beta(k)))
+            tstimp = max(tstimp, abs(beta(k) - beta0_(k))/abs(beta(k)))
          end if
       end do
 
@@ -1513,7 +1527,7 @@ contains
          !! Work array, _equivalenced_ to `wrk1` and `wrk2`.
       integer, intent(in) :: lwrk
          !! Length of array `wrk`.
-      real(wp), intent(inout) :: rwork(lrwork)
+      real(wp), intent(inout), target :: rwork(lrwork)
          !! Real workspace.
       integer, intent(in) :: lrwork
          !! Length of array `rwork`.
@@ -1541,13 +1555,14 @@ contains
       integer, parameter :: ludflt = output_unit
       integer :: i, idf, iflag, int2, ipr, ipr1, ipr2, ipr2f, ipr3, irank, istop, istopc, &
                  iwrk, j, jpvt, l, looped, lunr, lunrpt, maxit, neta, nfev, niter, njev, &
-                 nlms, nnzw, npp, npr, npu, omega, qraux, sd, u, vcv, wrk1, wrk2, wrk3, &
-                 wrk4, wrk5, wrk6
+                 nlms, nnzw, npp, npr, npu, omega, qraux, sd, u, vcv, wrk1i, wrk2i, wrk3i, &
+                 wrk4i, wrk5i, wrk6i
       logical :: access, anajac, cdjac, chkjac, cnvpar, cnvss, didvcv, dovcv, implct, initd, &
                  intdbl, isodr, lstep, redoj, restrt
 
       ! Local arrays
       real(wp) :: loweru(np), upperu(np), wss(3)
+      real(wp), pointer :: wrk1_(:, :, :), wrk6_(:, :, :)
 
       ! Variable Definitions (alphabetically)
       !  ACCESS:  The variable designating whether information is to be accessed from the work
@@ -1653,35 +1668,37 @@ contains
       !  VCV:     The starting location in array RWORK of array VCV.
       !  WSS:     The sum-of-squares of the weighted EPSILONS and DELTAS, the sum-of-squares
       !           of the weighted DELTAS, and the sum-of-squares of the weighted EPSILONS.
-      !  WRK1:    The starting location in array RWORK of array WRK1.
-      !  WRK2:    The starting location in array RWORK of array WRK2.
-      !  WRK3:    The starting location in array RWORK of array WRK3.
-      !  WRK4:    The starting location in array RWORK of array WRK4.
-      !  WRK5:    The starting location in array RWORK of array WRK5.
-      !  WRK6:    The starting location in array RWORK of array WRK6.
+      !  WRK1I:   The starting location in array RWORK of array WRK1.
+      !  WRK2I:   The starting location in array RWORK of array WRK2.
+      !  WRK3I:   The starting location in array RWORK of array WRK3.
+      !  WRK4I:   The starting location in array RWORK of array WRK4.
+      !  WRK5I:   The starting location in array RWORK of array WRK5.
+      !  WRK6I:   The starting location in array RWORK of array WRK6.
 
       ! Initialize necessary variables
+      access = .true.
+      didvcv = .false.
+      intdbl = .false.
+      lstep = .true.
+
       call pack_vec(np, npu, loweru, lower, ifixb)
       call pack_vec(np, npu, upperu, upper, ifixb)
       call set_flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
-      access = .true.
+
       call access_workspace( &
          n, m, np, q, ldwe, ld2we, &
          rwork, lrwork, iwork, liwork, &
          access, isodr, &
          jpvt, omega, u, qraux, sd, vcv, &
-         wrk1, wrk2, wrk3, wrk4, wrk5, wrk6, &
+         wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, &
          nnzw, npp, &
          job, partol, sstol, maxit, taufac, eta, neta, &
          lunrpt, ipr1, ipr2, ipr2f, ipr3, &
          wss, rvar, idf, &
          tau, alpha, niter, nfev, njev, int2, olmavg, &
          rcond, irank, actrs, pnorm, prers, rnorms, istop)
-      rnorm = sqrt(wss(1))
 
-      didvcv = .false.
-      intdbl = .false.
-      lstep = .true.
+      rnorm = sqrt(wss(1))
 
       ! Print initial summary if desired
       if (ipr1 /= 0 .and. lunrpt /= 0) then
@@ -1719,6 +1736,10 @@ contains
          end do
       end if
 
+      ! Get subarray views
+      wrk1_(1:n, 1:m, 1:q) => rwork(wrk1i:wrk1i + n*m*q - 1)
+      wrk6_(1:n, 1:np, 1:q) => rwork(wrk6i:wrk6i + n*np*q - 1)
+
       ! Stop if initial estimates are exact solution
       if (rnorm == zero) then
          info = 1
@@ -1755,7 +1776,7 @@ contains
                        ifixb, ifixx, ldifx, &
                        x, delta, xplusd, stpd, ldstpd, &
                        ssf, tt, ldtt, neta, fs, &
-                       t, rwork(wrk1), rwork(wrk2), rwork(wrk3), rwork(wrk6), tempret, &
+                       t, rwork(wrk1i), rwork(wrk2i), rwork(wrk3i), rwork(wrk6i), tempret, &
                        fjacb, isodr, fjacd, we1, ldwe, ld2we, &
                        njev, nfev, istop, info, &
                        lower, upper)
@@ -1780,11 +1801,11 @@ contains
                            f, fjacb, fjacd, &
                            wd, ldwd, ld2wd, ss, tt, ldtt, delta, &
                            alpha, tau, eta, isodr, &
-                           rwork(wrk6), rwork(omega), &
+                           rwork(wrk6i), rwork(omega), &
                            rwork(u), rwork(qraux), iwork(jpvt), &
                            s, t, nlms, rcond, irank, &
-                           rwork(wrk1), rwork(wrk2), rwork(wrk3), rwork(wrk4), &
-                           rwork(wrk5), wrk, lwrk, istopc)
+                           rwork(wrk1i), rwork(wrk2i), rwork(wrk3i), rwork(wrk4i), &
+                           rwork(wrk5i), wrk, lwrk, istopc)
       end if
       if (istopc /= 0) then
          info = istopc
@@ -1853,8 +1874,7 @@ contains
       call unpack_vec(np, betan, beta, ifixb)
       xplusd = x + deltan
       istop = 0
-      call fcn(n, m, q, np, beta, xplusd, &
-               ifixb, ifixx, ldifx, 002, fn, rwork(wrk6), rwork(wrk1), istop)
+      call fcn(beta, xplusd, ifixb, ifixx, 002, fn, wrk6_, wrk1_, istop)
       if (istop == 0) then
          nfev = nfev + 1
       end if
@@ -2074,7 +2094,7 @@ contains
                           ifixb, ifixx, ldifx, &
                           x, delta, xplusd, stpd, ldstpd, &
                           ssf, tt, ldtt, neta, fs, &
-                          t, rwork(wrk1), rwork(wrk2), rwork(wrk3), rwork(wrk6), tempret, &
+                          t, rwork(wrk1i), rwork(wrk2i), rwork(wrk3i), rwork(wrk6i), tempret, &
                           fjacb, isodr, fjacd, we1, ldwe, ld2we, &
                           njev, nfev, istop, info, &
                           lower, upper)
@@ -2099,11 +2119,11 @@ contains
                           wd, ldwd, ld2wd, ssf, ss, tt, ldtt, delta, &
                           eta, isodr, &
                           rwork(vcv), rwork(sd), &
-                          rwork(wrk6), rwork(omega), &
+                          rwork(wrk6i), rwork(omega), &
                           rwork(u), rwork(qraux), iwork(jpvt), &
                           s, t, irank, rcond, rss, idf, rvar, ifixb, &
-                          rwork(wrk1), rwork(wrk2), rwork(wrk3), rwork(wrk4), &
-                          rwork(wrk5), wrk, lwrk, istopc)
+                          rwork(wrk1i), rwork(wrk2i), rwork(wrk3i), rwork(wrk4i), &
+                          rwork(wrk5i), wrk, lwrk, istopc)
             if (istopc /= 0) then
                info = istopc
                goto 200
@@ -2116,12 +2136,12 @@ contains
       ! Set JPVT to indicate dropped, fixed and estimated parameters
 200   continue
       do i = 0, np - 1
-         rwork(wrk3 + i) = iwork(jpvt + i)
+         rwork(wrk3i + i) = iwork(jpvt + i)
          iwork(jpvt + i) = -2
       end do
       if (redoj .or. niter >= 1) then
          do i = 0, npp - 1
-            j = int(rwork(wrk3 + i)) - 1
+            j = int(rwork(wrk3i + i)) - 1
             if (i <= npp - irank - 1) then
                iwork(jpvt + j) = 1
             else
@@ -2165,7 +2185,7 @@ contains
          rwork, lrwork, iwork, liwork, &
          access, isodr, &
          jpvt, omega, u, qraux, sd, vcv, &
-         wrk1, wrk2, wrk3, wrk4, wrk5, wrk6, &
+         wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, &
          nnzw, npp, &
          job, partol, sstol, maxit, taufac, eta, neta, &
          lunrpt, ipr1, ipr2, ipr2f, ipr3, &
@@ -2241,7 +2261,7 @@ contains
       integer, intent(in) :: np
          !! Number of function parameters.
       logical, intent(in) :: isodr
-         !! The variable designating whether the solution is by ODR (`isodr = .true.`)
+         !! Variable designating whether the solution is by ODR (`isodr = .true.`)
          !! or by OLS (`isodr = .false.`).
       integer, intent(out) :: lrwork
          !! Length of `rwork` array.
