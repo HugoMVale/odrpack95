@@ -311,27 +311,27 @@ contains
       integer, intent(out) :: jpvt
          !! Pivot vector.
       integer, intent(out) :: omega
-         !! Starting location in array `rwork` of array `omega`.
+         !! Starting location in array `rwork` of array `omega(q**2)`.
       integer, intent(out) :: u
-         !! Starting location in array `rwork` of array `u`.
+         !! Starting location in array `rwork` of array `u(np)`.
       integer, intent(out) :: qraux
-         !! Starting location in array `rwork` of array `qraux`.
+         !! Starting location in array `rwork` of array `qraux(np)`.
       integer, intent(out) :: sd
-         !! Starting location in array `rwork` of array `sd`.
+         !! Starting location in array `rwork` of array `sd(np)`.
       integer, intent(out) :: vcv
-         !! Starting location in array `rwork` of array `vcv`.
+         !! Starting location in array `rwork` of array `vcv(np**2)`.
       integer, intent(out) :: wrk1
-         !! Starting location in array `rwork` of array `wrk1`.
+         !! Starting location in array `rwork` of array `wrk1(n, m, q)`.
       integer, intent(out) :: wrk2
-         !! Starting location in array `rwork` of array `wrk2`.
+         !! Starting location in array `rwork` of array `wrk2(n, q)`.
       integer, intent(out) :: wrk3
-         !! Starting location in array `rwork` of array `wrk3`.
+         !! Starting location in array `rwork` of array `wrk3(np)`.
       integer, intent(out) :: wrk4
-         !! Starting location in array `rwork` of array `wrk4`.
+         !! Starting location in array `rwork` of array `wrk4(m, m)`.
       integer, intent(out) :: wrk5
-         !! Starting location in array `rwork` of array `wrk5`.
+         !! Starting location in array `rwork` of array `wrk5(m)`.
       integer, intent(out) :: wrk6
-         !! Starting location in array `rwork` of array `wrk6`.
+         !! Starting location in array `rwork` of array `wrk6(n, np, q)`.
       integer, intent(out) :: nnzw
          !! Number of nonzero weighted observations.
       integer, intent(out) :: npp
@@ -1723,17 +1723,17 @@ contains
       logical, intent(in) :: isodr
          !! Variable designating whether the solution is by ODR (`isodr`=.true.) or by OLS (`isodr`=.false.).
       integer, intent(out) :: deltai
-         !! Starting location in array `rwork` of array `delta`.
+         !! Starting location in array `rwork` of array `delta(n, m)`.
       integer, intent(out) :: epsi
-         !! Starting location in array `rwork` of array `eps`.
+         !! Starting location in array `rwork` of array `eps(n, q)`.
       integer, intent(out) :: xplusi
-         !! Starting location in array `rwork` of array `xplusd`.
+         !! Starting location in array `rwork` of array `xplusd(n, m)`.
       integer, intent(out) :: fni
-         !! Starting location in array `rwork` of array `fn`.
+         !! Starting location in array `rwork` of array `fn(n, q)`.
       integer, intent(out) :: sdi
-         !! Starting location in array `rwork` of array `sd`.
+         !! Starting location in array `rwork` of array `sd(np)`.
       integer, intent(out) :: vcvi
-         !! Starting location in array `rwork` of array `vcv`.
+         !! Starting location in array `rwork` of array `vcv(np**2)`.
       integer, intent(out) :: rvari
          !! Location in array `rwork` of variable `rvar`.
       integer, intent(out) :: wssi
@@ -1769,61 +1769,61 @@ contains
       integer, intent(out) :: epsmai
          !! Location in array `rwork` of variable `epsmac`.
       integer, intent(out) :: beta0i
-         !! Starting location in array `rwork` of array `beta0`.
+         !! Starting location in array `rwork` of array `beta0(np)`.
       integer, intent(out) :: betaci
-         !! Starting location in array `rwork` of array `betac`.
+         !! Starting location in array `rwork` of array `betac(np)`.
       integer, intent(out) :: betasi
-         !! Starting location in array `rwork` of array `betas`.
+         !! Starting location in array `rwork` of array `betas(np)`.
       integer, intent(out) :: betani
-         !! Starting location in array `rwork` of array `betan`.
+         !! Starting location in array `rwork` of array `betan(np)`.
       integer, intent(out) :: si
-         !! Starting location in array `rwork` of array `s`.
+         !! Starting location in array `rwork` of array `s(np)`.
       integer, intent(out) :: ssi
-         !! Starting location in array `rwork` of array `ss`.
+         !! Starting location in array `rwork` of array `ss(np)`.
       integer, intent(out) :: ssfi
-         !! Starting location in array `rwork` of array `ssf`.
+         !! Starting location in array `rwork` of array `ssf(np)`.
       integer, intent(out) :: qrauxi
-         !! Starting location in array `rwork` of array `qraux`.
+         !! Starting location in array `rwork` of array `qraux(np)`.
       integer, intent(out) :: ui
-         !! Starting location in array `rwork` of array `u`.
+         !! Starting location in array `rwork` of array `u(np)`.
       integer, intent(out) :: fsi
-         !! Starting location in array `rwork` of array `fs`.
+         !! Starting location in array `rwork` of array `fs(n, q)`.
       integer, intent(out) :: fjacbi
-         !! Starting location in array `rwork` of array `fjacb`.
+         !! Starting location in array `rwork` of array `fjacb(n, np, q)`.
       integer, intent(out) :: we1i
-         !! Starting location in array `rwork` of array `we1`.
+         !! Starting location in array `rwork` of array `we1(ldwe, ldwe2, q)`.
       integer, intent(out) :: diffi
-         !! Starting location in array `rwork` of array `diff`.
+         !! Starting location in array `rwork` of array `diff(q*(np + m))`.
       integer, intent(out) :: deltsi
-         !! Starting location in array `rwork` of array `deltas`.
+         !! Starting location in array `rwork` of array `deltas(n, m)`.
       integer, intent(out) :: deltni
-         !! Starting location in array `rwork` of array `deltan`.
+         !! Starting location in array `rwork` of array `deltan(n, m)`.
       integer, intent(out) :: ti
-         !! Starting location in array `rwork` of array `t`.
+         !! Starting location in array `rwork` of array `t(n, m)`.
       integer, intent(out) :: tti
-         !! Starting location in array `rwork` of array `tt`.
+         !! Starting location in array `rwork` of array `tt(n, m)`.
       integer, intent(out) :: omegai
-         !! Starting location in array `rwork` of array `omega`.
+         !! Starting location in array `rwork` of array `omega(q**2)`.
       integer, intent(out) :: fjacdi
-         !! Starting location in array `rwork` of array `fjacd`.
+         !! Starting location in array `rwork` of array `fjacd(n, m, q)`.
       integer, intent(out) :: wrk1i
-         !! Starting location in array `rwork` of array `wrk1`.
+         !! Starting location in array `rwork` of array `wrk1(n, m, q)`.
       integer, intent(out) :: wrk2i
-         !! Starting location in array `rwork` of array `wrk2`.
+         !! Starting location in array `rwork` of array `wrk2(n, q)`.
       integer, intent(out) :: wrk3i
-         !! Starting location in array `rwork` of array `wrk3`.
+         !! Starting location in array `rwork` of array `wrk3(np)`.
       integer, intent(out) :: wrk4i
-         !! Starting location in array `rwork` of array `wrk4`.
+         !! Starting location in array `rwork` of array `wrk4(m, m)`.
       integer, intent(out) :: wrk5i
-         !! Starting location in array `rwork` of array `wrk5`.
+         !! Starting location in array `rwork` of array `wrk5(m)`.
       integer, intent(out) :: wrk6i
-         !! Starting location in array `rwork` of array `wrk6`.
+         !! Starting location in array `rwork` of array `wrk6(n, np, q)`.
       integer, intent(out) :: wrk7i
-         !! Starting location in array `rwork` of array `wrk7`.
+         !! Starting location in array `rwork` of array `wrk7(5*q)`.
       integer, intent(out) :: loweri
-         !! Starting location in array `rwork` of array `lower`.
+         !! Starting location in array `rwork` of array `lower(np)`.
       integer, intent(out) :: upperi
-         !! Starting location in array `rwork` of array `upper`.
+         !! Starting location in array `rwork` of array `upper(np)`.
       integer, intent(out) :: lrwkmn
          !! Minimum acceptable length of vector `rwork`.
 
@@ -4811,7 +4811,7 @@ contains
        beta, xplusd, ifixb, ifixx, ldifx, &
        nrow, j, lq, stp, &
        istop, nfev, pvb, &
-       wrk1, wrk2, wrk6)
+       fjacd, f, fjacb)
    !! Compute the `nrow`-th function value using `beta(j) + stp`.
 
       procedure(fcn_t) :: fcn
@@ -4849,12 +4849,12 @@ contains
          !! Number of function evaluations.
       real(wp), intent(out) :: pvb
          !! Function value for the selected observation & response.
-      real(wp), intent(out) :: wrk1(n, m, q)
-         !! Work array.
-      real(wp), intent(out) :: wrk2(n, q)
-         !! Work array.
-      real(wp), intent(out) :: wrk6(n, np, q)
-         !! Work array.
+      real(wp), intent(out) :: fjacd(n, m, q)
+         !! Jacobian wrt delta.
+      real(wp), intent(out) :: f(n, q)
+         !! Predicted function values.
+      real(wp), intent(out) :: fjacb(n, np, q)
+         !! Jocobian wrt beta.
 
       ! Local scalars
       real(wp) :: betaj
@@ -4866,7 +4866,7 @@ contains
       beta(j) = beta(j) + stp
 
       istop = 0
-      call fcn(beta, xplusd, ifixb, ifixx, 003, wrk2, wrk6, wrk1, istop)
+      call fcn(beta, xplusd, ifixb, ifixx, 003, f, fjacb, fjacd, istop)
       if (istop == 0) then
          nfev = nfev + 1
       else
@@ -4874,7 +4874,7 @@ contains
       end if
 
       beta(j) = betaj
-      pvb = wrk2(nrow, lq)
+      pvb = f(nrow, lq)
 
    end subroutine fpvb
 
