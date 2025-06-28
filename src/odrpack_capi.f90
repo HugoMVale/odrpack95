@@ -8,7 +8,7 @@ module odrpack_capi
 
    abstract interface
       subroutine fcn_tc( &
-         n, m, q, np, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop) bind(C)
+         n, m, q, np, ldifx, beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop) bind(C)
       !! User-supplied subroutine for evaluating the model.
          import :: c_int, c_double
          implicit none
@@ -20,6 +20,8 @@ module odrpack_capi
             !! Number of responses per observation.
          integer(c_int), intent(in) :: np
             !! Number of function parameters.
+         integer(c_int), intent(in) :: ldifx
+            !! Leading dimension of array `ifixx`.
          real(c_double), intent(in) :: beta(np)
             !! Current values of parameters.
          real(c_double), intent(in) :: xplusd(n, m)
@@ -28,8 +30,6 @@ module odrpack_capi
             !! Indicators for "fixing" parameters (`beta`).
          integer(c_int), intent(in) :: ifixx(ldifx, m)
             !! Indicators for "fixing" explanatory variable (`x`).
-         integer(c_int), intent(in) :: ldifx
-            !! Leading dimension of array `ifixx`.
          integer(c_int), intent(in) :: ideval
             !! Indicator for selecting computation to be performed.
          real(c_double), intent(out) :: f(n, q)
@@ -170,10 +170,28 @@ contains
       integer(c_int), intent(in), optional :: job
          !! Variable controlling initialization and computational method.
 
-      call odr(fcn, n, m, q, np, beta, y, x, &
+      call odr(fcn_, n, m, q, np, beta, y, x, &
                delta=delta, &
                lower=lower, upper=upper, &
                job=job)
+
+   contains
+
+      subroutine fcn_(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
+         real(c_double), intent(in) :: beta(:)
+         real(c_double), intent(in) :: xplusd(:, :)
+         integer(c_int), intent(in) :: ifixb(:)
+         integer(c_int), intent(in) :: ifixx(:, :)
+         integer(c_int), intent(in) :: ideval
+         real(c_double), intent(out) :: f(:, :)
+         real(c_double), intent(out) :: fjacb(:, :, :)
+         real(c_double), intent(out) :: fjacd(:, :, :)
+         integer, intent(out) :: istop
+
+         call fcn(size(xplusd, 1), size(xplusd, 2), size(f, 2), size(beta), size(ifixx, 1), &
+                  beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
+
+      end subroutine fcn_
 
    end subroutine odr_short_c
 
@@ -248,7 +266,7 @@ contains
       integer(c_int), intent(out), optional :: info
          !! Logical unit number for computation reports.
 
-      call odr(fcn, n, m, q, np, beta, y, x, &
+      call odr(fcn_, n, m, q, np, beta, y, x, &
                we=we, wd=wd, &
                ifixb=ifixb, ifixx=ifixx, &
                delta=delta, &
@@ -256,6 +274,23 @@ contains
                job=job, &
                iprint=iprint, lunerr=lunerr, lunrpt=lunrpt, &
                info=info)
+   contains
+
+      subroutine fcn_(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
+         real(c_double), intent(in) :: beta(:)
+         real(c_double), intent(in) :: xplusd(:, :)
+         integer(c_int), intent(in) :: ifixb(:)
+         integer(c_int), intent(in) :: ifixx(:, :)
+         integer(c_int), intent(in) :: ideval
+         real(c_double), intent(out) :: f(:, :)
+         real(c_double), intent(out) :: fjacb(:, :, :)
+         real(c_double), intent(out) :: fjacd(:, :, :)
+         integer, intent(out) :: istop
+
+         call fcn(size(xplusd, 1), size(xplusd, 2), size(f, 2), size(beta), size(ifixx, 1), &
+                  beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
+
+      end subroutine fcn_
 
    end subroutine odr_medium_c
 
@@ -369,7 +404,7 @@ contains
       integer(c_int), intent(out), optional :: info
          !! Variable designating why the computations were stopped.
 
-      call odr(fcn, n, m, q, np, beta, y, x, &
+      call odr(fcn_, n, m, q, np, beta, y, x, &
                we=we, wd=wd, &
                ifixb=ifixb, ifixx=ifixx, &
                delta=delta, &
@@ -381,6 +416,24 @@ contains
                sclb=sclb, scld=scld, &
                info=info, &
                rwork=rwork, iwork=iwork)
+
+   contains
+
+      subroutine fcn_(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
+         real(c_double), intent(in) :: beta(:)
+         real(c_double), intent(in) :: xplusd(:, :)
+         integer(c_int), intent(in) :: ifixb(:)
+         integer(c_int), intent(in) :: ifixx(:, :)
+         integer(c_int), intent(in) :: ideval
+         real(c_double), intent(out) :: f(:, :)
+         real(c_double), intent(out) :: fjacb(:, :, :)
+         real(c_double), intent(out) :: fjacd(:, :, :)
+         integer, intent(out) :: istop
+
+         call fcn(size(xplusd, 1), size(xplusd, 2), size(f, 2), size(beta), size(ifixx, 1), &
+                  beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
+
+      end subroutine fcn_
 
    end subroutine odr_long_c
 

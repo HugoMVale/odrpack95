@@ -38,11 +38,11 @@ ODRPACK_EXTERN void close_file(
  * @param m       `==>` Number of columns of data in the independent variable.
  * @param q       `==>` Number of responses per observation.
  * @param np      `==>` Number of function parameters.
+ * @param ldifx   `==>` Leading dimension of array `ifixx`, `ifixx ∈ {1, n}`
  * @param beta    `==>` Array [np] of current parameter values.
  * @param xplusd  `==>` Array [m][ldn] of current explanatory variable values, i.e., `x + delta`.
  * @param ifixb   `==>` Array [np] of indicators for fixing parameters `beta`.
  * @param ifixx   `==>` Array [m][ldifx] of indicators for fixing explanatory variable `x`.
- * @param ldifx   `==>` Leading dimension of array `ifixx`, `ifixx ∈ {1, n}`
  * @param ideval  `==>` Indicator for selecting computation to be performed.
  * @param f       `<==` Array [q][n] for predicted function values.
  * @param fjacb   `<==` Array [q][np][n] for Jacobian with respect to `beta`.
@@ -57,11 +57,11 @@ typedef void (*odrpack_fcn_t)(
     const int *m,
     const int *q,
     const int *np,
+    const int *ldifx,
     const double beta[],
     const double xplusd[],
     const int ifixb[],
     const int ifixx[],
-    const int *ldifx,
     const int *ideval,
     double f[],
     double fjacb[],
