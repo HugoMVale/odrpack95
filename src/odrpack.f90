@@ -116,14 +116,14 @@ contains
          !! Print control variable.
       integer, intent(in), optional :: lunerr
          !! Logical unit number for error messages. Available options are:
-         !!   0 => no output.
-         !!   6 => output to standard output (default).
-         !!   other => output to logical unit number `lunerr`.
+         !!  `0`: No output.
+         !!  `6`: Output to standard output.
+         !!  `k /= 0,6`: Output to logical unit `k`.
       integer, intent(in), optional :: lunrpt
          !! Logical unit number for computation reports. Available options are:
-         !!   0 => no output.
-         !!   6 => output to standard output (default).
-         !!   other => output to logical unit number `lunrpt`.
+         !!  `0`: No output.
+         !!  `6`: Output to standard output.
+         !!  `k /= 0,6`: Output to logical unit `k`.
       real(wp), intent(in), optional, target :: stpb(:)
          !! Relative step for computing finite difference derivatives with respect to `beta`.
          !! `Shape: (np)`.
@@ -680,14 +680,14 @@ contains
 
       ! Variable Definitions (alphabetically)
       !  CNVTOL:    The convergence tolerance for implicit models.
-      !  DONE:      The variable designating whether the inplicit solution has been found (DONE=TRUE)
-      !             or not (DONE=FALSE).
-      !  FIRSTITR:  The variable designating whether this is the first iteration (FSTITR=TRUE)
-      !             or not (FSTITR=FALSE).
-      !  HEAD:      The variable designating whether the heading is to be printed (HEAD=TRUE)
-      !             or not (HEAD=FALSE).
-      !  IMPLICIT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
-      !             or explicit ODR (IMPLCT=FALSE).
+      !  DONE:      The variable designating whether the inplicit solution has been found (TRUE)
+      !             or not (FALSE).
+      !  FIRSTITR:  The variable designating whether this is the first iteration (TRUE)
+      !             or not (FALSE).
+      !  HEAD:      The variable designating whether the heading is to be printed (TRUE)
+      !             or not (FALSE).
+      !  IMPLICIT:  The variable designating whether the solution is by implicit ODR (TRUE)
+      !             or explicit ODR (FALSE).
       !  IPRNTI:    The print control variables.
       !  IPR1:      The 1st digit of the print control variable.
       !  IPR2:      The 2nd digit of the print control variable.
@@ -705,7 +705,7 @@ contains
       !             parameter value.
       !  PENALTY:   The penalty parameter for an implicit model.
       !  PRINTPEN:  The value designating whether the penalty parameter is to be printed in the
-      !             iteration report (PRTPEN=TRUE) or not (PRTPEN=FALSE).
+      !             iteration report (TRUE) or not (FALSE).
       !  TSTIMP:    The relative change in the parameters between the initial values and the solution.
 
       implicit = mod(job, 10) == 1
@@ -825,11 +825,11 @@ contains
                               init_work, loc_iwork, loc_rwork, move_beta, pack_vec, &
                               select_row, set_flags, scale_mat, unpack_vec
       use odrpack_reports, only: print_errors
-      use blas_interfaces, only: ddot, dnrm2
+      use blas_interfaces, only: ddot
 
       logical, intent(inout) :: head
-         !! Variable designating whether the heading is to be printed (`head = .true.`)
-         !! or not (`head = .false.`).
+         !! Variable designating whether the heading is to be printed (`.true.`)
+         !! or not (`.false.`).
       logical, intent(inout) :: firstitr
          !! Variable designating whether this is the first iteration (`.true.`)
          !! or not (`.false.`).
@@ -926,14 +926,14 @@ contains
       ! Local scalars
       real(wp) :: epsmac, eta
       integer :: actrsi, alphai, betaci, betani, betasi, beta0i, boundi, deltai, &
-                 deltni, deltsi, diffi, epsmaci, etai, fi, fjacbi, fjacdi, fni, fsi, &
+                 deltani, deltasi, diffi, epsmaci, etai, fi, fjacbi, fjacdi, fni, fsi, &
                  idfi, int2i, iprini, iranki, istop, istopi, jobi, jpvti, k, &
-                 ldtti, liwkmn, loweri, luneri, lunrpi, lrwkmn, lwrk, maxiti, msgb, &
+                 ldtti, liwkmin, loweri, luneri, lunrpi, lrwkmin, lwrk, maxiti, msgb, &
                  msgd, neta, netai, nfev, nfevi, niteri, njev, njevi, nnzw, nnzwi, &
-                 npp, nppi, nrow, nrowi, ntol, ntoli, olmavi, omegai, partli, pnormi, &
-                 prersi, qrauxi, rcondi, rnorsi, rvari, sdi, si, ssfi, ssi, sstoli, &
-                 taufci, taui, ti, tti, ui, upperi, vcvi, we1i, wrk1i, wrk2i, wrk3i, &
-                 wrk4i, wrk5i, wrk6i, wrk7i, wrki, wssi, wssdei, wssepi, xplusdi
+                 npp, nppi, nrow, nrowi, ntol, ntoli, olmavgi, omegai, partoli, pnormi, &
+                 prersi, qrauxi, rcondi, rnormsi, rvari, sdi, si, ssfi, ssi, sstoli, &
+                 taufaci, taui, ti, tti, ui, upperi, vcvi, we1i, wrk1i, wrk2i, wrk3i, &
+                 wrk4i, wrk5i, wrk6i, wrk7i, wrki, wssi, wssdeli, wssepsi, xplusdi
       logical :: anajac, cdjac, chkjac, dovcv, implicit, initd, isodr, redoj, restart
 
       ! Local arrays
@@ -947,22 +947,22 @@ contains
       !  ACTRSI:   The location in array work of variable ACTRS.
       !  ALPHAI:   The location in array work of variable ALPHA.
       !  ANAJAC:   The variable designating whether the Jacobians are computed by finite
-      !            differences (ANAJAC=FALSE) or not (ANAJAC=TRUE).
+      !            differences (FALSE) or not (TRUE).
       !  BETACI:   The starting location in array RWORK of array BETAC.
       !  BETAJ:    The parameters to use in the derivative checking algorithm.
       !  BETANI:   The starting location in array RWORK of array BETAN.
       !  BETASI:   The starting location in array RWORK of array BETAS.
       !  BETA0I:   The starting location in array RWORK of array BETA0.
       !  CDJAC:    The variable designating whether the Jacobians are computed by central
-      !            differences (CDJAC=TRUE) or forward differences (CDJAC=FALSE).
+      !            differences (TRUE) or forward differences (FALSE).
       !  CHKJAC:   The variable designating whether the user supplied Jacobians are to be
-      !            checked (CHKJAC=TRUE) or not (CHKJAC=FALSE).
+      !            checked (TRUE) or not (FALSE).
       !  DELTAI:   The starting location in array RWORK of array DELTA.
-      !  DELTNI:   The starting location in array RWORK of array DELTAN.
-      !  DELTSI:   The starting location in array RWORK of array DELTAS.
+      !  DELTANI:  The starting location in array RWORK of array DELTAN.
+      !  DELTASI:  The starting location in array RWORK of array DELTAS.
       !  DIFFI:    The starting location in array RWORK of array DIFF.
       !  DOVCV:    The variable designating whether the covariance matrix is to be computed
-      !            (DOVCV=TRUE) or not (DOVCV=FALSE).
+      !            (TRUE) or not (FALSE).
       !  EPSMACI:  The location in array RWORK of variable EPSMAC.
       !  ETA:      The relative noise in the function results.
       !  ETAI:     The location in array RWORK of variable ETA.
@@ -972,17 +972,17 @@ contains
       !  FNI:      The starting location in array RWORK of array FN.
       !  FSI:      The starting location in array RWORK of array FS.
       !  IDFI:     The location in array iwork of variable IDF.
-      !  IMPLICIT: The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
-      !            or explicit ODR (IMPLCT=FALSE).
-      !  INITD:    The variable designating whether DELTA is to be initialized to zero (INITD=TRUE)
-      !            or to the values in the first N by M elements of array RWORK (INITD=FALSE).
+      !  IMPLICIT: The variable designating whether the solution is by implicit ODR (TRUE)
+      !            or explicit ODR (FALSE).
+      !  INITD:    The variable designating whether DELTA is to be initialized to zero (TRUE)
+      !            or to the values in the first N by M elements of array RWORK (FALSE).
       !  INT2I:    The location in array IWORK of variable INT2.
       !  INTERVAL: Specifies which checks can be performed when checking derivatives based on the
       !            interval of the bound constraints.
-      !  IPRINI:   The location in array iwork of variable IPRINT.
+      !  IPRINTI:  The location in array iwork of variable IPRINT.
       !  IRANKI:   The location in array IWORK of variable IRANK.
-      !  ISODR:    The variable designating whether the solution is by ODR (ISODR=TRUE)
-      !            or by OLS (ISODR=FALSE).
+      !  ISODR:    The variable designating whether the solution is by ODR (TRUE)
+      !            or by OLS (FALSE).
       !  ISTOP:    The variable designating whether there are problems computing the function
       !            at the current BETA and DELTA.
       !  ISTOPI:   The location in array IWORK of variable ISTOP.
@@ -991,10 +991,10 @@ contains
       !  K:        An index variable.
       !  LDTT:     The leading dimension of array TT.
       !  LDTTI:    The location in array IWORK of variable LDTT.
-      !  LIWKMN:   The minimum acceptable length of array IWORK.
-      !  LUNERI:   The location in array IWORK of variable LUNERR.
-      !  LUNRPI:   The location in array IWORK of variable LUNRPT.
-      !  LRWKMN:   The minimum acceptable length of array RWORK.
+      !  LIWKMIN:  The minimum acceptable length of array IWORK.
+      !  LUNERRI:  The location in array IWORK of variable LUNERR.
+      !  LUNRPTI:  The location in array IWORK of variable LUNRPT.
+      !  LRWKMIN:  The minimum acceptable length of array RWORK.
       !  LWRK:     The length of vector WRK.
       !  MAXITI:   The location in array IWORK of variable MAXIT.
       !  MSGB:     The starting location in array IWORK of array MSGB.
@@ -1015,26 +1015,25 @@ contains
       !  NTOL:     The number of digits of agreement required between the numerical derivatives
       !            and the user supplied derivatives, set by DJCK.
       !  NTOLI:    The location in array IWORK of variable NTOL.
-      !  OLMAVI:   The location in array RWORK of variable OLMAVG.
+      !  OLMAVGI:  The location in array RWORK of variable OLMAVG.
       !  OMEGAI:   The starting location in array RWORK of array OMEGA.
-      !  PARTLI:   The location in array RWORK of variable PARTOL.
+      !  PARTOLI:  The location in array RWORK of variable PARTOL.
       !  PNORM:    The norm of the scaled estimated parameters.
       !  PNORMI:   The location in array RWORK of variable PNORM.
       !  PRERSI:   The location in array RWORK of variable PRERS.
       !  QRAUXI:   The starting location in array RWORK of array QRAUX.
       !  RCONDI:   The location in array RWORK of variable RCOND.
       !  REDOJ:    The variable designating whether the Jacobian matrix is to be recomputed for
-      !            the computation of the covariance matrix (REDOJ=TRUE) or not (REDOJ=FALSE).
-      !  RESTART:  The variable designating whether the call is a restart (RESTRT=TRUE) or
-      !            not (RESTRT=FALSE).
-      !  RNORSI:   The location in array RWORK of variable RNORMS.
+      !            the computation of the covariance matrix (TRUE) or not (FALSE).
+      !  RESTART:  The variable designating whether the call is a restart (TRUE) or not (FALSE).
+      !  RNORMSI:  The location in array RWORK of variable RNORMS.
       !  RVARI:    The location in array RWORK of variable RVAR.
       !  SDI:      The starting location in array RWORK of array SD.
       !  SI:       The starting location in array RWORK of array S.
       !  SSFI:     The starting location in array RWORK of array SSF.
       !  SSI:      The starting location in array RWORK of array SS.
       !  SSTOLI:   The location in array RWORK of variable SSTOL.
-      !  TAUFCI:   The location in array RWORK of variable TAUFAC.
+      !  TAUFACI:  The location in array RWORK of variable TAUFAC.
       !  TAUI:     The location in array RWORK of variable TAU.
       !  TI:       The starting location in array RWORK of array T.
       !  TTI:      The starting location in array RWORK of array TT.
@@ -1050,8 +1049,8 @@ contains
       !  WRK6I:    The starting location in array RWORK of array WRK6.
       !  WRK7I:    The starting location in array RWORK of array WRK7.
       !  WSSI:     The location in array RWORK of variable WSS.
-      !  WSSDEI:   The location in array RWORK of variable WSSDEL.
-      !  WSSEPI:   The location in array RWORK of variable WSSEPS.
+      !  WSSDELI:  The location in array RWORK of variable WSSDEL.
+      !  WSSEPSI:  The location in array RWORK of variable WSSEPS.
       !  XPLUSDI:  The starting location in array RWORK of array XPLUSD.
 
       ! Initialize necessary variables
@@ -1064,19 +1063,19 @@ contains
                      jobi, iprini, luneri, lunrpi, &
                      nrowi, ntoli, netai, &
                      maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
-                     boundi, liwkmn)
+                     boundi, liwkmin)
 
       ! Get starting locations within REAL work space
       call loc_rwork(n, m, q, np, ldwe, ld2we, isodr, &
                      deltai, fi, xplusdi, fni, sdi, vcvi, &
-                     rvari, wssi, wssdei, wssepi, rcondi, etai, &
-                     olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
-                     partli, sstoli, taufci, epsmaci, &
+                     rvari, wssi, wssdeli, wssepsi, rcondi, etai, &
+                     olmavgi, taui, alphai, actrsi, pnormi, rnormsi, prersi, &
+                     partoli, sstoli, taufaci, epsmaci, &
                      beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
                      fsi, fjacbi, we1i, diffi, &
-                     deltsi, deltni, ti, tti, omegai, fjacdi, &
+                     deltasi, deltani, ti, tti, omegai, fjacdi, &
                      wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
-                     loweri, upperi, lrwkmn)
+                     loweri, upperi, lrwkmin)
 
       if (isodr) then
          wrki = wrk1i
@@ -1120,10 +1119,10 @@ contains
 
          if (job >= 0) iwork(jobi) = job
          if (iprint >= 0) iwork(iprini) = iprint
-         if (partol >= zero .and. partol < one) rwork(partli) = partol
+         if (partol >= zero .and. partol < one) rwork(partoli) = partol
          if (sstol >= zero .and. sstol < one) rwork(sstoli) = sstol
 
-         rwork(olmavi) = rwork(olmavi)*iwork(niteri)
+         rwork(olmavgi) = rwork(olmavgi)*iwork(niteri)
 
          if (implicit) then
             f_ = fn_
@@ -1134,8 +1133,8 @@ contains
          call scale_mat(n, q, we1_, ldwe, ld2we, f_, tempret(1:n, 1:q))
          f_ = tempret(1:n, 1:q)
 
-         rwork(wssepi) = ddot(n*q, rwork(fi), 1, rwork(fi), 1)
-         rwork(wssi) = rwork(wssepi) + rwork(wssdei)
+         rwork(wssepsi) = ddot(n*q, rwork(fi), 1, rwork(fi), 1)
+         rwork(wssi) = rwork(wssepsi) + rwork(wssdeli)
 
       else
 
@@ -1145,7 +1144,7 @@ contains
                            isodr, anajac, &
                            beta, ifixb, &
                            ldifx, ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-                           lrwork, lrwkmn, liwork, liwkmn, &
+                           lrwork, lrwkmin, liwork, liwkmin, &
                            sclb, scld, stpb, stpd, &
                            info, &
                            lower, upper)
@@ -1163,14 +1162,14 @@ contains
                         sstol, partol, maxit, taufac, &
                         job, iprint, lunerr, lunrpt, &
                         lower, upper, &
-                        epsmaci, sstoli, partli, maxiti, taufci, &
+                        epsmaci, sstoli, partoli, maxiti, taufaci, &
                         jobi, iprini, luneri, lunrpi, &
                         ssfi, tti, ldtti, deltai, &
                         loweri, upperi, boundi)
 
          iwork(msgb) = -1
          iwork(msgd) = -1
-         rwork(taui) = -rwork(taufci)
+         rwork(taui) = -rwork(taufaci)
 
          ! Set up for parameter estimation
          ! Pull BETA's to be estimated and corresponding scale values
@@ -1223,21 +1222,21 @@ contains
             call scale_mat(n, m, rwork(tti:tti + iwork(ldtti)*1*m - 1), &
                            iwork(ldtti), 1, delta_, tempret(1:n, 1:m))
             rwork(wrki + npp:wrki + npp + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
-            rwork(pnormi) = dnrm2(npp + n*m, rwork(wrki), 1)
+            rwork(pnormi) = norm2(rwork(wrki:wrki + npp + n*m - 1))
          else
-            rwork(pnormi) = dnrm2(npp, rwork(wrki), 1)
+            rwork(pnormi) = norm2(rwork(wrki:wrki + npp - 1))
          end if
 
          ! Compute sum of squares of the weighted EPSILONS and weighted DELTAS
-         rwork(wssepi) = ddot(n*q, rwork(fi), 1, rwork(fi), 1)
+         rwork(wssepsi) = ddot(n*q, rwork(fi), 1, rwork(fi), 1)
          if (isodr) then
             call scale_mat(n, m, wd, ldwd, ld2wd, rwork(deltai:deltai + n*m), tempret(1:n, 1:m))
             rwork(wrki:wrki + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
-            rwork(wssdei) = ddot(n*m, rwork(deltai), 1, rwork(wrki), 1)
+            rwork(wssdeli) = ddot(n*m, rwork(deltai), 1, rwork(wrki), 1)
          else
-            rwork(wssdei) = zero
+            rwork(wssdeli) = zero
          end if
-         rwork(wssi) = rwork(wssepi) + rwork(wssdei)
+         rwork(wssi) = rwork(wssepsi) + rwork(wssdeli)
 
          ! Select first row of X + DELTA that contains no zeros
          nrow = -1
@@ -1345,7 +1344,7 @@ contains
                   (info, lunerr, &
                    n, m, np, q, &
                    ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-                   lrwkmn, liwkmn, &
+                   lrwkmin, liwkmin, &
                    rwork(fjacbi), rwork(fjacdi), &
                    rwork(diffi), iwork(msgb), isodr, iwork(msgd), &
                    rwork(xplusdi), iwork(nrowi), iwork(netai), iwork(ntoli))
@@ -1380,7 +1379,7 @@ contains
                     we, rwork(we1i), ldwe, ld2we, wd, ldwd, ld2wd, &
                     ifixb, ifixx, ldifx, &
                     rwork(betaci), rwork(betani), rwork(betasi), rwork(si), &
-                    rwork(deltai), rwork(deltni), rwork(deltsi), &
+                    rwork(deltai), rwork(deltani), rwork(deltasi), &
                     rwork(loweri), rwork(upperi), &
                     rwork(ti), rwork(fi), rwork(fni), rwork(fsi), &
                     rwork(fjacbi), iwork(msgb), rwork(fjacdi), iwork(msgd), &
@@ -1404,7 +1403,7 @@ contains
    end subroutine odrstart
 
    impure subroutine odrsolve &
-      (head, fstitr, prtpen, &
+      (head, firstitr, printpen, &
        fcn, n, m, np, q, job, beta, y, x, &
        we, we1, ldwe, ld2we, wd, ldwd, ld2wd, &
        ifixb, ifixx, ldifx, &
@@ -1420,17 +1419,17 @@ contains
       use odrpack_core, only: access_workspace, eval_jac, fcn_t, pack_vec, scale_mat, &
                               set_flags, trust_region, unpack_vec, vcv_beta
       use odrpack_reports, only: print_reports
-      use blas_interfaces, only: ddot, dnrm2
+      use blas_interfaces, only: ddot
 
       logical, intent(inout) :: head
-         !! Variable designating whether the heading is to be printed (`head = .true.`)
-         !! or not (`head = .false.`).
-      logical, intent(inout) :: fstitr
-         !! Variable designating whether this is the first iteration (`fstitr = .true.`)
-         !! or not (`fstitr = .false.`).
-      logical, intent(inout) :: prtpen
-         !! Value designating whether the penalty parameter is to be printed in the
-         !! iteration report (`prtpen = .true.`) or not (`prtpen = .false.`).
+         !! Variable designating whether the heading is to be printed (`.true.`)
+         !! or not (`.false.`).
+      logical, intent(inout) :: firstitr
+         !! Variable designating whether this is the first iteration (`.true.`)
+         !! or not (`.false.`).
+      logical, intent(inout) :: printpen
+         !! Value designating whether the penalty parameter is to be printed in the iteration
+         !! report (`.true.`) or not (`.false.`).
       procedure(fcn_t) :: fcn
          !! User-supplied subroutine for evaluating the model.
       integer, intent(in) :: n
@@ -1557,123 +1556,123 @@ contains
                  iwrk, j, jpvt, l, looped, lunr, lunrpt, maxit, neta, nfev, niter, njev, &
                  nlms, nnzw, npp, npr, npu, omega, qraux, sd, u, vcv, wrk1i, wrk2i, wrk3i, &
                  wrk4i, wrk5i, wrk6i
-      logical :: access, anajac, cdjac, chkjac, cnvpar, cnvss, didvcv, dovcv, implct, initd, &
-                 intdbl, isodr, lstep, redoj, restrt
+      logical :: access, anajac, cdjac, chkjac, cnvpar, cnvss, didvcv, dovcv, implicit, initd, &
+                 intdbl, isodr, lstep, redoj, restart
 
       ! Local arrays
       real(wp) :: loweru(np), upperu(np), wss(3)
       real(wp), pointer :: wrk1_(:, :, :), wrk6_(:, :, :)
 
       ! Variable Definitions (alphabetically)
-      !  ACCESS:  The variable designating whether information is to be accessed from the work
-      !           arrays (ACCESS=TRUE) or stored in them (ACCESS=FALSE).
-      !  ACTRED:  The actual relative reduction in the sum-of-squares.
-      !  ACTRS:   The saved actual relative reduction in the sum-of-squares.
-      !  ALPHA:   The Levenberg-Marquardt parameter.
-      !  ANAJAC:  The variable designating whether the Jacobians are computed by finite
-      !           differences (ANAJAC=FALSE) or not (ANAJAC=TRUE).
-      !  CDJAC:   The variable designating whether the Jacobians are computed by central
-      !           differences (cdjac=true) or by forward differences (CDJAC=FALSE).
-      !  CHKJAC:  The variable designating whether the user supplied Jacobians are to be
-      !           checked (CHKJAC=TRUE) or not (CHKJAC=FALSE).
-      !  CNVPAR:  The variable designating whether parameter convergence was attained
-      !           (CNVPAR=TRUE) or not (CNVPAR=FALSE).
-      !  CNVSS:   The variable designating whether sum-of-squares convergence was attained
-      !           (CNVSS=TRUE) or not (CNVSS=FALSE).
-      !  DIDVCV:  The variable designating whether the covariance matrix was computed
-      !           (DIDVCV=TRUE) or not (DIDVCV=FALSE).
-      !  DIRDER:  The directional derivative.
-      !  DOVCV:   The variable designating whether the covariance matrix should to be
-      !           computed (DOVCV=TRUE) or not (DOVCV=FALSE).
-      !  ETA:     The relative noise in the function results.
-      !  I:       An indexing variable.
-      !  IDF:     The degrees of freedom of the fit, equal to the number of observations with
-      !           nonzero weighted derivatives minus the number of parameters being estimated.
-      !  IFLAG:   The variable designating which report is to be printed.
-      !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
-      !           or explicit ODR (IMPLCT=FALSE).
-      !  INFO:    The variable designating why the computations were stopped.
-      !  INITD:   The variable designating whether delta is initialized to zero (INITD=TRUE) or
-      !           to the values in the first N by M elements of array work (INITD=FALSE).
-      !  INT2:    The number of internal doubling steps taken.
-      !  INTDBL:  The variable designating whether internal doubling is to be used (INTDBL=TRUE)
-      !           or NOT (INTDBL=FALSE).
-      !  IPR:     The values designating the length of the printed report.
-      !  IPR1:    The value of the 4th digit (from the right) of iprint, which controls the
-      !           initial summary report.
-      !  IPR2:    The value of the 3rd digit (from the right) of iprint, which controls the
-      !           final iteration report.
-      !  IPR2F:   The value of the 2nd digit (from the right) of iprint, which controls the
-      !           frequency of the iteration reports.
-      !  IPR3:    The value of the 1st digit (from the right) of iprint, which controls the final
-      !           summary report.
-      !  IRANK:   The rank deficiency of the Jacobian wrt BETA.
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or
-      !           OLS (ISODR=FALSE).
-      !  ISTOP:   The variable designating whether there are problems computing the function
-      !           at the current BETA and DELTA.
-      !  ISTOPC:  The variable designating whether the computations were stoped due to some
-      !           numerical error within routine  DODSTP.
-      !  IWRK:    An index variable.
-      !  J:       An index variable.
-      !  JPVT:    The starting location in IWORK of array JPVT.
-      !  L:       An index variable.
-      !  LOOPED:  A counter used to determine how many times the subloop has been executed,
-      !           where if the count becomes large enough the computations will be stopped.
-      !  LOWERU:  The lower bound for unfixed BETAs.
-      !  LSTEP:   The variable designating whether a successful step has been found (LSTEP=TRUE)
-      !           or not (LSTEP=FALSE).
-      !  LUDFLT:  The default logical unit number, used for computation reports to the screen.
-      !  LUNR:    The logical unit number used for computation reports.
-      !  LUNRPT:  The logical unit number used for computation reports.
-      !  MAXIT:   The maximum number of iterations allowed.
-      !  NETA:    The number of accurate digits in the function results.
-      !  NFEV:    The number of function evaluations.
-      !  NITER:   The number of iterations taken.
-      !  NJEV:    The number of Jacobian evaluations.
-      !  NLMS:    The number of Levenberg-Marquardt steps taken.
-      !  NNZW:    The number of nonzero weighted observations.
-      !  NPP:     The number of function parameters being estimated.
-      !  NPR:     The number of times the report is to be written.
-      !  NPU:     The number of unfixed parameters.
-      !  OLMAVG:  The average number of Levenberg-Marquardt steps per iteration.
-      !  OMEGA:   The starting location in RWORK of array OMEGA.
-      !  PARTOL:  The parameter convergence stopping tolerance.
-      !  PNORM:   The norm of the scaled estimated parameters.
-      !  PRERED:  The predicted relative reduction in the sum-of-squares.
-      !  PRERS:   The old predicted relative reduction in the sum-of-squares.
-      !  QRAUX:   The starting location in array RWORK of array QRAUX.
-      !  RATIO:   The ratio of the actual relative reduction to the predicted relative reduction
-      !           in the sum-of-squares.
-      !  RCOND:   The approximate reciprocal condition of FJACB.
-      !  REDOJ:   The variable designating whether the Jacobian matrix is to be recomputed for
-      !           the computation of the covariance matrix (REDOJ=TRUE) or not (REDOJ=FALSE).
-      !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or
-      !           not (RESTRT=FALSE).
-      !  RNORM:   The norm of the weighted errors.
-      !  RNORMN:  The new norm of the weighted errors.
-      !  RNORMS:  The saved norm of the weighted errors.
-      !  RSS:     The residual sum of squares.
-      !  RVAR:    The residual variance.
-      !  SD:      The starting location in array work of array SD.
-      !  SSTOL:   The sum-of-squares convergence stopping tolerance.
-      !  TAU:     The trust region diameter.
-      !  TAUFAC:  The factor used to compute the initial trust region diameter.
-      !  TEMP:    A temporary storage location.
-      !  TEMP1:   A temporary storage location.
-      !  TEMP2:   A temporary storage location.
-      !  TSNORM:  The norm of the scaled step.
-      !  U:       The starting location in array RWORK of array U.
-      !  UPPERU:  The upper bound for unfixed BETAs.
-      !  VCV:     The starting location in array RWORK of array VCV.
-      !  WSS:     The sum-of-squares of the weighted EPSILONS and DELTAS, the sum-of-squares
-      !           of the weighted DELTAS, and the sum-of-squares of the weighted EPSILONS.
-      !  WRK1I:   The starting location in array RWORK of array WRK1.
-      !  WRK2I:   The starting location in array RWORK of array WRK2.
-      !  WRK3I:   The starting location in array RWORK of array WRK3.
-      !  WRK4I:   The starting location in array RWORK of array WRK4.
-      !  WRK5I:   The starting location in array RWORK of array WRK5.
-      !  WRK6I:   The starting location in array RWORK of array WRK6.
+      !  ACCESS:   The variable designating whether information is to be accessed from the work
+      !            arrays (TRUE) or stored in them (FALSE).
+      !  ACTRED:   The actual relative reduction in the sum-of-squares.
+      !  ACTRS:    The saved actual relative reduction in the sum-of-squares.
+      !  ALPHA:    The Levenberg-Marquardt parameter.
+      !  ANAJAC:   The variable designating whether the Jacobians are computed by finite
+      !            differences (FALSE) or not (TRUE).
+      !  CDJAC:    The variable designating whether the Jacobians are computed by central
+      !            differences (TRUE) or by forward differences (FALSE).
+      !  CHKJAC:   The variable designating whether the user supplied Jacobians are to be
+      !            checked (TRUE) or not (FALSE).
+      !  CNVPAR:   The variable designating whether parameter convergence was attained
+      !            (TRUE) or not (FALSE).
+      !  CNVSS:    The variable designating whether sum-of-squares convergence was attained
+      !            (TRUE) or not (FALSE).
+      !  DIDVCV:   The variable designating whether the covariance matrix was computed
+      !            (TRUE) or not (FALSE).
+      !  DIRDER:   The directional derivative.
+      !  DOVCV:    The variable designating whether the covariance matrix should to be
+      !            computed (TRUE) or not (FALSE).
+      !  ETA:      The relative noise in the function results.
+      !  I:        An indexing variable.
+      !  IDF:      The degrees of freedom of the fit, equal to the number of observations with
+      !            nonzero weighted derivatives minus the number of parameters being estimated.
+      !  IFLAG:    The variable designating which report is to be printed.
+      !  IMPLICIT: The variable designating whether the solution is by implicit ODR (TRUE)
+      !            or explicit ODR (FALSE).
+      !  INFO:     The variable designating why the computations were stopped.
+      !  INITD:    The variable designating whether delta is initialized to zero (TRUE) or
+      !            to the values in the first N by M elements of array work (FALSE).
+      !  INT2:     The number of internal doubling steps taken.
+      !  INTDBL:   The variable designating whether internal doubling is to be used (TRUE)
+      !            or not (FALSE).
+      !  IPR:      The values designating the length of the printed report.
+      !  IPR1:     The value of the 4th digit (from the right) of iprint, which controls the
+      !            initial summary report.
+      !  IPR2:     The value of the 3rd digit (from the right) of iprint, which controls the
+      !            final iteration report.
+      !  IPR2F:    The value of the 2nd digit (from the right) of iprint, which controls the
+      !            frequency of the iteration reports.
+      !  IPR3:     The value of the 1st digit (from the right) of iprint, which controls the
+      !            final summary report.
+      !  IRANK:    The rank deficiency of the Jacobian wrt BETA.
+      !  ISODR:    The variable designating whether the solution is by ODR (TRUE) or
+      !            OLS (FALSE).
+      !  ISTOP:    The variable designating whether there are problems computing the function
+      !            at the current BETA and DELTA.
+      !  ISTOPC:   The variable designating whether the computations were stoped due to some
+      !            numerical error within routine  DODSTP.
+      !  IWRK:     An index variable.
+      !  J:        An index variable.
+      !  JPVT:     The starting location in IWORK of array JPVT.
+      !  L:        An index variable.
+      !  LOOPED:   A counter used to determine how many times the subloop has been executed,
+      !            where if the count becomes large enough the computations will be stopped.
+      !  LOWERU:   The lower bound for unfixed BETAs.
+      !  LSTEP:    The variable designating whether a successful step has been found (TRUE)
+      !            or not (FALSE).
+      !  LUDFLT:   The default logical unit number, used for computation reports to the screen.
+      !  LUNR:     The logical unit number used for computation reports.
+      !  LUNRPT:   The logical unit number used for computation reports.
+      !  MAXIT:    The maximum number of iterations allowed.
+      !  NETA:     The number of accurate digits in the function results.
+      !  NFEV:     The number of function evaluations.
+      !  NITER:    The number of iterations taken.
+      !  NJEV:     The number of Jacobian evaluations.
+      !  NLMS:     The number of Levenberg-Marquardt steps taken.
+      !  NNZW:     The number of nonzero weighted observations.
+      !  NPP:      The number of function parameters being estimated.
+      !  NPR:      The number of times the report is to be written.
+      !  NPU:      The number of unfixed parameters.
+      !  OLMAVG:   The average number of Levenberg-Marquardt steps per iteration.
+      !  OMEGA:    The starting location in RWORK of array OMEGA.
+      !  PARTOL:   The parameter convergence stopping tolerance.
+      !  PNORM:    The norm of the scaled estimated parameters.
+      !  PRERED:   The predicted relative reduction in the sum-of-squares.
+      !  PRERS:    The old predicted relative reduction in the sum-of-squares.
+      !  QRAUX:    The starting location in array RWORK of array QRAUX.
+      !  RATIO:    The ratio of the actual relative reduction to the predicted relative reduction
+      !            in the sum-of-squares.
+      !  RCOND:    The approximate reciprocal condition of FJACB.
+      !  REDOJ:    The variable designating whether the Jacobian matrix is to be recomputed for
+      !            the computation of the covariance matrix (TRUE) or not (FALSE).
+      !  RESTART:  The variable designating whether the call is a restart (TRUE) or
+      !            not (FALSE).
+      !  RNORM:    The norm of the weighted errors.
+      !  RNORMN:   The new norm of the weighted errors.
+      !  RNORMS:   The saved norm of the weighted errors.
+      !  RSS:      The residual sum of squares.
+      !  RVAR:     The residual variance.
+      !  SD:       The starting location in array work of array SD.
+      !  SSTOL:    The sum-of-squares convergence stopping tolerance.
+      !  TAU:      The trust region diameter.
+      !  TAUFAC:   The factor used to compute the initial trust region diameter.
+      !  TEMP:     A temporary storage location.
+      !  TEMP1:    A temporary storage location.
+      !  TEMP2:    A temporary storage location.
+      !  TSNORM:   The norm of the scaled step.
+      !  U:        The starting location in array RWORK of array U.
+      !  UPPERU:   The upper bound for unfixed BETAs.
+      !  VCV:      The starting location in array RWORK of array VCV.
+      !  WSS:      The sum-of-squares of the weighted EPSILONS and DELTAS, the sum-of-squares
+      !            of the weighted DELTAS, and the sum-of-squares of the weighted EPSILONS.
+      !  WRK1I:    The starting location in array RWORK of array WRK1.
+      !  WRK2I:    The starting location in array RWORK of array WRK2.
+      !  WRK3I:    The starting location in array RWORK of array WRK3.
+      !  WRK4I:    The starting location in array RWORK of array WRK4.
+      !  WRK5I:    The starting location in array RWORK of array WRK5.
+      !  WRK6I:    The starting location in array RWORK of array WRK6.
 
       ! Initialize necessary variables
       access = .true.
@@ -1683,7 +1682,7 @@ contains
 
       call pack_vec(np, npu, loweru, lower, ifixb)
       call pack_vec(np, npu, upperu, upper, ifixb)
-      call set_flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
+      call set_flags(job, restart, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implicit)
 
       call access_workspace( &
          n, m, np, q, ldwe, ld2we, &
@@ -1716,7 +1715,7 @@ contains
          lunr = lunrpt
          do i = 1, npr
             call print_reports(ipr, lunr, &
-                               head, prtpen, fstitr, didvcv, iflag, &
+                               head, printpen, firstitr, didvcv, iflag, &
                                n, m, np, q, npp, nnzw, &
                                msgb, msgd, beta, y, x, delta, &
                                we, ldwe, ld2we, wd, ldwd, ld2wd, &
@@ -1749,7 +1748,7 @@ contains
       end if
 
       ! Stop if number of iterations already equals maximum permitted
-      if (restrt .and. (niter >= maxit)) then
+      if (restart .and. (niter >= maxit)) then
          istop = 0
          goto 150
       elseif (niter >= maxit) then
@@ -1841,9 +1840,9 @@ contains
       call scale_mat(npp, 1, ss, npp, 1, s, wrk(1:npp))
       if (isodr) then
          call scale_mat(n, m, tt, ldtt, 1, t, wrk(npp + 1:npp + 1 + n*m - 1))
-         tsnorm = dnrm2(npp + n*m, wrk, 1)
+         tsnorm = norm2(wrk(1:npp + n*m))
       else
-         tsnorm = dnrm2(npp, wrk, 1)
+         tsnorm = norm2(wrk(1:npp))
       end if
 
       ! Compute scaled predicted reduction
@@ -1851,9 +1850,9 @@ contains
       do l = 1, q
          do i = 1, n
             iwrk = iwrk + 1
-            wrk(iwrk) = ddot(npp, fjacb(i, 1, l), n, s, 1)
+            wrk(iwrk) = dot_product(fjacb(i, 1:npp, l), s(1:npp))
             if (isodr) then
-               wrk(iwrk) = wrk(iwrk) + ddot(m, fjacd(i, 1, l), n, t(i, 1), n)
+               wrk(iwrk) = wrk(iwrk) + dot_product(fjacd(i, :, l), t(i, :))
             end if
          end do
       end do
@@ -1863,7 +1862,7 @@ contains
          temp1 = ddot(n*q, wrk, 1, wrk, 1) + ddot(n*m, t, 1, wrk(n*q + 1), 1)
          temp1 = sqrt(temp1)/rnorm
       else
-         temp1 = dnrm2(n*q, wrk, 1)/rnorm
+         temp1 = norm2(wrk(1:n*q))/rnorm
       end if
       temp2 = sqrt(alpha)*tsnorm/rnorm
       prered = temp1**2 + temp2**2/p5
@@ -1888,7 +1887,7 @@ contains
          rnormn = rnorm/(p1*p75)
       else
          ! Compute norm of new weighted EPSILONS and weighted DELTAS (RNORMN)
-         if (implct) then
+         if (implicit) then
             wrk(1:n*q) = reshape(fn, [n*q])
          else
             wrk(1:n*q) = reshape(fn - y, [n*q])
@@ -1900,7 +1899,7 @@ contains
             rnormn = sqrt(ddot(n*q, wrk, 1, wrk, 1) + &
                           ddot(n*m, deltan, 1, wrk(n*q + 1), 1))
          else
-            rnormn = dnrm2(n*q, wrk, 1)
+            rnormn = norm2(wrk(1:n*q))
          end if
       end if
 
@@ -1971,7 +1970,7 @@ contains
       ! Check acceptance
       if (ratio >= p0001) then
          fs = fn
-         if (implct) then
+         if (implicit) then
             f = fs
          else
             f = fs - y
@@ -1984,9 +1983,9 @@ contains
          call scale_mat(npp, 1, ss, npp, 1, betac, wrk(1:npp))
          if (isodr) then
             call scale_mat(n, m, tt, ldtt, 1, delta, wrk(npp + 1:npp + 1 + n*m - 1))
-            pnorm = dnrm2(npp + n*m, wrk, 1)
+            pnorm = norm2(wrk(1:npp + n*m))
          else
-            pnorm = dnrm2(npp, wrk, 1)
+            pnorm = norm2(wrk(1:npp))
          end if
          lstep = .true.
       else
@@ -2000,7 +1999,7 @@ contains
               (abs(actred) <= sstol .and. &
                prered <= sstol .and. &
                p5*ratio <= one)
-      cnvpar = (tau <= partol*pnorm) .and. (.not. implct)
+      cnvpar = (tau <= partol*pnorm) .and. (.not. implicit)
       if (cnvss) info = 1
       if (cnvpar) info = 2
       if (cnvss .and. cnvpar) info = 3
@@ -2025,7 +2024,7 @@ contains
                lunr = lunrpt
                do i = 1, npr
                   call print_reports(ipr, lunr, &
-                                     head, prtpen, fstitr, didvcv, iflag, &
+                                     head, printpen, firstitr, didvcv, iflag, &
                                      n, m, np, q, npp, nnzw, &
                                      msgb, msgd, beta, y, x, delta, &
                                      we, ldwe, ld2we, wd, ldwd, ld2wd, &
@@ -2043,8 +2042,8 @@ contains
                   end if
                   lunr = ludflt
                end do
-               fstitr = .false.
-               prtpen = .false.
+               firstitr = .false.
+               printpen = .false.
             end if
          end if
       end if
@@ -2071,7 +2070,7 @@ contains
       if (istop > 0) info = info + 100
 
       ! Store unweighted EPSILONS and X+DELTA to return to user
-      if (implct) then
+      if (implicit) then
          f = fs
       else
          f = fs - y
@@ -2107,7 +2106,7 @@ contains
             end if
          end if
 
-         if (implct) then
+         if (implicit) then
             call scale_mat(n, m, wd, ldwd, ld2wd, delta, wrk(n*q + 1:n*q + 1 + n*m - 1))
             rss = ddot(n*m, delta, 1, wrk(n*q + 1), 1)
          else
@@ -2227,7 +2226,7 @@ contains
          lunr = lunrpt
          do i = 1, npr
             call print_reports(ipr, lunr, &
-                               head, prtpen, fstitr, didvcv, iflag, &
+                               head, printpen, firstitr, didvcv, iflag, &
                                n, m, np, q, npp, nnzw, &
                                msgb, msgd, beta, y, x, delta, &
                                we, ldwe, ld2we, wd, ldwd, ld2wd, &
@@ -2261,8 +2260,7 @@ contains
       integer, intent(in) :: np
          !! Number of function parameters.
       logical, intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr = .true.`)
-         !! or by OLS (`isodr = .false.`).
+         !! Variable designating whether the solution is by ODR (`.true.`) or by OLS (`.false.`).
       integer, intent(out) :: lrwork
          !! Length of `rwork` array.
       integer, intent(out) :: liwork
