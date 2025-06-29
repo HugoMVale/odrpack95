@@ -10,8 +10,7 @@ contains
    !! Print report heading.
 
       logical, intent(inout) :: head
-         !! Variable designating whether the heading is to be printed (`head = .true.`)
-         !! or not (`head = .false.`).
+         !! Variable designating whether the heading is to be printed (`.true.`) or not (`.false.`).
       integer, intent(in) :: lunit
          !! Logical unit number to which the heading is written.
 
@@ -32,7 +31,7 @@ contains
 
    impure subroutine print_reports &
       (ipr, lunrpt, &
-       head, prtpen, fstitr, didvcv, iflag, &
+       head, printpen, firstitr, didvcv, iflag, &
        n, m, np, q, npp, nnzw, &
        msgb, msgd, beta, y, x, delta, &
        we, ldwe, ld2we, wd, ldwd, ld2wd, &
@@ -52,17 +51,15 @@ contains
       integer, intent(in) :: lunrpt
          !! Logical unit number used for computation reports.
       logical, intent(inout) :: head
-         !! Variable designating whether the heading is to be printed (`head = .true.`)
-         !! or not (`head = .false.`).
-      logical, intent(in) :: prtpen
+         !! Variable designating whether the heading is to be printed (`.true.`) or not (`.false.`).
+      logical, intent(in) :: printpen
          !! Variable designating whether the penalty parameter is to be printed in the
-         !! iteration report (`prtpen = .true.`) or not (`prtpen = .false.`).
-      logical, intent(in) :: fstitr
-         !! Variable designating whether this is the first iteration (`fstitr = .true.`)
-         !! or not (`fstitr = .false.`).
+         !! iteration report (`.true.`) or not (`.false.`).
+      logical, intent(in) :: firstitr
+         !! Variable designating whether this is the first iteration (`.true.`) or not (`.false.`).
       logical, intent(in) :: didvcv
-         !! Variable designating whether the covariance matrix was computed
-         !! (`didvcv = .true.`) or not (`didvcv = .false.`).
+         !! Variable designating whether the covariance matrix was computed (`.true.`)
+         !! or not (`.false.`).
       integer, intent(in) :: iflag
          !! Variable designating what is to be printed.
       integer, intent(in) :: n
@@ -178,34 +175,34 @@ contains
          !! current `beta` and `delta`.
 
       ! Local scalars
-      real(wp) :: pnlty
-      logical :: anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
+      real(wp) :: penalty
+      logical :: anajac, cdjac, chkjac, dovcv, implicit, initd, isodr, redoj, restart
       character(len=3) :: typ
 
       ! Variable Definitions (alphabetically)
-      !  ANAJAC:  The variable designating whether the Jacobians are computed by finite
-      !           differences (ANAJAC=FALSE) or not (ANAJAC=TRUE).
-      !  CDJAC:   The variable designating whether the jacobians are computed by central
-      !           differences (CDJAC=TRUE) or by forward differences (CDJAC=FALSE).
-      !  CHKJAC:  The variable designating whether the user supplied Jacobians are to be checked
-      !           (CHKJAC=TRUE) or not (CHKJAC=FALSE).
-      !  DOVCV:   The variable designating whether the covariance matrix was to be computed
-      !           (DOVCV=TRUE) or not (DOVCV=FALSE).
-      !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE)
-      !           or explicit ODR (IMPLCT=FALSE).
-      !  INITD:   The variable designating whether DELTA is initialized to zero (INITD=TRUE) or
-      !           to the values in the first N by M elements of array RWORK (INITD=FALSE).
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by
-      !           OLS (ISODR=FALSE).
-      !  PNLTY:   The penalty parameter for an implicit model.
-      !  REDOJ:   The variable designating whether the Jacobian matrix is to be recomputed for
-      !           the computation of the covariance matrix (REDOJ=TRUE) or not (REDOJ=FALSE).
-      !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or not
-      !           (RESTRT=FALSE).
-      !  TYP:     The CHARACTER*3 string "ODR" or "OLS".
+      !  ANAJAC:   The variable designating whether the Jacobians are computed by finite
+      !            differences (FALSE) or not (TRUE).
+      !  CDJAC:    The variable designating whether the jacobians are computed by central
+      !            differences (TRUE) or by forward differences (FALSE).
+      !  CHKJAC:   The variable designating whether the user supplied Jacobians are to be checked
+      !            (TRUE) or not (FALSE).
+      !  DOVCV:    The variable designating whether the covariance matrix was to be computed
+      !            (TRUE) or not (FALSE).
+      !  IMPLICIT: The variable designating whether the solution is by implicit ODR (TRUE)
+      !            or explicit ODR (FALSE).
+      !  INITD:    The variable designating whether DELTA is initialized to zero (TRUE) or
+      !            to the values in the first N by M elements of array RWORK (FALSE).
+      !  ISODR:    The variable designating whether the solution is by ODR (TRUE) or by
+      !            OLS (FALSE).
+      !  PENALTY:  The penalty parameter for an implicit model.
+      !  REDOJ:    The variable designating whether the Jacobian matrix is to be recomputed for
+      !            the computation of the covariance matrix (TRUE) or not (FALSE).
+      !  RESTART:  The variable designating whether the call is a restart (TRUE) or not
+      !            (FALSE).
+      !  TYP:      The CHARACTER*3 string "ODR" or "OLS".
 
-      call set_flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
-      pnlty = abs(we(1, 1, 1))
+      call set_flags(job, restart, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implicit)
+      penalty = abs(we(1, 1, 1))
 
       if (head) then
          call print_header(head, lunrpt)
@@ -221,22 +218,22 @@ contains
          write (lunrpt, 1200) typ
          call print_report_initial &
             (ipr, lunrpt, &
-             anajac, cdjac, chkjac, initd, restrt, isodr, implct, dovcv, redoj, &
+             anajac, cdjac, chkjac, initd, restart, isodr, implicit, dovcv, redoj, &
              msgb(1), msgb(2), msgd(1), msgd(2), n, m, np, q, npp, nnzw, x, &
              ifixx, ldifx, delta, wd, ldwd, ld2wd, tt, ldtt, stpd, ldstpd, &
-             y, we, ldwe, ld2we, pnlty, beta, ifixb, ssf, stpb, lower, &
+             y, we, ldwe, ld2we, penalty, beta, ifixb, ssf, stpb, lower, &
              upper, job, neta, taufac, sstol, partol, maxit, wss(1), wss(2), &
              wss(3))
 
          ! Print iteration reports
       elseif (iflag == 2) then
 
-         if (fstitr) then
+         if (firstitr) then
             write (lunrpt, 1300) typ
          end if
          call print_report_iter &
-            (ipr, lunrpt, fstitr, implct, prtpen, &
-             pnlty, &
+            (ipr, lunrpt, firstitr, implicit, printpen, &
+             penalty, &
              niter, nfev, wss(1), actred, prered, alpha, tau, pnorm, np, beta)
 
          ! Print final summary
@@ -245,10 +242,10 @@ contains
          write (lunrpt, 1400) typ
          call print_report_final &
             (ipr, lunrpt, &
-             isodr, implct, didvcv, dovcv, redoj, anajac, &
+             isodr, implicit, didvcv, dovcv, redoj, anajac, &
              n, m, np, q, npp, &
              info, niter, nfev, njev, irank, rcond, istop, &
-             wss(1), wss(2), wss(3), pnlty, rvar, idf, &
+             wss(1), wss(2), wss(3), penalty, rvar, idf, &
              beta, sdbeta, ifixb, f, delta, lower, upper)
       end if
 
@@ -265,11 +262,11 @@ contains
 
    impure subroutine print_report_initial &
       (ipr, lunrpt, &
-       anajac, cdjac, chkjac, initd, restrt, isodr, implct, dovcv, redoj, &
+       anajac, cdjac, chkjac, initd, restart, isodr, implicit, dovcv, redoj, &
        msgb1, msgb, msgd1, msgd, &
        n, m, np, q, npp, nnzw, &
        x, ifixx, ldifx, delta, wd, ldwd, ld2wd, tt, ldtt, stpd, ldstpd, &
-       y, we, ldwe, ld2we, pnlty, beta, ifixb, ssf, stpb, lower, &
+       y, we, ldwe, ld2we, penalty, beta, ifixb, ssf, stpb, lower, &
        upper, job, neta, taufac, sstol, partol, maxit, wss, wssdel, wsseps)
    !! Generate initial summary report.
 
@@ -282,31 +279,29 @@ contains
          !! Logical unit number for the computation reports.
       logical, intent(in) :: anajac
          !! Variable designating whether the Jacobians are computed by finite differences
-         !! (`anajac = .false.`) or not (`anajac = .true.`).
+         !! (`.false.`) or not (`.true.`).
       logical, intent(in) :: cdjac
          !! Variable designating whether the Jacobians are computed by central differences
-         !! (`cdjac = .true.`) or forward differences (`cdjac = .false.`).
+         !! (`.true.`) or forward differences (`.false.`).
       logical, intent(in) :: chkjac
          !! Variable designating whether the user-supplied Jacobians are to be checked
-         !! (`chkjac = .true.`) or not (`chkjac = .false.`).
+         !! (`.true.`) or not (`.false.`).
       logical, intent(in) :: initd
-         !! Variable designating whether `delta` is initialized to zero (`initd = .true.`)
-         !! or to the values in the first `n` by `m` elements of array `rwork` (`initd = .false.`).
-      logical, intent(in) :: restrt
-         !! Variable designating whether the call is a restart (`restrt = .true.`) or
-         !! not (`restrt = .false.`).
+         !! Variable designating whether `delta` is initialized to zero (`.true.`)
+         !! or to the values in the first `n` by `m` elements of array `rwork` (`.false.`).
+      logical, intent(in) :: restart
+         !! Variable designating whether the call is a restart (`.true.`) or not (`.false.`).
       logical, intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr = .true.`) or
-         !! by OLS (`isodr = .false.`).
-      logical, intent(in) :: implct
-         !! Variable designating whether the solution is by implicit ODR (`implct = .true.`)
-         !! or explicit ODR (`implct = .false.`).
+         !! Variable designating whether the solution is by ODR (`.true.`) or by OLS (`.false.`).
+      logical, intent(in) :: implicit
+         !! Variable designating whether the solution is by implicit ODR (`.true.`)
+         !! or explicit ODR (`.false.`).
       logical, intent(in) :: dovcv
-         !! Variable designating whether the covariance matrix is to be computed
-         !! (`dovcv = .true.`) or not (`dovcv = .false.`).
+         !! Variable designating whether the covariance matrix is to be computed (`.true.`)
+         !! or not (`.false.`).
       logical, intent(in) :: redoj
          !! Variable designating whether the Jacobian matrix is to be recomputed for the
-         !! computation of the covariance matrix (`redoj = .true.`) or not (`redoj = .false.`).
+         !! computation of the covariance matrix (`.true.`) or not (`.false.`).
       integer, intent(in) :: msgb1
          !! Error checking results for the Jacobian with respect to `beta`.
       integer, intent(in) :: msgb(q, np)
@@ -357,7 +352,7 @@ contains
          !! Leading dimension of array `we`.
       integer, intent(in) :: ld2we
          !! Second dimension of array `we`.
-      real(wp), intent(in) :: pnlty
+      real(wp), intent(in) :: penalty
          !! Penalty parameter for an implicit model.
       real(wp), intent(in) :: beta(np)
          !! Function parameters.
@@ -429,7 +424,7 @@ contains
       job4 = mod(job, 100)/10
       job5 = mod(job, 10)
       write (lunrpt, 1100) job
-      if (restrt) then
+      if (restart) then
          write (lunrpt, 1110) job1
       else
          write (lunrpt, 1111) job1
@@ -470,7 +465,7 @@ contains
          write (lunrpt, 1145) job4
       end if
       if (isodr) then
-         if (implct) then
+         if (implicit) then
             write (lunrpt, 1150) job5
          else
             write (lunrpt, 1151) job5
@@ -489,10 +484,10 @@ contains
       write (lunrpt, 1400) sstol, partol, maxit
 
       ! Print initial sum of squares
-      if (implct) then
+      if (implicit) then
          write (lunrpt, 1500) wssdel
          if (isodr) then
-            write (lunrpt, 1510) wss, wsseps, pnlty
+            write (lunrpt, 1510) wss, wsseps, penalty
          end if
       else
          write (lunrpt, 1600) wss
@@ -701,7 +696,7 @@ contains
          end if
 
          ! Print response variable data and observation error weights
-         if (.not. implct) then
+         if (.not. implicit) then
             write (lunrpt, 3000)
             write (lunrpt, 3100)
             do l = 1, q
@@ -901,8 +896,8 @@ contains
    end subroutine print_report_initial
 
    impure subroutine print_report_iter &
-      (ipr, lunrpt, fstitr, implct, prtpen, &
-       pnlty, &
+      (ipr, lunrpt, firstitr, implicit, printpen, &
+       penalty, &
        niter, nfev, wss, actred, prered, alpha, tau, pnorm, np, beta)
    !! Generate iteration reports.
 
@@ -912,16 +907,16 @@ contains
          !! Value indicating the report to be printed.
       integer, intent(in) :: lunrpt
          !! Logical unit number used for computation reports.
-      logical, intent(in) :: fstitr
-         !! Variable designating whether this is the first iteration (`fstitr = .true.`) or
-         !! not (`fstitr = .false.`).
-      logical, intent(in) :: implct
-         !! Variable designating whether the solution is by implicit ODR (`implct = .true.`)
-         !! or explicit ODR (`implct = .false.`).
-      logical, intent(in) :: prtpen
+      logical, intent(in) :: firstitr
+         !! Variable designating whether this is the first iteration (`.true.`) or
+         !! not (`.false.`).
+      logical, intent(in) :: implicit
+         !! Variable designating whether the solution is by implicit ODR (`.true.`)
+         !! or explicit ODR (`.false.`).
+      logical, intent(in) :: printpen
          !! Variable designating whether the penalty parameter is to be printed in the
-         !! iteration report (`prtpen = .true.`) or not (`prtpen = .false.`).
-      real(wp), intent(in) :: pnlty
+         !! iteration report (`.true.`) or not (`.false.`).
+      real(wp), intent(in) :: penalty
          !! Penalty parameter for an implicit model.
       integer, intent(in) :: niter
          !! Number of iterations.
@@ -956,23 +951,23 @@ contains
       !  L:       An indexing variable.
       !  RATIO:   The ratio of TAU to PNORM.
 
-      if (fstitr) then
+      if (firstitr) then
          if (ipr == 1) then
-            if (implct) then
+            if (implicit) then
                write (lunrpt, 1121)
             else
                write (lunrpt, 1122)
             end if
          else
-            if (implct) then
+            if (implicit) then
                write (lunrpt, 1131)
             else
                write (lunrpt, 1132)
             end if
          end if
       end if
-      if (prtpen) then
-         write (lunrpt, 1133) pnlty
+      if (printpen) then
+         write (lunrpt, 1133) penalty
       end if
 
       if (alpha == zero) then
@@ -1063,10 +1058,10 @@ contains
 
    impure subroutine print_report_final &
       (ipr, lunrpt, &
-       isodr, implct, didvcv, dovcv, redoj, anajac, &
+       isodr, implicit, didvcv, dovcv, redoj, anajac, &
        n, m, np, q, npp, &
        info, niter, nfev, njev, irank, rcond, istop, &
-       wss, wssdel, wsseps, pnlty, rvar, idf, &
+       wss, wssdel, wsseps, penalty, rvar, idf, &
        beta, sdbeta, ifixb2, f, delta, &
        lower, upper)
    !! Generate final summary report.
@@ -1078,23 +1073,22 @@ contains
       integer, intent(in) :: lunrpt
          !! Logical unit number used for computation reports.
       logical, intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr = .true.`) or
-         !! by OLS (`isodr = .false.`).
-      logical, intent(in) :: implct
-         !! Variable designating whether the solution is by implicit ODR (`implct = .true.`)
-         !! or explicit ODR (`implct = .false.`).
+         !! Variable designating whether the solution is by ODR (`.true.`) or by OLS (`.false.`).
+      logical, intent(in) :: implicit
+         !! Variable designating whether the solution is by implicit ODR (`.true.`)
+         !! or explicit ODR (`.false.`).
       logical, intent(in) :: didvcv
-         !! Variable designating whether the covariance matrix was computed (`didvcv = .true.`)
-         !! or not (`didvcv = .false.`).
+         !! Variable designating whether the covariance matrix was computed (`.true.`)
+         !! or not (`.false.`).
       logical, intent(in) :: dovcv
          !! Variable designating whether the covariance matrix was to be computed
-         !! (`dovcv = .true.`) or not (`dovcv = .false.`).
+         !! (`.true.`) or not (`.false.`).
       logical, intent(in) :: redoj
          !! Variable designating whether the Jacobian matrix is to be recomputed for the
-         !! computation of the covariance matrix (`redoj = .true.`) or not (`redoj = .false.`).
+         !! computation of the covariance matrix (`.true.`) or not (`.false.`).
       logical, intent(in) :: anajac
          !! Variable designating whether the Jacobians are computed by finite differences
-         !! (`anajac = .false.`) or not (`anajac = .true.`).
+         !! (`.false.`) or not (`.true.`).
       integer, intent(in) :: n
          !! Number of observations.
       integer, intent(in) :: m
@@ -1126,7 +1120,7 @@ contains
          !! Sum-of-squares of the weighted `delta`s.
       real(wp), intent(in) :: wsseps
          !! Sum-of-squares of the weighted `epsilon`s.
-      real(wp), intent(in) :: pnlty
+      real(wp), intent(in) :: penalty
          !! Penalty parameter for an implicit model.
       real(wp), intent(in) :: rvar
          !! Residual variance.
@@ -1235,10 +1229,10 @@ contains
       write (lunrpt, 1350) istop
 
       ! Print final sum of squares
-      if (implct) then
+      if (implicit) then
          write (lunrpt, 2000) wssdel
          if (isodr) then
-            write (lunrpt, 2010) wss, wsseps, pnlty
+            write (lunrpt, 2010) wss, wsseps, penalty
          end if
       else
          write (lunrpt, 2100) wss
@@ -1317,7 +1311,7 @@ contains
 
       ! Print EPSILON's and DELTA's together in a column if the number of
       ! columns of data in EPSILON and DELTA is less than or equal to three.
-      if (implct .and. &
+      if (implicit .and. &
           (m <= 4)) then
          write (lunrpt, 4100)
          write (fmt1, 9110) m
@@ -1347,7 +1341,7 @@ contains
       else
 
          ! Print EPSILON's and DELTA's separately
-         if (.not. implct) then
+         if (.not. implicit) then
 
             ! Print EPSILON'S
             do j = 1, q
@@ -1600,7 +1594,7 @@ contains
       (info, lunerr, &
        n, m, np, q, &
        ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-       lrwkmn, liwkmn, &
+       lrwkmin, liwkmin, &
        fjacb, fjacd, &
        diff, msgb, isodr, msgd, &
        xplusd, nrow, neta, ntol)
@@ -1630,9 +1624,9 @@ contains
          !! Leading dimension of array `wd`.
       integer, intent(in) :: ld2wd
          !! Second dimension of array `wd`.
-      integer, intent(in) :: lrwkmn
+      integer, intent(in) :: lrwkmin
          !! Minimum acceptable length of array `rwork`.
-      integer, intent(in) :: liwkmn
+      integer, intent(in) :: liwkmin
          !! Minimum acceptable length of array `iwork`.
       real(wp), intent(in) :: fjacb(n, np, q)
          !! Jacobian with respect to `beta`.
@@ -1694,7 +1688,7 @@ contains
          call print_error_inputs(lunerr, info, d1, d2, d3, d4, d5, &
                                  n, m, q, &
                                  ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-                                 lrwkmn, liwkmn)
+                                 lrwkmin, liwkmin)
 
       elseif ((d1 == 4) .or. (msgb(1) >= 0)) then
 
@@ -1747,7 +1741,7 @@ contains
       (lunerr, info, d1, d2, d3, d4, d5, &
        n, m, q, &
        ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-       lrwkmn, liwkmn)
+       lrwkmin, liwkmin)
    !! Print error reports.
 
       integer, intent(in) :: lunerr
@@ -1782,9 +1776,9 @@ contains
          !! Leading dimension of array `wd`.
       integer, intent(in) :: ld2wd
          !! Second dimension of array `wd`.
-      integer, intent(in) :: lrwkmn
+      integer, intent(in) :: lrwkmin
          !! Minimum acceptable length of array `rwork`.
-      integer, intent(in) :: liwkmn
+      integer, intent(in) :: liwkmin
          !! Minimum acceptable length of array `iwork`.
 
       ! Print appropriate messages for errors in problem specification parameters
@@ -1842,10 +1836,10 @@ contains
 
          if (d5 /= 0) then
             if (d5 == 1 .or. d5 == 3) then
-               write (lunerr, 2410) lrwkmn
+               write (lunerr, 2410) lrwkmin
             end if
             if (d5 == 2 .or. d5 == 3) then
-               write (lunerr, 2420) liwkmn
+               write (lunerr, 2420) liwkmin
             end if
          end if
 
