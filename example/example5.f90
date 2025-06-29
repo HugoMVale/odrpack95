@@ -71,8 +71,9 @@ program example5
    allocate (iwork(liwork))
    allocate (rwork(lrwork))
 
-   call odr(fcn, n, m, q, np, beta, y, x, job=job, iwork=iwork, rwork=rwork, &
-            lower=lower, upper=upper)
+   call odr(fcn, n, m, q, np, beta, y, x, &
+            lower=lower, upper=upper, &
+            job=job, iwork=iwork, rwork=rwork)
 
    ! Remove the comments to print out 'iwork'
    ! print *, "iwork"

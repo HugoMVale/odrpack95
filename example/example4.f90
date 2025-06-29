@@ -121,8 +121,7 @@ program example4
 
    beta = [1.1E-0_wp, 3.3E+0_wp, 8.7_wp]
 
-   call odr(fcn, n, m, q, np, &
-            beta=beta, &
+   call odr(fcn, n, m, q, np, beta, &
             y=reshape([55.0_wp, 45.0_wp, 40.0_wp, 30.0_wp, 20.0_wp], [n, q]), &
             x=reshape([0.15_wp, 0.20_wp, 0.25_wp, 0.30_wp, 0.50_wp], [n, m]), &
             lower=[0.0_wp, 0.0_wp, 0.0_wp], &

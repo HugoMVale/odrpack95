@@ -47,7 +47,7 @@ program example2
    implicit none
 
    ! Variable declarations
-   integer :: i, info, iprint, j, job, lundata, lunrpt, m, n, np, q
+   integer :: i, iprint, j, job, lundata, lunrpt, m, n, np, q
    real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :)
 
    ! Set up report files
@@ -76,13 +76,8 @@ program example2
    iprint = 2002
 
    ! Compute solution
-   call odr(fcn=fcn, &
-            n=n, m=m, q=q, np=np, &
-            beta=beta, &
-            y=y, x=x, &
-            job=job, &
-            lunerr=lunrpt, lunrpt=lunrpt, iprint=iprint, &
-            info=info)
+   call odr(fcn, n, m, q, np, beta, y, x, &
+            job=job, lunerr=lunrpt, lunrpt=lunrpt, iprint=iprint)
 
    close (lunrpt)
 

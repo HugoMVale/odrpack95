@@ -61,7 +61,7 @@ program example1
    implicit none
 
    ! Variable declarations
-   integer :: i, info, iprint, j, job, lundata, lunrpt, m, n, np, q
+   integer :: i, iprint, j, job, lundata, lunrpt, m, n, np, q
    integer, allocatable :: ifixx(:, :)
    real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :)
 
@@ -99,14 +99,9 @@ program example1
    iprint = 1112
 
    ! Compute solution
-   call odr(fcn=fcn, &
-            n=n, m=m, q=q, np=np, &
-            beta=beta, &
-            y=y, x=x, &
+   call odr(fcn, n, m, q, np, beta, y, x, &
             ifixx=ifixx, &
-            job=job, &
-            iprint=iprint, lunerr=lunrpt, lunrpt=lunrpt, &
-            info=info)
+            job=job, iprint=iprint, lunerr=lunrpt, lunrpt=lunrpt)
 
    close (lunrpt)
 
