@@ -1133,7 +1133,7 @@ contains
          call scale_mat(n, q, we1_, ldwe, ld2we, f_, tempret(1:n, 1:q))
          f_ = tempret(1:n, 1:q)
 
-         rwork(wssepsi) = ddot(n*q, rwork(fi), 1, rwork(fi), 1)
+         rwork(wssepsi) = sum(f_**2)
          rwork(wssi) = rwork(wssepsi) + rwork(wssdeli)
 
       else
@@ -1228,9 +1228,9 @@ contains
          end if
 
          ! Compute sum of squares of the weighted EPSILONS and weighted DELTAS
-         rwork(wssepsi) = ddot(n*q, rwork(fi), 1, rwork(fi), 1)
+         rwork(wssepsi) = sum(f_**2)
          if (isodr) then
-            call scale_mat(n, m, wd, ldwd, ld2wd, rwork(deltai:deltai + n*m), tempret(1:n, 1:m))
+            call scale_mat(n, m, wd, ldwd, ld2wd, delta_, tempret(1:n, 1:m))
             rwork(wrki:wrki + n*m - 1) = reshape(tempret(1:n, 1:m), [n*m])
             rwork(wssdeli) = ddot(n*m, rwork(deltai), 1, rwork(wrki), 1)
          else
