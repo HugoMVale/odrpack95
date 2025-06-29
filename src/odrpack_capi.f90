@@ -191,7 +191,7 @@ contains
          real(c_double), intent(out) :: f(:, :)
          real(c_double), intent(out) :: fjacb(:, :, :)
          real(c_double), intent(out) :: fjacd(:, :, :)
-         integer, intent(out) :: istop
+         integer(c_int), intent(out) :: istop
 
          call fcn(size(xplusd, 1), size(xplusd, 2), size(f, 2), size(beta), size(ifixx, 1), &
                   beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
@@ -290,7 +290,7 @@ contains
          real(c_double), intent(out) :: f(:, :)
          real(c_double), intent(out) :: fjacb(:, :, :)
          real(c_double), intent(out) :: fjacd(:, :, :)
-         integer, intent(out) :: istop
+         integer(c_int), intent(out) :: istop
 
          call fcn(size(xplusd, 1), size(xplusd, 2), size(f, 2), size(beta), size(ifixx, 1), &
                   beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
@@ -433,7 +433,7 @@ contains
          real(c_double), intent(out) :: f(:, :)
          real(c_double), intent(out) :: fjacb(:, :, :)
          real(c_double), intent(out) :: fjacd(:, :, :)
-         integer, intent(out) :: istop
+         integer(c_int), intent(out) :: istop
 
          call fcn(size(xplusd, 1), size(xplusd, 2), size(f, 2), size(beta), size(ifixx, 1), &
                   beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
