@@ -6,14 +6,12 @@ module example2_model
 
 contains
 
-   pure subroutine fcn( &
-      n, m, q, np, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+   pure subroutine fcn(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
    !! User-supplied subroutine for evaluating the model.
 
-      integer, intent(in) :: ideval, ldifx, m, n, np, q
-      integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
-      real(kind=wp), intent(in) :: beta(np), xplusd(n, m)
-      real(kind=wp), intent(out) :: f(n, q), fjacb(n, np, q), fjacd(n, m, q)
+      integer, intent(in) :: ideval, ifixb(:), ifixx(:, :)
+      real(kind=wp), intent(in) :: beta(:), xplusd(:, :)
+      real(kind=wp), intent(out) :: f(:, :), fjacb(:, :, :), fjacd(:, :, :)
       integer, intent(out) :: istop
 
       ! Local variables
@@ -29,7 +27,7 @@ contains
 
       ! Compute predicted values
       if (mod(ideval, 10) >= 1) then
-         do i = 1, q
+         do i = 1, ubound(f, 2)
             f(:, i) = beta(3)*(xplusd(:, 1) - beta(1))**2 + &
                       2*beta(4)*(xplusd(:, 1) - beta(1))*(xplusd(:, 2) - beta(2)) + &
                       beta(5)*(xplusd(:, 2) - beta(2))**2 - one
@@ -49,7 +47,7 @@ program example2
    implicit none
 
    ! Variable declarations
-   integer :: i, info, iprint, j, job, lundata, lunrpt, m, n, np, q
+   integer :: i, iprint, j, job, lundata, lunrpt, m, n, np, q
    real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :)
 
    ! Set up report files
@@ -78,13 +76,8 @@ program example2
    iprint = 2002
 
    ! Compute solution
-   call odr(fcn=fcn, &
-            n=n, m=m, q=q, np=np, &
-            beta=beta, &
-            y=y, x=x, &
-            job=job, &
-            lunerr=lunrpt, lunrpt=lunrpt, iprint=iprint, &
-            info=info)
+   call odr(fcn, n, m, q, np, beta, y, x, &
+            job=job, lunerr=lunrpt, lunrpt=lunrpt, iprint=iprint)
 
    close (lunrpt)
 

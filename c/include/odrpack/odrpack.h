@@ -38,30 +38,30 @@ ODRPACK_EXTERN void close_file(
  * @param m       `==>` Number of columns of data in the independent variable.
  * @param q       `==>` Number of responses per observation.
  * @param np      `==>` Number of function parameters.
+ * @param ldifx   `==>` Leading dimension of array `ifixx`, `ifixx ∈ {1, n}`
  * @param beta    `==>` Array [np] of current parameter values.
  * @param xplusd  `==>` Array [m][ldn] of current explanatory variable values, i.e., `x + delta`.
  * @param ifixb   `==>` Array [np] of indicators for fixing parameters `beta`.
  * @param ifixx   `==>` Array [m][ldifx] of indicators for fixing explanatory variable `x`.
- * @param ldifx   `==>` Leading dimension of array `ifixx`, `ifixx ∈ {1, n}`
  * @param ideval  `==>` Indicator for selecting computation to be performed.
  * @param f       `<==` Array [q][n] for predicted function values.
  * @param fjacb   `<==` Array [q][np][n] for Jacobian with respect to `beta`.
  * @param fjacd   `<==` Array [q][m][n] for Jacobian with respect to errors `delta`.
  * @param istop   `<==` Integer for stopping condition. Values:
  *                0 - current `beta` and `x + delta` were acceptable and values were computed successfully,
- *                1 - current `beta` and `x + delta` are not acceptable; ODRPACK95 should select values closer to most recently used values if possible,
- *               -1 - current `beta` and `x + delta` are not acceptable; ODRPACK95 should stop.
+ *                1 - current `beta` and `x + delta` are not acceptable; 'odrpack' should select values closer to most recently used values if possible,
+ *               -1 - current `beta` and `x + delta` are not acceptable; 'odrpack' should stop.
  */
 typedef void (*odrpack_fcn_t)(
     const int *n,
     const int *m,
     const int *q,
     const int *np,
+    const int *ldifx,
     const double beta[],
     const double xplusd[],
     const int ifixb[],
     const int ifixx[],
-    const int *ldifx,
     const int *ideval,
     double f[],
     double fjacb[],
@@ -248,29 +248,29 @@ ODRPACK_EXTERN void odr_long_c(
  */
 typedef struct
 {
-    int msgb;   /**< The starting location in array `iwork` of array `msgb`. */
-    int msgd;   /**< The starting location in array `iwork` of array `msgd`. */
-    int ifix2;  /**< The starting location in array `iwork` of array `ifix2`. */
-    int istop;  /**< The location in array `iwork` of variable `istop`. */
-    int nnzw;   /**< The location in array `iwork` of variable `nnzw`. */
-    int npp;    /**< The location in array `iwork` of variable `npp`. */
-    int idf;    /**< The location in array `iwork` of variable `idf`. */
-    int job;    /**< The location in array `iwork` of variable `job`. */
-    int iprin;  /**< The location in array `iwork` of variable `iprint`. */
-    int luner;  /**< The location in array `iwork` of variable `lunerr`. */
-    int lunrp;  /**< The location in array `iwork` of variable `lunrpt`. */
-    int nrow;   /**< The location in array `iwork` of variable `nrow`. */
-    int ntol;   /**< The location in array `iwork` of variable `ntol`. */
-    int neta;   /**< The location in array `iwork` of variable `neta`. */
-    int maxit;  /**< The location in array `iwork` of variable `maxit`. */
-    int niter;  /**< The location in array `iwork` of variable `niter`. */
-    int nfev;   /**< The location in array `iwork` of variable `nfev`. */
-    int njev;   /**< The location in array `iwork` of variable `njev`. */
-    int int2;   /**< The location in array `iwork` of variable `int2`. */
-    int irank;  /**< The location in array `iwork` of variable `irank`. */
-    int ldtt;   /**< The location in array `iwork` of variable `ldtt`. */
-    int bound;  /**< The location in array `iwork` of variable `bound`. */
-    int liwkmn; /**< The minimum acceptable length of array `iwork`. */
+    int msgb;    /**< The starting location in array `iwork` of array `msgb`. */
+    int msgd;    /**< The starting location in array `iwork` of array `msgd`. */
+    int ifix2;   /**< The starting location in array `iwork` of array `ifix2`. */
+    int istop;   /**< The location in array `iwork` of variable `istop`. */
+    int nnzw;    /**< The location in array `iwork` of variable `nnzw`. */
+    int npp;     /**< The location in array `iwork` of variable `npp`. */
+    int idf;     /**< The location in array `iwork` of variable `idf`. */
+    int job;     /**< The location in array `iwork` of variable `job`. */
+    int iprint;  /**< The location in array `iwork` of variable `iprint`. */
+    int lunerr;  /**< The location in array `iwork` of variable `lunerr`. */
+    int lunrpt;  /**< The location in array `iwork` of variable `lunrpt`. */
+    int nrow;    /**< The location in array `iwork` of variable `nrow`. */
+    int ntol;    /**< The location in array `iwork` of variable `ntol`. */
+    int neta;    /**< The location in array `iwork` of variable `neta`. */
+    int maxit;   /**< The location in array `iwork` of variable `maxit`. */
+    int niter;   /**< The location in array `iwork` of variable `niter`. */
+    int nfev;    /**< The location in array `iwork` of variable `nfev`. */
+    int njev;    /**< The location in array `iwork` of variable `njev`. */
+    int int2;    /**< The location in array `iwork` of variable `int2`. */
+    int irank;   /**< The location in array `iwork` of variable `irank`. */
+    int ldtt;    /**< The location in array `iwork` of variable `ldtt`. */
+    int bound;   /**< The location in array `iwork` of variable `bound`. */
+    int liwkmin; /**< The minimum acceptable length of array `iwork`. */
 } iworkidx_t;
 
 /**
@@ -278,58 +278,58 @@ typedef struct
  */
 typedef struct
 {
-    int delta;  /**< Starting location of array `delta`. */
-    int eps;    /**< Starting location of array `eps`. */
-    int xplus;  /**< Starting location of array `xplusd`. */
-    int fn;     /**< Starting location of array `fn`. */
-    int sd;     /**< Starting location of array `sd`. */
-    int vcv;    /**< Starting location of array `vcv`. */
-    int rvar;   /**< Location of variable `rvar`. */
-    int wss;    /**< Location of variable `wss`. */
-    int wssde;  /**< Location of variable `wssdel`. */
-    int wssep;  /**< Location of variable `wsep`. */
-    int rcond;  /**< Location of variable `rcond`. */
-    int eta;    /**< Location of variable `eta`. */
-    int olmav;  /**< Location of variable `olmavg`. */
-    int tau;    /**< Location of variable `tau`. */
-    int alpha;  /**< Location of variable `alpha`. */
-    int actrs;  /**< Location of variable `actrs`. */
-    int pnorm;  /**< Location of variable `pnorm`. */
-    int rnors;  /**< Location of variable `rnorms`. */
-    int prers;  /**< Location of variable `prers`. */
-    int partl;  /**< Location of variable `partol`. */
-    int sstol;  /**< Location of variable `sstol`. */
-    int taufc;  /**< Location of variable `taufac`. */
-    int epsma;  /**< Location of variable `epsmac`. */
-    int beta0;  /**< Starting location of array `beta0`. */
-    int betac;  /**< Starting location of array `betac`. */
-    int betas;  /**< Starting location of array `betas`. */
-    int betan;  /**< Starting location of array `betan`. */
-    int s;      /**< Starting location of array `s`. */
-    int ss;     /**< Starting location of array `ss`. */
-    int ssf;    /**< Starting location of array `ssf`. */
-    int qraux;  /**< Starting location of array `qraux`. */
-    int u;      /**< Starting location of array `u`. */
-    int fs;     /**< Starting location of array `fs`. */
-    int fjacb;  /**< Starting location of array `fjacb`. */
-    int we1;    /**< Location of variable `we1`. */
-    int diff;   /**< Starting location of array `diff`. */
-    int delts;  /**< Starting location of array `deltas`. */
-    int deltn;  /**< Starting location of array `deltan`. */
-    int t;      /**< Starting location of array `t`. */
-    int tt;     /**< Starting location of array `tt`. */
-    int omega;  /**< Starting location of array `omega`. */
-    int fjacd;  /**< Starting location of array `fjacd`. */
-    int wrk1;   /**< Starting location of array `wrk1`. */
-    int wrk2;   /**< Starting location of array `wrk2`. */
-    int wrk3;   /**< Starting location of array `wrk3`. */
-    int wrk4;   /**< Starting location of array `wrk4`. */
-    int wrk5;   /**< Starting location of array `wrk5`. */
-    int wrk6;   /**< Starting location of array `wrk6`. */
-    int wrk7;   /**< Starting location of array `wrk7`. */
-    int lower;  /**< Starting location of array `lower`. */
-    int upper;  /**< Starting location of array `upper`. */
-    int lrwkmn; /**< Minimum acceptable length of vector `rwork`. */
+    int delta;   /**< Starting location of array `delta`. */
+    int eps;     /**< Starting location of array `eps`. */
+    int xplusd;  /**< Starting location of array `xplusd`. */
+    int fn;      /**< Starting location of array `fn`. */
+    int sd;      /**< Starting location of array `sd`. */
+    int vcv;     /**< Starting location of array `vcv`. */
+    int rvar;    /**< Location of variable `rvar`. */
+    int wss;     /**< Location of variable `wss`. */
+    int wssdel;  /**< Location of variable `wssdel`. */
+    int wsseps;  /**< Location of variable `wsep`. */
+    int rcond;   /**< Location of variable `rcond`. */
+    int eta;     /**< Location of variable `eta`. */
+    int olmavg;  /**< Location of variable `olmavg`. */
+    int tau;     /**< Location of variable `tau`. */
+    int alpha;   /**< Location of variable `alpha`. */
+    int actrs;   /**< Location of variable `actrs`. */
+    int pnorm;   /**< Location of variable `pnorm`. */
+    int rnorms;  /**< Location of variable `rnorms`. */
+    int prers;   /**< Location of variable `prers`. */
+    int partol;  /**< Location of variable `partol`. */
+    int sstol;   /**< Location of variable `sstol`. */
+    int taufac;  /**< Location of variable `taufac`. */
+    int epsmac;  /**< Location of variable `epsmac`. */
+    int beta0;   /**< Starting location of array `beta0`. */
+    int betac;   /**< Starting location of array `betac`. */
+    int betas;   /**< Starting location of array `betas`. */
+    int betan;   /**< Starting location of array `betan`. */
+    int s;       /**< Starting location of array `s`. */
+    int ss;      /**< Starting location of array `ss`. */
+    int ssf;     /**< Starting location of array `ssf`. */
+    int qraux;   /**< Starting location of array `qraux`. */
+    int u;       /**< Starting location of array `u`. */
+    int fs;      /**< Starting location of array `fs`. */
+    int fjacb;   /**< Starting location of array `fjacb`. */
+    int we1;     /**< Location of variable `we1`. */
+    int diff;    /**< Starting location of array `diff`. */
+    int deltas;  /**< Starting location of array `deltas`. */
+    int deltan;  /**< Starting location of array `deltan`. */
+    int t;       /**< Starting location of array `t`. */
+    int tt;      /**< Starting location of array `tt`. */
+    int omega;   /**< Starting location of array `omega`. */
+    int fjacd;   /**< Starting location of array `fjacd`. */
+    int wrk1;    /**< Starting location of array `wrk1`. */
+    int wrk2;    /**< Starting location of array `wrk2`. */
+    int wrk3;    /**< Starting location of array `wrk3`. */
+    int wrk4;    /**< Starting location of array `wrk4`. */
+    int wrk5;    /**< Starting location of array `wrk5`. */
+    int wrk6;    /**< Starting location of array `wrk6`. */
+    int wrk7;    /**< Starting location of array `wrk7`. */
+    int lower;   /**< Starting location of array `lower`. */
+    int upper;   /**< Starting location of array `upper`. */
+    int lrwkmin; /**< Minimum acceptable length of vector `rwork`. */
 } rworkidx_t;
 
 /**
@@ -355,7 +355,7 @@ ODRPACK_EXTERN void loc_iwork_c(
  * @param np    `==>` Number of function parameters.
  * @param ldwe  `==>` Leading dimension of array `we`.
  * @param ld2we `==>` Second dimension of array `we`.
- * @param isodr `==>` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
+ * @param isodr `==>` Variable designating whether the solution is by ODR (`true`) or by OLS (`false`).
  * @param rwi   `<==` 0-based indexes of real work array.
  */
 ODRPACK_EXTERN void loc_rwork_c(
@@ -375,7 +375,7 @@ ODRPACK_EXTERN void loc_rwork_c(
  * @param m      `==>` Number of columns of data in the explanatory variable.
  * @param q      `==>` Number of responses per observation.
  * @param np     `==>` Number of function parameters.
- * @param isodr  `==>` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
+ * @param isodr  `==>` Variable designating whether the solution is by ODR (`true`) or by OLS (`false`).
  * @param lrwork `<==` Length of real `rwork` array.
  * @param liwork `<==` Length of integer `iwork` array.
  */

@@ -6,14 +6,12 @@ module example3_model
 
 contains
 
-   pure subroutine fcn( &
-      n, m, q, np, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+   pure subroutine fcn(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
    !! User-supplied subroutine for evaluating the model.
 
-      integer, intent(in) :: ideval, ldifx, m, n, np, q
-      integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
-      real(kind=wp), intent(in) :: beta(np), xplusd(n, m)
-      real(kind=wp), intent(out) :: f(n, q), fjacb(n, np, q), fjacd(n, m, q)
+      integer, intent(in) :: ideval, ifixb(:), ifixx(:, :)
+      real(kind=wp), intent(in) :: beta(:), xplusd(:, :)
+      real(kind=wp), intent(out) :: f(:, :), fjacb(:, :, :), fjacd(:, :, :)
       integer, intent(out) :: istop
 
       ! Local variables
@@ -22,7 +20,7 @@ contains
       integer :: i
 
       ! Check for unacceptable values for this problem
-      do i = 1, n
+      do i = 1, ubound(xplusd, 1)
          if (xplusd(i, 1) < zero) then
             istop = 1
             return
@@ -36,7 +34,7 @@ contains
 
       ! Compute predicted values
       if (mod(ideval, 10) >= 1) then
-         do i = 1, n
+         do i = 1, ubound(xplusd, 1)
             freq = xplusd(i, 1)
             omega = (2.0E0_wp*pi*freq*exp(-beta(3)))**beta(4)
             phi = atan2((omega*stheta), (1 + omega*ctheta))
@@ -60,7 +58,7 @@ program example3
    implicit none
 
    ! Variable declarations
-   integer :: i, info, iprint, j, job, lundata, lunrpt, m, n, np, q
+   integer :: i, iprint, j, job, lundata, lunrpt, m, n, np, q
    integer, allocatable :: ifixx(:, :)
    real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :), wd(:, :, :), we(:, :, :), &
                                  delta(:, :)
@@ -133,16 +131,9 @@ program example3
    end do
 
    ! Compute solution
-   call odr(fcn=fcn, &
-            n=n, m=m, q=q, np=np, &
-            beta=beta, &
-            y=y, x=x, &
-            delta=delta, &
-            we=we, wd=wd, &
-            ifixx=ifixx, &
-            job=job, &
-            iprint=iprint, lunerr=lunrpt, lunrpt=lunrpt, &
-            info=info)
+   call odr(fcn, n, m, q, np, beta, y, x, &
+            delta=delta, we=we, wd=wd, ifixx=ifixx, &
+            job=job, iprint=iprint, lunerr=lunrpt, lunrpt=lunrpt)
 
    close (lunrpt)
 

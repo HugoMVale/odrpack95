@@ -7,14 +7,12 @@ module test_error_detection_m
 
 contains
 
-   subroutine fcn( &
-      n, m, q, np, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+   subroutine fcn(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
    !! User-supplied subroutine for evaluating the model.
 
-      integer, intent(in) :: ideval, ldifx, m, n, np, q
-      integer, intent(in) :: ifixb(np), ifixx(ldifx, m)
-      real(kind=wp), intent(in) :: beta(np), xplusd(n, m)
-      real(kind=wp), intent(out) :: f(n, q), fjacb(n, np, q), fjacd(n, m, q)
+      integer, intent(in) :: ideval, ifixb(:), ifixx(:, :)
+      real(kind=wp), intent(in) :: beta(:), xplusd(:, :)
+      real(kind=wp), intent(out) :: f(:, :), fjacb(:, :, :), fjacd(:, :, :)
       integer, intent(out) :: istop
 
       integer :: i
@@ -29,20 +27,18 @@ contains
 
       if (any(lower > beta)) then
          write (0, *) "LOWER BOUNDS VIOLATED"
-         do i = 1, np
+         do i = 1, size(beta)
             if (lower(i) > beta(i)) then
-               write (0, *) "   IN THE ", i, " POSITION WITH ", beta(i), &
-                  "<", lower(i)
+               write (0, *) "   IN THE ", i, " POSITION WITH ", beta(i), "<", lower(i)
             end if
          end do
       end if
 
       if (any(upper < beta)) then
          write (0, *) "UPPER BOUNDS VIOLATED"
-         do i = 1, np
+         do i = 1, size(beta)
             if (upper(i) < beta(i)) then
-               write (0, *) "   IN THE ", i, " POSITION WITH ", beta(i), &
-                  ">", upper(i)
+               write (0, *) "   IN THE ", i, " POSITION WITH ", beta(i), ">", upper(i)
             end if
          end do
       end if
@@ -50,20 +46,20 @@ contains
       istop = 0
 
       if (mod(ideval, 10) /= 0) then
-         do i = 1, n
+         do i = 1, ubound(f, 1)
             f(i, 1) = beta(1)*exp(beta(2)*xplusd(i, 1))
          end do
       end if
 
       if (mod(ideval/10, 10) /= 0) then
-         do i = 1, n
+         do i = 1, ubound(f, 1)
             fjacb(i, 1, 1) = exp(beta(2)*xplusd(i, 1))
             fjacb(i, 2, 1) = beta(1)*xplusd(i, 1)*exp(beta(2)*xplusd(i, 1))
          end do
       end if
 
       if (mod(ideval/100, 10) /= 0) then
-         do i = 1, n
+         do i = 1, ubound(f, 1)
             fjacd(i, 1, 1) = beta(1)*beta(2)*exp(beta(2)*xplusd(i, 1))
          end do
       end if

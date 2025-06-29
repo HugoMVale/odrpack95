@@ -1953,30 +1953,24 @@ contains
 
    end subroutine set_inputs
 
-   pure subroutine fcn( &
-      n, m, q, np, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop)
+   pure subroutine fcn(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
    !! Compute model function and jacobian for odrpack exerciser.
 
       use odrpack_kinds, only: zero, one
 
-      integer, intent(in) :: n
-      integer, intent(in) :: m
-      integer, intent(in) :: q
-      integer, intent(in) :: np
-      real(wp), intent(in) :: beta(np)
-      real(wp), intent(in) :: xplusd(n, m)
-      integer, intent(in) :: ifixb(np)
-      integer, intent(in) :: ifixx(ldifx, m)
-      integer, intent(in) :: ldifx
+      real(wp), intent(in) :: beta(:)
+      real(wp), intent(in) :: xplusd(:, :)
+      integer, intent(in) :: ifixb(:)
+      integer, intent(in) :: ifixx(:, :)
       integer, intent(in) :: ideval
-      real(wp), intent(out) :: f(n, q)
-      real(wp), intent(out) :: fjacb(n, np, q)
-      real(wp), intent(out) :: fjacd(n, m, q)
+      real(wp), intent(out) :: f(:, :)
+      real(wp), intent(out) :: fjacb(:, :, :)
+      real(wp), intent(out) :: fjacd(:, :, :)
       integer, intent(out) :: istop
 
       ! Local scalars
       real(wp) :: ctheta, fac1, fac2, fac3, fac4, freq, omega, phi, pi, r, stheta, theta
-      integer :: i, j, k
+      integer :: i, j, k, n
 
       ! Variable definitions (alphabetically)
       !  BETA:    Current values of parameters
@@ -2019,6 +2013,8 @@ contains
          istop = -2
          return
       end if
+
+      n = ubound(xplusd, 1)
 
       if (setno == 1) then
 
@@ -2330,33 +2326,33 @@ contains
 
    end subroutine fcn
 
-   subroutine loc_wsse(n, m, np, q, ldwe, ld2we, isodr, wssi, wssdei, wssepi)
+   subroutine loc_wsse(n, m, np, q, ldwe, ld2we, isodr, wssi, wssdeli, wssepsi)
    !! Locations of the weighted sum of squares results in the `rwork` array.
 
       use odrpack_core, only: loc_rwork
 
       integer, intent(in) :: n, m, np, q, ldwe, ld2we
       logical, intent(in) :: isodr
-      integer, intent(out) :: wssi, wssdei, wssepi
+      integer, intent(out) :: wssi, wssdeli, wssepsi
 
-      integer :: deltai, epsi, xplusi, fni, sdi, vcvi, rvari, &
-                 rcondi, etai, olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, partli, &
-                 sstoli, taufci, epsmai, beta0i, betaci, betasi, betani, si, ssi, ssfi, &
-                 qrauxi, ui, fsi, fjacbi, we1i, diffi, deltsi, deltni, ti, tti, omegai, &
+      integer :: deltai, epsi, xplusdi, fni, sdi, vcvi, rvari, &
+                 rcondi, etai, olmavgi, taui, alphai, actrsi, pnormi, rnormsi, prersi, partoli, &
+                 sstoli, taufaci, epsmaci, beta0i, betaci, betasi, betani, si, ssi, ssfi, &
+                 qrauxi, ui, fsi, fjacbi, we1i, diffi, deltasi, deltani, ti, tti, omegai, &
                  fjacdi, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, loweri, upperi, &
-                 lwkmn
+                 lwkmin
 
       call loc_rwork(n, m, q, np, ldwe, ld2we, isodr, &
-                     deltai, epsi, xplusi, fni, sdi, vcvi, &
-                     rvari, wssi, wssdei, wssepi, rcondi, etai, &
-                     olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
-                     partli, sstoli, taufci, epsmai, &
+                     deltai, epsi, xplusdi, fni, sdi, vcvi, &
+                     rvari, wssi, wssdeli, wssepsi, rcondi, etai, &
+                     olmavgi, taui, alphai, actrsi, pnormi, rnormsi, prersi, &
+                     partoli, sstoli, taufaci, epsmaci, &
                      beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
                      fsi, fjacbi, we1i, diffi, &
-                     deltsi, deltni, ti, tti, omegai, fjacdi, &
+                     deltasi, deltani, ti, tti, omegai, fjacdi, &
                      wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
                      loweri, upperi, &
-                     lwkmn)
+                     lwkmin)
 
    end subroutine loc_wsse
 

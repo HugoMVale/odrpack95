@@ -8,7 +8,7 @@ module odrpack_capi
 
    abstract interface
       subroutine fcn_tc( &
-         n, m, q, np, beta, xplusd, ifixb, ifixx, ldifx, ideval, f, fjacb, fjacd, istop) bind(C)
+         n, m, q, np, ldifx, beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop) bind(C)
       !! User-supplied subroutine for evaluating the model.
          import :: c_int, c_double
          implicit none
@@ -20,6 +20,8 @@ module odrpack_capi
             !! Number of responses per observation.
          integer(c_int), intent(in) :: np
             !! Number of function parameters.
+         integer(c_int), intent(in) :: ldifx
+            !! Leading dimension of array `ifixx`.
          real(c_double), intent(in) :: beta(np)
             !! Current values of parameters.
          real(c_double), intent(in) :: xplusd(n, m)
@@ -28,8 +30,6 @@ module odrpack_capi
             !! Indicators for "fixing" parameters (`beta`).
          integer(c_int), intent(in) :: ifixx(ldifx, m)
             !! Indicators for "fixing" explanatory variable (`x`).
-         integer(c_int), intent(in) :: ldifx
-            !! Leading dimension of array `ifixx`.
          integer(c_int), intent(in) :: ideval
             !! Indicator for selecting computation to be performed.
          real(c_double), intent(out) :: f(n, q)
@@ -39,7 +39,12 @@ module odrpack_capi
          real(c_double), intent(out) :: fjacd(n, m, q)
             !! Jacobian with respect to errors `delta`.
          integer(c_int), intent(out) :: istop
-            !! Stopping condition.
+            !! Stopping condition, with meaning as follows.
+            !!  `0`: Current `beta` and `x + delta` were acceptable and values were computed
+            !!       successfully.
+            !!  `1`: Current `beta` and `x + delta` are not acceptable; 'odrpack' should select
+            !!       values closer to most recently used values if possible.
+            !! `-1`: Current `beta` and `x + delta` are not acceptable; 'odrpack' should stop.
       end subroutine
    end interface
 
@@ -55,27 +60,27 @@ module odrpack_capi
    !! 0-based indices of the variables stored in the real work array.
       integer(c_int) :: delta
       integer(c_int) :: eps
-      integer(c_int) :: xplus
+      integer(c_int) :: xplusd
       integer(c_int) :: fn
       integer(c_int) :: sd
       integer(c_int) :: vcv
       integer(c_int) :: rvar
       integer(c_int) :: wss
-      integer(c_int) :: wssde
-      integer(c_int) :: wssep
+      integer(c_int) :: wssdel
+      integer(c_int) :: wsseps
       integer(c_int) :: rcond
       integer(c_int) :: eta
-      integer(c_int) :: olmav
+      integer(c_int) :: olmavg
       integer(c_int) :: tau
       integer(c_int) :: alpha
       integer(c_int) :: actrs
       integer(c_int) :: pnorm
-      integer(c_int) :: rnors
+      integer(c_int) :: rnorms
       integer(c_int) :: prers
-      integer(c_int) :: partl
+      integer(c_int) :: partol
       integer(c_int) :: sstol
-      integer(c_int) :: taufc
-      integer(c_int) :: epsma
+      integer(c_int) :: taufac
+      integer(c_int) :: epsmac
       integer(c_int) :: beta0
       integer(c_int) :: betac
       integer(c_int) :: betas
@@ -89,8 +94,8 @@ module odrpack_capi
       integer(c_int) :: fjacb
       integer(c_int) :: we1
       integer(c_int) :: diff
-      integer(c_int) :: delts
-      integer(c_int) :: deltn
+      integer(c_int) :: deltas
+      integer(c_int) :: deltan
       integer(c_int) :: t
       integer(c_int) :: tt
       integer(c_int) :: omega
@@ -104,7 +109,7 @@ module odrpack_capi
       integer(c_int) :: wrk7
       integer(c_int) :: lower
       integer(c_int) :: upper
-      integer(c_int) :: lrwkmn
+      integer(c_int) :: lrwkmin
    end type rworkidx_t
 
    type, bind(C) :: iworkidx_t
@@ -117,9 +122,9 @@ module odrpack_capi
       integer(c_int) :: npp
       integer(c_int) :: idf
       integer(c_int) :: job
-      integer(c_int) :: iprin
-      integer(c_int) :: luner
-      integer(c_int) :: lunrp
+      integer(c_int) :: iprint
+      integer(c_int) :: lunerr
+      integer(c_int) :: lunrpt
       integer(c_int) :: nrow
       integer(c_int) :: ntol
       integer(c_int) :: neta
@@ -131,7 +136,7 @@ module odrpack_capi
       integer(c_int) :: irank
       integer(c_int) :: ldtt
       integer(c_int) :: bound
-      integer(c_int) :: liwkmn
+      integer(c_int) :: liwkmin
    end type iworkidx_t
 
 contains
@@ -170,10 +175,28 @@ contains
       integer(c_int), intent(in), optional :: job
          !! Variable controlling initialization and computational method.
 
-      call odr(fcn, n, m, q, np, beta, y, x, &
+      call odr(fcn_, n, m, q, np, beta, y, x, &
                delta=delta, &
                lower=lower, upper=upper, &
                job=job)
+
+   contains
+
+      subroutine fcn_(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
+         real(c_double), intent(in) :: beta(:)
+         real(c_double), intent(in) :: xplusd(:, :)
+         integer(c_int), intent(in) :: ifixb(:)
+         integer(c_int), intent(in) :: ifixx(:, :)
+         integer(c_int), intent(in) :: ideval
+         real(c_double), intent(out) :: f(:, :)
+         real(c_double), intent(out) :: fjacb(:, :, :)
+         real(c_double), intent(out) :: fjacd(:, :, :)
+         integer, intent(out) :: istop
+
+         call fcn(size(xplusd, 1), size(xplusd, 2), size(f, 2), size(beta), size(ifixx, 1), &
+                  beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
+
+      end subroutine fcn_
 
    end subroutine odr_short_c
 
@@ -236,19 +259,19 @@ contains
       integer(c_int), intent(in), optional :: iprint
          !! Print control variable.
       integer(c_int), intent(in), optional :: lunerr
-         !! Logical unit number for error messages. Available options are:
-         !!   0 => no output.
-         !!   6 => output to standard error.
-         !!   other => output to logical unit number `lunerr`.
+         !! Logical unit number for error messages.
+         !!  `0`: No output.
+         !!  `6`: Output to standard output.
+         !!  `k /= 0,6`: Output to logical unit `k`.
       integer(c_int), intent(in), optional :: lunrpt
-         !! Logical unit number for computation reports. Available options are:
-         !!   0 => no output.
-         !!   6 => output to standard error.
-         !!   other => output to logical unit number `lunrpt`.
+         !! Logical unit number for computation reports.
+         !!  `0`: No output.
+         !!  `6`: Output to standard output.
+         !!  `k /= 0,6`: Output to logical unit `k`.
       integer(c_int), intent(out), optional :: info
          !! Logical unit number for computation reports.
 
-      call odr(fcn, n, m, q, np, beta, y, x, &
+      call odr(fcn_, n, m, q, np, beta, y, x, &
                we=we, wd=wd, &
                ifixb=ifixb, ifixx=ifixx, &
                delta=delta, &
@@ -256,6 +279,23 @@ contains
                job=job, &
                iprint=iprint, lunerr=lunerr, lunrpt=lunrpt, &
                info=info)
+   contains
+
+      subroutine fcn_(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
+         real(c_double), intent(in) :: beta(:)
+         real(c_double), intent(in) :: xplusd(:, :)
+         integer(c_int), intent(in) :: ifixb(:)
+         integer(c_int), intent(in) :: ifixx(:, :)
+         integer(c_int), intent(in) :: ideval
+         real(c_double), intent(out) :: f(:, :)
+         real(c_double), intent(out) :: fjacb(:, :, :)
+         real(c_double), intent(out) :: fjacd(:, :, :)
+         integer, intent(out) :: istop
+
+         call fcn(size(xplusd, 1), size(xplusd, 2), size(f, 2), size(beta), size(ifixx, 1), &
+                  beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
+
+      end subroutine fcn_
 
    end subroutine odr_medium_c
 
@@ -357,19 +397,19 @@ contains
       integer(c_int), intent(in), optional :: iprint
          !! Print control variable.
       integer(c_int), intent(in), optional :: lunerr
-         !! Logical unit number for error messages. Available options are:
-         !!   0 => no output.
-         !!   6 => output to standard error.
-         !!   other => output to logical unit number `lunerr`.
+         !! Logical unit number for error messages.
+         !!  `0`: No output.
+         !!  `6`: Output to standard output.
+         !!  `k /= 0,6`: Output to logical unit `k`.
       integer(c_int), intent(in), optional :: lunrpt
-         !! Logical unit number for computation reports. Available options are:
-         !!   0 => no output.
-         !!   6 => output to standard error.
-         !!   other => output to logical unit number `lunrpt`.
+         !! Logical unit number for computation reports.
+         !!  `0`: No output.
+         !!  `6`: Output to standard output.
+         !!  `k /= 0,6`: Output to logical unit `k`.
       integer(c_int), intent(out), optional :: info
          !! Variable designating why the computations were stopped.
 
-      call odr(fcn, n, m, q, np, beta, y, x, &
+      call odr(fcn_, n, m, q, np, beta, y, x, &
                we=we, wd=wd, &
                ifixb=ifixb, ifixx=ifixx, &
                delta=delta, &
@@ -381,6 +421,24 @@ contains
                sclb=sclb, scld=scld, &
                info=info, &
                rwork=rwork, iwork=iwork)
+
+   contains
+
+      subroutine fcn_(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
+         real(c_double), intent(in) :: beta(:)
+         real(c_double), intent(in) :: xplusd(:, :)
+         integer(c_int), intent(in) :: ifixb(:)
+         integer(c_int), intent(in) :: ifixx(:, :)
+         integer(c_int), intent(in) :: ideval
+         real(c_double), intent(out) :: f(:, :)
+         real(c_double), intent(out) :: fjacb(:, :, :)
+         real(c_double), intent(out) :: fjacd(:, :, :)
+         integer, intent(out) :: istop
+
+         call fcn(size(xplusd, 1), size(xplusd, 2), size(f, 2), size(beta), size(ifixx, 1), &
+                  beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
+
+      end subroutine fcn_
 
    end subroutine odr_long_c
 
@@ -445,18 +503,18 @@ contains
       type(iworkidx_t), intent(out) :: iwi
          !! 0-based indexes of integer work array.
 
-      integer :: msgbi, msgdi, ifix2i, istopi, nnzwi, nppi, idfi, jobi, iprini, luneri, &
-                 lunrpi, nrowi, ntoli, netai, maxiti, niteri, nfevi, njevi, int2i, iranki, &
-                 ldtti, boundi, liwkmn
+      integer :: msgbi, msgdi, ifix2i, istopi, nnzwi, nppi, idfi, jobi, iprinti, lunerri, &
+                 lunrpti, nrowi, ntoli, netai, maxiti, niteri, nfevi, njevi, int2i, iranki, &
+                 ldtti, boundi, liwkmin
 
       call loc_iwork(m, q, np, &
                      msgbi, msgdi, ifix2i, istopi, &
                      nnzwi, nppi, idfi, &
-                     jobi, iprini, luneri, lunrpi, &
+                     jobi, iprinti, lunerri, lunrpti, &
                      nrowi, ntoli, netai, &
                      maxiti, niteri, nfevi, njevi, int2i, iranki, ldtti, &
                      boundi, &
-                     liwkmn)
+                     liwkmin)
 
       iwi%msgb = msgbi - 1
       iwi%msgd = msgdi - 1
@@ -466,9 +524,9 @@ contains
       iwi%npp = nppi - 1
       iwi%idf = idfi - 1
       iwi%job = jobi - 1
-      iwi%iprin = iprini - 1
-      iwi%luner = luneri - 1
-      iwi%lunrp = lunrpi - 1
+      iwi%iprint = iprinti - 1
+      iwi%lunerr = lunerri - 1
+      iwi%lunrpt = lunrpti - 1
       iwi%nrow = nrowi - 1
       iwi%ntol = ntoli - 1
       iwi%neta = netai - 1
@@ -480,7 +538,7 @@ contains
       iwi%irank = iranki - 1
       iwi%ldtt = ldtti - 1
       iwi%bound = boundi - 1
-      iwi%liwkmn = liwkmn
+      iwi%liwkmin = liwkmin
 
    end subroutine loc_iwork_c
 
@@ -500,53 +558,52 @@ contains
       integer(c_int), intent(in) :: ld2we
          !! Second dimension of array `we`.
       logical(c_bool), intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr = .true.`) or
-         !! by OLS (`isodr = .false.`).
+         !! Variable designating whether the solution is by ODR (`.true.`) or by OLS (`.false.`).
       type(rworkidx_t), intent(out) :: rwi
          !! 0-based indexes of real work array.
 
-      integer :: deltai, epsi, xplusi, fni, sdi, vcvi, rvari, wssi, wssdei, wssepi, &
-                 rcondi, etai, olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, partli, &
-                 sstoli, taufci, epsmai, beta0i, betaci, betasi, betani, si, ssi, ssfi, &
-                 qrauxi, ui, fsi, fjacbi, we1i, diffi, deltsi, deltni, ti, tti, omegai, &
+      integer :: deltai, epsi, xplusdi, fni, sdi, vcvi, rvari, wssi, wssdeli, wssepsi, &
+                 rcondi, etai, olmavgi, taui, alphai, actrsi, pnormi, rnormsi, prersi, partoli, &
+                 sstoli, taufaci, epsmaci, beta0i, betaci, betasi, betani, si, ssi, ssfi, &
+                 qrauxi, ui, fsi, fjacbi, we1i, diffi, deltasi, deltani, ti, tti, omegai, &
                  fjacdi, wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, loweri, upperi, &
-                 lrwkmn
+                 lrwkmin
 
       call loc_rwork(n, m, q, np, ldwe, ld2we, logical(isodr, kind=kind(.true.)), &
-                     deltai, epsi, xplusi, fni, sdi, vcvi, &
-                     rvari, wssi, wssdei, wssepi, rcondi, etai, &
-                     olmavi, taui, alphai, actrsi, pnormi, rnorsi, prersi, &
-                     partli, sstoli, taufci, epsmai, &
+                     deltai, epsi, xplusdi, fni, sdi, vcvi, &
+                     rvari, wssi, wssdeli, wssepsi, rcondi, etai, &
+                     olmavgi, taui, alphai, actrsi, pnormi, rnormsi, prersi, &
+                     partoli, sstoli, taufaci, epsmaci, &
                      beta0i, betaci, betasi, betani, si, ssi, ssfi, qrauxi, ui, &
                      fsi, fjacbi, we1i, diffi, &
-                     deltsi, deltni, ti, tti, omegai, fjacdi, &
+                     deltasi, deltani, ti, tti, omegai, fjacdi, &
                      wrk1i, wrk2i, wrk3i, wrk4i, wrk5i, wrk6i, wrk7i, &
                      loweri, upperi, &
-                     lrwkmn)
+                     lrwkmin)
 
       rwi%delta = deltai - 1
       rwi%eps = epsi - 1
-      rwi%xplus = xplusi - 1
+      rwi%xplusd = xplusdi - 1
       rwi%fn = fni - 1
       rwi%sd = sdi - 1
       rwi%vcv = vcvi - 1
       rwi%rvar = rvari - 1
       rwi%wss = wssi - 1
-      rwi%wssde = wssdei - 1
-      rwi%wssep = wssepi - 1
+      rwi%wssdel = wssdeli - 1
+      rwi%wsseps = wssepsi - 1
       rwi%rcond = rcondi - 1
       rwi%eta = etai - 1
-      rwi%olmav = olmavi - 1
+      rwi%olmavg = olmavgi - 1
       rwi%tau = taui - 1
       rwi%alpha = alphai - 1
       rwi%actrs = actrsi - 1
       rwi%pnorm = pnormi - 1
-      rwi%rnors = rnorsi - 1
+      rwi%rnorms = rnormsi - 1
       rwi%prers = prersi - 1
-      rwi%partl = partli - 1
+      rwi%partol = partoli - 1
       rwi%sstol = sstoli - 1
-      rwi%taufc = taufci - 1
-      rwi%epsma = epsmai - 1
+      rwi%taufac = taufaci - 1
+      rwi%epsmac = epsmaci - 1
       rwi%beta0 = beta0i - 1
       rwi%betac = betaci - 1
       rwi%betas = betasi - 1
@@ -560,8 +617,8 @@ contains
       rwi%fjacb = fjacbi - 1
       rwi%we1 = we1i - 1
       rwi%diff = diffi - 1
-      rwi%delts = deltsi - 1
-      rwi%deltn = deltni - 1
+      rwi%deltas = deltasi - 1
+      rwi%deltan = deltani - 1
       rwi%t = ti - 1
       rwi%tt = tti - 1
       rwi%omega = omegai - 1
@@ -575,7 +632,7 @@ contains
       rwi%wrk7 = wrk7i - 1
       rwi%lower = loweri - 1
       rwi%upper = upperi - 1
-      rwi%lrwkmn = lrwkmn
+      rwi%lrwkmin = lrwkmin
 
    end subroutine loc_rwork_c
 
@@ -591,8 +648,7 @@ contains
       integer(c_int), intent(in) :: np
          !! Number of function parameters.
       logical(c_bool), intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr = .true.`)
-         !! or by OLS (`isodr = .false.`).
+         !! Variable designating whether the solution is by ODR (`.true.`) or by OLS (`.false.`).
       integer(c_int), intent(out) :: lrwork
          !! Length of real `rwork` array.
       integer(c_int), intent(out) :: liwork
