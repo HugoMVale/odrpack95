@@ -26,11 +26,12 @@ module odrpack_core
          real(wp), intent(out) :: fjacd(:, :, :)
             !! Jacobian with respect to errors `delta`. Shape: `(n, m, q)`.
          integer, intent(out) :: istop
-            !! Stopping condition, with meaning as follows. 0 means current `beta` and
-            !! `x + delta` were acceptable and values were computed successfully. 1 means current
-            !! `beta` and `x + delta` are not acceptable;  'odrpack' should select values closer
-            !! to most recently used values if possible. -1 means current `beta` and `x + delta`
-            !! are not acceptable; 'odrpack' should stop.
+            !! Stopping condition, with meaning as follows.
+            !!  `0`: Current `beta` and `x + delta` were acceptable and values were computed
+            !!       successfully.
+            !!  `1`: Current `beta` and `x + delta` are not acceptable; 'odrpack' should select
+            !!       values closer to most recently used values if possible.
+            !! `-1`: Current `beta` and `x + delta` are not acceptable; 'odrpack' should stop.
       end subroutine fcn_t
    end interface
 
@@ -87,8 +88,7 @@ contains
       real(wp), intent(in) :: epsfcn
          !! Function's precision.
       logical, intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr = .true.`)
-         !! or by OLS (`isodr = .false.`).
+         !! Variable designating whether the solution is by ODR (`.true.`) or by OLS (`.false.`).
       real(wp), intent(out) :: tfjacb(n, q, np)
          !! Array `omega*fjacb`.
       real(wp), intent(out) :: omega(q, q)
@@ -96,7 +96,7 @@ contains
       real(wp), intent(out) :: u(np)
          !! Approximate null vector for `tfjacb`.
       real(wp), intent(out) :: qraux(np)
-         !! Array required to recover the orthogonal part of the Q-R decomposition.
+         !! Array required to recover the orthogonal part of the QR decomposition.
       integer, intent(out) :: jpvt(np)
          !! Pivot vector.
       real(wp), intent(out) :: s(np)
@@ -138,7 +138,7 @@ contains
       !  ALPHA1:  The previous Levenberg-Marquardt parameter.
       !  BOT:     The lower limit for setting ALPHA.
       !  FORVCV:  The variable designating whether this subroutine was called to set up for the
-      !           covariance matrix computations (FORVCV=TRUE) or not (FORVCV=FALSE).
+      !           covariance matrix computations (TRUE) or not (FALSE).
       !  I:       An indexing variable.
       !  IWRK:    An indexing variable.
       !  J:       An indexing variable.
@@ -595,8 +595,9 @@ contains
       use odrpack_kinds, only: zero, one
 
       integer, intent(in) :: itype
-         !! Finite difference method being used, where: `itype = 0` indicates forward
-         !! finite differences, and `itype = 1` indicates central finite differences.
+         !! Finite difference method being used.
+         !! `0`: Forward finite differences.
+         !! `1`: Central finite differences.
       integer, intent(in) :: k
          !! Index into `beta` where `betak` resides.
       real(wp), intent(in) :: betak
@@ -939,10 +940,10 @@ contains
          !! User-supplied subroutine for evaluating the model.
       logical, intent(in) :: anajac
          !! Variable designating whether the Jacobians are computed by finite differences
-         !! (`anajac = .false.`) or not (`anajac = .true.`).
+         !! (`.false.`) or not (`.true.`).
       logical, intent(in) :: cdjac
          !! Variable designating whether the Jacobians are computed by central differences
-         !! (`cdjac = .true.`) or by forward differences (`cdjac = .false.`).
+         !! (`.true.`) or by forward differences (`.false.`).
       integer, intent(in) :: n
          !! Number of observations.
       integer, intent(in) :: m
@@ -998,8 +999,7 @@ contains
       real(wp), intent(out) :: fjacb(n, np, q)
          !! Jacobian with respect to `beta`.
       logical, intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr = .true.`) or
-         !! by OLS (`isodr = .false.`).
+         !! Variable designating whether the solution is by ODR (`.true.`) or by OLS (`.false.`).
       real(wp), intent(out) :: fjacd(n, m, q)
          !! Jacobian with respect to `delta`.
       real(wp), intent(in) :: we1(ldwe, ld2we, q)
@@ -1129,8 +1129,7 @@ contains
 
       logical, intent(in) :: oksemi
          !! Flag indicating whether the factored array can be positive semidefinite
-         !! (`oksemi = .true.`) or whether it must be found to be positive definite
-         !! (`oksemi = .false.`).
+         !! (`.true.`) or whether it must be found to be positive definite (`.false.`).
       real(wp), intent(inout) :: a(lda, n)
          !! Array to be factored. Upon return, `a` contains the upper triangular matrix
          !! `r` so that `a = trans(r)*r` where the strict lower triangle is set to zero.
@@ -1212,8 +1211,7 @@ contains
       integer, intent(in) :: npp
          !! Number of function parameters being estimated.
       logical, intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr = .true`) or
-         !! by OLS (`isodr = .false`).
+         !! Variable designating whether the solution is by ODR (`.true`) or by OLS (`.false`).
       real(wp), intent(in) :: we(ldwe, ld2we, q)
          !! Squared `epsilon` weights.
       integer, intent(in) :: ldwe
@@ -1246,7 +1244,7 @@ contains
       !  J:        An indexing variable.
       !  L:        An indexing variable.
       !  NOTZERO:  The variable designating whether a given component of the weight array WE
-      !            contains a nonzero element (NOTZRO=FALSE) or not (NOTZRO=TRUE).
+      !            contains a nonzero element (FALSE) or not (TRUE).
 
       ! Check EPSILON weights, and store factorization in WE1
 
@@ -1391,38 +1389,36 @@ contains
    end subroutine fctrw
 
    pure subroutine set_flags( &
-      job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
+      job, restart, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implicit)
    !! Set flags indicating conditions specified by `job`.
 
       integer, intent(in) :: job
          !! Variable controlling problem initialization and computational method.
-      logical, intent(out) :: restrt
-         !! Variable designating whether the call is a restart (`restrt = .true.`)
-         !! or not (`restrt = .false.`).
+      logical, intent(out) :: restart
+         !! Variable designating whether the call is a restart (`.true.`) or not (`.false.`).
       logical, intent(out) :: initd
-         !! Variable designating whether `delta` is to be initialized to zero (`initd = .true.`)
-         !! or to the first `n` by `m` elements of array `rwork` (`initd = .false.`).
+         !! Variable designating whether `delta` is to be initialized to zero (`.true.`)
+         !! or to the first `n` by `m` elements of array `rwork` (`.false.`).
       logical, intent(out) :: dovcv
-         !! Variable designating whether the covariance matrix is to be computed
-         !! (`dovcv = .true.`) or not (`dovcv = .false.`).
+         !! Variable designating whether the covariance matrix is to be computed (`.true.`)
+         !! or not (`.false.`).
       logical, intent(out) :: redoj
          !! Variable designating whether the Jacobian matrix is to be recomputed for the
-         !! computation of the covariance matrix (`redoj = .true.`) or not (`redoj = .false.`).
+         !! computation of the covariance matrix (`.true.`) or not (`.false.`).
       logical, intent(out) :: anajac
          !! Variable designating whether the Jacobians are computed by finite differences
-         !! (`anajac = .false.`) or not (`anajac = .true.`).
+         !! (`.false.`) or not (`.true.`).
       logical, intent(out) :: cdjac
          !! Variable designating whether the Jacobians are computed by central differences
-         !! (`cdjac = .true.`) or by forward differences (`cdjac = .false.`).
+         !! (`.true.`) or by forward differences (`.false.`).
       logical, intent(out) :: chkjac
          !! Variable designating whether the user-supplied Jacobians are to be checked
-         !! (`chkjac = .true.`) or not (`chkjac = .false.`).
+         !! (`.true.`) or not (`.false.`).
       logical, intent(out) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr = .true.`)
-         !! or by OLS (`isodr = .false.`).
-      logical, intent(out) :: implct
-         !! Variable designating whether the solution is by implicit ODR (`implct = .true.`)
-         !! or explicit ODR (`implct = .false.`).
+         !! Variable designating whether the solution is by ODR (`.true.`) or by OLS (`.false.`).
+      logical, intent(out) :: implicit
+         !! Variable designating whether the solution is by implicit ODR (`.true.`)
+         !! or explicit ODR (`.false.`).
 
       ! Local scalars
       integer :: j
@@ -1432,7 +1428,7 @@ contains
 
       if (job >= 0) then
 
-         restrt = job >= 10000
+         restart = job >= 10000
          initd = mod(job, 10000)/1000 == 0
          j = mod(job, 1000)/100
 
@@ -1469,18 +1465,18 @@ contains
          j = mod(job, 10)
          if (j == 0) then
             isodr = .true.
-            implct = .false.
+            implicit = .false.
          elseif (j == 1) then
             isodr = .true.
-            implct = .true.
+            implicit = .true.
          else
             isodr = .false.
-            implct = .false.
+            implicit = .false.
          end if
 
       else
 
-         restrt = .false.
+         restart = .false.
          initd = .true.
          dovcv = .true.
          redoj = .true.
@@ -1488,7 +1484,7 @@ contains
          cdjac = .false.
          chkjac = .false.
          isodr = .true.
-         implct = .false.
+         implicit = .false.
 
       end if
 
@@ -1500,8 +1496,9 @@ contains
       use odrpack_kinds, only: zero, two, three, ten
 
       integer, intent(in) :: itype
-         !! Finite difference method being used, where: `itype = 0` indicates forward
-         !! finite differences, and `itype = 1` indicates central finite differences.
+         !! Finite difference method being used.
+         !! `0`: Forward finite differences.
+         !! `1`: Central finite differences.
       integer, intent(in) :: neta
          !! Number of good digits in the function results.
       integer, intent(in) :: i
@@ -2067,31 +2064,31 @@ contains
 
       ! Local scalars
       integer :: i, j, istart
-      logical :: anajac, cdjac, chkjac, dovcv, implct, initd, isodr, redoj, restrt
+      logical :: anajac, cdjac, chkjac, dovcv, implicit, initd, isodr, redoj, restart
 
       ! Variable Definitions (alphabetically)
-      !  ANAJAC:  The variable designating whether the Jacobians are computed by finite differences
-      !           (ANAJAC=FALSE) or not (ANAJAC=TRUE).
-      !  CDJAC:   The variable designating whether the Jacobians are computed by central differences
-      !           (CDJAC=TRUE) or by forward differences (CDJAC=FALSE).
-      !  CHKJAC:  The variable designating whether the user-supplied Jacobians are to be checked
-      !           (CHKJAC=TRUE) or not (CHKJAC=FALSE).
-      !  DOVCV:   The variable designating whether the covariance matrix is to be computed (DOVCV=TRUE)
-      !           or not (DOVCV=FALSE).
-      !  I:       An indexing variable.
-      !  IMPLCT:  The variable designating whether the solution is by implicit ODR (IMPLCT=TRUE) or
-      !           explicit ODR (IMPLCT=FALSE).
-      !  INITD:   The variable designating whether DELTA is to be initialized to zero (INITD=TRUE) or
-      !           to the values in the first N by M elements of array RWORK (INITD=FALSE).
-      !  ISODR:   The variable designating whether the solution is by ODR (ISODR=TRUE) or by OLS
-      !           ISODR=FALSE).
-      !  J:       An indexing variable.
-      !  REDOJ:   The variable designating whether the Jacobian matrix is to be recomputed for the
-      !           computation of the covariance matrix (REDOJ=TRUE) or not (REDOJ=FALSE).
-      !  RESTRT:  The variable designating whether the call is a restart (RESTRT=TRUE) or not
-      !           (RESTRT=FALSE).
+      !  ANAJAC:   The variable designating whether the Jacobians are computed by finite differences
+      !            (FALSE) or not (TRUE).
+      !  CDJAC:    The variable designating whether the Jacobians are computed by central differences
+      !            (TRUE) or by forward differences (FALSE).
+      !  CHKJAC:   The variable designating whether the user-supplied Jacobians are to be checked
+      !            (TRUE) or not (FALSE).
+      !  DOVCV:    The variable designating whether the covariance matrix is to be computed (TRUE)
+      !            or not (FALSE).
+      !  I:        An indexing variable.
+      !  IMPLICIT: The variable designating whether the solution is by implicit ODR (TRUE) or
+      !            explicit ODR (FALSE).
+      !  INITD:    The variable designating whether DELTA is to be initialized to zero (TRUE) or
+      !            to the values in the first N by M elements of array RWORK (FALSE).
+      !  ISODR:    The variable designating whether the solution is by ODR (TRUE) or by OLS
+      !            (FALSE).
+      !  J:        An indexing variable.
+      !  REDOJ:    The variable designating whether the Jacobian matrix is to be recomputed for the
+      !            computation of the covariance matrix (TRUE) or not (FALSE).
+      !  RESTART:  The variable designating whether the call is a restart (TRUE) or not
+      !            (FALSE).
 
-      call set_flags(job, restrt, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implct)
+      call set_flags(job, restart, initd, dovcv, redoj, anajac, cdjac, chkjac, isodr, implicit)
 
       ! Store value of machine precision in work vector
       rwork(epsmai) = epsilon(zero)
@@ -2274,8 +2271,7 @@ contains
       real(wp), intent(out) :: fjacb(n, np, q)
          !! Jacobian with respect to `beta`.
       logical, intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr = .true.`) or
-         !! by OLS (`isodr = .false.`).
+         !! Variable designating whether the solution is by ODR (`.true.`) or by OLS (`.false.`).
       real(wp), intent(out) :: fjacd(n, m, q)
          !! Jacobian with respect to `delta`.
       integer, intent(inout) :: nfev
@@ -2298,13 +2294,13 @@ contains
       ! Variable Definitions (alphabetically)
       !  BETAK:    The K-th function parameter.
       !  DOIT:     The variable designating whether the derivative wrt a given BETA or DELTA
-      !            needs to be computed (DOIT=TRUE) or not (DOIT=FALSE).
+      !            needs to be computed (TRUE) or not (FALSE).
       !  I:        An indexing variable.
       !  J:        An indexing variable.
       !  K:        An indexing variable.
       !  L:        An indexing variable.
       !  SETZERO:  The variable designating whether the derivative wrt some DELTA needs to be
-      !            set to zero (SETZRO=TRUE) or not (SETZRO=FALSE).
+      !            set to zero (TRUE) or not (FALSE).
       !  TYPJ:     The typical size of the J-th unknown BETA or DELTA.
 
       ! Compute the Jacobian wrt the estimated BETAS
@@ -2531,8 +2527,7 @@ contains
       real(wp), intent(out) :: fjacb(n, np, q)
          !! Jacobian with respect to `beta`.
       logical, intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr = .true.`) or
-         !! by OLS (`isodr = .false.`).
+         !! Variable designating whether the solution is by ODR (`.true.`) or by OLS (`.false.`).
       real(wp), intent(out) :: fjacd(n, m, q)
          !! Jacobian with respect to `delta`.
       integer, intent(inout) :: nfev
@@ -2555,13 +2550,13 @@ contains
       ! Variable Definitions (alphabetically)
       !  BETAK:   The K-th function parameter.
       !  DOIT:    The variable designating whether the derivative wrt a given BETA or DELTA needs
-      !           to be computed (DOIT=TRUE) or not (DOIT=FALSE).
+      !           to be computed (TRUE) or not (FALSE).
       !  I:       An indexing variable.
       !  J:       An indexing variable.
       !  K:       An indexing variable.
       !  L:       An indexing variable.
       !  SETZRO:  The variable designating whether the derivative wrt some DELTA needs to be set
-      !           to zero (SETZRO=TRUE) or not (SETZRO=FALSE).
+      !           to zero (TRUE) or not (FALSE).
       !  TYPJ:    The typical size of the J-th unknown BETA or DELTA.
 
       ! Compute the Jacobian wrt the estimated BETAS
@@ -2746,8 +2741,7 @@ contains
       integer, intent(in) :: nrow
          !! Row number of the explanatory variable array at which the derivative is checked.
       logical, intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr = .true.`) or
-         !! by OLS (`isodr = .false.`).
+         !! Variable designating whether the solution is by ODR (`.true.`) or by OLS (`.false.`).
       real(wp), intent(in) :: epsmac
          !! Value of machine precision.
       real(wp), intent(in) :: pv0i(n, q)
@@ -2795,9 +2789,9 @@ contains
       !  HC0:      The initial relative step size for central differences.
       !  IDEVAL:   The variable designating what computations are to be performed by user supplied
       !            subroutine FCN.
-      !  ISFIXD:   The variable designating whether the parameter is fixed (ISFIXD=TRUE) or not (ISFIXD=FALSE).
-      !  ISWRTB:   The variable designating whether the derivatives wrt BETA (ISWRTB=TRUE) or DELTA
-      !            (ISWRTB=FALSE) are being checked.
+      !  ISFIXD:   The variable designating whether the parameter is fixed (TRUE) or not (FALSE).
+      !  ISWRTB:   The variable designating whether the derivatives wrt BETA (TRUE) or DELTA
+      !            (FALSE) are being checked.
       !  J:        An index variable.
       !  LQ:       The response currently being examined.
       !  MSGB1:    The error checking results for the Jacobian wrt BETA.
@@ -3667,7 +3661,7 @@ contains
        isodr, anajac, &
        beta, ifixb, &
        ldifx, ldscld, ldstpd, ldwe, ld2we, ldwd, ld2wd, &
-       lrwork, lrwkmn, liwork, liwkmn, &
+       lrwork, lrwkmin, liwork, liwkmin, &
        sclb, scld, stpb, stpd, &
        info, &
        lower, upper)
@@ -3684,11 +3678,10 @@ contains
       integer, intent(in) :: q
          !! Number of responses per observation.
       logical, intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr = .true.`) or
-         !! by OLS (`isodr = .false.`).
+         !! Variable designating whether the solution is by ODR (`.true.`) or by OLS (`.false.`).
       logical, intent(in) :: anajac
          !! Variable designating whether the Jacobians are computed by finite differences
-         !! (`anajac = .false.`) or not (`anajac = .true.`).
+         !! (`.false.`) or not (`.true.`).
       real(wp), intent(in) :: beta(np)
          !! Function parameters.
       integer, intent(in) :: ifixb(np)
@@ -3709,11 +3702,11 @@ contains
          !! Second dimension of array `wd`.
       integer, intent(in) :: lrwork
          !! Length of vector `rwork`.
-      integer, intent(in) :: lrwkmn
+      integer, intent(in) :: lrwkmin
          !! Minimum acceptable length of array `rwork`.
       integer, intent(in) :: liwork
          !! Length of vector `iwork`.
-      integer, intent(in) :: liwkmn
+      integer, intent(in) :: liwkmin
          !! Minimum acceptable length of array `iwork`.
       real(wp), intent(in) :: sclb(np)
          !! Scaling values for `beta`.
@@ -3770,8 +3763,8 @@ contains
           (isodr .and. ((ldifx /= 1) .and. (ldifx < n))) .or. &
           (isodr .and. ((ldstpd /= 1) .and. (ldstpd < n))) .or. &
           (isodr .and. ((ldscld /= 1) .and. (ldscld < n))) .or. &
-          (lrwork < lrwkmn) .or. &
-          (liwork < liwkmn)) then
+          (lrwork < lrwkmin) .or. &
+          (liwork < liwkmin)) then
 
          info = 20000
 
@@ -3797,11 +3790,11 @@ contains
             info = info + 40
          end if
 
-         if (lrwork < lrwkmn) then
+         if (lrwork < lrwkmin) then
             info = info + 1
          end if
 
-         if (liwork < liwkmn) then
+         if (liwork < liwkmin) then
             info = info + 2
          end if
 
@@ -3926,8 +3919,7 @@ contains
       real(wp), intent(in) :: epsfcn
          !! Function's precision.
       logical, intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr = .true.`) or
-         !! by OLS (`isodr = .false.`).
+         !! Variable designating whether the solution is by ODR (`.true.`) or by OLS (`.false.`).
       real(wp), intent(out) :: tfjacb(n, q, np)
          !! Array `omega*fjacb`.
       real(wp), intent(out) :: omega(q, q)
@@ -4272,8 +4264,7 @@ contains
       real(wp), intent(in) :: epsfcn
          !! Function's precision.
       logical, intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr = .true.`) or
-         !! by OLS (`isodr = .false.`).
+         !! Variable designating whether the solution is by ODR (`.true.`) or by OLS (`.false.`).
       real(wp), intent(out) :: vcv(np, np)
          !! Covariance matrix of the estimated `beta`s.
       real(wp), intent(out) :: sd(np)
@@ -4330,8 +4321,8 @@ contains
       logical :: forvcv
 
       ! Variable definitions (alphabetically)
-      !  FORVCV:  The variable designating whether subroutine DODSTP is called to set up for the
-      !           covariance matrix computations (FORVCV=TRUE) or not (FORVCV=FALSE).
+      !  FORVCV:  The variable designating whether subroutine DODSTP is called to set up for
+      !           the covariance matrix computations (TRUE) or not (FALSE).
       !  I:       An indexing variable.
       !  IUNFIX:  The index of the next unfixed parameter.
       !  J:       An indexing variable.
@@ -4579,8 +4570,7 @@ contains
       use odrpack_kinds, only: zero, half, one
 
       real(wp), intent(in) :: p
-         !! Probability at which the percent point is to be evaluated. `p` must lie between
-         !! 0.0 and 1.0, exclusive.
+         !! Probability at which the percent point is to be evaluated; `0 < p < 1`.
 
       ! Local scalars
       real(wp), parameter :: p0 = -0.322232431088E0_wp, &
@@ -4657,8 +4647,7 @@ contains
       use odrpack_kinds, only: pi, zero, half, one, two, three, eight, fiftn
 
       real(wp), intent(in) :: p
-         !! Probability at which the percent point is to be evaluated. `p` must lie between
-         !! 0.0 and 1.0, exclusive.
+         !! Probability at which the percent point is to be evaluated; `0 < p < 1`.
       integer, intent(in) :: idf
          !! Degrees of freedom.
 
@@ -5016,7 +5005,7 @@ contains
 
       ! Variable Definitions (alphabetically)
       !  BIGDIF:  The variable designating whether there is a significant difference in the
-      !           magnitudes of the nonzero elements of BETA (BIGDIF=.TRUE.) or not (BIGDIF=.FALSE.).
+      !           magnitudes of the nonzero elements of BETA (TRUE) or not (FALSE).
       !  BMAX:    The largest nonzero magnitude.
       !  BMIN:    The smallest nonzero magnitude.
       !  K:       An indexing variable.
@@ -5077,9 +5066,8 @@ contains
       logical :: bigdif
 
       ! Variable Definitions (alphabetically)
-      !  BIGDIF:  The variable designating whether there is a significant
-      !           difference in the magnitudes of the nonzero elements of
-      !           X (BIGDIF=.TRUE.) or not (BIGDIF=.FALSE.).
+      !  BIGDIF:  The variable designating whether there is a significant difference in the
+      !           magnitudes of the nonzero elements of X (TRUE) or not (FALSE).
       !  I:       An indexing variable.
       !  J:       An indexing variable.
       !  XMAX:    The largest nonzero magnitude.
@@ -5189,7 +5177,7 @@ contains
       integer :: j1, j, jn
 
       ! Variable Definitions (alphabetically)
-      !  B:       On input:  the right hand side;  On exit:  the solution
+      !  B:       On input: the right hand side; On exit: the solution
       !  J1:      The first nonzero entry in T.
       !  J:       An indexing variable.
       !  JN:      The last nonzero entry in T.
