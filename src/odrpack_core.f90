@@ -49,7 +49,6 @@ contains
    !! trust-region Levenberg-Marquardt algorithm.
 
       use odrpack_kinds, only: zero
-      use blas_interfaces, only: ddot, dnrm2
 
       integer, intent(in) :: n
          !! Number of observations.
@@ -186,7 +185,7 @@ contains
 
       do k = 1, npp
          tfjacb(1:n, 1:q, k) = fjacb(1:n, k, 1:q)
-         wrk(k) = ddot(n*q, tfjacb(1, 1, k), 1, f(1, 1), 1)
+         wrk(k) = sum(tfjacb(:, :, k)*f)
       end do
 
       call scale_vec(npp, 1, ss, npp, wrk, npp, wrk, npp) ! work is input (as t) and output (as sclt)
@@ -197,13 +196,13 @@ contains
          do j = 1, m
             do i = 1, n
                iwrk = iwrk + 1
-               wrk(iwrk) = wrk(iwrk) + ddot(q, fjacd(i, j, 1), n*m, f(i, 1), n)
+               wrk(iwrk) = wrk(iwrk) + dot_product(fjacd(i, j, :), f(i, :))
             end do
          end do
          call scale_vec(n, m, tt, ldtt, wrk(npp + 1), n, wrk(npp + 1), n)
-         top = dnrm2(npp + n*m, wrk, 1)/tau
+         top = norm2(wrk(1:npp + n*m))/tau
       else
-         top = dnrm2(npp, wrk, 1)/tau
+         top = norm2(wrk(1:npp))/tau
       end if
 
       if (alpha2 > top .or. alpha2 == zero) then
@@ -934,7 +933,6 @@ contains
    !! Compute the weighted Jacobians wrt `beta` and `delta`.
 
       use odrpack_kinds, only: zero
-      use blas_interfaces, only: ddot
 
       procedure(fcn_t) :: fcn
          !! User-supplied subroutine for evaluating the model.
@@ -1081,7 +1079,7 @@ contains
          return
       elseif (.not. isodr) then
          ! Try to detect whether the user has computed JFACD within FCN in the OLS case
-         ferror = ddot(n*m, delta, 1, delta, 1) /= zero
+         ferror = sum(delta**2) /= zero
          if (ferror) then
             info = 50300
             return
@@ -3882,7 +3880,7 @@ contains
 
       use odrpack_kinds, only: zero, one
       use linpack, only: dchex, dqrdc, dqrsl, dtrco, dtrsl
-      use blas_interfaces, only: dnrm2, drot, drotg
+      use blas_interfaces, only: drot, drotg
 
       integer, intent(in) :: n
          !! Number of observations.
@@ -4208,9 +4206,9 @@ contains
       call scale_mat(npp, 1, ss, npp, 1, s, wrk(1:npp))
       if (isodr) then
          call scale_mat(n, m, tt, ldtt, 1, t, wrk(npp + 1:npp + 1 + n*m - 1))
-         phi = dnrm2(npp + n*m, wrk, 1)
+         phi = norm2(wrk(1:npp + n*m))
       else
-         phi = dnrm2(npp, wrk, 1)
+         phi = norm2(wrk(1:npp))
       end if
 
    end subroutine lcstep
