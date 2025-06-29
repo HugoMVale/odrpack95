@@ -193,7 +193,7 @@ contains
          real(c_double), intent(out) :: fjacd(:, :, :)
          integer(c_int), intent(out) :: istop
 
-         call fcn(size(xplusd, 1), size(xplusd, 2), size(f, 2), size(beta), size(ifixx, 1), &
+         call fcn(n, m, q, np, 1, &
                   beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
 
       end subroutine fcn_
@@ -292,7 +292,7 @@ contains
          real(c_double), intent(out) :: fjacd(:, :, :)
          integer(c_int), intent(out) :: istop
 
-         call fcn(size(xplusd, 1), size(xplusd, 2), size(f, 2), size(beta), size(ifixx, 1), &
+         call fcn(n, m, q, np, ldifx, &
                   beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
 
       end subroutine fcn_
@@ -435,7 +435,7 @@ contains
          real(c_double), intent(out) :: fjacd(:, :, :)
          integer(c_int), intent(out) :: istop
 
-         call fcn(size(xplusd, 1), size(xplusd, 2), size(f, 2), size(beta), size(ifixx, 1), &
+         call fcn(n, m, q, np, ldifx, &
                   beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
 
       end subroutine fcn_
