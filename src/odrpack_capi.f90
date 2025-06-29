@@ -39,7 +39,12 @@ module odrpack_capi
          real(c_double), intent(out) :: fjacd(n, m, q)
             !! Jacobian with respect to errors `delta`.
          integer(c_int), intent(out) :: istop
-            !! Stopping condition.
+            !! Stopping condition, with meaning as follows.
+            !!  `0`: Current `beta` and `x + delta` were acceptable and values were computed
+            !!       successfully.
+            !!  `1`: Current `beta` and `x + delta` are not acceptable; 'odrpack' should select
+            !!       values closer to most recently used values if possible.
+            !! `-1`: Current `beta` and `x + delta` are not acceptable; 'odrpack' should stop.
       end subroutine
    end interface
 
@@ -254,15 +259,15 @@ contains
       integer(c_int), intent(in), optional :: iprint
          !! Print control variable.
       integer(c_int), intent(in), optional :: lunerr
-         !! Logical unit number for error messages. Available options are:
-         !!   0 => no output.
-         !!   6 => output to standard error.
-         !!   other => output to logical unit number `lunerr`.
+         !! Logical unit number for error messages.
+         !!  `0`: No output.
+         !!  `6`: Output to standard output.
+         !!  `k /= 0,6`: Output to logical unit `k`.
       integer(c_int), intent(in), optional :: lunrpt
-         !! Logical unit number for computation reports. Available options are:
-         !!   0 => no output.
-         !!   6 => output to standard error.
-         !!   other => output to logical unit number `lunrpt`.
+         !! Logical unit number for computation reports.
+         !!  `0`: No output.
+         !!  `6`: Output to standard output.
+         !!  `k /= 0,6`: Output to logical unit `k`.
       integer(c_int), intent(out), optional :: info
          !! Logical unit number for computation reports.
 
@@ -392,15 +397,15 @@ contains
       integer(c_int), intent(in), optional :: iprint
          !! Print control variable.
       integer(c_int), intent(in), optional :: lunerr
-         !! Logical unit number for error messages. Available options are:
-         !!   0 => no output.
-         !!   6 => output to standard error.
-         !!   other => output to logical unit number `lunerr`.
+         !! Logical unit number for error messages.
+         !!  `0`: No output.
+         !!  `6`: Output to standard output.
+         !!  `k /= 0,6`: Output to logical unit `k`.
       integer(c_int), intent(in), optional :: lunrpt
-         !! Logical unit number for computation reports. Available options are:
-         !!   0 => no output.
-         !!   6 => output to standard error.
-         !!   other => output to logical unit number `lunrpt`.
+         !! Logical unit number for computation reports.
+         !!  `0`: No output.
+         !!  `6`: Output to standard output.
+         !!  `k /= 0,6`: Output to logical unit `k`.
       integer(c_int), intent(out), optional :: info
          !! Variable designating why the computations were stopped.
 
@@ -553,8 +558,7 @@ contains
       integer(c_int), intent(in) :: ld2we
          !! Second dimension of array `we`.
       logical(c_bool), intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr = .true.`) or
-         !! by OLS (`isodr = .false.`).
+         !! Variable designating whether the solution is by ODR (`.true.`) or by OLS (`.false.`).
       type(rworkidx_t), intent(out) :: rwi
          !! 0-based indexes of real work array.
 
@@ -644,8 +648,7 @@ contains
       integer(c_int), intent(in) :: np
          !! Number of function parameters.
       logical(c_bool), intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`isodr = .true.`)
-         !! or by OLS (`isodr = .false.`).
+         !! Variable designating whether the solution is by ODR (`.true.`) or by OLS (`.false.`).
       integer(c_int), intent(out) :: lrwork
          !! Length of real `rwork` array.
       integer(c_int), intent(out) :: liwork

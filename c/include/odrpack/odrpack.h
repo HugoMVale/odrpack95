@@ -49,8 +49,8 @@ ODRPACK_EXTERN void close_file(
  * @param fjacd   `<==` Array [q][m][n] for Jacobian with respect to errors `delta`.
  * @param istop   `<==` Integer for stopping condition. Values:
  *                0 - current `beta` and `x + delta` were acceptable and values were computed successfully,
- *                1 - current `beta` and `x + delta` are not acceptable; ODRPACK95 should select values closer to most recently used values if possible,
- *               -1 - current `beta` and `x + delta` are not acceptable; ODRPACK95 should stop.
+ *                1 - current `beta` and `x + delta` are not acceptable; 'odrpack' should select values closer to most recently used values if possible,
+ *               -1 - current `beta` and `x + delta` are not acceptable; 'odrpack' should stop.
  */
 typedef void (*odrpack_fcn_t)(
     const int *n,
@@ -355,7 +355,7 @@ ODRPACK_EXTERN void loc_iwork_c(
  * @param np    `==>` Number of function parameters.
  * @param ldwe  `==>` Leading dimension of array `we`.
  * @param ld2we `==>` Second dimension of array `we`.
- * @param isodr `==>` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
+ * @param isodr `==>` Variable designating whether the solution is by ODR (`true`) or by OLS (`false`).
  * @param rwi   `<==` 0-based indexes of real work array.
  */
 ODRPACK_EXTERN void loc_rwork_c(
@@ -375,7 +375,7 @@ ODRPACK_EXTERN void loc_rwork_c(
  * @param m      `==>` Number of columns of data in the explanatory variable.
  * @param q      `==>` Number of responses per observation.
  * @param np     `==>` Number of function parameters.
- * @param isodr  `==>` Variable designating whether the solution is by ODR (`isodr=.true.`) or by OLS (`isodr=.false.`).
+ * @param isodr  `==>` Variable designating whether the solution is by ODR (`true`) or by OLS (`false`).
  * @param lrwork `<==` Length of real `rwork` array.
  * @param liwork `<==` Length of integer `iwork` array.
  */
