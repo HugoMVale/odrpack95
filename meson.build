@@ -43,13 +43,22 @@ odrpack_source = files(
   'src/odrpack_capi.f90'
 )
 
-odrpack_lib = static_library(
-  meson.project_name(),
-  sources: [odrpack_source, blas_source],
-  dependencies: [blas_dep]
-)
-
 incdir = include_directories('c/include')
+
+if get_option('build_shared')
+  odrpack_lib = shared_library(
+    meson.project_name(),
+    sources: [odrpack_source, blas_source],
+    dependencies: [blas_dep],
+    install: true
+  )
+else
+  odrpack_lib = static_library(
+    meson.project_name(),
+    sources: [odrpack_source, blas_source],
+    dependencies: [blas_dep]
+  )
+endif
 
 odrpack_dep = declare_dependency(
   include_directories: [incdir],
