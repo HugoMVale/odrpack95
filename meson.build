@@ -12,6 +12,14 @@ project(
 
 c_compiler = meson.get_compiler('c')
 
+# Check if the C compiler is GCC
+if c_compiler.get_id() == 'gcc'
+  gcc_version = c_compiler.version()
+  if gcc_version.version_compare('>=14')
+    add_project_arguments('-ftrampoline-impl=heap', language: 'c')
+  endif
+endif
+
 # BLAS
 if host_machine.system() == 'darwin'
   message('Using `Accelerate` framework as BLAS library.')
