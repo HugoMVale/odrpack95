@@ -34,7 +34,7 @@ jobs:
         uses: fortran-lang/setup-fpm@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          fpm-version: "latest"
+          fpm-version: "0.11"
 
       - name: Build and test
         run: |
