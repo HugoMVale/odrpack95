@@ -3,7 +3,8 @@ name: Build and test pkg
 on: [push, pull_request]
 
 env:
-  FLAGS: "-Wno-compare-reals -Wno-unused-dummy-argument -ftrampoline-impl=heap"
+  # FLAGS: "-Wno-compare-reals -Wno-unused-dummy-argument -ftrampoline-impl=heap"
+  FLAGS: "-Wno-compare-reals -ftrampoline-impl=heap"
   FLAGSCOV: "--coverage -fprofile-abs-path"
 
 jobs:
