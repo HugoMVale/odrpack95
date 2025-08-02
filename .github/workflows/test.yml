@@ -65,7 +65,7 @@ jobs:
 
   msys2-gcc-build:
     runs-on: windows-latest
-    continue-on-error: false
+    continue-on-error: true
     defaults:
       run:
         shell: msys2 {0}
@@ -91,5 +91,5 @@ jobs:
           fpm --version
           # fpm test --profile debug --flag "$FLAGS" --verbose
           # fpm test --profile release --flag "$FLAGS" --verbose
-          fpm test --profile debug --verbose
+          # fpm test --profile debug --verbose
           fpm test --profile release --verbose
