@@ -3,8 +3,8 @@ name: Build and test pkg
 on: [push, pull_request]
 
 env:
-  FLAGS: '-Wno-compare-reals -Wno-unused-dummy-argument -ftrampoline-impl=heap'
-  FLAGSCOV: "--coverage -fprofile-abs-path"
+  FLAGS: -Wno-compare-reals -Wno-unused-dummy-argument -ftrampoline-impl=heap
+  FLAGSCOV: --coverage -fprofile-abs-path
 
 jobs:
   linux-gcc-build:
@@ -40,8 +40,8 @@ jobs:
         run: |
           gfortran --version
           fpm --version
-          fpm test --profile debug --flag $FLAGS --verbose
-          fpm test --profile release --flag $FLAGS --verbose
+          fpm test --profile debug --flag "$FLAGS" --verbose
+          fpm test --profile release --flag "$FLAGS" --verbose
       
       - name: Generate coverage report
         run: |
@@ -89,5 +89,5 @@ jobs:
         run: |
           gfortran --version
           fpm --version
-          fpm test --profile debug --flag $FLAGS --verbose
-          fpm test --profile release --flag $FLAGS --verbose
+          fpm test --profile debug --flag "$FLAGS" --verbose
+          fpm test --profile release --flag "$FLAGS" --verbose
