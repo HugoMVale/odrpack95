@@ -1,0 +1,79 @@
+name: Build and test pkg
+
+on: [push, pull_request, workflow_dispatch]
+
+env:
+  FLAGS: -Wno-compare-reals -Wno-unused-dummy-argument -ftrampoline-impl=heap
+
+jobs:
+
+  # Quick test in Ubuntu+GCC
+  test_quick:
+    runs-on: ubuntu-latest
+    steps:
+    
+      - name: Set up Fortran
+        uses: gha3mi/setup-fortran-conda@latest
+        with:
+          compiler: gfortran
+          compiler-version: "14.2"
+          platform: ubuntu-latest
+          extra-packages: "gcovr libopenblas"
+      
+      - name: Test debug with coverage
+        run: |
+          gcov --version
+          conda install -c conda-forge gcovr libopenblas
+          fpm test --profile debug --flag "$FLAGS --coverage -fprofile-abs-path"
+          gcovr --filter src --cobertura-pretty --output coverage.xml
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: false
+        
+#   # Matrix test 
+#   test_matrix:
+#     name: ${{ matrix.os }}-${{ matrix.compiler }}
+#     runs-on: ${{ matrix.os }}
+#     needs: test_quick
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         include:
+#           - compiler: gfortran
+#             os: ubuntu-latest
+#             compiler-version: 14.2.0
+#             extra-packages: ""
+#           - compiler: gfortran
+#             os: windows-latest
+#             compiler-version: 14.2.0
+#             extra-packages: ""
+#           # - compiler: lfortran # error associate
+#           #   os: ubuntu-latest
+#           #   extra-packages: ""
+#           # - compiler: flang # error testdrive
+#           #   os: ubuntu-latest
+#           #   extra-packages: ""
+          
+#     steps:
+#       - name: Set up Fortran
+#         uses: gha3mi/setup-fortran-conda@latest
+#         with:
+#           compiler: ${{ matrix.compiler }}
+#           compiler-version: ${{ matrix.compiler-version }}
+#           platform: ${{ matrix.os }}
+#           extra-packages: ${{ matrix.extra-packages }}
+
+#       - name: Test debug mode
+#         run: fpm test --compiler ${{ matrix.compiler }} --profile debug --verbose
+
+#       - name: Test release mode
+#         run: fpm test --compiler ${{ matrix.compiler }} --profile release --verbose
+      
+#       - name: Run examples
+#         run: |
+#           gfortran --version
+#           fpm run --example "example1*" --profile release
+#           fpm run --example "example2*" --profile release
