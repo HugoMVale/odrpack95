@@ -3,8 +3,7 @@ name: Build and test pkg
 on: [push, pull_request]
 
 env:
-  # FLAGS: "-Wno-compare-reals -Wno-unused-dummy-argument -ftrampoline-impl=heap"
-  FLAGS: "-Wno-compare-reals -ftrampoline-impl=heap"
+  FLAGS: '-Wno-compare-reals -Wno-unused-dummy-argument -ftrampoline-impl=heap'
   FLAGSCOV: "--coverage -fprofile-abs-path"
 
 jobs:
@@ -35,11 +34,12 @@ jobs:
         uses: fortran-lang/setup-fpm@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          fpm-version: "v0.11.0"
+          fpm-version: "latest"
 
       - name: Build and test
         run: |
           gfortran --version
+          fpm --version
           fpm test --profile debug --flag $FLAGS --verbose
           fpm test --profile release --flag $FLAGS --verbose
       
@@ -88,5 +88,6 @@ jobs:
       - name: Build and test
         run: |
           gfortran --version
+          fpm --version
           fpm test --profile debug --flag $FLAGS --verbose
           fpm test --profile release --flag $FLAGS --verbose
