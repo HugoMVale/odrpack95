@@ -18,7 +18,7 @@ jobs:
           compiler: gfortran
           compiler-version: "14.2"
           platform: ubuntu-latest
-          extra-packages: "gcovr libopenblas"
+          extra-packages: "gcovr openblas"
       
       - name: Test debug with coverage
         run: |
