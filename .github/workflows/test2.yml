@@ -35,7 +35,7 @@ jobs:
         
   # Matrix test 
   test_matrix:
-    name: ${{ matrix.os }}-${{ matrix.compiler }}
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.compiler-version }}
     runs-on: ${{ matrix.os }}
     needs: test_quick
     strategy:
@@ -60,13 +60,21 @@ jobs:
           extra-packages: ${{ matrix.extra-packages }}
 
       - name: Test debug mode
-        run: fpm test --compiler ${{ matrix.compiler }} --profile debug --verbose
+        run: |
+          meson setup builddir --buildtype=debug -Dbuild_tests=true -Dbuild_examples=true
+          meson compile -C builddir
+          meson test -C builddir
 
       - name: Test release mode
-        run: fpm test --compiler ${{ matrix.compiler }} --profile release --verbose
-      
-      - name: Run examples
         run: |
-          gfortran --version
-          fpm run --example "example1*" --profile release
-          fpm run --example "example2*" --profile release
+          meson setup --wipe
+          meson setup builddir -Dbuild_tests=true -Dbuild_examples=true
+          meson compile -C builddir
+          meson test -C builddir
+
+      # - name: Test debug mode
+      #   run: fpm test --compiler ${{ matrix.compiler }} --profile debug --verbose
+
+      # - name: Test release mode
+      #   run: fpm test --compiler ${{ matrix.compiler }} --profile release --verbose
+      
