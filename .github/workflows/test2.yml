@@ -33,47 +33,41 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: false
         
-#   # Matrix test 
-#   test_matrix:
-#     name: ${{ matrix.os }}-${{ matrix.compiler }}
-#     runs-on: ${{ matrix.os }}
-#     needs: test_quick
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         include:
-#           - compiler: gfortran
-#             os: ubuntu-latest
-#             compiler-version: 14.2.0
-#             extra-packages: ""
-#           - compiler: gfortran
-#             os: windows-latest
-#             compiler-version: 14.2.0
-#             extra-packages: ""
-#           # - compiler: lfortran # error associate
-#           #   os: ubuntu-latest
-#           #   extra-packages: ""
-#           # - compiler: flang # error testdrive
-#           #   os: ubuntu-latest
-#           #   extra-packages: ""
+  # Matrix test 
+  test_matrix:
+    name: ${{ matrix.os }}-${{ matrix.compiler }}
+    runs-on: ${{ matrix.os }}
+    needs: test_quick
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - compiler: gfortran
+            os: ubuntu-latest
+            compiler-version: 14.2.0
+            extra-packages: "openblas"
+          - compiler: gfortran
+            os: windows-latest
+            compiler-version: 14.2.0
+            extra-packages: "openblas"
           
-#     steps:
-#       - name: Set up Fortran
-#         uses: gha3mi/setup-fortran-conda@latest
-#         with:
-#           compiler: ${{ matrix.compiler }}
-#           compiler-version: ${{ matrix.compiler-version }}
-#           platform: ${{ matrix.os }}
-#           extra-packages: ${{ matrix.extra-packages }}
+    steps:
+      - name: Set up Fortran
+        uses: gha3mi/setup-fortran-conda@latest
+        with:
+          compiler: ${{ matrix.compiler }}
+          compiler-version: ${{ matrix.compiler-version }}
+          platform: ${{ matrix.os }}
+          extra-packages: ${{ matrix.extra-packages }}
 
-#       - name: Test debug mode
-#         run: fpm test --compiler ${{ matrix.compiler }} --profile debug --verbose
+      - name: Test debug mode
+        run: fpm test --compiler ${{ matrix.compiler }} --profile debug --verbose
 
-#       - name: Test release mode
-#         run: fpm test --compiler ${{ matrix.compiler }} --profile release --verbose
+      - name: Test release mode
+        run: fpm test --compiler ${{ matrix.compiler }} --profile release --verbose
       
-#       - name: Run examples
-#         run: |
-#           gfortran --version
-#           fpm run --example "example1*" --profile release
-#           fpm run --example "example2*" --profile release
+      - name: Run examples
+        run: |
+          gfortran --version
+          fpm run --example "example1*" --profile release
+          fpm run --example "example2*" --profile release
