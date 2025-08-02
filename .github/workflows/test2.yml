@@ -46,9 +46,9 @@ jobs:
         compiler-version: ["14.2.0"]
         include:
           - os: ubuntu-latest
-            extra-packages: "openblas meson"
+            extra-packages: "libopenblas meson"
           - os: windows-latest
-            extra-packages: "openblas meson"
+            extra-packages: "libopenblas meson pkg-config"
           
     steps:
       - name: Set up Fortran
