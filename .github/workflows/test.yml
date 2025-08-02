@@ -3,8 +3,7 @@ name: Build and test pkg
 on: [push, pull_request]
 
 env:
-  FLAGS: -Wno-compare-reals -Wno-unused-dummy-argument
-  FLAGSTRAMP: -ftrampoline-impl=heap
+  FLAGS: -Wno-compare-reals -Wno-unused-dummy-argument -ftrampoline-impl=heap
   FLAGSCOV: --coverage -fprofile-abs-path
 
 jobs:
@@ -41,8 +40,8 @@ jobs:
         run: |
           gfortran --version
           fpm --version
-          fpm test --profile debug --flag "$FLAGS $FLAGSTRAMP" --verbose
-          fpm test --profile release --flag "$FLAGS $FLAGSTRAMP" --verbose
+          fpm test --profile debug --flag "$FLAGS" --verbose
+          fpm test --profile release --flag "$FLAGS" --verbose
       
       - name: Generate coverage report
         run: |
@@ -50,7 +49,7 @@ jobs:
           gcov --version
           pip install gcovr
           rm -rf ./build/gfortran*
-          fpm test --profile debug --flag "$FLAGS $FLAGSTRAMP $FLAGSCOV"
+          fpm test --profile debug --flag "$FLAGS $FLAGSCOV"
           gcovr --filter src --cobertura-pretty --output coverage.xml
           
       - name: Run examples
@@ -90,5 +89,7 @@ jobs:
         run: |
           gfortran --version
           fpm --version
-          fpm test --profile debug --flag "$FLAGS" --verbose
-          fpm test --profile release --flag "$FLAGS" --verbose
+          # fpm test --profile debug --flag "$FLAGS" --verbose
+          # fpm test --profile release --flag "$FLAGS" --verbose
+          fpm test --profile debug --verbose
+          fpm test --profile release --verbose
