@@ -10,21 +10,21 @@ project(
   ],
 )
 
-c_compiler = meson.get_compiler('c')
+cc = meson.get_compiler('c')
+os = host_machine.system()
 
-# Set specific compiler flags
-if c_compiler.get_id() == 'gcc'
+# Compiler flags
+if cc.get_id() == 'gcc'
   add_project_arguments('-Wno-compare-reals', '-Wno-unused-dummy-argument', language: ['fortran'])
-  gcc_version = c_compiler.version()
-  if gcc_version.version_compare('>=14')
+  if cc.version().version_compare('>=14') and os != 'windows'
     add_project_arguments('-ftrampoline-impl=heap', language: ['c', 'fortran'])
   endif
 else
-  warning('Compiler is @0@. If the build fails, try using the GCC compiler.'.format(c_compiler.get_id()))
+  warning('Compiler is @0@. If the build fails, try using the GCC compiler.'.format(cc.get_id()))
 endif
 
 # BLAS
-if host_machine.system() == 'darwin'
+if os == 'darwin'
   message('Using `Accelerate` framework as BLAS library.')
   add_project_link_arguments('-framework', 'Accelerate')
   blas_dep = declare_dependency()
@@ -32,7 +32,7 @@ else
   # static linking does not work in cibuildwheel
   blas_dep = dependency('openblas', required: false)
   if not blas_dep.found()
-    blas_dep = c_compiler.find_library('openblas', required: false)
+    blas_dep = cc.find_library('openblas', required: false)
   endif
 endif
 
