@@ -16,8 +16,7 @@ c_compiler = meson.get_compiler('c')
 if c_compiler.get_id() == 'gcc'
   gcc_version = c_compiler.version()
   if gcc_version.version_compare('>=14')
-    add_project_arguments('-ftrampoline-impl=heap', language: 'c')
-    add_project_arguments('-ftrampoline-impl=heap', language: 'fortran')
+    add_project_arguments('-ftrampoline-impl=heap', language: ['c', 'fortran'])
   endif
 endif
 
