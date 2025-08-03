@@ -40,7 +40,7 @@ endif
 if blas_dep.found()
   blas_source = []
 else
-  message('No specific BLAS library detected. Falling back to reference BLAS.')
+  warning('No specific BLAS library detected. Falling back to reference BLAS.')
   blas_source = join_paths(meson.current_source_dir(), 'extern/blas.f')
 endif
 
