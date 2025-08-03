@@ -42,9 +42,9 @@ jobs:
         compiler-version: ["14.2.0"]
         include:
           - os: ubuntu-latest
-            extra-packages: "libopenblas meson"
+            extra-packages: "meson openblas"
           - os: windows-latest
-            extra-packages: "libopenblas meson pkg-config"
+            extra-packages: "meson openblas pkg-config"
           
     steps:
       - name: Set up Fortran
@@ -55,13 +55,13 @@ jobs:
           platform: ${{ matrix.os }}
           extra-packages: ${{ matrix.extra-packages }}
 
-      - name: Test debug mode
+      - name: Test Debug
         run: |
           meson setup build_debug --buildtype=debug -Dbuild_tests=true -Dbuild_examples=true
           meson compile -C build_debug
           meson test -C build_debug
 
-      - name: Test release mode
+      - name: Test Release
         run: |
           meson setup build_release -Dbuild_tests=true -Dbuild_examples=true
           meson compile -C build_release
