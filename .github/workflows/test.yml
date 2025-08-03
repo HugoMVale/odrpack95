@@ -20,7 +20,7 @@ jobs:
       - name: Test debug with coverage
         run: |
           gcov --version
-          pip install gcovr
+          pip install gcovr coverage
           fpm test --profile debug --flag "-Wno-compare-reals -Wno-unused-dummy-argument -ftrampoline-impl=heap --coverage -fprofile-abs-path"
           gcovr --filter src --cobertura-pretty --output coverage.xml
       
