@@ -69,9 +69,8 @@ jobs:
           meson compile -C build_release
           meson test -C build_release
 
-      # - name: Test debug mode
-      #   run: fpm test --compiler ${{ matrix.compiler }} --profile debug --verbose
-
-      # - name: Test release mode
-      #   run: fpm test --compiler ${{ matrix.compiler }} --profile release --verbose
+      - name: Run Examples (Release)
+        run: |
+          ./builddir/example/example5
+          ./builddir/c/example/example5
       
