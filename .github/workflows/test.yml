@@ -15,11 +15,12 @@ jobs:
           compiler: gfortran
           compiler-version: 14.2
           platform: ubuntu-latest
-          extra-packages: "gcovr openblas"
+          extra-packages: "openblas"
       
       - name: Test debug with coverage
         run: |
           gcov --version
+          pip install gcovr
           fpm test --profile debug --flag "-Wno-compare-reals -Wno-unused-dummy-argument -ftrampoline-impl=heap --coverage -fprofile-abs-path"
           gcovr --filter src --cobertura-pretty --output coverage.xml
       
@@ -27,7 +28,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: false
+          verbose: true
         
   # Matrix test 
   test_matrix:
