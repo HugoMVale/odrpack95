@@ -37,7 +37,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latestm, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         compiler: [gfortran]
         compiler-version: ["14.2.0"]
         include:
@@ -45,7 +45,9 @@ jobs:
             extra-packages: "meson openblas"
           - os: windows-latest
             extra-packages: "meson openblas pkg-config"
-          
+          - os: macos-latest
+            extra-packages: "meson openblas"
+                
     steps:
       - name: Set up Fortran
         uses: gha3mi/setup-fortran-conda@latest
