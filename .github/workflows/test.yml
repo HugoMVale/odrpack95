@@ -71,6 +71,6 @@ jobs:
 
       - name: Run Examples (Release)
         run: |
-          ./builddir/example/example5
-          ./builddir/c/example/example5
+          ./build_release/example/example5
+          ./build_release/c/example/example5
       
