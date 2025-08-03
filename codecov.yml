@@ -4,11 +4,7 @@ coverage:
   round: down
   precision: 2
   ignore:
-    - test
-    - doc
-    - example
     - "src/linpack.f"
-    - "src/blas.f_"
   status:
     patch:
       default:
