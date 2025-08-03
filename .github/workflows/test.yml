@@ -4,7 +4,7 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
 
-  # Quick test in Ubuntu+GCC
+  # Quick test in Ubuntu
   test_quick:
     runs-on: ubuntu-latest
     steps:
@@ -39,7 +39,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         compiler: [gfortran]
-        compiler-version: ["14.2.0"]
+        compiler-version: ["14.2.0", "12.2.0"]
         include:
           - os: ubuntu-latest
             extra-packages: "meson openblas"
