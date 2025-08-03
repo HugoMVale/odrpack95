@@ -11,12 +11,13 @@ project(
 )
 
 cc = meson.get_compiler('c')
+fc = meson.get_compiler('fortran')
 os = host_machine.system()
 
 # Compiler flags
-if cc.get_id() == 'gcc'
+if fc.get_id() == 'gcc'
   add_project_arguments('-Wno-compare-reals', '-Wno-unused-dummy-argument', language: ['fortran'])
-  if cc.version().version_compare('>=14') and os != 'windows'
+  if fc.version().version_compare('>=14') and os != 'windows'
     add_project_arguments('-ftrampoline-impl=heap', language: ['c', 'fortran'])
   endif
 else
