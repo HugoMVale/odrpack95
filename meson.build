@@ -17,9 +17,10 @@ os = host_machine.system()
 # Compiler flags
 if fc.get_id() == 'gcc'
   add_project_arguments('-Wno-compare-reals', '-Wno-unused-dummy-argument', language: ['fortran'])
-  if fc.version().version_compare('>=14') and os != 'windows'
-    add_project_arguments('-ftrampoline-impl=heap', language: ['c', 'fortran'])
-  endif
+  # This flag makes cibw break with manylinux_2_8 
+  # if fc.version().version_compare('>=14') and os != 'windows'
+  #   add_project_arguments('-ftrampoline-impl=heap', language: ['c', 'fortran'])
+  # endif
 else
   warning('Compiler is @0@. If the build fails, try using the GCC compiler.'.format(cc.get_id()))
 endif
