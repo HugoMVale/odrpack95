@@ -23,20 +23,13 @@ jobs:
           pip install gcovr coverage
           fpm test --profile debug --flag "-Wno-compare-reals -Wno-unused-dummy-argument -ftrampoline-impl=heap --coverage -fprofile-abs-path"
           gcovr --filter src --cobertura-pretty --output coverage.xml
-      
-      - name: Check coverage files
-        run: |
-          ls -alR .
-          echo "--- Contents of coverage.xml ---"
-          cat coverage.xml
-          echo "------------------------------"
     
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
-          verbose: true
+          verbose: false
         
   # Matrix test 
   test_matrix:
