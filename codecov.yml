@@ -5,6 +5,8 @@ coverage:
   precision: 2
   ignore:
     - "src/linpack.f"
+    - test
+    - example
   status:
     patch:
       default:
