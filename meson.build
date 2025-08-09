@@ -22,7 +22,7 @@ if fc.get_id() == 'gcc'
   #   add_project_arguments('-ftrampoline-impl=heap', language: ['c', 'fortran'])
   # endif
 else
-  warning('Compiler is @0@. If the build fails, try using the GCC compiler.'.format(cc.get_id()))
+  warning('Compiler is @0@. If the build fails, try using the GCC compiler.'.format(fc.get_id()))
 endif
 
 # BLAS
