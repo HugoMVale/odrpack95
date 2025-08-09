@@ -107,7 +107,7 @@ meson test -C builddir
 First, setup the build:
 
 ```sh
-cmake -S . -B builddir -DBUILD_TESTS=ON
+cmake -B builddir -DBUILD_TESTS=ON
 ```
 
 To build the libraries, do:
