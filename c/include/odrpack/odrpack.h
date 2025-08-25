@@ -100,63 +100,6 @@ ODRPACK_EXTERN void odr_short_c(
     const int *job);
 
 /**
- * @brief "Medium-call" wrapper for the ODR routine including mandatory arguments and most
- * commonly used optional arguments.
- *
- * @param fcn    `==>` User-supplied subroutine for evaluating the model.
- * @param n      `==>` Number of observations.
- * @param m      `==>` Number of columns of data in the independent variable.
- * @param q     `==>` Number of responses per observation.
- * @param np     `==>` Number of function parameters.
- * @param ldwe   `==>` Leading dimension of array `we`, `ldwe ∈ {1, n}`.
- * @param ld2we  `==>` Second dimension of array `we`, `ld2we ∈ {1, q}`.
- * @param ldwd   `==>` Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
- * @param ld2wd  `==>` Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
- * @param ldifx  `==>` Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.
- * @param beta   `<=>` Array [np] of function parameters.
- * @param y      `==>` Array [q][n] of dependent variable. Unused when the model is implicit.
- * @param x      `==>` Array [m][n] of explanatory variable.
- * @param we     `==>` Optional array [q][ld2we][ldwe] with `epsilon` weights.
- * @param wd     `==>` Optional array [m][ld2wd][ldwd] with `delta` weights.
- * @param ifixb  `==>` Optional array [np] with values designating whether the elements of `beta` are fixed at their input values or not.
- * @param ifixx  `==>` Optional array [m][ldifx] with values designating whether the elements of `x` are fixed at their input values or not.
- * @param delta  `<=>` Optional array [m][n] with initial error in the `x` data.
- * @param lower  `==>` Optional array [np] with lower bound on `beta`.
- * @param upper  `==>` Optional array [np] with upper bound on `beta`.
- * @param job    `==>` Optional variable controlling initialization and computational method.
- * @param iprint `==>` Optional print control variable.
- * @param lunerr `==>` Optional logical unit number for error messages.
- * @param lunrpt `==>` Optional logical unit number for computation reports.
- * @param info   `<==` Optional variable designating why the computations were stopped.
- */
-ODRPACK_EXTERN void odr_medium_c(
-    odrpack_fcn_t fcn,
-    const int *n,
-    const int *m,
-    const int *q,
-    const int *np,
-    const int *ldwe,
-    const int *ld2we,
-    const int *ldwd,
-    const int *ld2wd,
-    const int *ldifx,
-    double beta[],
-    const double y[],
-    const double x[],
-    const double we[],
-    const double wd[],
-    const int ifixb[],
-    const int ifixx[],
-    double delta[],
-    const double lower[],
-    const double upper[],
-    const int *job,
-    const int *iprint,
-    const int *lunerr,
-    const int *lunrpt,
-    int *info);
-
-/**
  * @brief "Long-call" wrapper for the ODR routine including mandatory arguments and all
  * optional arguments.
  *
