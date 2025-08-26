@@ -28,7 +28,7 @@ contains
       end do
       istop = 0
 
-      theta = pi*beta(4)*0.5E0_wp
+      theta = pi/2*beta(4)
       ctheta = cos(theta)
       stheta = sin(theta)
 
@@ -36,7 +36,7 @@ contains
       if (mod(ideval, 10) >= 1) then
          do i = 1, ubound(xplusd, 1)
             freq = xplusd(i, 1)
-            omega = (2.0E0_wp*pi*freq*exp(-beta(3)))**beta(4)
+            omega = (2*pi*freq*exp(-beta(3)))**beta(4)
             phi = atan2((omega*stheta), (1 + omega*ctheta))
             r = (beta(1) - beta(2))*sqrt((1 + omega*ctheta)**2 + (omega*stheta)**2)**(-beta(5))
             f(i, 1) = beta(2) + r*cos(beta(5)*phi)
