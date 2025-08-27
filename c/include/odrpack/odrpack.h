@@ -106,7 +106,7 @@ ODRPACK_EXTERN void odr_short_c(
  * @param fcn    `==>` User-supplied subroutine for evaluating the model.
  * @param n      `==>` Number of observations.
  * @param m      `==>` Number of columns of data in the independent variable.
- * @param q     `==>` Number of responses per observation.
+ * @param q      `==>` Number of responses per observation.
  * @param np     `==>` Number of function parameters.
  * @param ldwe   `==>` Leading dimension of array `we`, `ldwe ∈ {1, n}`.
  * @param ld2we  `==>` Second dimension of array `we`, `ld2we ∈ {1, q}`.
@@ -330,5 +330,18 @@ ODRPACK_EXTERN void workspace_dimensions_c(
     const bool *isodr,
     int *lrwork,
     int *liwork);
+
+/**
+ * @brief Get a message corresponding to a given `info` code.
+ *
+ *
+ * @param info         `==>` Integer code designating why the computations were stopped.
+ * @param message      `<==` Output buffer that will contain the null-terminated message string corresponding to `info`.
+ * @param message_size `==>` Length of array `message`.
+ */
+ODRPACK_EXTERN void stop_message_c(
+    int info,
+    char message[],
+    size_t message_size);
 
 #endif  // ODRPACK_H

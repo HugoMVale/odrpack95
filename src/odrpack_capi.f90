@@ -1,13 +1,14 @@
 module odrpack_capi
    !! C-bindings for 'odrpack'.
 
-   use, intrinsic :: iso_c_binding, only: c_bool, c_char, c_double, c_f_pointer, c_int, c_ptr
+   use, intrinsic :: iso_c_binding, only: &
+      c_bool, c_char, c_double, c_f_pointer, c_int, c_null_char, c_ptr, c_size_t
    use odrpack, only: odr, workspace_dimensions
    use odrpack_core, only: loc_iwork, loc_rwork
    implicit none
 
    abstract interface
-      subroutine fcn_tc( &
+      subroutine fcn_c_t( &
          n, m, q, np, ldifx, beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop) bind(C)
       !! User-supplied subroutine for evaluating the model.
          import :: c_int, c_double
@@ -150,7 +151,7 @@ contains
       job) bind(C)
    !! "Short-call" wrapper for the `odr` routine including very few optional arguments.
 
-      procedure(fcn_tc) :: fcn
+      procedure(fcn_c_t) :: fcn
          !! User-supplied subroutine for evaluating the model.
       integer(c_int), intent(in) :: n
          !! Number of observations.
@@ -222,7 +223,7 @@ contains
       info) bind(C)
    !! "Long-call" wrapper for the `odr` routine including all optional arguments.
 
-      procedure(fcn_tc) :: fcn
+      procedure(fcn_c_t) :: fcn
          !! User-supplied subroutine for evaluating the model.
       integer(c_int), intent(in) :: n
          !! Number of observations.
@@ -559,5 +560,39 @@ contains
                                 lrwork, liwork)
 
    end subroutine workspace_dimensions_c
+
+   pure subroutine stop_message_c(info, message, message_size) bind(C)
+   !! Get a message corresponding to a given `info` code.
+      integer(c_int), intent(in), value :: info
+         !! Variable designating why the computations were stopped.
+      character(kind=c_char), intent(out) :: message(message_size)
+         !! C-string containing a message corresponding to `info`.
+      integer(c_size_t), intent(in), value :: message_size
+         !! Length of array `message`.
+
+      character(len=:), allocatable :: msg
+      integer(c_size_t) :: i
+
+      select case (info)
+      case (1)
+         msg = "Sum of squares convergence."
+      case (2)
+         msg = "Parameter convergence."
+      case (3)
+         msg = "Sum of squares and parameter convergence."
+      case (4)
+         msg = "Iteration limit reached."
+      case (5:)
+         msg = "Questionable results or fatal errors detected. See report and error message."
+      case default
+         msg = "Unknown info code."
+      end select
+      msg = msg//c_null_char
+
+      do i = 1, min(message_size, len(msg))
+         message(i) = msg(i:i)
+      end do
+
+   end subroutine stop_message_c
 
 end module odrpack_capi

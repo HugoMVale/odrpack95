@@ -17,14 +17,14 @@ void fcn(const int *n, const int *m, const int *q, const int *np, const int *ldi
     *istop = 0;
 
     // Model function
-    if (*ideval % 10 != 0) {
+    if (*ideval % 10 > 0) {
         for (int i = 0; i < *n; i++) {
             f[i] = beta[0] * exp(beta[1] * xplusd[i]);
         }
     }
 
     // Model partial derivatives wrt `beta`
-    if ((*ideval / 10) % 10 != 0) {
+    if ((*ideval / 10) % 10 > 0) {
         for (int i = 0; i < *n; i++) {
             fjacb[i] = exp(beta[1] * xplusd[i]);
             fjacb[*n + i] = beta[0] * xplusd[i] * exp(beta[1] * xplusd[i]);
@@ -32,7 +32,7 @@ void fcn(const int *n, const int *m, const int *q, const int *np, const int *ldi
     }
 
     // Model partial derivatives wrt `delta`
-    if ((*ideval / 100) % 10 != 0) {
+    if ((*ideval / 100) % 10 > 0) {
         for (int i = 0; i < *n; i++) {
             fjacd[i] = beta[0] * beta[1] * exp(beta[1] * xplusd[i]);
         }
@@ -141,7 +141,10 @@ int main() {
     loc_rwork_c(&n, &m, &q, &np, &ldwe, &ld2we, &isodr, &rwi);
 
     // Print some outputs
-    printf("info: %d\n", info);
+
+    char message[256] = {};
+    stop_message_c(info, (char *)message, sizeof(message));
+    printf("Stop reason (info = %d): %s\n", info, message);
 
     for (int i = 0; i < NP; i++) {
         printf("beta[%d] = %f\n", i, beta[i]);
