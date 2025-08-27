@@ -33,7 +33,7 @@ contains
       stheta = sin(theta)
 
       ! Compute predicted values
-      if (mod(ideval, 10) >= 1) then
+      if (mod(ideval, 10) > 0) then
          do i = 1, ubound(xplusd, 1)
             freq = xplusd(i, 1)
             omega = (2*pi*freq*exp(-beta(3)))**beta(4)

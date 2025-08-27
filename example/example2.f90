@@ -26,7 +26,7 @@ contains
       end if
 
       ! Compute predicted values
-      if (mod(ideval, 10) >= 1) then
+      if (mod(ideval, 10) > 0) then
          do i = 1, ubound(f, 2)
             f(:, i) = beta(3)*(xplusd(:, 1) - beta(1))**2 + &
                       2*beta(4)*(xplusd(:, 1) - beta(1))*(xplusd(:, 2) - beta(2)) + &

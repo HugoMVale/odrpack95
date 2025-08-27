@@ -26,14 +26,14 @@ contains
       end if
 
       ! Compute predicted values
-      if (mod(ideval, 10) >= 1) then
+      if (mod(ideval, 10) > 0) then
          do i = 1, ubound(f, 2)
             f(:, i) = beta(1) + beta(2)*(exp(beta(3)*xplusd(:, 1)) - one)**2
          end do
       end if
 
       ! Compute derivatives with respect to 'beta'
-      if (mod(ideval/10, 10) >= 1) then
+      if (mod(ideval/10, 10) > 0) then
          do i = 1, ubound(f, 2)
             fjacb(:, 1, i) = one
             fjacb(:, 2, i) = (exp(beta(3)*xplusd(:, 1)) - one)**2
@@ -42,7 +42,7 @@ contains
       end if
 
       ! Compute derivatives with respect to 'delta'
-      if (mod(ideval/100, 10) >= 1) then
+      if (mod(ideval/100, 10) > 0) then
       do i = 1, ubound(f, 2)
          fjacd(:, 1, i) = beta(2)*2*(exp(beta(3)*xplusd(:, 1)) - one)*exp(beta(3)*xplusd(:, 1))*beta(3)
       end do

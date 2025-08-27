@@ -21,7 +21,7 @@ contains
       istop = 0
       fjacb = zero
       fjacd = zero
-      if (mod(ideval, 10) >= 1) then
+      if (mod(ideval, 10) > 0) then
          do i = 1, ubound(f, 1)
             f(i, 1) = 1440.0_wp
             call mpf(uout, xplusd(i, 1), beta(1), beta(2), beta(3), zero, f(i, 1), xplusd(i, 1)/2)
