@@ -31,12 +31,12 @@ void fcn(const int *n, const int *m, const int *q, const int *np, const int *ldi
     stheta = sin(theta);
 
     // Model function
-    if ((*ideval % 10) >= 1) {
+    if ((*ideval % 10) > 0) {
         for (int i = 0; i < *n; i++) {
             freq = xplusd[i];
             omega = pow(2.0 * pi * freq * exp(-beta[2]), beta[3]);
-            phi = atan2(omega * stheta, 1 + omega * ctheta);
-            r = (beta[0] - beta[1]) * pow(sqrt(pow(1 + omega * ctheta, 2) + pow(omega * stheta, 2)), -beta[4]);
+            phi = atan2(omega * stheta, 1.0 + omega * ctheta);
+            r = (beta[0] - beta[1]) * pow(sqrt(pow(1.0 + omega * ctheta, 2.0) + pow(omega * stheta, 2.0)), -beta[4]);
             f[i] = beta[1] + r * cos(beta[4] * phi);
             f[i + *n] = r * sin(beta[4] * phi);
         }
@@ -55,7 +55,10 @@ int main() {
     double beta[NP], x[M][N], y[Q][N], delta[M][N], wd[M][M][N], we[Q][Q][N];
     int ifixx[M][N];
     int ifixb[NP] = {1, 1, 1, 1, 1};
+    int ldstpd = 1;
+    int ldscld = 1;
     int iscan = 0;
+    int zero = 0;
 
     // Read problem data
     FILE *data_file = fopen("./example/data3.dat", "r");
@@ -144,16 +147,26 @@ int main() {
     int info = 0;
 
     // Compute solution
-    odr_medium_c(fcn, &n, &m, &q, &np,
-                 &ldwe, &ld2we, &ldwd, &ld2wd, &ldifx,
-                 beta,
-                 (double *)y, (double *)x,
-                 (double *)we,
-                 (double *)wd,
-                 ifixb, (int *)ifixx,
-                 (double *)delta,
-                 NULL, NULL,
-                 &job, &iprint, &lunerr, &lunrpt, &info);
+    odr_long_c(fcn, &n, &m, &q, &np,
+               &ldwe, &ld2we, &ldwd, &ld2wd,
+               &ldifx, &ldstpd, &ldscld,
+               &zero, &zero,
+               beta,
+               (double *)y, (double *)x,
+               (double *)we, (double *)wd,
+               ifixb, (int *)ifixx,
+               NULL, NULL,
+               NULL, NULL,
+               (double *)delta,
+               NULL, NULL,
+               NULL, NULL,
+               &job, NULL, NULL, NULL, NULL, NULL,
+               &iprint, &lunerr, &lunrpt,
+               &info);
+
+    char message[256] = {};
+    stop_message_c(info, message, sizeof(message));
+    printf("Stop reason (info = %d): %s\n", info, message);
 
     return 0;
 }
