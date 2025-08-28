@@ -99,3 +99,10 @@ endif()
 if(BUILD_TESTS)
     add_subdirectory(test)
 endif()
+
+# Install the library
+include(GNUInstallDirs)
+install(TARGETS odrpack95
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)

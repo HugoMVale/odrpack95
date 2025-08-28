@@ -36,7 +36,8 @@ use and maintain. The main changes include:
 * [x] Addition of explicit interfaces to BLAS routines.
 * [x] Implementation of a C API.
 * [x] Automatic code documentation with FORD.
-* [x] Python bindings, available in the companion repo [odrpack-python](https://github.com/HugoMVale/odrpack-python). 
+* [x] Python bindings, available in the companion repo [odrpack-python](https://github.com/HugoMVale/odrpack-python).
+* [x] Julia bindings, available in the companion repo [Odrpack.jl](https://github.com/HugoMVale/Odrpack.jl). 
 
 |    Version    | Year |   Standard   |
 |:-------------:|:----:|:------------:|
@@ -107,7 +108,7 @@ meson test -C builddir
 First, setup the build:
 
 ```sh
-cmake -S . -B builddir -DBUILD_TESTS=ON
+cmake -B builddir -DBUILD_TESTS=ON
 ```
 
 To build the libraries, do:
