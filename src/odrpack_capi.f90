@@ -2,16 +2,16 @@ module odrpack_capi
    !! C-bindings for 'odrpack'.
 
    use, intrinsic :: iso_c_binding, only: &
-      c_bool, c_char, c_double, c_f_pointer, c_int, c_null_char, c_ptr, c_size_t
+      c_bool, c_char, c_double, c_f_pointer, c_int, c_null_char, c_ptr, c_size_t, c_null_ptr
    use odrpack, only: odr, workspace_dimensions
    use odrpack_core, only: loc_iwork, loc_rwork
    implicit none
 
    abstract interface
       subroutine fcn_c_t( &
-         n, m, q, np, ldifx, beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop) bind(C)
-      !! User-supplied subroutine for evaluating the model.
-         import :: c_int, c_double
+         n, m, q, np, ldifx, beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop, thunk) bind(C)
+      !! User-supplied subroutine for evaluating the model, with user-defined data.
+         import :: c_int, c_double, c_ptr
          implicit none
          integer(c_int), intent(in) :: n
             !! Number of observations.
@@ -46,6 +46,8 @@ module odrpack_capi
             !!  `1`: Current `beta` and `x + delta` are not acceptable; 'odrpack' should select
             !!       values closer to most recently used values if possible.
             !! `-1`: Current `beta` and `x + delta` are not acceptable; 'odrpack' should stop.
+         type(c_ptr), intent(in), value :: thunk
+            !! User-defined data passed to the function.
       end subroutine
    end interface
 
@@ -195,7 +197,7 @@ contains
          integer(c_int), intent(out) :: istop
 
          call fcn(n, m, q, np, 1, &
-                  beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
+                  beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop, c_null_ptr)
 
       end subroutine fcn_
 
@@ -219,9 +221,9 @@ contains
       rwork, iwork, &
       job, ndigit, taufac, &
       sstol, partol, maxit, &
-      iprint, lunerr, lunrpt, &
-      info) bind(C)
-   !! "Long-call" wrapper for the `odr` routine including all optional arguments.
+      iprint, lunerr, lunrpt, info, &
+      thunk) bind(C)
+   !! "Long-call" wrapper for the `odr` routine including all optional arguments and thunk.
 
       procedure(fcn_c_t) :: fcn
          !! User-supplied subroutine for evaluating the model.
@@ -310,6 +312,8 @@ contains
          !!  `k /= 0,6`: Output to logical unit `k`.
       integer(c_int), intent(out), optional :: info
          !! Variable designating why the computations were stopped.
+      type(c_ptr), intent(in), value :: thunk
+         !! User-defined data passed to the function.
 
       call odr(fcn_, n, m, q, np, beta, y, x, &
                we=we, wd=wd, &
@@ -338,7 +342,7 @@ contains
          integer(c_int), intent(out) :: istop
 
          call fcn(n, m, q, np, ldifx, &
-                  beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
+                  beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop, thunk)
 
       end subroutine fcn_
 

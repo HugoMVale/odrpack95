@@ -13,7 +13,7 @@ This is an adaptation of example 5 from the ODRPACK95 documentation.
 void fcn(const int *n, const int *m, const int *q, const int *np, const int *ldifx,
          const double beta[], const double xplusd[],
          const int ifixb[], const int ifixx[], const int *ideval,
-         double f[], double fjacb[], double fjacd[], int *istop) {
+         double f[], double fjacb[], double fjacd[], int *istop, void *thunk) {
     *istop = 0;
 
     // Model function
@@ -129,7 +129,7 @@ int main() {
                rwork, iwork,
                &job, &ndigit, &taufac, &sstol, &partol, &maxit,
                &iprint, &lunerr, &lunrpt,
-               &info);
+               &info, NULL);
 
     close_file(&lunrpt, &ierr);
     // printf("Error code (ierr): %d\n", ierr);

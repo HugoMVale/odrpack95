@@ -12,7 +12,7 @@ This is a translation of example 3 from the ODRPACK95 documentation.
 void fcn(const int *n, const int *m, const int *q, const int *np, const int *ldifx,
          const double beta[], const double xplusd[],
          const int ifixb[], const int ifixx[], const int *ideval,
-         double f[], double fjacb[], double fjacd[], int *istop) {
+         double f[], double fjacb[], double fjacd[], int *istop, void *thunk) {
     // Local variables
     double freq, omega, ctheta, stheta, theta, phi, r;
     const double pi = 4 * atan(1.0);
@@ -162,7 +162,7 @@ int main() {
                NULL, NULL,
                &job, NULL, NULL, NULL, NULL, NULL,
                &iprint, &lunerr, &lunrpt,
-               &info);
+               &info, NULL);
 
     char message[256] = {};
     stop_message_c(info, message, sizeof(message));

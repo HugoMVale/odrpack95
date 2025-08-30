@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stddef.h>
 
 #ifndef ODRPACK_H
 #define ODRPACK_H
@@ -51,6 +52,7 @@ ODRPACK_EXTERN void close_file(
  *                0 - current `beta` and `x + delta` were acceptable and values were computed successfully,
  *                1 - current `beta` and `x + delta` are not acceptable; 'odrpack' should select values closer to most recently used values if possible,
  *               -1 - current `beta` and `x + delta` are not acceptable; 'odrpack' should stop.
+ * @param thunk   `==>` User-defined data passed through to this function (can be NULL).
  */
 typedef void (*odrpack_fcn_t)(
     const int *n,
@@ -66,7 +68,8 @@ typedef void (*odrpack_fcn_t)(
     double f[],
     double fjacb[],
     double fjacd[],
-    int *istop);
+    int *istop,
+    void *thunk);
 
 /**
  * @brief "Short-call" wrapper for the ODR routine including mandatory arguments and very few
@@ -143,6 +146,7 @@ ODRPACK_EXTERN void odr_short_c(
  * @param lunerr `==>` Optional logical unit number for error messages.
  * @param lunrpt `==>` Optional logical unit number for computation reports.
  * @param info   `<==` Optional variable designating why the computations were stopped.
+ * @param thunk  `==>` User-defined data passed through to this function (can be NULL).
  */
 ODRPACK_EXTERN void odr_long_c(
     odrpack_fcn_t fcn,
@@ -184,7 +188,8 @@ ODRPACK_EXTERN void odr_long_c(
     const int *iprint,
     const int *lunerr,
     const int *lunrpt,
-    int *info);
+    int *info,
+    void *thunk);
 
 /**
  * @brief 0-based locations within integer work array.
