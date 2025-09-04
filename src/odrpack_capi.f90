@@ -1,55 +1,9 @@
 module odrpack_capi
    !! C-bindings for 'odrpack'.
 
-   use, intrinsic :: iso_c_binding, only: &
-      c_bool, c_char, c_double, c_f_pointer, c_int, c_null_char, c_ptr, c_size_t, c_null_ptr
-   use odrpack, only: odr, workspace_dimensions
-   use odrpack_core, only: loc_iwork, loc_rwork
+   use iso_c_binding, only: c_bool, c_char, c_double, c_f_pointer, c_int, c_null_char, &
+                            c_ptr, c_size_t, c_null_ptr
    implicit none
-
-   abstract interface
-      subroutine fcn_c_t( &
-         n, m, q, np, ldifx, beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop, thunk) bind(C)
-      !! User-supplied subroutine for evaluating the model, with user-defined data.
-         import :: c_int, c_double, c_ptr
-         implicit none
-         integer(c_int), intent(in) :: n
-            !! Number of observations.
-         integer(c_int), intent(in) :: m
-            !! Number of columns of data in the independent variable.
-         integer(c_int), intent(in) :: q
-            !! Number of responses per observation.
-         integer(c_int), intent(in) :: np
-            !! Number of function parameters.
-         integer(c_int), intent(in) :: ldifx
-            !! Leading dimension of array `ifixx`.
-         real(c_double), intent(in) :: beta(np)
-            !! Current values of parameters.
-         real(c_double), intent(in) :: xplusd(n, m)
-            !! Current value of explanatory variable, i.e., `x + delta`.
-         integer(c_int), intent(in) :: ifixb(np)
-            !! Indicators for "fixing" parameters (`beta`).
-         integer(c_int), intent(in) :: ifixx(ldifx, m)
-            !! Indicators for "fixing" explanatory variable (`x`).
-         integer(c_int), intent(in) :: ideval
-            !! Indicator for selecting computation to be performed.
-         real(c_double), intent(out) :: f(n, q)
-            !! Predicted function values.
-         real(c_double), intent(out) :: fjacb(n, np, q)
-            !! Jacobian with respect to `beta`.
-         real(c_double), intent(out) :: fjacd(n, m, q)
-            !! Jacobian with respect to errors `delta`.
-         integer(c_int), intent(out) :: istop
-            !! Stopping condition, with meaning as follows.
-            !!  `0`: Current `beta` and `x + delta` were acceptable and values were computed
-            !!       successfully.
-            !!  `1`: Current `beta` and `x + delta` are not acceptable; 'odrpack' should select
-            !!       values closer to most recently used values if possible.
-            !! `-1`: Current `beta` and `x + delta` are not acceptable; 'odrpack' should stop.
-         type(c_ptr), intent(in), value :: thunk
-            !! User-defined data passed to the function.
-      end subroutine
-   end interface
 
    interface
       integer(c_int) function strlen(string) bind(C)
@@ -145,7 +99,7 @@ module odrpack_capi
 contains
 
    subroutine odr_short_c( &
-      fcn, &
+      fcn, data, &
       n, m, q, np, &
       beta, y, x, &
       delta, &
@@ -153,8 +107,13 @@ contains
       job) bind(C)
    !! "Short-call" wrapper for the `odr` routine including very few optional arguments.
 
-      procedure(fcn_c_t) :: fcn
+      use odrpack_core, only: fcn_t, odrpack_model
+      use odrpack, only: odr
+
+      procedure(fcn_t) :: fcn
          !! User-supplied subroutine for evaluating the model.
+      type(c_ptr), intent(in), value :: data
+         !! User-defined data passed to the function.
       integer(c_int), intent(in) :: n
          !! Number of observations.
       integer(c_int), intent(in) :: m
@@ -178,33 +137,18 @@ contains
       integer(c_int), intent(in), optional :: job
          !! Variable controlling initialization and computational method.
 
-      call odr(fcn_, n, m, q, np, beta, y, x, &
-               delta=delta, &
-               lower=lower, upper=upper, &
-               job=job)
+      type(odrpack_model) :: model
 
-   contains
+      model%fcn => fcn
+      model%data = data
 
-      subroutine fcn_(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
-         real(c_double), intent(in) :: beta(:)
-         real(c_double), intent(in) :: xplusd(:, :)
-         integer(c_int), intent(in) :: ifixb(:)
-         integer(c_int), intent(in) :: ifixx(:, :)
-         integer(c_int), intent(in) :: ideval
-         real(c_double), intent(out) :: f(:, :)
-         real(c_double), intent(out) :: fjacb(:, :, :)
-         real(c_double), intent(out) :: fjacd(:, :, :)
-         integer(c_int), intent(out) :: istop
-
-         call fcn(n, m, q, np, 1, &
-                  beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop, c_null_ptr)
-
-      end subroutine fcn_
+      call odr(model, n, m, q, np, beta, y, x, &
+               delta=delta, lower=lower, upper=upper, job=job)
 
    end subroutine odr_short_c
 
    subroutine odr_long_c( &
-      fcn, &
+      fcn, data, &
       n, m, q, np, &
       ldwe, ld2we, &
       ldwd, ld2wd, &
@@ -225,8 +169,13 @@ contains
       thunk) bind(C)
    !! "Long-call" wrapper for the `odr` routine including all optional arguments and thunk.
 
-      procedure(fcn_c_t) :: fcn
+      use odrpack_core, only: fcn_t, odrpack_model
+      use odrpack, only: odr
+
+      procedure(fcn_t) :: fcn
          !! User-supplied subroutine for evaluating the model.
+      type(c_ptr), intent(in), value :: data
+         !! User-defined data passed to the function.
       integer(c_int), intent(in) :: n
          !! Number of observations.
       integer(c_int), intent(in) :: m
@@ -315,7 +264,12 @@ contains
       type(c_ptr), intent(in), value :: thunk
          !! User-defined data passed to the function.
 
-      call odr(fcn_, n, m, q, np, beta, y, x, &
+      type(odrpack_model) :: model
+
+      model%fcn => fcn
+      model%data = data
+
+      call odr(model, n, m, q, np, beta, y, x, &
                we=we, wd=wd, &
                ifixb=ifixb, ifixx=ifixx, &
                delta=delta, &
@@ -327,24 +281,6 @@ contains
                sclb=sclb, scld=scld, &
                info=info, &
                rwork=rwork, iwork=iwork)
-
-   contains
-
-      subroutine fcn_(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
-         real(c_double), intent(in) :: beta(:)
-         real(c_double), intent(in) :: xplusd(:, :)
-         integer(c_int), intent(in) :: ifixb(:)
-         integer(c_int), intent(in) :: ifixx(:, :)
-         integer(c_int), intent(in) :: ideval
-         real(c_double), intent(out) :: f(:, :)
-         real(c_double), intent(out) :: fjacb(:, :, :)
-         real(c_double), intent(out) :: fjacd(:, :, :)
-         integer(c_int), intent(out) :: istop
-
-         call fcn(n, m, q, np, ldifx, &
-                  beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop, thunk)
-
-      end subroutine fcn_
 
    end subroutine odr_long_c
 
@@ -400,6 +336,8 @@ contains
    pure subroutine loc_iwork_c(m, q, np, iwi) bind(C)
    !! Get storage locations within integer work space.
 
+      use odrpack_core, only: loc_iwork
+
       integer(c_int), intent(in) :: m
          !! Number of columns of data in the independent variable.
       integer(c_int), intent(in) :: q
@@ -450,6 +388,8 @@ contains
 
    pure subroutine loc_rwork_c(n, m, q, np, ldwe, ld2we, isodr, rwi) bind(C)
    !! Get storage locations within real work space.
+
+      use odrpack_core, only: loc_rwork
 
       integer(c_int), intent(in) :: n
          !! Number of observations.
@@ -544,6 +484,8 @@ contains
 
    pure subroutine workspace_dimensions_c(n, m, q, np, isodr, lrwork, liwork) bind(C)
    !! Calculate the dimensions of the workspace arrays.
+
+      use odrpack_core, only: workspace_dimensions
 
       integer(c_int), intent(in) :: n
          !! Number of observations.

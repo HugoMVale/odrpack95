@@ -94,7 +94,7 @@ C***Routines called  DROTG
 C***End Prologue  DCHEX
 
 C...Used modules
-      use odrpack_kinds, only: wp
+      use odrpack_kinds, only: dp
       use blas_interfaces, only: drotg
 
 C...Scalar arguments
@@ -107,13 +107,13 @@ C...Scalar arguments
       INTEGER, INTENT(IN) :: P
 
 C...Array arguments
-      REAL(wp), INTENT(OUT) :: C(*)
-      REAL(wp), INTENT(INOUT) :: R(LDR,*)
-      REAL(wp), INTENT(OUT) :: S(*)
-      REAL(wp), INTENT(INOUT) :: Z(LDZ,*)
+      REAL(dp), INTENT(OUT) :: C(*)
+      REAL(dp), INTENT(INOUT) :: R(LDR,*)
+      REAL(dp), INTENT(OUT) :: S(*)
+      REAL(dp), INTENT(INOUT) :: Z(LDZ,*)
 
 C...Local scalars
-      REAL(wp)
+      REAL(dp)
      &   T,T1
       INTEGER
      &   I,II,IL,IU,J,JJ,KM1,KP1,LM1,LMK
@@ -154,7 +154,7 @@ C        Reorder the columns.
             DO 30 I = 1, J
                R(I,J+1) = R(I,J)
    30       CONTINUE
-            R(J+1,J+1) = 0.0E0_wp
+            R(J+1,J+1) = 0.0E0_dp
    40    CONTINUE
          IF (K .EQ. 1) GO TO 60
             DO 50 I = 1, KM1
@@ -219,7 +219,7 @@ C        Reorder the columns
             R(I,L) = S(II)
   170    CONTINUE
          DO 180 I = KP1, L
-            R(I,L) = 0.0E0_wp
+            R(I,L) = 0.0E0_dp
   180    CONTINUE
 
 C        Reduction loop.
@@ -314,7 +314,7 @@ C***Routines called  DAXPY,DSCAL
 C***End Prologue  DPODI
 
 C...Used modules
-      use odrpack_kinds, only: wp
+      use odrpack_kinds, only: dp
       use blas_interfaces, only: daxpy, dscal
 
 C...Scalar arguments
@@ -323,11 +323,11 @@ C...Scalar arguments
       INTEGER, INTENT(IN) :: N
 
 C...Array arguments
-      REAL(wp), INTENT(INOUT) :: A(LDA,*)
-      REAL(wp), INTENT(OUT) :: DET(*)
+      REAL(dp), INTENT(INOUT) :: A(LDA,*)
+      REAL(dp), INTENT(OUT) :: DET(*)
 
 C...Local scalars
-      REAL(wp) S,T
+      REAL(dp) S,T
       INTEGER I,J,JM1,K,KP1
 
 C...Intrinsic functions
@@ -338,21 +338,21 @@ C***First executable statement  DPODI
 
 
       IF (JOB/10 .EQ. 0) GO TO 70
-         DET(1) = 1.0E0_wp
-         DET(2) = 0.0E0_wp
-         S = 10.0E0_wp
+         DET(1) = 1.0E0_dp
+         DET(2) = 0.0E0_dp
+         S = 10.0E0_dp
          DO 50 I = 1, N
             DET(1) = A(I,I)**2*DET(1)
 C        ...Exit
-            IF (DET(1) .EQ. 0.0E0_wp) GO TO 60
-   10       IF (DET(1) .GE. 1.0E0_wp) GO TO 20
+            IF (DET(1) .EQ. 0.0E0_dp) GO TO 60
+   10       IF (DET(1) .GE. 1.0E0_dp) GO TO 20
                DET(1) = S*DET(1)
-               DET(2) = DET(2) - 1.0E0_wp
+               DET(2) = DET(2) - 1.0E0_dp
             GO TO 10
    20       CONTINUE
    30       IF (DET(1) .LT. S) GO TO 40
                DET(1) = DET(1)/S
-               DET(2) = DET(2) + 1.0E0_wp
+               DET(2) = DET(2) + 1.0E0_dp
             GO TO 30
    40       CONTINUE
    50    CONTINUE
@@ -363,14 +363,14 @@ C     Compute inverse(R)
 
       IF (MOD(JOB,10) .EQ. 0) GO TO 140
          DO 100 K = 1, N
-            A(K,K) = 1.0E0_wp/A(K,K)
+            A(K,K) = 1.0E0_dp/A(K,K)
             T = -A(K,K)
             CALL DSCAL(K-1,T,A(1,K),1)
             KP1 = K + 1
             IF (N .LT. KP1) GO TO 90
             DO 80 J = KP1, N
                T = A(K,J)
-               A(K,J) = 0.0E0_wp
+               A(K,J) = 0.0E0_dp
                CALL DAXPY(K,T,A(1,K),1,A(1,J),1)
    80       CONTINUE
    90       CONTINUE
@@ -466,7 +466,7 @@ C***Routines Called  DAXPY,DDOT,DNRM2,DSCAL,DSWAP
 C***End Prologue  DQRDC
 
 C...Used modules
-      use odrpack_kinds, only: wp
+      use odrpack_kinds, only: dp
       use blas_interfaces, only: ddot, dnrm2, daxpy, dscal, dswap
 
 C...Scalar arguments
@@ -476,13 +476,13 @@ C...Scalar arguments
       INTEGER, INTENT(IN) :: P
 
 C...Array arguments
-      REAL(wp), INTENT(OUT) :: QRAUX(*)
-      REAL(wp), INTENT(OUT) :: WORK(*)
-      REAL(wp), INTENT(INOUT) :: X(LDX,*)
+      REAL(dp), INTENT(OUT) :: QRAUX(*)
+      REAL(dp), INTENT(OUT) :: WORK(*)
+      REAL(dp), INTENT(INOUT) :: X(LDX,*)
       INTEGER, INTENT(INOUT) :: JPVT(*)
 
 C...Local scalars
-      REAL(wp)
+      REAL(dp)
      &   MAXNRM,NRMXL,T,TT
       INTEGER
      &   J,JJ,JP,L,LP1,LUP,MAXJ,PL,PU
@@ -550,7 +550,7 @@ C     Perform the Householder Reduction of X.
 C           LOCATE THE COLUMN OF LARGEST NORM AND BRING IT
 C           INTO THE PIVOT POSITION.
 
-            MAXNRM = 0.0E0_wp
+            MAXNRM = 0.0E0_dp
             MAXJ = L
             DO 100 J = L, PU
                IF (QRAUX(J) .LE. MAXNRM) GO TO 90
@@ -567,16 +567,16 @@ C           INTO THE PIVOT POSITION.
                JPVT(L) = JP
   110       CONTINUE
   120    CONTINUE
-         QRAUX(L) = 0.0E0_wp
+         QRAUX(L) = 0.0E0_dp
          IF (L .EQ. N) GO TO 190
 
 C           Compute the Householder Transformation for column L.
 
             NRMXL = DNRM2(N-L+1,X(L,L),1)
-            IF (NRMXL .EQ. 0.0E0_wp) GO TO 180
-               IF (X(L,L) .NE. 0.0E0_wp) NRMXL = DSIGN(NRMXL,X(L,L))
-               CALL DSCAL(N-L+1,1.0E0_wp/NRMXL,X(L,L),1)
-               X(L,L) = 1.0E0_wp + X(L,L)
+            IF (NRMXL .EQ. 0.0E0_dp) GO TO 180
+               IF (X(L,L) .NE. 0.0E0_dp) NRMXL = DSIGN(NRMXL,X(L,L))
+               CALL DSCAL(N-L+1,1.0E0_dp/NRMXL,X(L,L),1)
+               X(L,L) = 1.0E0_dp + X(L,L)
 
 C              Apply the transformation to the remaining columns,
 C              updating the norms.
@@ -587,12 +587,12 @@ C              updating the norms.
                   T = -DDOT(N-L+1,X(L,L),1,X(L,J),1)/X(L,L)
                   CALL DAXPY(N-L+1,T,X(L,L),1,X(L,J),1)
                   IF (J .LT. PL .OR. J .GT. PU) GO TO 150
-                  IF (QRAUX(J) .EQ. 0.0E0_wp) GO TO 150
-                     TT = 1.0E0_wp - (DABS(X(L,J))/QRAUX(J))**2
-                     TT = DMAX1(TT,0.0E0_wp)
+                  IF (QRAUX(J) .EQ. 0.0E0_dp) GO TO 150
+                     TT = 1.0E0_dp - (DABS(X(L,J))/QRAUX(J))**2
+                     TT = DMAX1(TT,0.0E0_dp)
                      T = TT
-                     TT = 1.0E0_wp + 0.05E0_wp*TT*(QRAUX(J)/WORK(J))**2
-                     IF (TT .EQ. 1.0E0_wp) GO TO 130
+                     TT = 1.0E0_dp + 0.05E0_dp*TT*(QRAUX(J)/WORK(J))**2
+                     IF (TT .EQ. 1.0E0_dp) GO TO 130
                         QRAUX(J) = QRAUX(J)*DSQRT(T)
                      GO TO 140
   130                CONTINUE
@@ -728,7 +728,7 @@ C***Routines Called  DAXPY,DCOPY,DDOT
 C***End Prologue  DQRSL
 
 C...Used modules
-      use odrpack_kinds, only: wp
+      use odrpack_kinds, only: dp
       use blas_interfaces, only: ddot, daxpy, dcopy
 
 C...Scalar arguments
@@ -739,17 +739,17 @@ C...Scalar arguments
       INTEGER, INTENT(IN) :: N
 
 C...Array arguments
-      REAL(wp), INTENT(OUT) :: B(*)
-      REAL(wp), INTENT(IN) :: QRAUX(*)
-      REAL(wp), INTENT(OUT) :: QTY(*)
-      REAL(wp), INTENT(OUT) :: QY(*)
-      REAL(wp), INTENT(OUT) :: RSD(*)
-      REAL(wp), INTENT(INOUT) :: X(LDX,*)
-      REAL(wp), INTENT(OUT) :: XB(*)
-      REAL(wp), INTENT(IN) :: Y(*)
+      REAL(dp), INTENT(OUT) :: B(*)
+      REAL(dp), INTENT(IN) :: QRAUX(*)
+      REAL(dp), INTENT(OUT) :: QTY(*)
+      REAL(dp), INTENT(OUT) :: QY(*)
+      REAL(dp), INTENT(OUT) :: RSD(*)
+      REAL(dp), INTENT(INOUT) :: X(LDX,*)
+      REAL(dp), INTENT(OUT) :: XB(*)
+      REAL(dp), INTENT(IN) :: Y(*)
 
 C...Local scalars
-      REAL(wp)
+      REAL(dp)
      &   T,TEMP
       INTEGER
      &   I,J,JJ,JU,KP1
@@ -782,14 +782,14 @@ C     Special action when N=1.
          IF (CQTY) QTY(1) = Y(1)
          IF (CXB) XB(1) = Y(1)
          IF (.NOT.CB) GO TO 30
-            IF (X(1,1) .NE. 0.0E0_wp) GO TO 10
+            IF (X(1,1) .NE. 0.0E0_dp) GO TO 10
                INFO = 1
             GO TO 20
    10       CONTINUE
                B(1) = Y(1)/X(1,1)
    20       CONTINUE
    30    CONTINUE
-         IF (CR) RSD(1) = 0.0E0_wp
+         IF (CR) RSD(1) = 0.0E0_dp
       GO TO 250
    40 CONTINUE
 
@@ -803,7 +803,7 @@ C           Compute QY.
 
             DO 60 JJ = 1, JU
                J = JU - JJ + 1
-               IF (QRAUX(J) .EQ. 0.0E0_wp) GO TO 50
+               IF (QRAUX(J) .EQ. 0.0E0_dp) GO TO 50
                   TEMP = X(J,J)
                   X(J,J) = QRAUX(J)
                   T = -DDOT(N-J+1,X(J,J),1,QY(J),1)/X(J,J)
@@ -817,7 +817,7 @@ C           Compute QY.
 C           Compute trans(Q)*Y.
 
             DO 90 J = 1, JU
-               IF (QRAUX(J) .EQ. 0.0E0_wp) GO TO 80
+               IF (QRAUX(J) .EQ. 0.0E0_dp) GO TO 80
                   TEMP = X(J,J)
                   X(J,J) = QRAUX(J)
                   T = -DDOT(N-J+1,X(J,J),1,QTY(J),1)/X(J,J)
@@ -835,12 +835,12 @@ C        Set up to compute B, RSD, or XB.
          IF (CR .AND. K .LT. N) CALL DCOPY(N-K,QTY(KP1),1,RSD(KP1),1)
          IF (.NOT.CXB .OR. KP1 .GT. N) GO TO 120
             DO 110 I = KP1, N
-               XB(I) = 0.0E0_wp
+               XB(I) = 0.0E0_dp
   110       CONTINUE
   120    CONTINUE
          IF (.NOT.CR) GO TO 140
             DO 130 I = 1, K
-               RSD(I) = 0.0E0_wp
+               RSD(I) = 0.0E0_dp
   130       CONTINUE
   140    CONTINUE
          IF (.NOT.CB) GO TO 190
@@ -849,7 +849,7 @@ C           Compute B.
 
             DO 170 JJ = 1, K
                J = K - JJ + 1
-               IF (X(J,J) .NE. 0.0E0_wp) GO TO 150
+               IF (X(J,J) .NE. 0.0E0_dp) GO TO 150
                   INFO = J
 C           ......EXIT
                   GO TO 180
@@ -868,7 +868,7 @@ C           Compute RSD or XB as required.
 
             DO 230 JJ = 1, JU
                J = JU - JJ + 1
-               IF (QRAUX(J) .EQ. 0.0E0_wp) GO TO 220
+               IF (QRAUX(J) .EQ. 0.0E0_dp) GO TO 220
                   TEMP = X(J,J)
                   X(J,J) = QRAUX(J)
                   IF (.NOT.CR) GO TO 200
@@ -938,21 +938,21 @@ C***Routines Called  DASUM,DAXPY,DSCAL
 C***End Prologue  DTRCO
 
 C...Used modules
-      use odrpack_kinds, only: wp
+      use odrpack_kinds, only: dp
       use blas_interfaces, only: dasum, daxpy, dscal
 
 C...Scalar arguments
-      REAL(wp), INTENT(OUT) :: RCOND
+      REAL(dp), INTENT(OUT) :: RCOND
       INTEGER, INTENT(IN) :: JOB
       INTEGER, INTENT(IN) :: LDT
       INTEGER, INTENT(IN) :: N
 
 C...Array arguments
-      REAL(wp), INTENT(IN) :: T(LDT,*)
-      REAL(wp), INTENT(OUT) :: Z(*)
+      REAL(dp), INTENT(IN) :: T(LDT,*)
+      REAL(dp), INTENT(OUT) :: Z(*)
 
 C...Local scalars
-      REAL(wp)
+      REAL(dp)
      &   EK,S,SM,TNORM,W,WK,WKM,YNORM
       INTEGER
      &   I1,J,J1,J2,K,KK,L
@@ -971,7 +971,7 @@ C***First executable statement  DTRCO
 
 C     Compute 1-norm of T
 
-      TNORM = 0.0E0_wp
+      TNORM = 0.0E0_dp
       DO 10 J = 1, N
          L = J
          IF (LOWER) L = N + 1 - J
@@ -989,14 +989,14 @@ C     The vectors are frequently rescaled to avoid overflow.
 
 C     Solve trans(T)*Y = E
 
-      EK = 1.0E0_wp
+      EK = 1.0E0_dp
       DO 20 J = 1, N
-         Z(J) = 0.0E0_wp
+         Z(J) = 0.0E0_dp
    20 CONTINUE
       DO 100 KK = 1, N
          K = KK
          IF (LOWER) K = N + 1 - KK
-         IF (Z(K) .NE. 0.0E0_wp) EK = DSIGN(EK,-Z(K))
+         IF (Z(K) .NE. 0.0E0_dp) EK = DSIGN(EK,-Z(K))
          IF (DABS(EK-Z(K)) .LE. DABS(T(K,K))) GO TO 30
             S = DABS(T(K,K))/DABS(EK-Z(K))
             CALL DSCAL(N,S,Z,1)
@@ -1006,13 +1006,13 @@ C     Solve trans(T)*Y = E
          WKM = -EK - Z(K)
          S = DABS(WK)
          SM = DABS(WKM)
-         IF (T(K,K) .EQ. 0.0E0_wp) GO TO 40
+         IF (T(K,K) .EQ. 0.0E0_dp) GO TO 40
             WK = WK/T(K,K)
             WKM = WKM/T(K,K)
          GO TO 50
    40    CONTINUE
-            WK = 1.0E0_wp
-            WKM = 1.0E0_wp
+            WK = 1.0E0_dp
+            WKM = 1.0E0_dp
    50    CONTINUE
          IF (KK .EQ. N) GO TO 90
             J1 = K + 1
@@ -1034,10 +1034,10 @@ C     Solve trans(T)*Y = E
    90    CONTINUE
          Z(K) = WK
   100 CONTINUE
-      S = 1.0E0_wp/DASUM(N,Z,1)
+      S = 1.0E0_dp/DASUM(N,Z,1)
       CALL DSCAL(N,S,Z,1)
 
-      YNORM = 1.0E0_wp
+      YNORM = 1.0E0_dp
 
 C     Solve T*Z = Y
 
@@ -1049,8 +1049,8 @@ C     Solve T*Z = Y
             CALL DSCAL(N,S,Z,1)
             YNORM = S*YNORM
   110    CONTINUE
-         IF (T(K,K) .NE. 0.0E0_wp) Z(K) = Z(K)/T(K,K)
-         IF (T(K,K) .EQ. 0.0E0_wp) Z(K) = 1.0E0_wp
+         IF (T(K,K) .NE. 0.0E0_dp) Z(K) = Z(K)/T(K,K)
+         IF (T(K,K) .EQ. 0.0E0_dp) Z(K) = 1.0E0_dp
          I1 = 1
          IF (LOWER) I1 = K + 1
          IF (KK .GE. N) GO TO 120
@@ -1059,12 +1059,12 @@ C     Solve T*Z = Y
   120    CONTINUE
   130 CONTINUE
 C     Make ZNORM = 1.0
-      S = 1.0E0_wp/DASUM(N,Z,1)
+      S = 1.0E0_dp/DASUM(N,Z,1)
       CALL DSCAL(N,S,Z,1)
       YNORM = S*YNORM
 
-      IF (TNORM .NE. 0.0E0_wp) RCOND = YNORM/TNORM
-      IF (TNORM .EQ. 0.0E0_wp) RCOND = 0.0E0_wp
+      IF (TNORM .NE. 0.0E0_dp) RCOND = YNORM/TNORM
+      IF (TNORM .EQ. 0.0E0_dp) RCOND = 0.0E0_dp
       RETURN
       END
 *DTRSL
@@ -1119,7 +1119,7 @@ C***Routines Called  DAXPY,DDOT
 C***End Prologue  DTRSL
 
 C...Used modules
-      use odrpack_kinds, only: wp
+      use odrpack_kinds, only: dp
       use blas_interfaces, only: ddot, daxpy
 
 C...Scalar arguments
@@ -1129,11 +1129,11 @@ C...Scalar arguments
       INTEGER, INTENT(IN) :: N
 
 C...Array arguments
-      REAL(wp), INTENT(INOUT) :: B(*)
-      REAL(wp), INTENT(IN) :: T(LDT,*)
+      REAL(dp), INTENT(INOUT) :: B(*)
+      REAL(dp), INTENT(IN) :: T(LDT,*)
 
 C...Local scalars
-      REAL(wp)
+      REAL(dp)
      &   TEMP
       INTEGER
      &   CASE,J,JJ
@@ -1152,7 +1152,7 @@ C        Check for zero diagonal elements.
 
          DO 10 INFO = 1, N
 C     ......Exit
-            IF (T(INFO,INFO) .EQ. 0.0E0_wp) GO TO 150
+            IF (T(INFO,INFO) .EQ. 0.0E0_dp) GO TO 150
    10    CONTINUE
          INFO = 0
 

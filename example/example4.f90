@@ -1,21 +1,24 @@
 module example4_model
 !! Model for example4.
 
-   use odrpack_kinds, only: wp, one, zero
+   use iso_c_binding, only: c_ptr
+   use odrpack_kinds, only: dp, one, zero
    implicit none
 
 contains
 
-   pure subroutine fcn(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
+   pure subroutine fcn( &
+      n, m, q, np, ldifx, beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop, data)
    !! User-supplied subroutine for evaluating the model.
 
-      integer, intent(in) :: ideval, ifixb(:), ifixx(:, :)
-      real(kind=wp), intent(in) :: beta(:), xplusd(:, :)
-      real(kind=wp), intent(out) :: f(:, :), fjacb(:, :, :), fjacd(:, :, :)
+      integer, intent(in) :: n, m, q, np, ldifx, ideval, ifixb(np), ifixx(ldifx, m)
+      real(dp), intent(in) :: beta(np), xplusd(n, m)
+      real(dp), intent(out) :: f(n, q), fjacb(n, np, q), fjacd(n, m, q)
       integer, intent(out) :: istop
+      type(c_ptr), intent(in), value :: data
 
       ! Local variables
-      real(kind=wp) :: uout
+      real(dp) :: uout
       integer :: i
 
       istop = 0
@@ -23,7 +26,7 @@ contains
       fjacd = zero
       if (mod(ideval, 10) > 0) then
          do i = 1, ubound(f, 1)
-            f(i, 1) = 1440.0_wp
+            f(i, 1) = 1440.0_dp
             call mpf(uout, xplusd(i, 1), beta(1), beta(2), beta(3), zero, f(i, 1), xplusd(i, 1)/2)
          end do
       end if
@@ -43,12 +46,12 @@ contains
    !! `c`: Total Cyclin
    !! `kwee`, `k25`, `k25p`: Model parameters corresponding to `beta(1:3)`
 
-      real(kind=wp), intent(out) :: u
-      real(kind=wp), intent(in) :: c, kwee, k25, k25p, print_every, root
-      real(kind=wp), intent(inout) :: tout
-      real(kind=wp), parameter :: h = 1.0E-1_wp
-      real(kind=wp) :: last_print, last_u, last_t, t
-      real(kind=wp) :: k1, k2, k3, k4
+      real(dp), intent(out) :: u
+      real(dp), intent(in) :: c, kwee, k25, k25p, print_every, root
+      real(dp), intent(inout) :: tout
+      real(dp), parameter :: h = 1.0E-1_dp
+      real(dp) :: last_print, last_u, last_t, t
+      real(dp) :: k1, k2, k3, k4
 
       u = zero
       t = zero
@@ -83,8 +86,8 @@ contains
    contains
 
       ! Equation from Zwolak et al. 2001.
-      real(kind=wp) pure function dudt(u_, c_, kwee_, k25_, k25p_) result(res)
-         real(kind=wp), intent(in) :: u_, c_, kwee_, k25_, k25p_
+      real(dp) pure function dudt(u_, c_, kwee_, k25_, k25p_) result(res)
+         real(dp), intent(in) :: u_, c_, kwee_, k25_, k25p_
          res = kwee_*u_ + (k25_ + k25p_*u_**2)*(c_ - u_)
       end function dudt
 
@@ -102,15 +105,18 @@ program example4
 !!   Curious users are encouraged to remove the bounds in the call statement,
 !! run the code, and compare the results to the current call statement.
 
-   use odrpack_kinds, only: wp
-   use odrpack, only: odr
+   use odrpack_kinds, only: dp
+   use odrpack, only: odr, odrpack_model
    use example4_model, only: fcn, mpf
    implicit none
 
-   real(kind=wp) :: beta(3)
+   type(odrpack_model) :: model
+   real(dp) :: beta(3)
    integer :: n, m, np, q, lunrpt
    ! integer :: i
-   ! real (kind=wp) :: u, c, tout
+   ! real (dp) :: u, c, tout
+
+   model%fcn => fcn
 
    open (newunit=lunrpt, file="./example/report4.dat")
 
@@ -119,13 +125,13 @@ program example4
    np = 3
    q = 1
 
-   beta = [1.1E-0_wp, 3.3E+0_wp, 8.7_wp]
+   beta = [1.1E-0_dp, 3.3E+0_dp, 8.7_dp]
 
-   call odr(fcn, n, m, q, np, beta, &
-            y=reshape([55.0_wp, 45.0_wp, 40.0_wp, 30.0_wp, 20.0_wp], [n, q]), &
-            x=reshape([0.15_wp, 0.20_wp, 0.25_wp, 0.30_wp, 0.50_wp], [n, m]), &
-            lower=[0.0_wp, 0.0_wp, 0.0_wp], &
-            upper=[1000.0_wp, 1000.0_wp, 1000.0_wp], &
+   call odr(model, n, m, q, np, beta, &
+            y=reshape([55.0_dp, 45.0_dp, 40.0_dp, 30.0_dp, 20.0_dp], [n, q]), &
+            x=reshape([0.15_dp, 0.20_dp, 0.25_dp, 0.30_dp, 0.50_dp], [n, m]), &
+            lower=[0.0_dp, 0.0_dp, 0.0_dp], &
+            upper=[1000.0_dp, 1000.0_dp, 1000.0_dp], &
             iprint=2122, &
             lunrpt=lunrpt, &
             maxit=20)
@@ -134,11 +140,11 @@ program example4
 
    ! The following code will reproduce the plot in Figure 2 of Zwolak et al. 2001.
    ! do i = 0, 100
-   !    c = 0.05_wp + (0.7_wp - 0.05_wp)*i/100
-   !    tout = 1440.0_wp
-   !    !call mpf(u, c, 1.1e-10_wp, 3.3e-3_wp, 8.7_wp, 0.0_wp, tout, c/2)
-   !    call mpf(u, c, 1.15395968E-02_wp, 2.61676386E-03_wp, &
-   !             9.23138811_wp, 0.0_wp, tout, c/2)
+   !    c = 0.05_dp + (0.7_dp - 0.05_dp)*i/100
+   !    tout = 1440.0_dp
+   !    !call mpf(u, c, 1.1e-10_dp, 3.3e-3_dp, 8.7_dp, 0.0_dp, tout, c/2)
+   !    call mpf(u, c, 1.15395968E-02_dp, 2.61676386E-03_dp, &
+   !             9.23138811_dp, 0.0_dp, tout, c/2)
    !    write (*, *) c, tout
    ! end do
 

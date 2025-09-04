@@ -1,19 +1,22 @@
 module test_error_detection_m
 
-   use odrpack_kinds, only: wp, zero, one
+   use iso_c_binding, only: c_ptr
+   use odrpack_kinds, only: dp, one, zero
    implicit none
 
-   real(wp), allocatable :: lower(:), upper(:)
+   real(dp), allocatable :: lower(:), upper(:)
 
 contains
 
-   subroutine fcn(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
+   subroutine fcn( &
+      n, m, q, np, ldifx, beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop, data)
    !! User-supplied subroutine for evaluating the model.
 
-      integer, intent(in) :: ideval, ifixb(:), ifixx(:, :)
-      real(kind=wp), intent(in) :: beta(:), xplusd(:, :)
-      real(kind=wp), intent(out) :: f(:, :), fjacb(:, :, :), fjacd(:, :, :)
+      integer, intent(in) :: n, m, q, np, ldifx, ideval, ifixb(np), ifixx(ldifx, m)
+      real(dp), intent(in) :: beta(np), xplusd(n, m)
+      real(dp), intent(out) :: f(n, q), fjacb(n, np, q), fjacd(n, m, q)
       integer, intent(out) :: istop
+      type(c_ptr), intent(in), value :: data
 
       integer :: i
 
@@ -71,14 +74,15 @@ end module test_error_detection_m
 program test_error_detection
    !! Error detection tests for [[odrpack]].
 
-   use odrpack_kinds, only: wp
-   use odrpack, only: odr
+   use odrpack_kinds, only: dp
+   use odrpack, only: odr, odrpack_model
    use test_error_detection_m, only: fcn, lower, upper
    implicit none
 
+   type(odrpack_model) :: model
    integer :: n, m, q, np, info, lunerr, lunrpt
    integer, allocatable :: iwork(:)
-   real(wp), allocatable :: beta(:), y(:, :), x(:, :), delta(:, :), rwork(:), &
+   real(dp), allocatable :: beta(:), y(:, :), x(:, :), delta(:, :), rwork(:), &
                             we(:, :, :), wd(:, :, :)
    logical :: passed
 
@@ -93,11 +97,14 @@ program test_error_detection
    q = -1
    np = 0
    allocate (beta(np), y(n, q), x(n, m))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
+   ! Set model procedure
+   model%fcn => fcn
+
+   call odr(model, n, m, q, np, beta, y, x, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 11111) passed = .false.
@@ -111,11 +118,11 @@ program test_error_detection
    np = 3
    deallocate (beta, y, x)
    allocate (beta(np + 1), y(n - 1, q + 1), x(n + 1, m - 1))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
+   call odr(model, n, m, q, np, beta, y, x, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 10**5) passed = .false.
@@ -129,11 +136,11 @@ program test_error_detection
    np = 3
    deallocate (beta, y, x)
    allocate (beta(np), y(n, q), x(n, m), iwork(42), rwork(69))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, iwork=iwork, rwork=rwork, &
+   call odr(model, n, m, q, np, beta, y, x, iwork=iwork, rwork=rwork, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 10**5) passed = .false.
@@ -147,14 +154,14 @@ program test_error_detection
    np = 3
    deallocate (beta, y, x)
    allocate (beta(np), y(n, q), x(n, m), delta(m, n))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
-            delta=delta, ifixb=[1, 0], sclb=[1.0_wp, 1.0_wp], stpb=[1.0_wp, 1.0_wp], &
-            ifixx=reshape([1, 0, 0, 1], [2, 2]), scld=reshape([1.0_wp, 1.0_wp], [2, 1]), &
-            stpd=reshape([1.0_wp, 1.0_wp], [2, 1]), &
+   call odr(model, n, m, q, np, beta, y, x, &
+            delta=delta, ifixb=[1, 0], sclb=[1.0_dp, 1.0_dp], stpb=[1.0_dp, 1.0_dp], &
+            ifixx=reshape([1, 0, 0, 1], [2, 2]), scld=reshape([1.0_dp, 1.0_dp], [2, 1]), &
+            stpd=reshape([1.0_dp, 1.0_dp], [2, 1]), &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 10**5) passed = .false.
@@ -168,12 +175,12 @@ program test_error_detection
    np = 3
    deallocate (beta, y, x)
    allocate (beta(np), y(n, q), x(n, m))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
-            wd=reshape([-1.0_wp], [1, 1, 1]), we=reshape([-1.0_wp], [1, 1, 1]), &
+   call odr(model, n, m, q, np, beta, y, x, &
+            wd=reshape([-1.0_dp], [1, 1, 1]), we=reshape([-1.0_dp], [1, 1, 1]), &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 10**5) passed = .false.
@@ -187,12 +194,12 @@ program test_error_detection
    np = 3
    deallocate (beta, y, x)
    allocate (beta(np), y(n, q), x(n, m))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
-            lower=[1.0_wp, 1.0_wp], upper=[1.0_wp, 1.0_wp, 1.0_wp, 1.0_wp], &
+   call odr(model, n, m, q, np, beta, y, x, &
+            lower=[1.0_dp, 1.0_dp], upper=[1.0_dp, 1.0_dp, 1.0_dp, 1.0_dp], &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 10**5) passed = .false.
@@ -206,12 +213,12 @@ program test_error_detection
    np = 3
    deallocate (beta, y, x)
    allocate (beta(np), y(n, q), x(n, m))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
-            lower=beta + 1e-10_wp, upper=beta - 1e-10_wp, &
+   call odr(model, n, m, q, np, beta, y, x, &
+            lower=beta + 1e-10_dp, upper=beta - 1e-10_dp, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 91000) passed = .false.
@@ -225,12 +232,12 @@ program test_error_detection
    np = 3
    deallocate (beta, y, x)
    allocate (beta(np), y(n, q), x(n, m))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
-            lower=beta + 1e-10_wp, upper=beta + 1.0_wp, &
+   call odr(model, n, m, q, np, beta, y, x, &
+            lower=beta + 1e-10_dp, upper=beta + 1.0_dp, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 90100) passed = .false.
@@ -244,13 +251,13 @@ program test_error_detection
    np = 3
    deallocate (beta, y, x)
    allocate (beta(np), y(n, q), x(n, m), lower(np), upper(np))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 1.0_wp
-   lower = beta - 1e-100_wp
-   upper = beta + 1e-100_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 1.0_dp
+   lower = beta - 1e-100_dp
+   upper = beta + 1e-100_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
+   call odr(model, n, m, q, np, beta, y, x, &
             lower=lower, upper=upper, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -260,11 +267,11 @@ program test_error_detection
 
    ! Inconsistent values of optional arrays UPPER - LOWER ~ 0
 
-   lower = beta - 1e-10_wp
-   upper = beta + 1e-10_wp
+   lower = beta - 1e-10_dp
+   upper = beta + 1e-10_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
-            lower=lower, upper=upper, stpb=beta*1e-5_wp, &
+   call odr(model, n, m, q, np, beta, y, x, &
+            lower=lower, upper=upper, stpb=beta*1e-5_dp, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 90020) passed = .false.
@@ -278,12 +285,12 @@ program test_error_detection
    np = 3
    deallocate (beta, y, x)
    allocate (beta(np), y(n, q), x(n, m))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
-            sclb=[1.0_wp, -1.0_wp, 1.0_wp], &
+   call odr(model, n, m, q, np, beta, y, x, &
+            sclb=[1.0_dp, -1.0_dp, 1.0_dp], &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 30100) passed = .false.
@@ -297,12 +304,12 @@ program test_error_detection
    np = 2
    deallocate (beta, y, x)
    allocate (beta(np), y(n, q), x(n, m))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
-            scld=reshape([1.0_wp, -1.0_wp, 1.0_wp], [n, m]), &
+   call odr(model, n, m, q, np, beta, y, x, &
+            scld=reshape([1.0_dp, -1.0_dp, 1.0_dp], [n, m]), &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 30200) passed = .false.
@@ -316,12 +323,12 @@ program test_error_detection
    np = 2
    deallocate (beta, y, x)
    allocate (beta(np), y(n, q), x(n, m))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
-            scld=reshape([1.0_wp, -1.0_wp], [1, m]), &
+   call odr(model, n, m, q, np, beta, y, x, &
+            scld=reshape([1.0_dp, -1.0_dp], [1, m]), &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 30200) passed = .false.
@@ -335,12 +342,12 @@ program test_error_detection
    np = 3
    deallocate (beta, y, x)
    allocate (beta(np), y(n, q), x(n, m))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
-            stpb=[1.0_wp, -1.0_wp, 1.0_wp], &
+   call odr(model, n, m, q, np, beta, y, x, &
+            stpb=[1.0_dp, -1.0_dp, 1.0_dp], &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 31000) passed = .false.
@@ -354,12 +361,12 @@ program test_error_detection
    np = 2
    deallocate (beta, y, x)
    allocate (beta(np), y(n, q), x(n, m))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
-            stpd=reshape([1.0_wp, -1.0_wp, 1.0_wp], [n, m]), &
+   call odr(model, n, m, q, np, beta, y, x, &
+            stpd=reshape([1.0_dp, -1.0_dp, 1.0_dp], [n, m]), &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 32000) passed = .false.
@@ -373,12 +380,12 @@ program test_error_detection
    np = 2
    deallocate (beta, y, x)
    allocate (beta(np), y(n, q), x(n, m))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
-            stpd=reshape([1.0_wp, -1.0_wp], [1, m]), &
+   call odr(model, n, m, q, np, beta, y, x, &
+            stpd=reshape([1.0_dp, -1.0_dp], [1, m]), &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 32000) passed = .false.
@@ -392,13 +399,13 @@ program test_error_detection
    np = 2
    deallocate (beta, y, x)
    allocate (beta(np), y(n, q), x(n, m), we(1, 1, q))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
-   we = -1.0_wp
-   we(1, 1, 1) = 1.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
+   we = -1.0_dp
+   we(1, 1, 1) = 1.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
+   call odr(model, n, m, q, np, beta, y, x, &
             we=we, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -413,13 +420,13 @@ program test_error_detection
    np = 2
    deallocate (beta, y, x, we)
    allocate (beta(np), y(n, q), x(n, m), we(1, q, q))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
-   we = -1.0_wp
-   we(1, 1, 1) = 1.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
+   we = -1.0_dp
+   we(1, 1, 1) = 1.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
+   call odr(model, n, m, q, np, beta, y, x, &
             we=we, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -434,13 +441,13 @@ program test_error_detection
    np = 2
    deallocate (beta, y, x, we)
    allocate (beta(np), y(n, q), x(n, m), we(n, 1, q))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
-   we = -1.0_wp
-   we(1, 1, 1) = 1.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
+   we = -1.0_dp
+   we(1, 1, 1) = 1.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
+   call odr(model, n, m, q, np, beta, y, x, &
             we=we, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -455,13 +462,13 @@ program test_error_detection
    np = 2
    deallocate (beta, y, x, we)
    allocate (beta(np), y(n, q), x(n, m), we(n, q, q))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
-   we = -1.0_wp
-   we(1, 1, 1) = 1.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
+   we = -1.0_dp
+   we(1, 1, 1) = 1.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
+   call odr(model, n, m, q, np, beta, y, x, &
             we=we, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -476,13 +483,13 @@ program test_error_detection
    np = 2
    deallocate (beta, y, x)
    allocate (beta(np), y(n, q), x(n, m), wd(1, 1, m))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
-   wd = -1.0_wp
-   wd(1, 1, 1) = 1.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
+   wd = -1.0_dp
+   wd(1, 1, 1) = 1.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
+   call odr(model, n, m, q, np, beta, y, x, &
             wd=wd, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -497,13 +504,13 @@ program test_error_detection
    np = 2
    deallocate (beta, y, x, wd)
    allocate (beta(np), y(n, q), x(n, m), wd(1, m, m))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
-   wd = -1.0_wp
-   wd(1, 1, 1) = 1.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
+   wd = -1.0_dp
+   wd(1, 1, 1) = 1.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
+   call odr(model, n, m, q, np, beta, y, x, &
             wd=wd, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -518,13 +525,13 @@ program test_error_detection
    np = 2
    deallocate (beta, y, x, wd)
    allocate (beta(np), y(n, q), x(n, m), wd(n, 1, m))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
-   wd = -1.0_wp
-   wd(1, 1, 1) = 1.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
+   wd = -1.0_dp
+   wd(1, 1, 1) = 1.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
+   call odr(model, n, m, q, np, beta, y, x, &
             wd=wd, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -539,13 +546,13 @@ program test_error_detection
    np = 2
    deallocate (beta, y, x, wd)
    allocate (beta(np), y(n, q), x(n, m), wd(n, m, m))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
-   wd = -1.0_wp
-   wd(1, 1, 1) = 1.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
+   wd = -1.0_dp
+   wd(1, 1, 1) = 1.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
+   call odr(model, n, m, q, np, beta, y, x, &
             wd=wd, &
             iprint=1, info=info, lunrpt=lunrpt, lunerr=lunerr)
 
@@ -560,11 +567,11 @@ program test_error_detection
    np = 1
    deallocate (beta, y, x)
    allocate (beta(np), y(n, q), x(n, m))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, iprint=1, info=info, job=10000, &
+   call odr(model, n, m, q, np, beta, y, x, iprint=1, info=info, job=10000, &
             lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 70110) passed = .false.
@@ -578,11 +585,11 @@ program test_error_detection
    np = 1
    deallocate (beta, y, x)
    allocate (beta(np), y(n, q), x(n, m))
-   y = 0.0_wp
-   x = 0.0_wp
-   beta = 0.0_wp
+   y = 0.0_dp
+   x = 0.0_dp
+   beta = 0.0_dp
 
-   call odr(fcn, n, m, q, np, beta, y, x, iprint=1, info=info, job=1000, &
+   call odr(model, n, m, q, np, beta, y, x, iprint=1, info=info, job=1000, &
             lunrpt=lunrpt, lunerr=lunerr)
 
    if (info /= 71000) passed = .false.
@@ -596,14 +603,14 @@ program test_error_detection
    np = 2
    deallocate (beta, y, x, lower, upper)
    allocate (beta(np), y(n, q), x(n, m), lower(np), upper(np))
-   beta = [-200.0_wp, -5.0_wp]
-   upper = [-200.0_wp, 0.0_wp]
-   lower = [-200.000029802322_wp, -5.0_wp]
-   y(:, 1) = [2.718281828459045_wp, 7.389056098930650_wp, &
-              148.4131591025766_wp, 403.4287934927353_wp]
-   x(:, 1) = [1.0_wp, 2.0_wp, 5.0_wp, 6.0_wp]
+   beta = [-200.0_dp, -5.0_dp]
+   upper = [-200.0_dp, 0.0_dp]
+   lower = [-200.000029802322_dp, -5.0_dp]
+   y(:, 1) = [2.718281828459045_dp, 7.389056098930650_dp, &
+              148.4131591025766_dp, 403.4287934927353_dp]
+   x(:, 1) = [1.0_dp, 2.0_dp, 5.0_dp, 6.0_dp]
 
-   call odr(fcn, n, m, q, np, beta, y, x, iprint=1, info=info, job=0020, &
+   call odr(model, n, m, q, np, beta, y, x, iprint=1, info=info, job=0020, &
             lunrpt=lunrpt, lunerr=lunerr, lower=lower, upper=upper)
 
    if (info /= 1) passed = .false.
@@ -635,9 +642,9 @@ program test_error_detection
 !       &       "FAILED TO RUN."
 !       STOP
 !       END IF
-!       Y(:,:) = 0.0_wp
-!       X(:,:) = 0.0_wp
-!       BETA(:) = 0.0_wp
+!       Y(:,:) = 0.0_dp
+!       X(:,:) = 0.0_dp
+!       BETA(:) = 0.0_dp
 !
 !       CALL ODR(FCN,N,M,Q,NP,BETA,Y,X,IPRINT=1,INFO=INFO,
 !       &   LUNRPT=LUN,LUNERR=LUN)

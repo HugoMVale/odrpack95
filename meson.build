@@ -50,7 +50,7 @@ odrpack_source = files(
   'src/linpack.f',
   'src/blas_interfaces.f90',
   'src/odrpack.f90',
-  'src/odrpack_kinds.F90',
+  'src/odrpack_kinds.f90',
   'src/odrpack_core.f90',
   'src/odrpack_reports.f90',
   'src/odrpack_capi.f90'

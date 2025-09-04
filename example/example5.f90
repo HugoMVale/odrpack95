@@ -1,18 +1,21 @@
 module example5_model
 !! Model for example5.
 
-   use odrpack_kinds, only: wp
+   use iso_c_binding, only: c_ptr
+   use odrpack_kinds, only: dp
    implicit none
 
 contains
 
-   pure subroutine fcn(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
+   pure subroutine fcn( &
+      n, m, q, np, ldifx, beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop, data)
    !! User-supplied subroutine for evaluating the model.
 
-      integer, intent(in) :: ideval, ifixb(:), ifixx(:, :)
-      real(kind=wp), intent(in) :: beta(:), xplusd(:, :)
-      real(kind=wp), intent(out) :: f(:, :), fjacb(:, :, :), fjacd(:, :, :)
+      integer, intent(in) :: n, m, q, np, ldifx, ideval, ifixb(np), ifixx(ldifx, m)
+      real(dp), intent(in) :: beta(np), xplusd(n, m)
+      real(dp), intent(out) :: f(n, q), fjacb(n, np, q), fjacd(n, m, q)
       integer, intent(out) :: istop
+      type(c_ptr), intent(in), value :: data
 
       istop = 0
 
@@ -40,15 +43,18 @@ program example5
 !! Explicit ODR job, with parameter bounds, user-supplied derivatives, and output of work
 !! arrays.
 
-   use odrpack_kinds, only: wp
-   use odrpack, only: odr, workspace_dimensions
+   use odrpack_kinds, only: dp
+   use odrpack, only: odr, odrpack_model, workspace_dimensions
    use example5_model, only: fcn
    implicit none
 
-   real(kind=wp), allocatable :: beta(:), lower(:), upper(:), x(:, :), y(:, :), rwork(:)
+   type(odrpack_model) :: model
+   real(dp), allocatable :: beta(:), lower(:), upper(:), x(:, :), y(:, :), rwork(:)
    integer, allocatable :: iwork(:)
    integer :: np, n, m, q, job
    integer :: lrwork, liwork !, i
+
+   model%fcn => fcn
 
    job = 20
 
@@ -59,11 +65,11 @@ program example5
 
    allocate (beta(np), lower(np), upper(np), x(n, m), y(n, q))
 
-   beta(1:2) = [2.0_wp, 0.5_wp]
-   lower(1:2) = [0.0_wp, 0.0_wp]
-   upper(1:2) = [10.0_wp, 0.9_wp]
-   x(1:4, 1) = [0.982_wp, 1.998_wp, 4.978_wp, 6.01_wp]
-   y(1:4, 1) = [2.7_wp, 7.4_wp, 148.0_wp, 403.0_wp]
+   beta(1:2) = [2.0_dp, 0.5_dp]
+   lower(1:2) = [0.0_dp, 0.0_dp]
+   upper(1:2) = [10.0_dp, 0.9_dp]
+   x(1:4, 1) = [0.982_dp, 1.998_dp, 4.978_dp, 6.01_dp]
+   y(1:4, 1) = [2.7_dp, 7.4_dp, 148.0_dp, 403.0_dp]
 
    ! Manual allocation of work arrays
    ! Not required! Just to show it can be done if so desired
@@ -71,7 +77,7 @@ program example5
    allocate (iwork(liwork))
    allocate (rwork(lrwork))
 
-   call odr(fcn, n, m, q, np, beta, y, x, &
+   call odr(model, n, m, q, np, beta, y, x, &
             lower=lower, upper=upper, &
             job=job, iwork=iwork, rwork=rwork)
 
