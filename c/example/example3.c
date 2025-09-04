@@ -12,7 +12,7 @@ This is a translation of example 3 from the ODRPACK95 documentation.
 void fcn(const int *n, const int *m, const int *q, const int *np, const int *ldifx,
          const double beta[], const double xplusd[],
          const int ifixb[], const int ifixx[], const int *ideval,
-         double f[], double fjacb[], double fjacd[], int *istop, void *thunk) {
+         double f[], double fjacb[], double fjacd[], int *istop, void *data) {
     // Local variables
     double freq, omega, ctheta, stheta, theta, phi, r;
     const double pi = 4 * atan(1.0);
@@ -147,22 +147,19 @@ int main() {
     int info = 0;
 
     // Compute solution
-    odr_long_c(fcn, &n, &m, &q, &np,
-               &ldwe, &ld2we, &ldwd, &ld2wd,
-               &ldifx, &ldstpd, &ldscld,
+    odr_long_c(fcn, NULL,
+               &n, &m, &q, &np, &ldwe, &ld2we, &ldwd, &ld2wd, &ldifx, &ldstpd, &ldscld,
                &zero, &zero,
                beta,
                (double *)y, (double *)x,
                (double *)we, (double *)wd,
                ifixb, (int *)ifixx,
-               NULL, NULL,
-               NULL, NULL,
+               NULL, NULL, NULL, NULL,
                (double *)delta,
                NULL, NULL,
                NULL, NULL,
                &job, NULL, NULL, NULL, NULL, NULL,
-               &iprint, &lunerr, &lunrpt,
-               &info, NULL);
+               &iprint, &lunerr, &lunrpt, &info);
 
     char message[256] = {};
     stop_message_c(info, message, sizeof(message));

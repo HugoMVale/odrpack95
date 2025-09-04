@@ -13,7 +13,7 @@ This is an adaptation of example 5 from the ODRPACK95 documentation.
 void fcn(const int *n, const int *m, const int *q, const int *np, const int *ldifx,
          const double beta[], const double xplusd[],
          const int ifixb[], const int ifixx[], const int *ideval,
-         double f[], double fjacb[], double fjacd[], int *istop, void *thunk) {
+         double f[], double fjacb[], double fjacd[], int *istop, void *rdata) {
     *istop = 0;
 
     // Model function
@@ -114,9 +114,8 @@ int main() {
     lunerr = lunrpt;
 
     // Call odr
-    odr_long_c(fcn, &n, &m, &q, &np,
-               &ldwe, &ld2we, &ldwd, &ld2wd,
-               &ldifx, &ldstpd, &ldscld,
+    odr_long_c(fcn, NULL,
+               &n, &m, &q, &np, &ldwe, &ld2we, &ldwd, &ld2wd, &ldifx, &ldstpd, &ldscld,
                &lrwork, &liwork,
                beta,
                (double *)y, (double *)x,
@@ -128,8 +127,7 @@ int main() {
                lower, upper,
                rwork, iwork,
                &job, &ndigit, &taufac, &sstol, &partol, &maxit,
-               &iprint, &lunerr, &lunrpt,
-               &info, NULL);
+               &iprint, &lunerr, &lunrpt, &info);
 
     close_file(&lunrpt, &ierr);
     // printf("Error code (ierr): %d\n", ierr);

@@ -1,7 +1,7 @@
 module odrpack_reports
    !! Reporting routines.
 
-   use odrpack_kinds, only: wp
+   use odrpack_kinds, only: dp
    implicit none
 
 contains
@@ -78,21 +78,21 @@ contains
          !! Error checking results for the Jacobian with respect to `beta`.
       integer, intent(in) :: msgd(q*m + 1)
          !! Error checking results for the Jacobian with respect to `delta`.
-      real(wp), intent(in) :: beta(np)
+      real(dp), intent(in) :: beta(np)
          !! Function parameters.
-      real(wp), intent(in) :: y(n, q)
+      real(dp), intent(in) :: y(n, q)
          !! Response variable. Unused when the model is implicit.
-      real(wp), intent(in) :: x(n, m)
+      real(dp), intent(in) :: x(n, m)
          !! Explanatory variable.
-      real(wp), intent(in) :: delta(n, m)
+      real(dp), intent(in) :: delta(n, m)
          !! Estimated errors in the explanatory variables.
-      real(wp), intent(in) :: we(ldwe, ld2we, q)
+      real(dp), intent(in) :: we(ldwe, ld2we, q)
          !! `epsilon` weights.
       integer, intent(in) :: ldwe
          !! Leading dimension of array `we`.
       integer, intent(in) :: ld2we
          !! Second dimension of array `we`.
-      real(wp), intent(in) :: wd(ldwd, ld2wd, m)
+      real(dp), intent(in) :: wd(ldwd, ld2wd, m)
          !! `delta` weights.
       integer, intent(in) :: ldwd
          !! Leading dimension of array `wd`.
@@ -106,20 +106,20 @@ contains
          !! or not.
       integer, intent(in) :: ldifx
          !! Leading dimension of array `ifixx`.
-      real(wp), intent(in) :: lower(np)
+      real(dp), intent(in) :: lower(np)
          !! Lower bounds for `beta`.
-      real(wp), intent(in) :: upper(np)
+      real(dp), intent(in) :: upper(np)
          !! Upper bounds for `beta`.
-      real(wp), intent(in) :: ssf(np)
+      real(dp), intent(in) :: ssf(np)
          !! Scaling values for `beta`.
-      real(wp), intent(in) :: tt(ldtt, m)
+      real(dp), intent(in) :: tt(ldtt, m)
          !! Scaling values for `delta`.
       integer, intent(in) :: ldtt
          !! Leading dimension of array `tt`.
-      real(wp), intent(in) :: stpb(np)
+      real(dp), intent(in) :: stpb(np)
          !! Relative step used for computing finite difference derivatives with respect
          !! to `beta`.
-      real(wp), intent(in) :: stpd(ldstpd, m)
+      real(dp), intent(in) :: stpd(ldstpd, m)
          !! Relative step used for computing finite difference derivatives with respect
          !! to `delta`.
       integer, intent(in) :: ldstpd
@@ -128,23 +128,23 @@ contains
          !! Variable controlling problem initialization and computational method.
       integer, intent(in) :: neta
          !! Number of accurate digits in the function results.
-      real(wp), intent(in) :: taufac
+      real(dp), intent(in) :: taufac
          !! Factor used to compute the initial trust region diameter.
-      real(wp), intent(in) :: sstol
+      real(dp), intent(in) :: sstol
          !! Sum-of-squares convergence stopping tolerance.
-      real(wp), intent(in) :: partol
+      real(dp), intent(in) :: partol
          !! Parameter convergence stopping tolerance.
       integer, intent(in) :: maxit
          !! Maximum number of iterations allowed.
-      real(wp), intent(in) :: wss(3)
+      real(dp), intent(in) :: wss(3)
          !! Sum-of-squares of the weighted `epsilon`s and `delta`s, the sum-of-squares of
          !! the weighted `delta`s, and the sum-of-squares of the weighted `epsilon`s.
-      real(wp), intent(in) :: rvar
+      real(dp), intent(in) :: rvar
          !! Residual variance.
       integer, intent(in) :: idf
          !! Degrees of freedom of the fit, equal to the number of observations with nonzero
          !! weighted derivatives minus the number of parameters being estimated.
-      real(wp), intent(in) :: sdbeta(np)
+      real(dp), intent(in) :: sdbeta(np)
          !! Standard errors of the estimated parameters.
       integer, intent(in) :: niter
          !! Number of iterations.
@@ -152,19 +152,19 @@ contains
          !! Number of function evaluations.
       integer, intent(in) :: njev
          !! Number of Jacobian evaluations.
-      real(wp), intent(in) :: actred
+      real(dp), intent(in) :: actred
          !! Actual relative reduction in the sum-of-squares.
-      real(wp), intent(in) :: prered
+      real(dp), intent(in) :: prered
          !! Predicted relative reduction in the sum-of-squares.
-      real(wp), intent(in) :: tau
+      real(dp), intent(in) :: tau
          !! Trust region diameter.
-      real(wp), intent(in) :: pnorm
+      real(dp), intent(in) :: pnorm
          !! Norm of the scaled estimated parameters.
-      real(wp), intent(in) :: alpha
+      real(dp), intent(in) :: alpha
          !! Levenberg-Marquardt parameter.
-      real(wp), intent(in) :: f(n, q)
+      real(dp), intent(in) :: f(n, q)
          !! Estimated values of `epsilon`.
-      real(wp), intent(in) :: rcond
+      real(dp), intent(in) :: rcond
          !! Approximate reciprocal condition of `tfjacb`.
       integer, intent(in) :: irank
          !! Rank deficiency of the Jacobian with respect to `beta`.
@@ -175,7 +175,7 @@ contains
          !! current `beta` and `delta`.
 
       ! Local scalars
-      real(wp) :: penalty
+      real(dp) :: penalty
       logical :: anajac, cdjac, chkjac, dovcv, implicit, initd, isodr, redoj, restart
       character(len=3) :: typ
 
@@ -322,50 +322,50 @@ contains
          !! Number of function parameters being estimated.
       integer, intent(in) :: nnzw
          !! Number of nonzero observational error weights.
-      real(wp), intent(in) :: x(n, m)
+      real(dp), intent(in) :: x(n, m)
          !! Explanatory variable.
       integer, intent(in) :: ifixx(ldifx, m)
          !! Values designating whether the elements of `x` are fixed at their input values or not.
       integer, intent(in) :: ldifx
          !! Leading dimension of array `ifixx`.
-      real(wp), intent(in) :: delta(n, m)
+      real(dp), intent(in) :: delta(n, m)
          !! Estimated errors in the explanatory variables.
-      real(wp), intent(in) :: wd(ldwd, ld2wd, m)
+      real(dp), intent(in) :: wd(ldwd, ld2wd, m)
          !! `delta` weights.
       integer, intent(in) :: ldwd
          !! Leading dimension of array `wd`.
       integer, intent(in) :: ld2wd
          !! Second dimension of array `wd`.
-      real(wp), intent(in) :: tt(ldtt, m)
+      real(dp), intent(in) :: tt(ldtt, m)
          !! Scaling values for `delta`.
       integer, intent(in) :: ldtt
          !! Leading dimension of array `tt`.
-      real(wp), intent(in) :: stpd(ldstpd, m)
+      real(dp), intent(in) :: stpd(ldstpd, m)
          !! Relative step used for computing finite difference derivatives with respect to `delta`.
       integer, intent(in) :: ldstpd
          !! Leading dimension of array `stpd`.
-      real(wp), intent(in) :: y(n, q)
+      real(dp), intent(in) :: y(n, q)
          !! Response variable. Unused when the model is implicit.
-      real(wp), intent(in) :: we(ldwe, ld2we, q)
+      real(dp), intent(in) :: we(ldwe, ld2we, q)
          !! `epsilon` weights.
       integer, intent(in) :: ldwe
          !! Leading dimension of array `we`.
       integer, intent(in) :: ld2we
          !! Second dimension of array `we`.
-      real(wp), intent(in) :: penalty
+      real(dp), intent(in) :: penalty
          !! Penalty parameter for an implicit model.
-      real(wp), intent(in) :: beta(np)
+      real(dp), intent(in) :: beta(np)
          !! Function parameters.
       integer, intent(in) :: ifixb(np)
          !! Values designating whether the elements of `beta` are fixed at their input values
          !! or not.
-      real(wp), intent(in) :: ssf(np)
+      real(dp), intent(in) :: ssf(np)
          !! Scaling values for `beta`.
-      real(wp), intent(in) :: stpb(np)
+      real(dp), intent(in) :: stpb(np)
          !! Relative step used for computing finite difference derivatives with respect to `beta`.
-      real(wp), intent(in) :: lower(np)
+      real(dp), intent(in) :: lower(np)
          !! Lower bounds for `beta`.
-      real(wp), intent(in) :: upper(np)
+      real(dp), intent(in) :: upper(np)
          !! Upper bounds for `beta`.
       integer, intent(in) :: job
          !! Variable controlling problem initialization and computational method.
@@ -373,23 +373,23 @@ contains
          !! Number of accurate digits in the function results. A negative value indicates
          !! that `neta` was estimated by 'odrpack'. A positive value indicates the value was
          !! supplied by the user.
-      real(wp), intent(in) :: taufac
+      real(dp), intent(in) :: taufac
          !! Factor used to compute the initial trust region diameter.
-      real(wp), intent(in) :: sstol
+      real(dp), intent(in) :: sstol
          !! Sum-of-squares convergence stopping tolerance.
-      real(wp), intent(in) :: partol
+      real(dp), intent(in) :: partol
          !! Parameter convergence stopping tolerance.
       integer, intent(in) :: maxit
          !! Maximum number of iterations allowed.
-      real(wp), intent(in) :: wss
+      real(dp), intent(in) :: wss
          !! Sum-of-squares of the weighted `epsilon`s and `delta`s.
-      real(wp), intent(in) :: wssdel
+      real(dp), intent(in) :: wssdel
          !! Sum-of-squares of the weighted `delta`s.
-      real(wp), intent(in) :: wsseps
+      real(dp), intent(in) :: wsseps
          !! Sum-of-squares of the weighted `epsilon`s.
 
       ! Local scalars
-      real(wp) :: temp1, temp2, temp3
+      real(dp) :: temp1, temp2, temp3
       integer :: i, itemp, j, job1, job2, job3, job4, job5, l
 
       ! Local arrays
@@ -916,31 +916,31 @@ contains
       logical, intent(in) :: printpen
          !! Variable designating whether the penalty parameter is to be printed in the
          !! iteration report (`.true.`) or not (`.false.`).
-      real(wp), intent(in) :: penalty
+      real(dp), intent(in) :: penalty
          !! Penalty parameter for an implicit model.
       integer, intent(in) :: niter
          !! Number of iterations.
       integer, intent(in) :: nfev
          !! Number of function evaluations.
-      real(wp), intent(in) :: wss
+      real(dp), intent(in) :: wss
          !! Sum-of-squares of the weighted `epsilon`s and `deltas`.
-      real(wp), intent(in) :: actred
+      real(dp), intent(in) :: actred
          !! Actual relative reduction in the sum-of-squares.
-      real(wp), intent(in) :: prered
+      real(dp), intent(in) :: prered
          !! Predicted relative reduction in the sum-of-squares.
-      real(wp), intent(in) :: alpha
+      real(dp), intent(in) :: alpha
          !! Levenberg-Marquardt parameter.
-      real(wp), intent(in) :: tau
+      real(dp), intent(in) :: tau
          !! Trust region diameter.
-      real(wp), intent(in) :: pnorm
+      real(dp), intent(in) :: pnorm
          !! Norm of the scaled estimated parameters.
       integer, intent(in) :: np
          !! Number of function parameters.
-      real(wp), intent(in) :: beta(np)
+      real(dp), intent(in) :: beta(np)
          !! Function parameters.
 
       ! Local scalars
-      real(wp) :: ratio
+      real(dp) :: ratio
       integer :: j, k, l
       character(len=3) :: gn
 
@@ -1109,42 +1109,42 @@ contains
          !! Number of Jacobian evaluations.
       integer, intent(in) :: irank
          !! Rank deficiency of the Jacobian with respect to `beta`.
-      real(wp), intent(in) :: rcond
+      real(dp), intent(in) :: rcond
          !! Approximate reciprocal condition of `tfjacb`.
       integer, intent(in) :: istop
          !! Variable designating whether there are problems computing the function at the
          !! current `beta` and `delta`.
-      real(wp), intent(in) :: wss
+      real(dp), intent(in) :: wss
          !! Sum-of-squares of the weighted `epsilon`s and `delta`s.
-      real(wp), intent(in) :: wssdel
+      real(dp), intent(in) :: wssdel
          !! Sum-of-squares of the weighted `delta`s.
-      real(wp), intent(in) :: wsseps
+      real(dp), intent(in) :: wsseps
          !! Sum-of-squares of the weighted `epsilon`s.
-      real(wp), intent(in) :: penalty
+      real(dp), intent(in) :: penalty
          !! Penalty parameter for an implicit model.
-      real(wp), intent(in) :: rvar
+      real(dp), intent(in) :: rvar
          !! Residual variance.
       integer, intent(in) :: idf
          !! Degrees of freedom of the fit, equal to the number of observations with nonzero
          !! weighted derivatives minus the number of parameters being estimated.
-      real(wp), intent(in) :: beta(np)
+      real(dp), intent(in) :: beta(np)
          !! Function parameters.
-      real(wp), intent(in) :: sdbeta(np)
+      real(dp), intent(in) :: sdbeta(np)
          !! Standard errors of the estimated parameters.
       integer, intent(in) :: ifixb2(np)
          !! Values designating whether the elements of `beta` were estimated, fixed, or
          !! dropped because they caused rank deficiency.
-      real(wp), intent(in) :: f(n, q)
+      real(dp), intent(in) :: f(n, q)
          !! Estimated values of `epsilon`.
-      real(wp), intent(in) :: delta(n, m)
+      real(dp), intent(in) :: delta(n, m)
          !! Estimated errors in the explanatory variables.
-      real(wp), intent(in) :: lower(np)
+      real(dp), intent(in) :: lower(np)
          !! Lower bound on `beta`.
-      real(wp), intent(in) :: upper(np)
+      real(dp), intent(in) :: upper(np)
          !! Upper bound on `beta`.
 
       ! Local scalars
-      real(wp) :: tval
+      real(dp) :: tval
       integer :: d1, d2, d3, d4, d5, i, j, k, l, nplm1
       character(len=90) :: fmt1
 
@@ -1250,7 +1250,7 @@ contains
       write (lunrpt, 3000)
       if (didvcv) then
          write (lunrpt, 7300)
-         tval = ppf_tstudent(0.975E0_wp, idf)
+         tval = ppf_tstudent(0.975E0_dp, idf)
          do j = 1, np
             if (ifixb2(j) >= 1) then
                write (lunrpt, 8400) j, beta(j), &
@@ -1628,11 +1628,11 @@ contains
          !! Minimum acceptable length of array `rwork`.
       integer, intent(in) :: liwkmin
          !! Minimum acceptable length of array `iwork`.
-      real(wp), intent(in) :: fjacb(n, np, q)
+      real(dp), intent(in) :: fjacb(n, np, q)
          !! Jacobian with respect to `beta`.
-      real(wp), intent(in) :: fjacd(n, m, q)
+      real(dp), intent(in) :: fjacd(n, m, q)
          !! Jacobian with respect to `delta`.
-      real(wp), intent(in) :: diff(q, np + m)
+      real(dp), intent(in) :: diff(q, np + m)
          !! Relative differences between the user-supplied and finite difference
          !! derivatives for each derivative checked.
       integer, intent(in) :: msgb(q*np + 1)
@@ -1642,7 +1642,7 @@ contains
          !! by OLS (`isodr = .false.`).
       integer, intent(in) :: msgd(q*m + 1)
          !! Error checking results for the Jacobian with respect to `delta`.
-      real(wp), intent(in) :: xplusd(n, m)
+      real(dp), intent(in) :: xplusd(n, m)
          !! Values `x + delta`.
       integer, intent(in) :: nrow
          !! Row number of the explanatory variable array at which the derivative is to be
@@ -2213,11 +2213,11 @@ contains
          !! Number of function parameters.
       integer, intent(in) :: q
          !! Number of responses per observation.
-      real(wp), intent(in) :: fjacb(n, np, q)
+      real(dp), intent(in) :: fjacb(n, np, q)
          !! Jacobian with respect to `beta`.
-      real(wp), intent(in) :: fjacd(n, m, q)
+      real(dp), intent(in) :: fjacd(n, m, q)
          !! Jacobian with respect to `delta`.
-      real(wp), intent(in) :: diff(q, np + m)
+      real(dp), intent(in) :: diff(q, np + m)
          !! Relative differences between the user-supplied and finite difference derivatives
          !! for each derivative checked.
       integer, intent(in) :: msgb1
@@ -2231,7 +2231,7 @@ contains
          !! Error checking results for the Jacobian with respect to `delta`.
       integer, intent(in) :: msgd(q, m)
          !! Error checking results for the Jacobian with respect to `delta`.
-      real(wp), intent(in) :: xplusd(n, m)
+      real(dp), intent(in) :: xplusd(n, m)
          !! Values of `x` + `delta`.
       integer, intent(in) :: nrow
          !! Row number of the explanatory variable array at which the derivative is to be

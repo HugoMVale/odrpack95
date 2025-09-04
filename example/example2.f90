@@ -1,18 +1,21 @@
 module example2_model
 !! Model for example2.
 
-   use odrpack_kinds, only: wp, one, zero
+   use iso_c_binding, only: c_ptr
+   use odrpack_kinds, only: dp, one, zero
    implicit none
 
 contains
 
-   pure subroutine fcn(beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop)
+   pure subroutine fcn( &
+      n, m, q, np, ldifx, beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop, data)
    !! User-supplied subroutine for evaluating the model.
 
-      integer, intent(in) :: ideval, ifixb(:), ifixx(:, :)
-      real(kind=wp), intent(in) :: beta(:), xplusd(:, :)
-      real(kind=wp), intent(out) :: f(:, :), fjacb(:, :, :), fjacd(:, :, :)
+      integer, intent(in) :: n, m, q, np, ldifx, ideval, ifixb(np), ifixx(ldifx, m)
+      real(dp), intent(in) :: beta(np), xplusd(n, m)
+      real(dp), intent(out) :: f(n, q), fjacb(n, np, q), fjacd(n, m, q)
       integer, intent(out) :: istop
+      type(c_ptr), intent(in), value :: data
 
       ! Local variables
       integer :: i
@@ -41,14 +44,18 @@ end module example2_model
 program example2
    !! Implicit ODR job.
 
-   use odrpack, only: odr
-   use odrpack_kinds, only: wp
+   use odrpack_kinds, only: dp
+   use odrpack, only: odr, odrpack_model
    use example2_model, only: fcn
    implicit none
 
    ! Variable declarations
+   type(odrpack_model) :: model
    integer :: i, iprint, j, job, lundata, lunrpt, m, n, np, q
-   real(kind=wp), allocatable :: beta(:), x(:, :), y(:, :)
+   real(dp), allocatable :: beta(:), x(:, :), y(:, :)
+
+   ! Set model procedure
+   model%fcn => fcn
 
    ! Set up report files
    open (newunit=lunrpt, file='./example/report2.dat')
@@ -76,7 +83,7 @@ program example2
    iprint = 2002
 
    ! Compute solution
-   call odr(fcn, n, m, q, np, beta, y, x, &
+   call odr(model, n, m, q, np, beta, y, x, &
             job=job, lunerr=lunrpt, lunrpt=lunrpt, iprint=iprint)
 
    close (lunrpt)

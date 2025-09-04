@@ -25,8 +25,8 @@ ODRPACK_EXTERN void open_file(
 /**
  * @brief Close a file associated with a specified logical unit number.
  *
- * @param lun    `==>` Logical unit number.
- * @param ierr   `<==` Error code (compiler dependent).
+ * @param lun   `==>` Logical unit number.
+ * @param ierr  `<==` Error code (compiler dependent).
  */
 ODRPACK_EXTERN void close_file(
     const int *lun,
@@ -49,10 +49,10 @@ ODRPACK_EXTERN void close_file(
  * @param fjacb   `<==` Array [q][np][n] for Jacobian with respect to `beta`.
  * @param fjacd   `<==` Array [q][m][n] for Jacobian with respect to errors `delta`.
  * @param istop   `<==` Integer for stopping condition. Values:
- *                0 - current `beta` and `x + delta` were acceptable and values were computed successfully,
- *                1 - current `beta` and `x + delta` are not acceptable; 'odrpack' should select values closer to most recently used values if possible,
- *               -1 - current `beta` and `x + delta` are not acceptable; 'odrpack' should stop.
- * @param thunk   `==>` User-defined data passed through to this function (can be NULL).
+ *                 0 - current `beta` and `x + delta` were acceptable and values were computed successfully,
+ *                 1 - current `beta` and `x + delta` are not acceptable; 'odrpack' should select values closer to most recently used values if possible,
+ *                -1 - current `beta` and `x + delta` are not acceptable; 'odrpack' should stop.
+ * @param data    `==>` User-defined data passed through to this function (can be NULL).
  */
 typedef void (*odrpack_fcn_t)(
     const int *n,
@@ -69,13 +69,14 @@ typedef void (*odrpack_fcn_t)(
     double fjacb[],
     double fjacd[],
     int *istop,
-    void *thunk);
+    void *data);
 
 /**
  * @brief "Short-call" wrapper for the ODR routine including mandatory arguments and very few
  * optional arguments.
  *
  * @param fcn    `==>` User-supplied subroutine for evaluating the model.
+ * @param data   `==>` User-defined data passed through to this function (can be NULL).
  * @param n      `==>` Number of observations.
  * @param m      `==>` Number of columns of data in the independent variable.
  * @param q      `==>` Number of responses per observation.
@@ -90,6 +91,7 @@ typedef void (*odrpack_fcn_t)(
  */
 ODRPACK_EXTERN void odr_short_c(
     odrpack_fcn_t fcn,
+    void *data,
     const int *n,
     const int *m,
     const int *q,
@@ -106,50 +108,51 @@ ODRPACK_EXTERN void odr_short_c(
  * @brief "Long-call" wrapper for the ODR routine including mandatory arguments and all
  * optional arguments.
  *
- * @param fcn    `==>` User-supplied subroutine for evaluating the model.
- * @param n      `==>` Number of observations.
- * @param m      `==>` Number of columns of data in the independent variable.
- * @param q      `==>` Number of responses per observation.
- * @param np     `==>` Number of function parameters.
- * @param ldwe   `==>` Leading dimension of array `we`, `ldwe ∈ {1, n}`.
- * @param ld2we  `==>` Second dimension of array `we`, `ld2we ∈ {1, q}`.
- * @param ldwd   `==>` Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
- * @param ld2wd  `==>` Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
- * @param ldifx  `==>` Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.
- * @param ldstpd `==>` Leading dimension of array `stpd`, `ldstpd ∈ {1, n}`.
- * @param ldscld `==>` Leading dimension of array `scld`, `ldscld ∈ {1, n}`.
- * @param lrwork `==>` Length of array `rwork`.
- * @param liwork `==>` Length of array `iwork`.
- * @param beta   `<=>` Array [np] of function parameters.
- * @param y      `==>` Array [q][n] of dependent variable. Unused when the model is implicit.
- * @param x      `==>` Array [m][n] of explanatory variable.
- * @param we     `==>` Optional array [q][ld2we][ldwe] with `epsilon` weights.
- * @param wd     `==>` Optional array [m][ld2wd][ldwd] with `delta` weights.
- * @param ifixb  `==>` Optional array [np] with values designating whether the elements of `beta` are fixed at their input values or not.
- * @param ifixx  `==>` Optional array [m][ldifx] with values designating whether the elements of `x` are fixed at their input values or not.
- * @param stpb   `==>` Optional array [np] with relative step for computing finite difference derivatives with respect to `beta`.
- * @param stpd   `==>` Optional array [m][ldstpd] with relative step for computing finite difference derivatives with respect to `delta`.
- * @param sclb   `==>` Optional array [np] with scaling values for `beta`.
- * @param scld   `==>` Optional array [m][ldscld] with scaling values for `delta`.
- * @param delta  `<=>` Optional array [m][n] with initial error in the `x` data.
- * @param lower  `==>` Optional array [np] with lower bound on `beta`.
- * @param upper  `==>` Optional array [np] with upper bound on `beta`.
- * @param rwork  `<=>` Optional real work space.
- * @param iwork  `<=>` Optional integer work space.
- * @param job    `==>` Optional variable controlling initialization and computational method.
- * @param ndigit `==>` Optional number of accurate digits in the function results, as supplied by the user.
- * @param taufac `==>` Optional factor used to compute the initial trust region diameter.
- * @param sstol  `==>` Optional sum-of-squares convergence stopping tolerance.
- * @param partol `==>` Optional parameter convergence stopping tolerance.
- * @param maxit  `==>` Optional maximum number of iterations allowed.
- * @param iprint `==>` Optional print control variable.
- * @param lunerr `==>` Optional logical unit number for error messages.
- * @param lunrpt `==>` Optional logical unit number for computation reports.
- * @param info   `<==` Optional variable designating why the computations were stopped.
- * @param thunk  `==>` User-defined data passed through to this function (can be NULL).
+ * @param fcn     `==>` User-supplied subroutine for evaluating the model.
+ * @param data    `==>` User-defined data passed through to this function (can be NULL).
+ * @param n       `==>` Number of observations.
+ * @param m       `==>` Number of columns of data in the independent variable.
+ * @param q       `==>` Number of responses per observation.
+ * @param np      `==>` Number of function parameters.
+ * @param ldwe    `==>` Leading dimension of array `we`, `ldwe ∈ {1, n}`.
+ * @param ld2we   `==>` Second dimension of array `we`, `ld2we ∈ {1, q}`.
+ * @param ldwd    `==>` Leading dimension of array `wd`, `ldwd ∈ {1, n}`.
+ * @param ld2wd   `==>` Second dimension of array `wd`, `ld2wd ∈ {1, m}`.
+ * @param ldifx   `==>` Leading dimension of array `ifixx`, `ldifx ∈ {1, n}`.
+ * @param ldstpd  `==>` Leading dimension of array `stpd`, `ldstpd ∈ {1, n}`.
+ * @param ldscld  `==>` Leading dimension of array `scld`, `ldscld ∈ {1, n}`.
+ * @param lrwork  `==>` Length of array `rwork`.
+ * @param liwork  `==>` Length of array `iwork`.
+ * @param beta    `<=>` Array [np] of function parameters.
+ * @param y       `==>` Array [q][n] of dependent variable. Unused when the model is implicit.
+ * @param x       `==>` Array [m][n] of explanatory variable.
+ * @param we      `==>` Optional array [q][ld2we][ldwe] with `epsilon` weights.
+ * @param wd      `==>` Optional array [m][ld2wd][ldwd] with `delta` weights.
+ * @param ifixb   `==>` Optional array [np] with values designating whether the elements of `beta` are fixed at their input values or not.
+ * @param ifixx   `==>` Optional array [m][ldifx] with values designating whether the elements of `x` are fixed at their input values or not.
+ * @param stpb    `==>` Optional array [np] with relative step for computing finite difference derivatives with respect to `beta`.
+ * @param stpd    `==>` Optional array [m][ldstpd] with relative step for computing finite difference derivatives with respect to `delta`.
+ * @param sclb    `==>` Optional array [np] with scaling values for `beta`.
+ * @param scld    `==>` Optional array [m][ldscld] with scaling values for `delta`.
+ * @param delta   `<=>` Optional array [m][n] with initial error in the `x` data.
+ * @param lower   `==>` Optional array [np] with lower bound on `beta`.
+ * @param upper   `==>` Optional array [np] with upper bound on `beta`.
+ * @param rwork   `<=>` Optional real work space.
+ * @param iwork   `<=>` Optional integer work space.
+ * @param job     `==>` Optional variable controlling initialization and computational method.
+ * @param ndigit  `==>` Optional number of accurate digits in the function results, as supplied by the user.
+ * @param taufac  `==>` Optional factor used to compute the initial trust region diameter.
+ * @param sstol   `==>` Optional sum-of-squares convergence stopping tolerance.
+ * @param partol  `==>` Optional parameter convergence stopping tolerance.
+ * @param maxit   `==>` Optional maximum number of iterations allowed.
+ * @param iprint  `==>` Optional print control variable.
+ * @param lunerr  `==>` Optional logical unit number for error messages.
+ * @param lunrpt  `==>` Optional logical unit number for computation reports.
+ * @param info    `<==` Optional variable designating why the computations were stopped.
  */
 ODRPACK_EXTERN void odr_long_c(
     odrpack_fcn_t fcn,
+    void *data,
     const int *n,
     const int *m,
     const int *q,
@@ -188,8 +191,7 @@ ODRPACK_EXTERN void odr_long_c(
     const int *iprint,
     const int *lunerr,
     const int *lunrpt,
-    int *info,
-    void *thunk);
+    int *info);
 
 /**
  * @brief 0-based locations within integer work array.
@@ -338,7 +340,6 @@ ODRPACK_EXTERN void workspace_dimensions_c(
 
 /**
  * @brief Get a message corresponding to a given `info` code.
- *
  *
  * @param info         `==>` Integer code designating why the computations were stopped.
  * @param message      `<==` Output buffer that will contain the null-terminated message string corresponding to `info`.

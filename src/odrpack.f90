@@ -2,31 +2,32 @@ module odrpack
 !! Main driver routines for finding the weighted explicit or implicit orthogonal distance
 !! regression (ODR) or ordinary linear or nonlinear least squares (OLS) solution.
 
-   use odrpack_kinds, only: wp
-   use, intrinsic :: iso_fortran_env, only: output_unit
+   use odrpack_kinds, only: dp
+   use odrpack_core, only: odrpack_model, workspace_dimensions
+   use iso_fortran_env, only: output_unit
    implicit none
    private
 
-   public :: odr, workspace_dimensions
+   public :: odr, odrpack_model, workspace_dimensions
 
 contains
 
-   impure subroutine odr &
-      (fcn, &
-       n, m, q, np, &
-       beta, &
-       y, x, &
-       delta, &
-       we, wd, &
-       ifixb, ifixx, &
-       job, ndigit, taufac, &
-       sstol, partol, maxit, &
-       iprint, lunerr, lunrpt, &
-       stpb, stpd, &
-       sclb, scld, &
-       rwork, iwork, &
-       info, &
-       lower, upper)
+   impure subroutine odr( &
+      model, &
+      n, m, q, np, &
+      beta, &
+      y, x, &
+      delta, &
+      we, wd, &
+      ifixb, ifixx, &
+      job, ndigit, taufac, &
+      sstol, partol, maxit, &
+      iprint, lunerr, lunrpt, &
+      stpb, stpd, &
+      sclb, scld, &
+      rwork, iwork, &
+      info, &
+      lower, upper)
    !! Driver routine for finding the weighted explicit or implicit orthogonal distance
    !! regression (ODR) or ordinary linear or nonlinear least squares (OLS) solution.
       ! Authors:
@@ -68,11 +69,10 @@ contains
       !    SIAM J. Sci. Stat. Comput., 8(6):1052-1078.
 
       use odrpack_kinds, only: negone, zero
-      use odrpack_core, only: fcn_t
       use odrpack_reports, only: print_header, print_error_inputs
 
-      procedure(fcn_t) :: fcn
-         !! User-supplied subroutine for evaluating the model.
+      type(odrpack_model) :: model
+         !! User-supplied model.
       integer, intent(in) :: n
          !! Number of observations.
       integer, intent(in) :: m
@@ -81,18 +81,18 @@ contains
          !! Number of responses per observation.
       integer, intent(in) :: np
          !! Number of function parameters.
-      real(wp), intent(inout) :: beta(:)
+      real(dp), intent(inout) :: beta(:)
          !! Function parameters. `Shape: (np)`.
-      real(wp), intent(in) :: y(:, :)
+      real(dp), intent(in) :: y(:, :)
          !! Dependent variable. `Shape: (n, q)`. Unused when the model is implicit.
-      real(wp), intent(in) :: x(:, :)
+      real(dp), intent(in) :: x(:, :)
          !! Explanatory variable. `Shape: (n, m)`.
-      real(wp), intent(inout), optional :: delta(:, :)
+      real(dp), intent(inout), optional :: delta(:, :)
          !! Error in the `x` data. `Shape: (n, m)`. Initial guess on input and estimated value
          !! on output.
-      real(wp), intent(in), optional, target :: we(:, :, :)
+      real(dp), intent(in), optional, target :: we(:, :, :)
          !! `epsilon` weights. `Shape: ({1,n}, {1,q}, q)`. See p. 25.
-      real(wp), intent(in), optional, target :: wd(:, :, :)
+      real(dp), intent(in), optional, target :: wd(:, :, :)
          !! `delta` weights. `Shape: ({1,n}, {1,m}, m)`. See p. 26.
       integer, intent(in), optional, target :: ifixb(:)
          !! Values designating whether the elements of `beta` are fixed at their input values
@@ -104,11 +104,11 @@ contains
          !! Variable controlling problem initialization and computational method.
       integer, intent(in), optional :: ndigit
          !! Number of accurate digits in the function results, as supplied by the user.
-      real(wp), intent(in), optional :: taufac
+      real(dp), intent(in), optional :: taufac
          !! Factor used to compute the initial trust region diameter.
-      real(wp), intent(in), optional :: sstol
+      real(dp), intent(in), optional :: sstol
          !! Sum-of-squares convergence stopping tolerance.
-      real(wp), intent(in), optional :: partol
+      real(dp), intent(in), optional :: partol
          !! Parameter convergence stopping tolerance.
       integer, intent(in), optional :: maxit
          !! Maximum number of iterations allowed.
@@ -124,25 +124,25 @@ contains
          !!  `0`: No output.
          !!  `6`: Output to standard output.
          !!  `k /= 0,6`: Output to logical unit `k`.
-      real(wp), intent(in), optional, target :: stpb(:)
+      real(dp), intent(in), optional, target :: stpb(:)
          !! Relative step for computing finite difference derivatives with respect to `beta`.
          !! `Shape: (np)`.
-      real(wp), intent(in), optional, target :: stpd(:, :)
+      real(dp), intent(in), optional, target :: stpd(:, :)
          !! Relative step for computing finite difference derivatives with respect to `delta`.
          !! `Shape: ({1,n}, m)`. See p. 31.
-      real(wp), intent(in), optional, target :: sclb(:)
+      real(dp), intent(in), optional, target :: sclb(:)
       !! Scaling values for `beta`. `Shape: (np)`.
-      real(wp), intent(in), optional, target :: scld(:, :)
+      real(dp), intent(in), optional, target :: scld(:, :)
          !! Scaling values for `delta`. `Shape: ({1,n}, m)`. See p. 32.
-      real(wp), intent(inout), optional, target :: rwork(:)
+      real(dp), intent(inout), optional, target :: rwork(:)
          !! Real work space.
       integer, intent(inout), optional, target :: iwork(:)
          !! Integer work space.
       integer, intent(out), optional :: info
          !! Variable designating why the computations were stopped.
-      real(wp), intent(in), optional, target :: lower(:)
+      real(dp), intent(in), optional, target :: lower(:)
          !! Lower bound on `beta`. `Shape: (np)`.
-      real(wp), intent(in), optional, target :: upper(:)
+      real(dp), intent(in), optional, target :: upper(:)
          !! Upper bound on `beta`. `Shape: (np)`.
 
       ! Local variables
@@ -152,12 +152,12 @@ contains
       integer, allocatable, target :: ifixb_local(:), ifixx_local(:, :), iwork_local(:)
       integer, pointer :: ifixb_(:), ifixx_(:, :), iwork_(:)
 
-      real(wp) :: taufac_, sstol_, partol_
-      real(wp), allocatable :: tempret(:, :)
-      real(wp), allocatable, target :: rwork_local(:), lower_local(:), upper_local(:), &
+      real(dp) :: taufac_, sstol_, partol_
+      real(dp), allocatable :: tempret(:, :)
+      real(dp), allocatable, target :: rwork_local(:), lower_local(:), upper_local(:), &
                                        sclb_local(:), scld_local(:, :), stpb_local(:), &
                                        stpd_local(:, :), we_local(:, :, :), wd_local(:, :, :)
-      real(wp), pointer :: rwork_(:), lower_(:), upper_(:), sclb_(:), scld_(:, :), stpb_(:), &
+      real(dp), pointer :: rwork_(:), lower_(:), upper_(:), sclb_(:), scld_(:, :), stpb_(:), &
                            stpd_(:, :), we_(:, :, :), wd_(:, :, :)
 
       logical :: head, isodr, restart
@@ -547,7 +547,7 @@ contains
 
       ! Call the driver routine
       call odrdrive( &
-         fcn, &
+         model, &
          n, m, np, q, &
          beta, y, x, &
          we_, ldwe, ld2we, &
@@ -572,21 +572,20 @@ contains
 
    end subroutine odr
 
-   impure subroutine odrdrive &
-      (fcn, n, m, np, q, beta, y, x, &
-       we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
-       job, ndigit, taufac, sstol, partol, maxit, iprint, lunerr, lunrpt, &
-       stpb, stpd, ldstpd, sclb, scld, ldscld, &
-       rwork, lrwork, tempret, iwork, liwork, &
-       info, lower, upper)
+   impure subroutine odrdrive( &
+      model, n, m, np, q, beta, y, x, &
+      we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
+      job, ndigit, taufac, sstol, partol, maxit, iprint, lunerr, lunrpt, &
+      stpb, stpd, ldstpd, sclb, scld, ldscld, &
+      rwork, lrwork, tempret, iwork, liwork, &
+      info, lower, upper)
    !! Driver routine for finding the weighted explicit or implicit orthogonal distance
    !! regression (ODR) or ordinary linear or nonlinear least squares (OLS) solution.
 
       use odrpack_kinds, only: zero, one, three
-      use odrpack_core, only: fcn_t
 
-      procedure(fcn_t) :: fcn
-         !! User-supplied subroutine for evaluating the model.
+      type(odrpack_model) :: model
+         !! User-supplied model.
       integer, intent(in) :: n
          !! Number of observations.
       integer, intent(in) :: m
@@ -595,19 +594,19 @@ contains
          !! Number of function parameters.
       integer, intent(in) :: q
          !! Number of responses per observation.
-      real(wp), intent(inout) :: beta(np)
+      real(dp), intent(inout) :: beta(np)
          !! Function parameters.
-      real(wp), intent(in) :: y(n, q)
+      real(dp), intent(in) :: y(n, q)
          !! Dependent variable. Unused when the model is implicit.
-      real(wp), intent(in) :: x(n, m)
+      real(dp), intent(in) :: x(n, m)
          !! Independent variable.
-      real(wp), intent(inout) :: we(ldwe, ld2we, q)
+      real(dp), intent(inout) :: we(ldwe, ld2we, q)
          !! `epsilon` weights.
       integer, intent(in) :: ldwe
          !! Leading dimension of array `we`.
       integer, intent(in) :: ld2we
          !! Second dimension of array `we`.
-      real(wp), intent(in) :: wd(ldwd, ld2wd, m)
+      real(dp), intent(in) :: wd(ldwd, ld2wd, m)
          !! `delta` weights.
       integer, intent(in) :: ldwd
          !! Leading dimension of array `wd`.
@@ -625,11 +624,11 @@ contains
          !! Variable controlling problem initialization and computational method.
       integer, intent(in) :: ndigit
          !! Number of accurate digits in the function results, as supplied by the user.
-      real(wp), intent(in) :: taufac
+      real(dp), intent(in) :: taufac
          !! Factor used to compute the initial trust region diameter.
-      real(wp), intent(in) :: sstol
+      real(dp), intent(in) :: sstol
          !! Sum-of-squares convergence stopping tolerance.
-      real(wp), intent(in) :: partol
+      real(dp), intent(in) :: partol
          !! User-supplied parameter convergence stopping tolerance.
       integer, intent(in) :: maxit
          !! Maximum number of iterations allowed.
@@ -639,23 +638,23 @@ contains
          !! Logical unit number used for error messages.
       integer, intent(in) :: lunrpt
          !! Logical unit number used for computation reports.
-      real(wp), intent(in) :: stpb(np)
+      real(dp), intent(in) :: stpb(np)
          !! Relative step for computing finite difference derivatives with respect to `beta`.
-      real(wp), intent(in) :: stpd(ldstpd, m)
+      real(dp), intent(in) :: stpd(ldstpd, m)
          !! Relative step for computing finite difference derivatives with respect to `delta`.
       integer, intent(in) :: ldstpd
          !! Leading dimension of array `stpd`.
-      real(wp), intent(in) :: sclb(np)
+      real(dp), intent(in) :: sclb(np)
          !! Scaling values for `beta`.
-      real(wp), intent(in) :: scld(ldscld, m)
+      real(dp), intent(in) :: scld(ldscld, m)
          !! Scaling value for `delta`.
       integer, intent(in) :: ldscld
          !! Leading dimension of array `scld`.
-      real(wp), intent(inout) :: rwork(lrwork)
+      real(dp), intent(inout) :: rwork(lrwork)
          !! Real work space.
       integer, intent(in) :: lrwork
          !! Length of vector `rwork`.
-      real(wp), intent(inout) :: tempret(:, :)
+      real(dp), intent(inout) :: tempret(:, :)
          !! Temporary work array for holding return values before copying to a lower rank array.
       integer, intent(inout) :: iwork(liwork)
          !! Integer work space.
@@ -663,20 +662,20 @@ contains
          !! Length of vector `iwork`.
       integer, intent(out) :: info
          !! Variable designating why the computations were stopped.
-      real(wp), intent(in) :: lower(np)
+      real(dp), intent(in) :: lower(np)
          !! Lower bound on `beta`.
-      real(wp), intent(in) :: upper(np)
+      real(dp), intent(in) :: upper(np)
          !! Upper bound on `beta`.
 
       ! Local scalars
-      real(wp), parameter :: pcheck = 1.0E3_wp, pstart = 1.0E1_wp, pfac = 1.0E1_wp
-      real(wp) :: cnvtol, tstimp
+      real(dp), parameter :: pcheck = 1.0E3_dp, pstart = 1.0E1_dp, pfac = 1.0E1_dp
+      real(dp) :: cnvtol, tstimp
       integer :: iprnti, ipr1, ipr2, ipr2f, ipr3, jobi, job1, job2, job3, job4, job5, &
                  maxiti, maxit1
       logical :: done, firstitr, head, implicit, printpen
 
       ! Local arrays
-      real(wp) :: penalty(1, 1, 1)
+      real(dp) :: penalty(1, 1, 1)
 
       ! Variable Definitions (alphabetically)
       !  CNVTOL:    The convergence tolerance for implicit models.
@@ -758,15 +757,15 @@ contains
 
          do while (.true.)
 
-            call odrstart &
-               (head, firstitr, printpen, &
-                fcn, n, m, np, q, beta, y, x, &
-                penalty, 1, 1, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
-                jobi, ndigit, taufac, sstol, cnvtol, maxiti, &
-                iprnti, lunerr, lunrpt, &
-                stpb, stpd, ldstpd, sclb, scld, ldscld, &
-                rwork, lrwork, tempret, iwork, liwork, &
-                maxit1, tstimp, info, lower, upper)
+            call odrstart( &
+               head, firstitr, printpen, &
+               model, n, m, np, q, beta, y, x, &
+               penalty, 1, 1, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
+               jobi, ndigit, taufac, sstol, cnvtol, maxiti, &
+               iprnti, lunerr, lunrpt, &
+               stpb, stpd, ldstpd, sclb, scld, ldscld, &
+               rwork, lrwork, tempret, iwork, liwork, &
+               maxit1, tstimp, info, lower, upper)
 
             if (done) then
                return
@@ -795,33 +794,33 @@ contains
 
       else
          ! Explicit problem
-         call odrstart &
-            (head, firstitr, printpen, &
-             fcn, n, m, np, q, beta, y, x, &
-             we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
-             job, ndigit, taufac, sstol, partol, maxit, &
-             iprint, lunerr, lunrpt, &
-             stpb, stpd, ldstpd, sclb, scld, ldscld, &
-             rwork, lrwork, tempret, iwork, liwork, &
-             maxit1, tstimp, info, lower, upper)
+         call odrstart( &
+            head, firstitr, printpen, &
+            model, n, m, np, q, beta, y, x, &
+            we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
+            job, ndigit, taufac, sstol, partol, maxit, &
+            iprint, lunerr, lunrpt, &
+            stpb, stpd, ldstpd, sclb, scld, ldscld, &
+            rwork, lrwork, tempret, iwork, liwork, &
+            maxit1, tstimp, info, lower, upper)
       end if
 
    end subroutine odrdrive
 
-   impure subroutine odrstart &
-      (head, firstitr, printpen, &
-       fcn, n, m, np, q, beta, y, x, &
-       we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
-       job, ndigit, taufac, sstol, partol, maxit, &
-       iprint, lunerr, lunrpt, &
-       stpb, stpd, ldstpd, sclb, scld, ldscld, &
-       rwork, lrwork, tempret, iwork, liwork, &
-       maxit1, tstimp, info, lower, upper)
+   impure subroutine odrstart( &
+      head, firstitr, printpen, &
+      model, n, m, np, q, beta, y, x, &
+      we, ldwe, ld2we, wd, ldwd, ld2wd, ifixb, ifixx, ldifx, &
+      job, ndigit, taufac, sstol, partol, maxit, &
+      iprint, lunerr, lunrpt, &
+      stpb, stpd, ldstpd, sclb, scld, ldscld, &
+      rwork, lrwork, tempret, iwork, liwork, &
+      maxit1, tstimp, info, lower, upper)
    !! Perform error checking and initialization, and begin procedure for performing orthogonal
    !! distance regression (ODR) or ordinary linear or nonlinear least squares (OLS).
 
       use odrpack_kinds, only: zero, one, ten, p5 => half
-      use odrpack_core, only: check_inputs, check_jac, derstep, eta_fcn, fcn_t, fctrw, &
+      use odrpack_core, only: check_inputs, check_jac, derstep, eta_fcn, fctrw, &
                               init_work, loc_iwork, loc_rwork, move_beta, pack_vec, &
                               select_row, set_flags, scale_mat, unpack_vec
       use odrpack_reports, only: print_errors
@@ -836,8 +835,8 @@ contains
       logical, intent(inout) :: printpen
          !! Variable designating whether the penalty parameter is to be printed in the
          !! iteration report (`.true.`) or not (`.false.`).
-      procedure(fcn_t) :: fcn
-         !! User-supplied subroutine for evaluating the model.
+      type(odrpack_model) :: model
+         !! User-supplied model.
       integer, intent(in) :: n
          !! Number of observations.
       integer, intent(in) :: m
@@ -846,19 +845,19 @@ contains
          !! Number of function parameters.
       integer, intent(in) :: q
          !! Number of responses per observation.
-      real(wp), intent(inout) :: beta(np)
+      real(dp), intent(inout) :: beta(np)
          !! Function parameters.
-      real(wp), intent(in) :: y(n, q)
+      real(dp), intent(in) :: y(n, q)
          !! Dependent variable. Unused when the model is implicit.
-      real(wp), intent(in) :: x(n, m)
+      real(dp), intent(in) :: x(n, m)
          !! Explanatory variable.
-      real(wp), intent(inout) :: we(ldwe, ld2we, q)
+      real(dp), intent(inout) :: we(ldwe, ld2we, q)
          !! `epsilon` weights.
       integer, intent(in) :: ldwe
          !! Leading dimension of array `we`.
       integer, intent(in) :: ld2we
          !! Second dimension of array `we`.
-      real(wp), intent(in) :: wd(ldwd, ld2wd, m)
+      real(dp), intent(in) :: wd(ldwd, ld2wd, m)
          !! `delta` weights.
       integer, intent(in) :: ldwd
          !! Leading dimension of array `wd`.
@@ -876,11 +875,11 @@ contains
          !! Variable controlling problem initialization and computational method.
       integer, intent(in) :: ndigit
          !! Number of accurate digits in the function results, as supplied by the user.
-      real(wp), intent(in) :: taufac
+      real(dp), intent(in) :: taufac
          !! Factor used to compute the initial trust region diameter.
-      real(wp), intent(in) :: sstol
+      real(dp), intent(in) :: sstol
          !! Sum-of-squares convergence stopping tolerance.
-      real(wp), intent(in) :: partol
+      real(dp), intent(in) :: partol
          !! Parameter convergence stopping tolerance.
       integer, intent(in) :: maxit
          !! Maximum number of iterations allowed.
@@ -890,23 +889,23 @@ contains
          !! Logical unit number used for error messages.
       integer, intent(in) :: lunrpt
          !! Logical unit number used for computation reports.
-      real(wp), intent(in) :: stpb(np)
+      real(dp), intent(in) :: stpb(np)
          !! Step size for finite difference derivatives with respect to `beta`.
-      real(wp), intent(in) :: stpd(ldstpd, m)
+      real(dp), intent(in) :: stpd(ldstpd, m)
          !! Step size for finite difference derivatives with respect to `delta`.
       integer, intent(in) :: ldstpd
          !! Leading dimension of array `stpd`.
-      real(wp), intent(in) :: sclb(np)
+      real(dp), intent(in) :: sclb(np)
          !! Scaling values for `beta`.
-      real(wp), intent(in) :: scld(ldscld, m)
+      real(dp), intent(in) :: scld(ldscld, m)
          !! Scaling values for `delta`.
       integer, intent(in) :: ldscld
          !! Leading dimension of array `scld`.
-      real(wp), intent(inout), target :: rwork(lrwork)
+      real(dp), intent(inout), target :: rwork(lrwork)
          !! Real work space.
       integer, intent(in) :: lrwork
          !! Length of array `rwork`.
-      real(wp), intent(inout) :: tempret(:, :)
+      real(dp), intent(inout) :: tempret(:, :)
          !! Temporary work array for holding return values before copying to a lower rank array.
       integer, intent(inout) :: iwork(liwork)
          !! Integer work space.
@@ -914,17 +913,17 @@ contains
          !! Length of array `iwork`.
       integer, intent(out) :: maxit1
          !! For implicit models, the iterations allowed for the next penalty parameter value.
-      real(wp), intent(out) :: tstimp
+      real(dp), intent(out) :: tstimp
          !! Relative change in the parameters between the initial values and the solution.
       integer, intent(inout) :: info
          !! Variable designating why the computations were stopped.
-      real(wp), intent(in) :: lower(np)
+      real(dp), intent(in) :: lower(np)
          !! Lower bound for `beta`.
-      real(wp), intent(in) :: upper(np)
+      real(dp), intent(in) :: upper(np)
          !! Upper bound for `beta`.
 
       ! Local scalars
-      real(wp) :: epsmac, eta
+      real(dp) :: epsmac, eta
       integer :: actrsi, alphai, betaci, betani, betasi, beta0i, boundi, deltai, &
                  deltani, deltasi, diffi, epsmaci, etai, fi, fjacbi, fjacdi, fni, fsi, &
                  idfi, int2i, iprini, iranki, istop, istopi, jobi, jpvti, k, &
@@ -937,9 +936,9 @@ contains
       logical :: anajac, cdjac, chkjac, dovcv, implicit, initd, isodr, redoj, restart
 
       ! Local arrays
-      real(wp) :: betaj(np)
+      real(dp) :: betaj(np)
       integer :: interval(np)
-      real(wp), pointer :: beta0_(:), delta_(:, :), f_(:, :), fn_(:, :), fs_(:, :), &
+      real(dp), pointer :: beta0_(:), delta_(:, :), f_(:, :), fn_(:, :), fs_(:, :), &
                            ssf_(:), we1_(:, :, :), wrk1_(:, :, :), wrk6_(:, :, :), &
                            xplusd_(:, :)
 
@@ -1196,7 +1195,8 @@ contains
          xplusd_ = x + delta_
 
          istop = 0
-         call fcn(beta, xplusd_, ifixb, ifixx, 002, fn_, wrk6_, wrk1_, istop)
+         call model%fcn(n, m, q, np, ldifx, beta, xplusd_, ifixb, ifixx, 002, &
+                        fn_, wrk6_, wrk1_, istop, model%data)
          iwork(istopi) = istop
 
          if (istop == 0) then
@@ -1248,7 +1248,7 @@ contains
          if (ndigit < 2) then
             iwork(netai) = -1
             nfev = iwork(nfevi)
-            call eta_fcn(fcn, &
+            call eta_fcn(model, &
                          n, m, np, q, &
                          rwork(xplusdi), beta, epsmac, nrow, &
                          rwork(betani), rwork(fni), &
@@ -1310,7 +1310,7 @@ contains
             call move_beta(np, betaj, lower, upper, rwork(ssfi), stpb, neta, eta, interval)
 
             ! Check the derivatives
-            call check_jac(fcn, &
+            call check_jac(model, &
                            n, m, np, q, &
                            beta, betaj, rwork(xplusdi), &
                            ifixb, ifixx, ldifx, stpb, stpd, ldstpd, &
@@ -1375,7 +1375,7 @@ contains
       ! Find least squares solution
       fs_ = fn_
       call odrsolve(head, firstitr, printpen, &
-                    fcn, n, m, np, q, job, beta, y, x, &
+                    model, n, m, np, q, job, beta, y, x, &
                     we, rwork(we1i), ldwe, ld2we, wd, ldwd, ld2wd, &
                     ifixb, ifixx, ldifx, &
                     rwork(betaci), rwork(betani), rwork(betasi), rwork(si), &
@@ -1402,22 +1402,21 @@ contains
 
    end subroutine odrstart
 
-   impure subroutine odrsolve &
-      (head, firstitr, printpen, &
-       fcn, n, m, np, q, job, beta, y, x, &
-       we, we1, ldwe, ld2we, wd, ldwd, ld2wd, &
-       ifixb, ifixx, ldifx, &
-       betac, betan, betas, s, delta, deltan, deltas, &
-       lower, upper, &
-       t, f, fn, fs, fjacb, msgb, fjacd, msgd, &
-       ssf, ss, tt, ldtt, stpb, stpd, ldstpd, &
-       xplusd, wrk, lwrk, rwork, lrwork, tempret, iwork, liwork, info, &
-       bound)
+   impure subroutine odrsolve( &
+      head, firstitr, printpen, &
+      model, n, m, np, q, job, beta, y, x, &
+      we, we1, ldwe, ld2we, wd, ldwd, ld2wd, &
+      ifixb, ifixx, ldifx, &
+      betac, betan, betas, s, delta, deltan, deltas, &
+      lower, upper, &
+      t, f, fn, fs, fjacb, msgb, fjacd, msgd, &
+      ssf, ss, tt, ldtt, stpb, stpd, ldstpd, &
+      xplusd, wrk, lwrk, rwork, lrwork, tempret, iwork, liwork, info, bound)
    !! Iteratively compute least squares solution.
 
       use odrpack_kinds, only: zero, one
-      use odrpack_core, only: access_workspace, eval_jac, fcn_t, pack_vec, scale_mat, &
-                              set_flags, trust_region, unpack_vec, vcv_beta
+      use odrpack_core, only: access_workspace, eval_jac, pack_vec, scale_mat, set_flags, &
+                              trust_region, unpack_vec, vcv_beta
       use odrpack_reports, only: print_reports
       use blas_interfaces, only: ddot
 
@@ -1430,8 +1429,8 @@ contains
       logical, intent(inout) :: printpen
          !! Value designating whether the penalty parameter is to be printed in the iteration
          !! report (`.true.`) or not (`.false.`).
-      procedure(fcn_t) :: fcn
-         !! User-supplied subroutine for evaluating the model.
+      type(odrpack_model) :: model
+         !! User-supplied model.
       integer, intent(in) :: n
          !! Number of observations.
       integer, intent(in) :: m
@@ -1442,21 +1441,21 @@ contains
          !! Number of responses per observation.
       integer, intent(inout) :: job
          !! Variable controlling problem initialization and computational method.
-      real(wp), intent(inout) :: beta(np)
+      real(dp), intent(inout) :: beta(np)
          !! Model parameters.
-      real(wp), intent(in) :: y(n, q)
+      real(dp), intent(in) :: y(n, q)
          !! Dependent variable. Unused when the model is implicit.
-      real(wp), intent(in) :: x(n, m)
+      real(dp), intent(in) :: x(n, m)
          !! Explanatory variable.
-      real(wp), intent(in) :: we(ldwe, ld2we, q)
+      real(dp), intent(in) :: we(ldwe, ld2we, q)
          !! `epsilon` weights.
-      real(wp), intent(in) :: we1(ldwe, ld2we, q)
+      real(dp), intent(in) :: we1(ldwe, ld2we, q)
          !! Square root of the `epsilon` weights.
       integer, intent(in) :: ldwe
          !! Leading dimension of arrays `we` and `we1`.
       integer, intent(in) :: ld2we
          !! Second dimension of arrays `we` and `we1`.
-      real(wp), intent(in) :: wd(ldwd, ld2wd, m)
+      real(dp), intent(in) :: wd(ldwd, ld2wd, m)
          !! `delta` weights.
       integer, intent(in) :: ldwd
          !! Leading dimension of array `wd`.
@@ -1470,67 +1469,67 @@ contains
          !! values or not.
       integer, intent(in) :: ldifx
          !! Leading dimension of array `ifixx`.
-      real(wp), intent(inout) :: betac(np)
+      real(dp), intent(inout) :: betac(np)
          !! Current estimated values of the unfixed `beta`s.
-      real(wp), intent(out) :: betan(np)
+      real(dp), intent(out) :: betan(np)
          !! New estimated values of the unfixed `beta`s.
-      real(wp), intent(inout) :: betas(np)
+      real(dp), intent(inout) :: betas(np)
          !! Saved estimated values of the unfixed `beta`s.
-      real(wp), intent(out) :: s(np)
+      real(dp), intent(out) :: s(np)
          !! Step for `beta`.
-      real(wp), intent(inout) :: delta(n, m)
+      real(dp), intent(inout) :: delta(n, m)
          !! Estimated errors in the explanatory variables.
-      real(wp), intent(out) :: deltan(n, m)
+      real(dp), intent(out) :: deltan(n, m)
          !! New estimated errors in the explanatory variables.
-      real(wp), intent(inout) :: deltas(n, m)
+      real(dp), intent(inout) :: deltas(n, m)
          !! Saved estimated errors in the explanatory variables.
-      real(wp), intent(in) :: lower(np)
+      real(dp), intent(in) :: lower(np)
          !! Lower bound for unfixed `beta`s.
-      real(wp), intent(in) :: upper(np)
+      real(dp), intent(in) :: upper(np)
          !! Upper bound for unfixed `beta`s.
-      real(wp), intent(out) :: t(n, m)
+      real(dp), intent(out) :: t(n, m)
          !! Step for `delta`.
-      real(wp), intent(inout) :: f(n, q)
+      real(dp), intent(inout) :: f(n, q)
          !! Weighted estimated values of `epsilon`.
-      real(wp), intent(out) :: fn(n, q)
+      real(dp), intent(out) :: fn(n, q)
          !! New predicted values from the function.
-      real(wp), intent(out) :: fs(n, q)
+      real(dp), intent(out) :: fs(n, q)
          !! Saved predicted values from the function.
-      real(wp), intent(out) :: fjacb(n, np, q)
+      real(dp), intent(out) :: fjacb(n, np, q)
          !! Jacobian with respect to `beta`.
       integer, intent(in) :: msgb(q*np + 1)
          !! Error checking results for the Jacobian with respect to `beta`.
-      real(wp), intent(out) :: fjacd(n, m, q)
+      real(dp), intent(out) :: fjacd(n, m, q)
          !! Jacobian with respect to `delta`.
       integer, intent(in) :: msgd(q*m + 1)
          !! Error checking results for the Jacobian with respect to `delta`.
-      real(wp), intent(in) :: ssf(np)
+      real(dp), intent(in) :: ssf(np)
          !! Scaling values used for `beta`.
-      real(wp), intent(in) :: ss(np)
+      real(dp), intent(in) :: ss(np)
          !! Scaling values used for the unfixed `beta`s.
-      real(wp), intent(in) :: tt(ldtt, m)
+      real(dp), intent(in) :: tt(ldtt, m)
          !! Scaling values used for `delta`.
       integer, intent(in) :: ldtt
          !! Leading dimension of array `tt`.
-      real(wp), intent(in) :: stpb(np)
+      real(dp), intent(in) :: stpb(np)
          !! Relative step used for computing finite difference derivatives with respect
          !! to each `beta`.
-      real(wp), intent(in) :: stpd(ldstpd, m)
+      real(dp), intent(in) :: stpd(ldstpd, m)
          !! Relative step used for computing finite difference derivatives with respect
          !! to `delta`.
       integer, intent(in) :: ldstpd
          !! Leading dimension of array `stpd`.
-      real(wp), intent(out) :: xplusd(n, m)
+      real(dp), intent(out) :: xplusd(n, m)
          !! Values of `x + delta`.
-      real(wp), intent(inout) :: wrk(lwrk)
+      real(dp), intent(inout) :: wrk(lwrk)
          !! Work array, _equivalenced_ to `wrk1` and `wrk2`.
       integer, intent(in) :: lwrk
          !! Length of array `wrk`.
-      real(wp), intent(inout), target :: rwork(lrwork)
+      real(dp), intent(inout), target :: rwork(lrwork)
          !! Real workspace.
       integer, intent(in) :: lrwork
          !! Length of array `rwork`.
-      real(wp), intent(inout) :: tempret(:, :)
+      real(dp), intent(inout) :: tempret(:, :)
          !! Temporary work array for holding return values before copying to a lower rank array.
       integer, intent(inout) :: iwork(liwork)
          !! Integer workspace.
@@ -1542,12 +1541,12 @@ contains
          !! Values of the bounds for `beta`.
 
       ! Local scalars
-      real(wp), parameter :: p0001 = 0.00010_wp, &
-                             p1 = 0.1_wp, &
-                             p25 = 0.25_wp, &
-                             p5 = 0.5_wp, &
-                             p75 = 0.75_wp
-      real(wp) :: actred, actrs, alpha, dirder, eta, olmavg, partol, pnorm, prered, &
+      real(dp), parameter :: p0001 = 0.00010_dp, &
+                             p1 = 0.1_dp, &
+                             p25 = 0.25_dp, &
+                             p5 = 0.5_dp, &
+                             p75 = 0.75_dp
+      real(dp) :: actred, actrs, alpha, dirder, eta, olmavg, partol, pnorm, prered, &
                   prers, ratio, rcond, rnorm, rnormn, rnorms, rss, rvar, sstol, tau, &
                   taufac, temp, temp1, temp2, tsnorm
 
@@ -1560,8 +1559,8 @@ contains
                  intdbl, isodr, lstep, redoj, restart
 
       ! Local arrays
-      real(wp) :: loweru(np), upperu(np), wss(3)
-      real(wp), pointer :: wrk1_(:, :, :), wrk6_(:, :, :)
+      real(dp) :: loweru(np), upperu(np), wss(3)
+      real(dp), pointer :: wrk1_(:, :, :), wrk6_(:, :, :)
 
       ! Variable Definitions (alphabetically)
       !  ACCESS:   The variable designating whether information is to be accessed from the work
@@ -1768,7 +1767,7 @@ contains
       if ((niter == 1) .and. (anajac .and. chkjac)) then
          istop = 0
       else
-         call eval_jac(fcn, &
+         call eval_jac(model, &
                        anajac, cdjac, &
                        n, m, np, q, &
                        betac, beta, stpb, &
@@ -1873,7 +1872,8 @@ contains
       call unpack_vec(np, betan, beta, ifixb)
       xplusd = x + deltan
       istop = 0
-      call fcn(beta, xplusd, ifixb, ifixx, 002, fn, wrk6_, wrk1_, istop)
+      call model%fcn(n, m, q, np, ldifx, beta, xplusd, ifixb, ifixx, 002, &
+                     fn, wrk6_, wrk1_, istop, model%data)
       if (istop == 0) then
          nfev = nfev + 1
       end if
@@ -2086,7 +2086,7 @@ contains
          ! Otherwise, Jacobian from beginning of last iteration will be used
          ! to compute covariance matrix
          if (redoj) then
-            call eval_jac(fcn, &
+            call eval_jac(model, &
                           anajac, cdjac, &
                           n, m, np, q, &
                           betac, beta, stpb, &
@@ -2247,35 +2247,5 @@ contains
       end if
 
    end subroutine odrsolve
-
-   pure subroutine workspace_dimensions(n, m, q, np, isodr, lrwork, liwork)
-   !! Calculate the dimensions of the workspace arrays.
-
-      integer, intent(in) :: n
-         !! Number of observations.
-      integer, intent(in) :: m
-         !! Number of columns of data in the independent variable.
-      integer, intent(in) :: q
-         !! Number of responses per observation.
-      integer, intent(in) :: np
-         !! Number of function parameters.
-      logical, intent(in) :: isodr
-         !! Variable designating whether the solution is by ODR (`.true.`) or by OLS (`.false.`).
-      integer, intent(out) :: lrwork
-         !! Length of `rwork` array.
-      integer, intent(out) :: liwork
-         !! Length of `iwork` array.
-
-      if (isodr) then
-         lrwork = 18 + 13*np + np**2 + m + m**2 + 4*n*q + 6*n*m + 2*n*q*np + &
-                  2*n*q*m + q**2 + 5*q + q*(np + m) + n*q**2
-      else
-         lrwork = 18 + 13*np + np**2 + m + m**2 + 4*n*q + 2*n*m + 2*n*q*np + &
-                  5*q + q*(np + m) + n*q**2
-      end if
-
-      liwork = 20 + 2*np + q*(np + m)
-
-   end subroutine workspace_dimensions
 
 end module odrpack
