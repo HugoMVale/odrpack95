@@ -7,7 +7,7 @@ module odrpack_core
 
    abstract interface
       subroutine fcn_t( &
-         n, m, q, np, ldifx, beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop, userdata) bind(C)
+         n, m, q, np, ldifx, beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop, data) bind(C)
       !! User-supplied subroutine for evaluating the model.
          import :: c_int, c_double, c_ptr
          implicit none
@@ -44,7 +44,7 @@ module odrpack_core
             !!  `1`: Current `beta` and `x + delta` are not acceptable; 'odrpack' should select
             !!       values closer to most recently used values if possible.
             !! `-1`: Current `beta` and `x + delta` are not acceptable; 'odrpack' should stop.
-         type(c_ptr), intent(in), value :: userdata
+         type(c_ptr), intent(in), value :: data
             !! User-defined data passed to the function.
       end subroutine fcn_t
    end interface
