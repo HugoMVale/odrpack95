@@ -30,7 +30,7 @@ C***Routines called  (none)
 C***End Prologue  DASUM
 
 C...Used modules
-      use odrpack_kinds, only: wp
+      use odrpack_kinds, only: dp
 
 C...Scalar arguments
       INTEGER
@@ -56,7 +56,7 @@ C...Intrinsic functions
 C***First executable statement  DASUM
 
 
-      DASUMR = 0.E0_wp
+      DASUMR = 0.E0_dp
       IF(N.LE.0)RETURN
       IF(INCX.EQ.1)GOTO 20
 
@@ -121,7 +121,7 @@ C***Routines called  (none)
 C***End Prologue  DAXPY
 
 C...Used modules
-      use odrpack_kinds, only: wp
+      use odrpack_kinds, only: dp
 
 C...Scalar arguments
       REAL(wp)
@@ -145,7 +145,7 @@ C...Intrinsic functions
 C***First executable statement  DAXPY
 
 
-      IF(N.LE.0.OR.DA.EQ.0.E0_wp) RETURN
+      IF(N.LE.0.OR.DA.EQ.0.E0_dp) RETURN
       IF(INCX.EQ.INCY) THEN
         IF(INCX-1.LT.0) THEN
           GOTO 5
@@ -234,7 +234,7 @@ C***Routines called  (none)
 C***End Prologue  DCOPY
 
 C...Used modules
-      use odrpack_kinds, only: wp
+      use odrpack_kinds, only: dp
 
 C...Scalar arguments
       INTEGER
@@ -348,7 +348,7 @@ C***Routines called  (none)
 C***End Prologue  DDOT
 
 C...Used modules
-      use odrpack_kinds, only: wp
+      use odrpack_kinds, only: dp
 
 C...Scalar arguments
       INTEGER
@@ -374,7 +374,7 @@ C...Intrinsic functions
 C***First executable statement  DDOT
 
 
-      DDOTR = 0.E0_wp
+      DDOTR = 0.E0_dp
       IF(N.LE.0)RETURN
       IF(INCX.EQ.INCY) THEN
         IF(INCX-1.LT.0) THEN
@@ -474,14 +474,14 @@ C     From the environmental parameters listed in the IMSL converter
 C     document the limiting values are as follows..
 C     CUTLO, S.P.   U/EPS = 2**(-102) for  Honeywell.  Close seconds are
 C                   UNIVAC and DEC at 2**(-103)
-C                   thus CUTLO = 2**(-51) = 4.44089E-16_wp
+C                   thus CUTLO = 2**(-51) = 4.44089E-16_dp
 C     CUTHI, S.P.   V = 2**127 for UNIVAC, Honeywell, and DEC.
-C                   thus CUTHI = 2**(63.5) = 1.30438E19_wp
+C                   thus CUTHI = 2**(63.5) = 1.30438E19_dp
 C     CUTLO, D.P.   U/EPS = 2**(-67) for Honeywell and DEC.
-C                   thus CUTLO = 2**(-33.5) = 8.23181E-11_wp
-C     CUTHI, D.P.   Same as S.P.  CUTHI = 1.30438E19_wp
-C     DATA CUTLO, CUTHI / 8.232E-11_wp,  1.304E19_wp /
-C     DATA CUTLO, CUTHI / 4.441E-16_wp,  1.304E19_wp /
+C                   thus CUTLO = 2**(-33.5) = 8.23181E-11_dp
+C     CUTHI, D.P.   Same as S.P.  CUTHI = 1.30438E19_dp
+C     DATA CUTLO, CUTHI / 8.232E-11_dp,  1.304E19_dp /
+C     DATA CUTLO, CUTHI / 4.441E-16_dp,  1.304E19_dp /
 C***References  Lawson C.L., Hanson R.J., Kincaid D.R., Krogh F.T.,
 C                 *Basic Linear Algebra Subprograms for FORTRAN Usage*,
 C                 Algorithm No. 539, Transactions on Mathematical
@@ -490,7 +490,7 @@ C***Routines called  (none)
 C***End Prologue  DNRM2
 
 C...Used modules
-      use odrpack_kinds, only: wp
+      use odrpack_kinds, only: dp
 
 C...Scalar arguments
       INTEGER
@@ -516,9 +516,9 @@ C...Intrinsic functions
 
 C...Data statements
       DATA
-     &   ZERO,ONE/0.0E0_wp,1.0E0_wp/
+     &   ZERO,ONE/0.0E0_dp,1.0E0_dp/
       DATA
-     &   CUTLO,CUTHI/8.232E-11_wp,1.304E19_wp/
+     &   CUTLO,CUTHI/8.232E-11_dp,1.304E19_dp/
 
 
 C***First executable statement  DNRM2
@@ -646,7 +646,7 @@ C***Routines Called  (NONE)
 C***End Prologue  DROT
 
 C...Used modules
-      use odrpack_kinds, only: wp
+      use odrpack_kinds, only: dp
 
 C...Scalar arguments
       REAL(wp)
@@ -666,7 +666,7 @@ C...Local scalars
 
 C...Data statements
       DATA
-     &   ZERO,ONE/0.E0_wp,1.E0_wp/
+     &   ZERO,ONE/0.E0_dp,1.E0_dp/
 
 
 C***First executable statement  DROT
@@ -735,7 +735,7 @@ C     which zeros the second entry of the 2-vector  (DA,DB)**T .
 C     the quantity R = (+/-)DSQRT(DA**2 + DB**2) overwrites DA in
 C     storage.  The value of DB is overwritten by a value Z which
 C     allows DC and DS to be recovered by the following algorithm.
-C           If Z=1  set  DC=0.E0_wp  and  DS=1.E0_wp
+C           If Z=1  set  DC=0.E0_dp  and  DS=1.E0_dp
 C           If DABS(Z) .LT. 1  set  DC=DSQRT(1-Z**2)  and  DS=Z
 C           If DABS(Z) .GT. 1  set  DC=1/Z  and  DS=DSQRT(1-DC**2)
 C     Normally, the subprogram DROT(N,DX,INCX,DY,INCY,DC,DS) will
@@ -748,7 +748,7 @@ C***Routines Called  (None)
 C***End Prologue  DROTG
 
 C...Used modules
-      use odrpack_kinds, only: wp
+      use odrpack_kinds, only: dp
 
 C...Scalar arguments
       REAL(wp)
@@ -775,7 +775,7 @@ C     *** Here DABS(DA) .GT. DABS(DB) ***
 
 C     Note that U and R have the sign of DA
 
-      R = DSQRT(.25E0_wp + V**2) * U
+      R = DSQRT(.25E0_dp + V**2) * U
 
 C     Note that DC is positive
 
@@ -787,29 +787,29 @@ C     Note that DC is positive
 
 C *** Here DABS(DA) .LE. DABS(DB) ***
 
-   10 IF (DB .EQ. 0.E0_wp) GO TO 20
+   10 IF (DB .EQ. 0.E0_dp) GO TO 20
       U = DB + DB
       V = DA / U
 
 C     Note that U and R have the sign of DB
 C     (R is immediately stored in DA)
 
-      DA = DSQRT(.25E0_wp + V**2) * U
+      DA = DSQRT(.25E0_dp + V**2) * U
 
 C     Note that DS is positive
 
       DS = DB / DA
       DC = V * (DS + DS)
-      IF (DC .EQ. 0.E0_wp) GO TO 15
-      DB = 1.E0_wp / DC
+      IF (DC .EQ. 0.E0_dp) GO TO 15
+      DB = 1.E0_dp / DC
       RETURN
-   15 DB = 1.E0_wp
+   15 DB = 1.E0_dp
       RETURN
 
-C *** Here DA = DB = 0.E0_wp ***
+C *** Here DA = DB = 0.E0_dp ***
 
-   20 DC = 1.E0_wp
-      DS = 0.E0_wp
+   20 DC = 1.E0_dp
+      DS = 0.E0_dp
       RETURN
 
       END
@@ -845,7 +845,7 @@ C***Routines Called  (None)
 C***End Prologue  DSCAL
 
 C...Used modules
-      use odrpack_kinds, only: wp
+      use odrpack_kinds, only: dp
 
 C...Scalar arguments
       REAL(wp)
@@ -937,7 +937,7 @@ C***Routines Called  (None)
 C***End Prologue  DSWAP
 
 C...Used modules
-      use odrpack_kinds, only: wp
+      use odrpack_kinds, only: dp
 
 C...Scalar arguments
       INTEGER
@@ -1058,7 +1058,7 @@ C***Routines Called  (None)
 C***End Prologue  IDAMAX
 
 C...Used modules
-      use odrpack_kinds, only: wp
+      use odrpack_kinds, only: dp
 
 C...Scalar arguments
       INTEGER
