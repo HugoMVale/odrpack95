@@ -4,7 +4,7 @@ C***Begin Prologue  DASUM
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A3A
-C***Keywords  Add,BLAS,REAL(wp),Linear Algebra,Magnitude,Sum,
+C***Keywords  Add,BLAS,REAL(dp),Linear Algebra,Magnitude,Sum,
 C             Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
@@ -16,11 +16,11 @@ C                B L A S  Subprogram
 C    Description of parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL(wp) vector with N elements
+C       DX  REAL(dp) vector with N elements
 C     INCX  Storage spacing between elements of DX
 C     --Output--
-C    DASUM  REAL(wp) result (Zero IF N .LE. 0)
-C     Returns sum of magnitudes of REAL(wp) DX.
+C    DASUM  REAL(dp) result (Zero IF N .LE. 0)
+C     Returns sum of magnitudes of REAL(dp) DX.
 C     DASUM = Sum from 0 to N-1 of DABS(DX(1+I*INCX))
 C***References  Lawson C.L., Hanson R.J., Kincaid D.R., Krogh F.T.,
 C                 *Basic Linear Algebra Subprograms For FORTRAN Usage*,
@@ -37,11 +37,11 @@ C...Scalar arguments
      &   INCX,N
 
 C...Array arguments
-      REAL(wp)
+      REAL(dp)
      &   DX(*)
 
 C...Result
-      REAL(wp)
+      REAL(dp)
      &   DASUMR
 
 C...Local scalars
@@ -91,7 +91,7 @@ C***Begin Prologue  DAXPY
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A7
-C***Keywords  BLAS,REAL(wp),Linear Algebra,Triad,Vector
+C***Keywords  BLAS,REAL(dp),Linear Algebra,Triad,Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
 C           Kincaid, D. R., (U. of Texas)
@@ -102,14 +102,14 @@ C                B L A S  Subprogram
 C    Description of parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DA  REAL(wp) scalar multiplier
-C       DX  REAL(wp) vector with N elements
+C       DA  REAL(dp) scalar multiplier
+C       DX  REAL(dp) vector with N elements
 C     INCX  Storage spacing between elements of DX
-C       DY  REAL(wp) vector with N elements
+C       DY  REAL(dp) vector with N elements
 C     INCY  Storage spacing between elements of DY
 C     --Output--
-C       DY  REAL(wp) result (unchanged IF N .LE. 0)
-C     Overwrite REAL(wp) DY with REAL(wp) DA*DX + DY.
+C       DY  REAL(dp) result (unchanged IF N .LE. 0)
+C     Overwrite REAL(dp) DY with REAL(dp) DA*DX + DY.
 C     For I = 0 to N-1, replace  DY(LY+I*INCY) with DA*DX(LX+I*INCX) +
 C       DY(LY+I*INCY), where LX = 1 IF INCX .GE. 0, ELSE LX = (-INCX)*N
 C       and LY is defined in a similar way using INCY.
@@ -124,13 +124,13 @@ C...Used modules
       use odrpack_kinds, only: dp
 
 C...Scalar arguments
-      REAL(wp)
+      REAL(dp)
      &   DA
       INTEGER
      &   INCX,INCY,N
 
 C...Array arguments
-      REAL(wp)
+      REAL(dp)
      &   DX(*),DY(*)
 
 C...Local scalars
@@ -205,7 +205,7 @@ C***Begin Prologue  DCOPY
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A5
-C***Keywords  BLAS,Copy,REAL(wp),Linear Algebra,Vector
+C***Keywords  BLAS,Copy,REAL(dp),Linear Algebra,Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
 C           Kincaid, D. R., (U. of Texas)
@@ -216,13 +216,13 @@ C                B L A S  Subprogram
 C    Description of parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL(wp) vector with N elements
+C       DX  REAL(dp) vector with N elements
 C     INCX  Storage spacing between elements of DX
-C       DY  REAL(wp) vector with N elements
+C       DY  REAL(dp) vector with N elements
 C     INCY  Storage spacing between elements of DY
 C     --Output--
 C       DY  Copy of vector DX (unchanged if N .LE. 0)
-C     Copy REAL(wp) DX to REAL(wp) DY.
+C     Copy REAL(dp) DX to REAL(dp) DY.
 C     For I = 0 to N-1, copy DX(LX+I*INCX) to DY(LY+I*INCY),
 C     where LX = 1 if INCX .GE. 0, else LX = (-INCX)*N, and LY is
 C     defined in a similar way using INCY.
@@ -241,7 +241,7 @@ C...Scalar arguments
      &   INCX,INCY,N
 
 C...Array arguments
-      REAL(wp)
+      REAL(dp)
      &   DX(*),DY(*)
 
 C...Local scalars
@@ -319,7 +319,7 @@ C***Begin Prologue  DDOT
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A4
-C***Keywords  BLAS,REAL(wp),Inner Product,Linear Algebra,Vector
+C***Keywords  BLAS,REAL(dp),Inner Product,Linear Algebra,Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
 C           Kincaid, D. R., (U. of Texas)
@@ -330,13 +330,13 @@ C                B L A S  Subprogram
 C    Description of parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL(wp) vector with N elements
+C       DX  REAL(dp) vector with N elements
 C     INCX  Storage spacing between elements of DX
-C       DY  REAL(wp) vector with N elements
+C       DY  REAL(dp) vector with N elements
 C     INCY  Storage spacing between elements of DY
 C     --Output--
-C     DDOT  REAL(wp) dot product (zero if N .LE. 0)
-C     returns the dot product of REAL(wp) DX and DY.
+C     DDOT  REAL(dp) dot product (zero if N .LE. 0)
+C     returns the dot product of REAL(dp) DX and DY.
 C     DDOT = SUM for I = 0 to N-1 of  DX(LX+I*INCX) * DY(LY+I*INCY)
 C     where LX = 1 if INCX .GE. 0, else LX = (-INCX)*N, and LY is
 C     defined in a similar way using INCY.
@@ -355,11 +355,11 @@ C...Scalar arguments
      &   INCX,INCY,N
 
 C...Array arguments
-      REAL(wp)
+      REAL(dp)
      &   DX(*),DY(*)
 
 C...Result
-      REAL(wp)
+      REAL(dp)
      &   DDOTR
 
 C...Local scalars
@@ -433,7 +433,7 @@ C***Begin Prologue  DNRM2
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A3B
-C***Keywords  BLAS,REAL(wp),Euclidean,L2,Length,Linear Algebra,
+C***Keywords  BLAS,REAL(dp),Euclidean,L2,Length,Linear Algebra,
 C             Norm,Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
@@ -445,10 +445,10 @@ C                B L A S  Subprogram
 C    Description of parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL(wp) vector with N elements
+C       DX  REAL(dp) vector with N elements
 C     INCX  Storage spacing between elements of DX
 C     --Output--
-C    DNRM2  REAL(wp) result (zero if N .LE. 0)
+C    DNRM2  REAL(dp) result (zero if N .LE. 0)
 C     Euclidean norm of the N-vector stored in DX() with storage
 C     increment INCX .
 C     If    N .LE. 0 return with result = 0.
@@ -497,15 +497,15 @@ C...Scalar arguments
      &   INCX,N
 
 C...Array arguments
-      REAL(wp)
+      REAL(dp)
      &   DX(*)
 
 C...Result
-      REAL(wp)
+      REAL(dp)
      &   DNRM2R
 
 C...Local scalars
-      REAL(wp)
+      REAL(dp)
      &   CUTHI,CUTLO,HITEST,ONE,SUM,XMAX,ZERO
       INTEGER
      &   I,J,NEXT,NN
@@ -624,9 +624,9 @@ C                B L A S  Subprogram
 C    Description of Parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL(wp) vector with N elements
+C       DX  REAL(dp) vector with N elements
 C     INCX  Storage spacing between elements of DX
-C       DY  REAL(wp) vector with N elements
+C       DY  REAL(dp) vector with N elements
 C     INCY  Storage spacing between elements of DY
 C       DC  D.P. element of rotation matrix
 C       DS  D.P. element of rotation matrix
@@ -649,17 +649,17 @@ C...Used modules
       use odrpack_kinds, only: dp
 
 C...Scalar arguments
-      REAL(wp)
+      REAL(dp)
      &   DC,DS
       INTEGER
      &   INCX,INCY,N
 
 C...Array arguments
-      REAL(wp)
+      REAL(dp)
      &   DX(*),DY(*)
 
 C...Local scalars
-      REAL(wp)
+      REAL(dp)
      &   ONE,W,Z,ZERO
       INTEGER
      &   I,KX,KY,NSTEPS
@@ -719,13 +719,13 @@ C***Description
 C                B L A S  Subprogram
 C    Description of Parameters
 C     --Input--
-C       DA  REAL(wp) scalar
-C       DB  REAL(wp) scalar
+C       DA  REAL(dp) scalar
+C       DB  REAL(dp) scalar
 C     --Output--
-C       DA  REAL(wp) result R
-C       DB  REAL(wp) result Z
-C       DC  REAL(wp) result
-C       DS  REAL(wp) result
+C       DA  REAL(dp) result R
+C       DB  REAL(dp) result Z
+C       DC  REAL(dp) result
+C       DS  REAL(dp) result
 C     Designed By C. L. Lawson, JPL, 1977 Sept 08
 C     Construct the Givens Transformation
 C         ( DC  DS )
@@ -751,11 +751,11 @@ C...Used modules
       use odrpack_kinds, only: dp
 
 C...Scalar arguments
-      REAL(wp)
+      REAL(dp)
      &   DA,DB,DC,DS
 
 C...Local scalars
-      REAL(wp)
+      REAL(dp)
      &   R,U,V
 
 C...Intrinsic functions
@@ -830,12 +830,12 @@ C                B L A S  Subprogram
 C    Description of Parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DA  REAL(wp) scale factor
-C       DX  REAL(wp) vector with N elements
+C       DA  REAL(dp) scale factor
+C       DX  REAL(dp) vector with N elements
 C     INCX  Storage spacing between elements of DX
 C     --Output--
-C       DX  REAL(wp) result (unchanged if N.LE.0)
-C     Replace REAL(wp) DX by REAL(wp) DA*DX.
+C       DX  REAL(dp) result (unchanged if N.LE.0)
+C     Replace REAL(dp) DX by REAL(dp) DA*DX.
 C     For I = 0 to N-1, replace DX(1+I*INCX) with  DA * DX(1+I*INCX)
 C***References  Lawson C.L., Hanson R.J., Kincaid D.R., Krogh F.T.,
 C                 *Basic Linear Algebra Subprograms for FORTRAN Usage*,
@@ -848,13 +848,13 @@ C...Used modules
       use odrpack_kinds, only: dp
 
 C...Scalar arguments
-      REAL(wp)
+      REAL(dp)
      &   DA
       INTEGER
      &   INCX,N
 
 C...Array arguments
-      REAL(wp)
+      REAL(dp)
      &   DX(*)
 
 C...Local scalars
@@ -907,7 +907,7 @@ C***Begin Prologue  DSWAP
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A5
-C***Keywords  BLAS,REAL(wp),Interchange,Linear Algebra,Vector
+C***Keywords  BLAS,REAL(dp),Interchange,Linear Algebra,Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
 C           Kincaid, D. R., (U. of Texas)
@@ -918,14 +918,14 @@ C                B L A S  Subprogram
 C    Description of Parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL(wp) vector with N elements
+C       DX  REAL(dp) vector with N elements
 C     INCX  Storage spacing between elements of DX
-C       DY  REAL(wp) vector with N elements
+C       DY  REAL(dp) vector with N elements
 C     INCY  Storage spacing between elements of DY
 C     --Output--
 C       DX  Input vector DY (unchanged if N .LE. 0)
 C       DY  Input vector DX (unchanged if N .LE. 0)
-C     Interchange REAL(wp) DX and REAL(wp) DY.
+C     Interchange REAL(dp) DX and REAL(dp) DY.
 C     For I = 0 TO N-1, interchange  DX(LX+I*INCX) and DY(LY+I*INCY),
 C     where LX = 1 if INCX .GE. 0, else LX = (-INCX)*N, and LY is
 C     defined in a similar way using INCY.
@@ -944,11 +944,11 @@ C...Scalar arguments
      &   INCX,INCY,N
 
 C...Array arguments
-      REAL(wp)
+      REAL(dp)
      &   DX(*),DY(*)
 
 C...Local scalars
-      REAL(wp)
+      REAL(dp)
      &   DTEMP1,DTEMP2,DTEMP3
       INTEGER
      &   I,IX,IY,M,MP1,NS
@@ -1032,7 +1032,7 @@ C***Begin Prologue  IDAMAX
 C***Date Written   791001   (YYMMDD)
 C***Revision Date  820801   (YYMMDD)
 C***Category No.  D1A2
-C***Keywords  BLAS,REAL(wp),Linear Algebra,Maximum Component,
+C***Keywords  BLAS,REAL(dp),Linear Algebra,Maximum Component,
 C             Vector
 C***Author  Lawson, C. L., (JPL)
 C           Hanson, R. J., (SNLA)
@@ -1044,11 +1044,11 @@ C                B L A S  Subprogram
 C    Description of parameters
 C     --Input--
 C        N  Number of elements in input vector(s)
-C       DX  REAL(wp) vector with N elements
+C       DX  REAL(dp) vector with N elements
 C     INCX  Storage spacing between elements of DX
 C     --Output--
 C   IDAMAX  Smallest index (zero if N .LE. 0)
-C     Find smallest index of maximum magnitude of REAL(wp) DX.
+C     Find smallest index of maximum magnitude of REAL(dp) DX.
 C     IDAMAX =  first I, I = 1 to N, to minimize  ABS(DX(1-INCX+I*INCX)
 C***References  Lawson C.L., Hanson R.J., Kincaid D.R., Krogh F.T.,
 C                 *Basic Linear Algebra Subprograms for FORTRAN Usage*,
@@ -1065,7 +1065,7 @@ C...Scalar arguments
      &   INCX,N
 
 C...Array arguments
-      REAL(wp)
+      REAL(dp)
      &   DX(*)
 
 C...Result
@@ -1073,7 +1073,7 @@ C...Result
      &   IDAMAXR
 
 C...Local scalars
-      REAL(wp)
+      REAL(dp)
      &   DMAX,XMAG
       INTEGER
      &   I,II,NS
