@@ -165,9 +165,8 @@ contains
       rwork, iwork, &
       job, ndigit, taufac, &
       sstol, partol, maxit, &
-      iprint, lunerr, lunrpt, info, &
-      thunk) bind(C)
-   !! "Long-call" wrapper for the `odr` routine including all optional arguments and thunk.
+      iprint, lunerr, lunrpt, info) bind(C)
+   !! "Long-call" wrapper for the `odr` routine including all optional arguments.
 
       use odrpack_core, only: fcn_t, odrpack_model
       use odrpack, only: odr
@@ -261,8 +260,6 @@ contains
          !!  `k /= 0,6`: Output to logical unit `k`.
       integer(c_int), intent(out), optional :: info
          !! Variable designating why the computations were stopped.
-      type(c_ptr), intent(in), value :: thunk
-         !! User-defined data passed to the function.
 
       type(odrpack_model) :: model
 
