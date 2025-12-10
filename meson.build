@@ -30,7 +30,10 @@ else
   # static linking does not work in cibuildwheel
   blas_dep = dependency('blas', required: false)
   if not blas_dep.found()
-    blas_dep = cc.find_library('blas', required: false)
+    blas_dep = dependency('openblas', required: false)
+  endif
+  if not blas_dep.found()
+    blas_dep = cc.find_library('openblas', required: false)
   endif
 endif
 
