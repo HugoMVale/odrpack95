@@ -3,50 +3,22 @@ name: Build and test pkg
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
-
-  # Quick test in Ubuntu
-  test_quick:
-    runs-on: ubuntu-latest
-    steps:
-    
-      - name: Set up Fortran
-        uses: gha3mi/setup-fortran-conda@latest
-        with:
-          compiler: gfortran
-          compiler-version: 14
-          platform: ubuntu-latest
-          extra-packages: "openblas"
       
-      - name: Test debug with coverage
-        run: |
-          gcov --version
-          pip install gcovr coverage
-          fpm test --profile debug --flag "-Wno-compare-reals -Wno-unused-dummy-argument -ftrampoline-impl=heap --coverage -fprofile-abs-path"
-          gcovr --filter src --cobertura-pretty --output coverage.xml
-    
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage.xml
-          verbose: false
-        
   # Matrix test 
   test_matrix:
     name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.compiler-version }}
     runs-on: ${{ matrix.os }}
-    needs: test_quick
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        compiler: [gfortran]
-        compiler-version: ["14", "12"]
-        exclude:
-          - os: windows-latest
-            compiler-version: "12" # not available in Windows
-          - os: macos-latest
-            compiler-version: "12" # missing linker issue
+        compiler: [flang]
+      #   compiler-version: ["14", "12"]
+      #   exclude:
+      #     - os: windows-latest
+      #       compiler-version: "12" # not available in Windows
+      #     - os: macos-latest
+      #       compiler-version: "12" # missing linker issue
         include:
           - os: ubuntu-latest
             extra-packages: "meson openblas"
@@ -76,8 +48,4 @@ jobs:
           meson compile -C build_release
           meson test -C build_release
 
-      - name: Run Examples (Release)
-        run: |
-          ./build_release/example/example5
-          ./build_release/c/example/example5
       
