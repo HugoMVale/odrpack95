@@ -12,6 +12,7 @@ extra_mods: iso_fortran_env:https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fFORT
             iso_c_binding:https://gcc.gnu.org/onlinedocs/gfortran/ISO_005fC_005fBINDING.html#ISO_005fC_005fBINDING
 source: true
 proc_internals: true
+preprocess: false
 graph: true
 coloured_edges: true
 print_creation_date: true
