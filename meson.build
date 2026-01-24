@@ -22,26 +22,54 @@ else
 endif
 
 # BLAS
-if os == 'darwin'
-  message('Using `Accelerate` framework as BLAS library.')
-  add_project_link_arguments('-framework', 'Accelerate', language: ['c', 'fortran'])
-  blas_dep = declare_dependency()
-else
-  # static linking does not work in cibuildwheel
-  blas_dep = dependency('blas', required: false)
-  if not blas_dep.found()
-    blas_dep = dependency('openblas', required: false)
-  endif
-  if not blas_dep.found()
-    blas_dep = cc.find_library('openblas', required: false)
-  endif
-endif
+blas_option = get_option('blas')
+blas_dep = disabler()
+blas_source = files()
 
-if blas_dep.found()
-  blas_source = []
+if blas_option == 'refblas'
+  message('`Reference BLAS` selected.')
+  blas_source = files('extern/blas.f')
+
+elif blas_option == 'openblas'
+  message('`OpenBLAS` selected.')
+  blas_dep = dependency('openblas', required: false)
+  if not blas_dep.found()
+    blas_dep = fc.find_library('openblas', required: false)
+  endif
+  if not blas_dep.found()
+    error('OpenBLAS library not found. Install OpenBLAS or select another BLAS option.')
+  endif
+
+elif blas_option == 'auto'
+  message('`Auto` BLAS selection enabled.')
+  
+  if os == 'darwin'
+    blas_dep = dependency('appleframeworks', modules: ['Accelerate'], required: false)
+    if blas_dep.found()
+      message('Using Apple Accelerate framework (BLAS/LAPACK).')
+    endif
+  endif
+  
+  if not blas_dep.found()
+    foreach lib : ['blas', 'openblas']
+      blas_dep = dependency(lib, required: false)
+      if not blas_dep.found()
+        blas_dep = fc.find_library(lib, required: false)
+      endif
+      if blas_dep.found()
+        message('Detected BLAS library: @0@'.format(lib))
+        break
+      endif
+    endforeach
+  endif
+
+  if not blas_dep.found()
+    warning('No BLAS library detected. Falling back to reference BLAS.')
+    blas_source = files('extern/blas.f')
+  endif
+
 else
-  warning('No specific BLAS library detected. Falling back to reference BLAS.')
-  blas_source = join_paths(meson.current_source_dir(), 'extern/blas.f')
+   error('Invalid BLAS option: @0@'.format(blas_option))
 endif
 
 # Sources
@@ -55,23 +83,31 @@ odrpack_source = files(
   'src/odrpack_capi.f90'
 )
 
-incdir = include_directories('c/include')
+all_sources = odrpack_source + blas_source
+
+
+# Library
+alls_deps = []
+if blas_dep.found()
+  alls_deps += blas_dep
+endif
 
 if get_option('build_shared')
   odrpack_lib = shared_library(
     meson.project_name(),
-    sources: [odrpack_source, blas_source],
-    dependencies: [blas_dep],
+    sources: all_sources,
+    dependencies: alls_deps,
     install: true
   )
 else
   odrpack_lib = static_library(
     meson.project_name(),
-    sources: [odrpack_source, blas_source],
-    dependencies: [blas_dep]
+    sources: all_sources,
+    dependencies: alls_deps
   )
 endif
 
+incdir = include_directories('c/include')
 odrpack_dep = declare_dependency(
   include_directories: [incdir],
   link_with: [odrpack_lib]

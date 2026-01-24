@@ -1,3 +1,5 @@
+option('blas', type: 'combo', choices: ['auto', 'openblas', 'refblas'], value: 'auto',
+       description: 'BLAS library to use (auto, openblas, or refblas)')
 option('build_examples', type : 'boolean', value : false,
        description : 'Build example programs')
 option('build_tests', type: 'boolean', value: false,
