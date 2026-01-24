@@ -1,4 +1,4 @@
-name: Build and test pkg
+name: Build and test pkg with Flang
 
 on: [push, pull_request, workflow_dispatch]
 
