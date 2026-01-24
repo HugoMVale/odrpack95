@@ -22,7 +22,7 @@ else
 endif
 
 # BLAS
-blas_option = get_option('blas')
+blas_option = get_option('blas_option')
 blas_dep = disabler()
 blas_source = files()
 
