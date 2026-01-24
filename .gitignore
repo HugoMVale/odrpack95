@@ -9,3 +9,4 @@ build
 _build
 local-scripts
 example/example*.txt
+builddir
