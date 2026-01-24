@@ -15,10 +15,6 @@ distances between each data point and the curve described by the model equation,
 model can be either explicit or implicit. Additionally, `odrpack` can be used to solve the ordinary least squares problem where all of
 the errors are attributed to the observations of the dependent variable.
 
-<p align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Total_least_squares.svg/220px-Total_least_squares.svg.png" width="200" alt="Deming regression; special case of ODR.">
-</p>
-
 ## History
 
 The first version of the library, named ODRPACK, was originally released in 1989 [^1], and the
