@@ -1,4 +1,4 @@
-name: Build and test pkg with GCC
+name: Test with GCC
 
 on: [push, pull_request, workflow_dispatch]
 
