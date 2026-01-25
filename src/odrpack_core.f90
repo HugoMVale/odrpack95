@@ -5363,15 +5363,15 @@ contains
          !! Number of rows of data in `t`.
       integer, intent(in) :: m
          !! Number of columns of data in `t`.
-      real(dp), intent(in), target :: wt(..)
+      real(dp), intent(in), contiguous, target :: wt(..)
          !! Array of shape conformable to `(ldwt,ld2wt,m)` holding the weights.
       integer, intent(in) :: ldwt
          !! Leading dimension of array `wt`.
       integer, intent(in) :: ld2wt
          !! Second dimension of array `wt`.
-      real(dp), intent(in), target :: t(..)
+      real(dp), intent(in), contiguous, target :: t(..)
          !! Array of shape conformable to `(n,m)` being scaled by `wt`.
-      real(dp), intent(out), target :: wtt(..)
+      real(dp), intent(out), contiguous, target :: wtt(..)
          !! Array of shape conformable to `(n,m)` holding the result of weighting array `t` by
          !! array `wt`. Array `wtt` can be the same as `t` only if the arrays in `wt` are upper
          !! triangular with zeros below the diagonal.
