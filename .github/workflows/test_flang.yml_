@@ -1,0 +1,51 @@
+name: Build and test pkg with Flang
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+      
+  # Matrix test 
+  test_matrix:
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.compiler-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest] #, windows-latest, macos-latest]
+        compiler: [flang]
+      #   compiler-version: ["14", "12"]
+      #   exclude:
+      #     - os: windows-latest
+      #       compiler-version: "12" # not available in Windows
+      #     - os: macos-latest
+      #       compiler-version: "12" # missing linker issue
+        include:
+          - os: ubuntu-latest
+            extra-packages: "meson openblas liblas"
+         #  - os: windows-latest
+         #    extra-packages: "meson openblas pkg-config"
+         #  - os: macos-latest
+         #    extra-packages: "meson openblas"
+                
+    steps:
+      - name: Set up Fortran
+        uses: gha3mi/setup-fortran-conda@latest
+        with:
+          compiler: ${{ matrix.compiler }}
+          compiler-version: ${{ matrix.compiler-version }}
+          platform: ${{ matrix.os }}
+          extra-packages: ${{ matrix.extra-packages }}
+
+      - name: Test Debug
+        run: |
+          meson setup build_debug --buildtype=debug -Dbuild_tests=true -Dbuild_examples=true
+          meson compile -C build_debug
+          meson test -C build_debug
+
+      - name: Test Release
+        run: |
+          meson setup build_release -Dbuild_tests=true -Dbuild_examples=true
+          meson compile -C build_release
+          meson test -C build_release
+
+      
