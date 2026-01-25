@@ -53,19 +53,19 @@ jobs:
       - name: Test Debug
         run: |
           meson setup --wipe build_debug --buildtype=debug --backend=ninja -Dbuild_tests=true -Dbuild_examples=true
-          meson compile -C build_debug --verbose
-          meson test -C build_debug --verbose
+          meson compile -C build_debug
+          meson test -C build_debug
 
-#       - name: Test Release
-#         run: |
-#           meson setup build_release -Dbuild_tests=true -Dbuild_examples=true
-#           meson compile -C build_release
-#           meson test -C build_release
+      - name: Test Release
+        run: |
+          meson setup --wipe build_release --buildtype=release --backend=ninja -Dbuild_tests=true -Dbuild_examples=true
+          meson compile -C build_release
+          meson test -C build_release
 
-#       - name: Run Examples (Release)
-#         run: |
-#           ./build_release/example/example5
-#          # ./build_release/c/example/example5
-      
+      - name: Run Examples (Release)
+        run: |
+          ./build_release/example/example5
+         # ./build_release/c/example/example5
+   
 # fpm+windows+flang: fails  
 # flang-new: error: unsupported option '-fPIC' for target 'x86_64-pc-windows-msvc'
