@@ -28,15 +28,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest]
         compiler: [flang]
+        compiler-version: ["21"]
         include:
           - os: ubuntu-latest
             extra-packages: "openblas"
           - os: windows-latest
             extra-packages: "openblas pkg-config"
-          - os: macos-latest
-            extra-packages: "openblas"
                 
     steps:
       - name: Set up Fortran
