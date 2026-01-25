@@ -49,11 +49,11 @@ jobs:
             compiler-version: "12" # missing linker issue
         include:
           - os: ubuntu-latest
-            extra-packages: "meson openblas"
+            extra-packages: "openblas"
           - os: windows-latest
-            extra-packages: "meson openblas pkg-config"
+            extra-packages: "openblas pkg-config"
           - os: macos-latest
-            extra-packages: "meson openblas"
+            extra-packages: "openblas"
                 
     steps:
       - name: Set up Fortran
