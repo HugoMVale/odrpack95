@@ -1,4 +1,4 @@
-name: Build and test pkg with Flang
+name: Test with Flang
 
 on: [push, pull_request, workflow_dispatch]
 
@@ -52,9 +52,9 @@ jobs:
 
       - name: Test Debug
         run: |
-          meson setup build_debug --buildtype=debug -Dbuild_tests=true -Dbuild_examples=true
-          meson compile -C build_debug
-          meson test -C build_debug
+          meson setup --wipe build_debug --buildtype=debug --backend=ninja -Dbuild_tests=true -Dbuild_examples=true
+          meson compile -C build_debug --verbose
+          meson test -C build_debug --verbose
 
 #       - name: Test Release
 #         run: |
