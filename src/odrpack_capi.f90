@@ -2,7 +2,7 @@ module odrpack_capi
    !! C-bindings for 'odrpack'.
 
    use iso_c_binding, only: c_bool, c_char, c_double, c_f_pointer, c_int, c_null_char, &
-                            c_ptr, c_size_t, c_null_ptr
+                            c_ptr, c_size_t, c_null_ptr, c_funptr, c_f_procpointer
    implicit none
 
    interface
@@ -110,7 +110,7 @@ contains
       use odrpack_core, only: fcn_t, odrpack_model
       use odrpack, only: odr
 
-      procedure(fcn_t) :: fcn
+      type(c_funptr) :: fcn
          !! User-supplied subroutine for evaluating the model.
       type(c_ptr), intent(in), value :: data
          !! User-defined data passed to the function.
@@ -138,8 +138,11 @@ contains
          !! Variable controlling initialization and computational method.
 
       type(odrpack_model) :: model
+      procedure(fcn_t), pointer :: fcn_ptr
+    
+      call c_f_procpointer(fcn, fcn_ptr)
 
-      model%fcn => fcn
+      model%fcn => fcn_ptr
       model%data = data
 
       call odr(model, n, m, q, np, beta, y, x, &
@@ -171,7 +174,7 @@ contains
       use odrpack_core, only: fcn_t, odrpack_model
       use odrpack, only: odr
 
-      procedure(fcn_t) :: fcn
+      type(c_funptr) :: fcn
          !! User-supplied subroutine for evaluating the model.
       type(c_ptr), intent(in), value :: data
          !! User-defined data passed to the function.
@@ -262,8 +265,11 @@ contains
          !! Variable designating why the computations were stopped.
 
       type(odrpack_model) :: model
+      procedure(fcn_t), pointer :: fcn_ptr
+    
+      call c_f_procpointer(fcn, fcn_ptr)
 
-      model%fcn => fcn
+      model%fcn => fcn_ptr
       model%data = data
 
       call odr(model, n, m, q, np, beta, y, x, &
