@@ -24,7 +24,7 @@ jobs:
   test_matrix:
     name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.compiler-version }}
     runs-on: ${{ matrix.os }}
-    # needs: test_quick
+    needs: test_quick
     strategy:
       fail-fast: false
       matrix:
@@ -45,10 +45,6 @@ jobs:
           compiler-version: ${{ matrix.compiler-version }}
           platform: ${{ matrix.os }}
           extra-packages: ${{ matrix.extra-packages }}
-
-      # - name: Test Debug
-      #   run: |
-      #     fpm test --profile debug --compiler flang-new
 
       - name: Test Debug
         run: |
