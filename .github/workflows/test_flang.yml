@@ -4,38 +4,33 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
 
-#   # Quick test in Ubuntu with fpm
-#   test_quick:
-#     runs-on: ubuntu-latest
-#     steps:
+  # Quick test in Ubuntu with fpm
+  test_quick:
+    runs-on: ubuntu-latest
+    steps:
     
-#       - name: Set up Fortran
-#         uses: gha3mi/setup-fortran-conda@latest
-#         with:
-#           compiler: flang
-#           platform: ubuntu-latest
-#           extra-packages: "openblas"
+      - name: Set up Fortran
+        uses: gha3mi/setup-fortran-conda@latest
+        with:
+          compiler: flang
+          platform: ubuntu-latest
+          extra-packages: "openblas pkg-config"
       
-#       - name: Test debug
-#         run: |
-#           fpm test --profile debug --compiler flang-new
+      - name: Test debug
+        run: |
+          fpm test --profile debug --compiler flang-new
         
   # Matrix test with meson
   test_matrix:
     name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.compiler-version }}
     runs-on: ${{ matrix.os }}
-    # needs: test_quick
+    needs: test_quick
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
         compiler: [flang]
         compiler-version: ["21"]
-        include:
-          - os: ubuntu-latest
-            extra-packages: "openblas pkg-config"
-          - os: windows-latest
-            extra-packages: "openblas pkg-config"
                 
     steps:
       - name: Set up Fortran
@@ -44,7 +39,7 @@ jobs:
           compiler: ${{ matrix.compiler }}
           compiler-version: ${{ matrix.compiler-version }}
           platform: ${{ matrix.os }}
-          extra-packages: ${{ matrix.extra-packages }}
+          extra-packages: "openblas pkg-config"
 
       - name: Test Debug
         run: |

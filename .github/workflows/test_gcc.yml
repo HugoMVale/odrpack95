@@ -15,7 +15,7 @@ jobs:
           compiler: gfortran
           compiler-version: 14
           platform: ubuntu-latest
-          extra-packages: "openblas"
+          extra-packages: "openblas pkg-config"
       
       - name: Test debug with coverage
         run: |
@@ -47,13 +47,6 @@ jobs:
             compiler-version: "12" # not available in Windows
           - os: macos-latest
             compiler-version: "12" # missing linker issue
-        include:
-          - os: ubuntu-latest
-            extra-packages: "openblas"
-          - os: windows-latest
-            extra-packages: "openblas pkg-config"
-          - os: macos-latest
-            extra-packages: "openblas"
                 
     steps:
       - name: Set up Fortran
@@ -62,7 +55,7 @@ jobs:
           compiler: ${{ matrix.compiler }}
           compiler-version: ${{ matrix.compiler-version }}
           platform: ${{ matrix.os }}
-          extra-packages: ${{ matrix.extra-packages }}
+          extra-packages: "openblas pkg-config"
 
       - name: Test Debug
         run: |
