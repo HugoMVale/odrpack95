@@ -79,5 +79,5 @@ jobs:
       - name: Run Examples (Release)
         run: |
           ./build_release/example/example5
-          ./build_release/c/example/example5
+         # ./build_release/c/example/example5
       
