@@ -141,7 +141,7 @@ int main() {
     // Print some outputs
 
     char message[256] = {};
-    stop_message_c(info, (char *)message, sizeof(message));
+    stop_message_c(info, sizeof(message), (char *)message);
     printf("Stop reason (info = %d): %s\n", info, message);
 
     for (int i = 0; i < NP; i++) {

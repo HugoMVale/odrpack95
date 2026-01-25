@@ -504,14 +504,14 @@ contains
 
    end subroutine workspace_dimensions_c
 
-   pure subroutine stop_message_c(info, message, message_size) bind(C)
+   pure subroutine stop_message_c(info, message_size, message) bind(C)
    !! Get a message corresponding to a given `info` code.
       integer(c_int), intent(in), value :: info
          !! Variable designating why the computations were stopped.
-      character(kind=c_char), intent(out) :: message(message_size)
-         !! C-string containing a message corresponding to `info`.
       integer(c_size_t), intent(in), value :: message_size
          !! Length of array `message`.
+      character(kind=c_char), intent(out) :: message(message_size)
+         !! C-string containing a message corresponding to `info`.
 
       character(len=:), allocatable :: msg
       integer(c_size_t) :: i

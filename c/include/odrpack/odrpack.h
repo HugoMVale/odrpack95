@@ -342,12 +342,12 @@ ODRPACK_EXTERN void workspace_dimensions_c(
  * @brief Get a message corresponding to a given `info` code.
  *
  * @param info         `==>` Integer code designating why the computations were stopped.
- * @param message      `<==` Output buffer that will contain the null-terminated message string corresponding to `info`.
  * @param message_size `==>` Length of array `message`.
+ * @param message      `<==` Output buffer that will contain the null-terminated message string corresponding to `info`.
  */
 ODRPACK_EXTERN void stop_message_c(
     int info,
-    char message[],
-    size_t message_size);
+    size_t message_size,
+    char message[]);
 
 #endif  // ODRPACK_H

@@ -162,7 +162,7 @@ int main() {
                &iprint, &lunerr, &lunrpt, &info);
 
     char message[256] = {};
-    stop_message_c(info, message, sizeof(message));
+    stop_message_c(info, sizeof(message), message);
     printf("Stop reason (info = %d): %s\n", info, message);
 
     return 0;
