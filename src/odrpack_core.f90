@@ -2,42 +2,42 @@ module odrpack_core
 !! Core mathematical routines, except drivers, and BLAS/LINPACK.
 
    use odrpack_kinds, only: dp
-   use iso_c_binding, only: c_int, c_double, c_ptr, c_null_ptr
+   use iso_c_binding, only: c_ptr, c_null_ptr
    implicit none
 
    abstract interface
       subroutine fcn_t( &
-         n, m, q, np, ldifx, beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop, data) bind(C)
+         n, m, q, np, ldifx, beta, xplusd, ifixb, ifixx, ideval, f, fjacb, fjacd, istop, data)
       !! User-supplied subroutine for evaluating the model.
-         import :: c_int, c_double, c_ptr
+         import :: dp, c_ptr
          implicit none
-         integer(c_int), intent(in) :: n
+         integer, intent(in) :: n
             !! Number of observations.
-         integer(c_int), intent(in) :: m
+         integer, intent(in) :: m
             !! Number of columns of data in the independent variable.
-         integer(c_int), intent(in) :: q
+         integer, intent(in) :: q
             !! Number of responses per observation.
-         integer(c_int), intent(in) :: np
+         integer, intent(in) :: np
             !! Number of function parameters.
-         integer(c_int), intent(in) :: ldifx
+         integer, intent(in) :: ldifx
             !! Leading dimension of array `ifixx`.
-         real(c_double), intent(in) :: beta(np)
+         real(dp), intent(in) :: beta(np)
             !! Current values of parameters.
-         real(c_double), intent(in) :: xplusd(n, m)
+         real(dp), intent(in) :: xplusd(n, m)
             !! Current value of explanatory variable, i.e., `x + delta`.
-         integer(c_int), intent(in) :: ifixb(np)
+         integer, intent(in) :: ifixb(np)
             !! Indicators for "fixing" parameters (`beta`).
-         integer(c_int), intent(in) :: ifixx(ldifx, m)
+         integer, intent(in) :: ifixx(ldifx, m)
             !! Indicators for "fixing" explanatory variable (`x`).
-         integer(c_int), intent(in) :: ideval
+         integer, intent(in) :: ideval
             !! Indicator for selecting computation to be performed.
-         real(c_double), intent(out) :: f(n, q)
+         real(dp), intent(out) :: f(n, q)
             !! Predicted function values.
-         real(c_double), intent(out) :: fjacb(n, np, q)
+         real(dp), intent(out) :: fjacb(n, np, q)
             !! Jacobian with respect to `beta`.
-         real(c_double), intent(out) :: fjacd(n, m, q)
+         real(dp), intent(out) :: fjacd(n, m, q)
             !! Jacobian with respect to errors `delta`.
-         integer(c_int), intent(out) :: istop
+         integer, intent(out) :: istop
             !! Stopping condition, with meaning as follows.
             !!  `0`: Current `beta` and `x + delta` were acceptable and values were computed
             !!       successfully.
