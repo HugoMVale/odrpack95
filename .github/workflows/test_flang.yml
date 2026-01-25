@@ -20,38 +20,36 @@ jobs:
         run: |
           fpm test --profile debug --compiler flang-new
         
-#   # Matrix test 
-#   test_matrix:
-#     name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.compiler-version }}
-#     runs-on: ${{ matrix.os }}
-#     needs: test_quick
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         os: [ubuntu-latest, windows-latest, macos-latest]
-#         compiler: [gfortran]
-#         compiler-version: ["14", "12"]
-#         exclude:
-#           - os: windows-latest
-#             compiler-version: "12" # not available in Windows
-#           - os: macos-latest
-#             compiler-version: "12" # missing linker issue
-#         include:
-#           - os: ubuntu-latest
-#             extra-packages: "openblas"
-#           - os: windows-latest
-#             extra-packages: "openblas pkg-config"
-#           - os: macos-latest
-#             extra-packages: "openblas"
+  # Matrix test 
+  test_matrix:
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.compiler-version }}
+    runs-on: ${{ matrix.os }}
+    needs: test_quick
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        compiler: [gfortran]
+        include:
+          - os: ubuntu-latest
+            extra-packages: "openblas"
+          - os: windows-latest
+            extra-packages: "openblas pkg-config"
+          - os: macos-latest
+            extra-packages: "openblas"
                 
-#     steps:
-#       - name: Set up Fortran
-#         uses: gha3mi/setup-fortran-conda@latest
-#         with:
-#           compiler: ${{ matrix.compiler }}
-#           compiler-version: ${{ matrix.compiler-version }}
-#           platform: ${{ matrix.os }}
-#           extra-packages: ${{ matrix.extra-packages }}
+    steps:
+      - name: Set up Fortran
+        uses: gha3mi/setup-fortran-conda@latest
+        with:
+          compiler: ${{ matrix.compiler }}
+          compiler-version: ${{ matrix.compiler-version }}
+          platform: ${{ matrix.os }}
+          extra-packages: ${{ matrix.extra-packages }}
+
+      - name: Test Debug
+        run: |
+          fpm test --profile debug --compiler flang-new
 
 #       - name: Test Debug
 #         run: |
