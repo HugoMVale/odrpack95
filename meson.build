@@ -17,6 +17,8 @@ os = host_machine.system()
 # Compiler flags
 if fc.get_id() == 'gcc'
   add_project_arguments('-Wno-compare-reals', '-Wno-unused-dummy-argument', language: ['fortran'])
+elif fc.get_id() == 'llvm-flang'
+  add_project_arguments('', language: ['fortran'])
 else
   warning('Compiler is @0@. If the build fails, try using the GCC compiler.'.format(fc.get_id()))
 endif
@@ -69,7 +71,7 @@ elif blas_option == 'auto'
   endif
 
 else
-   error('Invalid BLAS option: @0@'.format(blas_option))
+  error('Invalid BLAS option: @0@'.format(blas_option))
 endif
 
 # Sources
@@ -115,8 +117,8 @@ odrpack_dep = declare_dependency(
 
 # Examples
 if get_option('build_examples')
-    subdir('example')
-    subdir('c')
+  subdir('example')
+  subdir('c')
 endif
 
 # Tests
