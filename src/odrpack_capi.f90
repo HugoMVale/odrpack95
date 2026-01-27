@@ -110,7 +110,7 @@ contains
       use odrpack_core, only: fcn_t, odrpack_model
       use odrpack, only: odr
 
-      type(c_funptr) :: fcn
+      type(c_funptr), value :: fcn 
          !! User-supplied subroutine for evaluating the model.
       type(c_ptr), intent(in), value :: data
          !! User-defined data passed to the function.
@@ -139,7 +139,7 @@ contains
 
       type(odrpack_model) :: model
       procedure(fcn_t), pointer :: fcn_ptr
-    
+
       call c_f_procpointer(fcn, fcn_ptr)
 
       model%fcn => fcn_ptr
@@ -174,7 +174,7 @@ contains
       use odrpack_core, only: fcn_t, odrpack_model
       use odrpack, only: odr
 
-      type(c_funptr) :: fcn
+      type(c_funptr), value :: fcn 
          !! User-supplied subroutine for evaluating the model.
       type(c_ptr), intent(in), value :: data
          !! User-defined data passed to the function.
@@ -266,7 +266,7 @@ contains
 
       type(odrpack_model) :: model
       procedure(fcn_t), pointer :: fcn_ptr
-    
+
       call c_f_procpointer(fcn, fcn_ptr)
 
       model%fcn => fcn_ptr
