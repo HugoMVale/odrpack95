@@ -9,6 +9,8 @@ foreach t : tests
       'test-@0@'.format(t),
       sources: files('test_@0@.c'.format(t.underscorify())),
       link_with: odrpack_lib,
+      link_args: host_machine.system() == 'windows' ? [] : ['-lm'],
+      link_language: 'fortran',
     ),
     suite: 'unit',
   )
