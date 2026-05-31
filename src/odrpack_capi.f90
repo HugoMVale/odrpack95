@@ -110,7 +110,7 @@ contains
       use odrpack_core, only: fcn_t, odrpack_model
       use odrpack, only: odr
 
-      type(c_funptr), value :: fcn 
+      type(c_funptr), value :: fcn
          !! User-supplied subroutine for evaluating the model.
       type(c_ptr), intent(in), value :: data
          !! User-defined data passed to the function.
@@ -174,7 +174,7 @@ contains
       use odrpack_core, only: fcn_t, odrpack_model
       use odrpack, only: odr
 
-      type(c_funptr), value :: fcn 
+      type(c_funptr), value :: fcn
          !! User-supplied subroutine for evaluating the model.
       type(c_ptr), intent(in), value :: data
          !! User-defined data passed to the function.
@@ -519,29 +519,139 @@ contains
       character(kind=c_char), intent(out) :: message(message_size)
          !! C-string containing a message corresponding to `info`.
 
-      character(len=:), allocatable :: msg
-      integer(c_size_t) :: i
+      character(len=:), allocatable :: msg, msg1, msg2, msg3
+      integer :: i
+      integer(c_size_t) :: j
+      integer :: digits(6)
 
-      select case (info)
-      case (1)
-         msg = "Sum of squares convergence."
-      case (2)
-         msg = "Parameter convergence."
-      case (3)
-         msg = "Sum of squares and parameter convergence."
-      case (4)
-         msg = "Iteration limit reached."
-      case (5:)
-         msg = "Questionable results or fatal errors detected. See report and error message."
-      case default
-         msg = "Unknown info code."
-      end select
-      msg = msg//c_null_char
+      do i = 1, size(digits)
+         digits(i) = get_digit(info, i)
+      end do
 
-      do i = 1, min(message_size, len(msg))
-         message(i) = msg(i:i)
+      msg1 = ""
+      msg2 = ""
+      msg3 = ""
+
+      if (info > 0 .and. info < 100000) then
+      
+         if (info >= 5) then
+
+            ! Questionable results
+            if (digits(6) == 0 .and. digits(5) == 0) then
+               msg1 = "Questionable results detected: "
+               if (digits(4) /= 0) then
+                  msg2 = "user-supplied derivatives possibly not correct."
+               else if (digits(3) /= 0) then
+                  msg2 = "`istop != 0` at last function call."
+               else if (digits(2) /= 0) then
+                  msg2 = "problem is not full rank at solution."
+               end if
+            end if  
+      
+            ! Fatal errors
+            if (digits(6) == 0 .and. digits(5) > 0) then
+               msg1 = "Fatal errors detected: "
+               if (digits(5) == 1) then
+                  if (digits(4) /= 0) then
+                     msg2 = "`n < 1`."
+                  else if (digits(3) /= 0) then
+                     msg2 = "`m < 1`."
+                  else if (digits(2) /= 0) then
+                     msg2 = "`np < 1` or `np > n`."
+                  else if (digits(1) /= 0) then
+                     msg2 = "`nq < 1`."
+                  end if
+               else if (digits(5) == 2) then
+                  if (digits(4) /= 0) then
+                     msg2 = "`x` and/or `y` dimensions too small."
+                  else if (digits(3) /= 0) then
+                     msg2 = "`we` and/or `wd` dimensions too small."
+                  else if (digits(2) /= 0) then
+                     msg2 = "`ifixx`, `stpd`, or `scld` dimensions too small."
+                  else if (digits(1) /= 0) then
+                     msg2 = "`work` or `iwork` dimensions too small."
+                  end if
+               else if (digits(5) == 3) then
+                  if (digits(4) /= 0) then
+                     msg2 = "`stpb` and/or `stpd` incorrect."
+                  else if (digits(3) /= 0) then
+                     msg2 = "`sclb` and/or `scld` incorrect."
+                  else if (digits(2) /= 0) then
+                     msg2 = "`we` incorrect."
+                  else if (digits(1) /= 0) then
+                     msg2 = "`wd` incorrect."
+                  end if
+               else if (digits(5) == 4) then
+                  msg2 = "error in derivatives."
+               else if (digits(5) == 5) then
+                  msg2 = "`istop != 0` at last function call."
+               else if (digits(5) == 6) then
+                  msg2 = "numerical error, possibly caused by incorrectly specified user input, "// &
+                  "and more commonly by a poor choice of scale or weights, "// &
+                  "or a discontinuity in the derivatives."
+               else if (digits(5) == 7) then
+                  msg2 = "`job` inconsistent with passed arguments."
+               else if (digits(5) == 8) then
+                  if (digits(4) /= 0) then
+                     msg2 = "array allocation failed for `tempret`."
+                  else if (digits(3) /= 0) then
+                     msg2 = "array allocation failed for `rwork`."
+                  else if (digits(2) /= 0) then
+                     msg2 = "array allocation failed for `iwork`."
+                  end if
+               else if (digits(5) == 9) then
+                  if (digits(4) == 1) then
+                     msg2 = "`upper(i) < lower(i)` for some `i`."
+                  else if (digits(3) == 1) then
+                     msg2 = "initial `beta` outside of bounds."
+                  else if (digits(2) == 1) then
+                     msg2 = "bounds too small for calculating the number of reliable digits `ndigit`."
+                  else if (digits(2) == 2) then
+                     msg2 = "bounds too small for derivative calculations."
+                  end if
+               end if
+            end if
+         
+         end if
+
+         ! Stopping condition (normal and questionable results)
+         if (digits(5) == 0) then
+            if (digits(1) == 1) then
+               msg3 = "Sum of squares convergence."
+            else if (digits(1) == 2) then
+               msg3 = "Parameter convergence."
+            else if (digits(1) == 3) then
+               msg3 = "Sum of squares and parameter convergence."
+            else if (digits(1) == 4) then
+               msg3 = "Iteration limit reached."
+            end if
+         end if
+          
+      else
+         msg1 = "Unknown `info` code."
+      end if
+
+      msg = msg1//msg2
+      if (len(msg) > 0 .and. len(msg3) > 0) then
+         msg = msg//" "
+      end if
+      msg = msg//msg3//c_null_char
+
+      do j = 1, min(message_size, len(msg))
+         message(j) = msg(j:j)
       end do
 
    end subroutine stop_message_c
+
+   integer pure function get_digit(number, position) result(res)
+   !! Get the `i`-th digit of an integer `number`, counting from the right and starting at 1.
+      integer, intent(in) :: number
+         !! The integer whose digit is to be extracted.
+      integer, intent(in) :: position
+         !! The position of the digit to extract, counting from the right and starting at 1.
+
+      res = mod(abs(number)/(10**(position - 1)), 10)
+
+   end function get_digit
 
 end module odrpack_capi

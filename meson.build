@@ -118,10 +118,11 @@ odrpack_dep = declare_dependency(
 # Examples
 if get_option('build_examples')
   subdir('example')
-  subdir('c')
+  subdir('c/example')
 endif
 
 # Tests
 if get_option('build_tests')
   subdir('test')
+  subdir('c/test')
 endif
