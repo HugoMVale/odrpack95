@@ -1,0 +1,31 @@
+# Normalize text files in the repository to LF
+* text=auto eol=lf
+
+# Source and build configuration files
+*.f text eol=lf
+*.f90 text eol=lf
+*.c text eol=lf
+*.h text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.cmake text eol=lf
+CMakeLists.txt text eol=lf
+meson.build text eol=lf
+meson.options text eol=lf
+fpm.toml text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.so binary
+*.a binary
+*.o binary
