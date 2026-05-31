@@ -533,7 +533,7 @@ contains
       msg3 = ""
 
       if (info > 0 .and. info < 100000) then
-      
+
          if (info >= 5) then
 
             ! Questionable results
@@ -546,8 +546,8 @@ contains
                else if (digits(2) /= 0) then
                   msg2 = "problem is not full rank at solution."
                end if
-            end if  
-      
+            end if
+
             ! Fatal errors
             if (digits(6) == 0 .and. digits(5) > 0) then
                msg1 = "Fatal errors detected: "
@@ -587,8 +587,8 @@ contains
                   msg2 = "`istop != 0` at last function call."
                else if (digits(5) == 6) then
                   msg2 = "numerical error, possibly caused by incorrectly specified user input, "// &
-                  "and more commonly by a poor choice of scale or weights, "// &
-                  "or a discontinuity in the derivatives."
+                         "and more commonly by a poor choice of scale or weights, "// &
+                         "or a discontinuity in the derivatives."
                else if (digits(5) == 7) then
                   msg2 = "`job` inconsistent with passed arguments."
                else if (digits(5) == 8) then
@@ -611,7 +611,7 @@ contains
                   end if
                end if
             end if
-         
+
          end if
 
          ! Stopping condition (normal and questionable results)
@@ -626,7 +626,7 @@ contains
                msg3 = "Iteration limit reached."
             end if
          end if
-          
+
       else
          msg1 = "Unknown `info` code."
       end if
