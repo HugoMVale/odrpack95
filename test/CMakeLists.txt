@@ -1,6 +1,7 @@
 set(tests
     error_detection
     solution
+    rank_selection
 )
 
 get_filename_component(PROJECT_SOURCE_DIR_ABS "${CMAKE_SOURCE_DIR}" ABSOLUTE)
