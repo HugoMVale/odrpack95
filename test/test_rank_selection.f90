@@ -25,15 +25,15 @@ contains
       e = exp(-xplusd(:, 1)/b)
       istop = 0
 
-      if (mod(ideval, 10) > 0) then
+      if (mod(ideval, 10) /= 0) then
          f(:, 1) = a*e + c
       end if
-      if (mod(ideval/10, 10) > 0) then
+      if (mod(ideval/10, 10) /= 0) then
          fjacb(:, 1, 1) = signs(1)*e
          fjacb(:, 2, 1) = signs(2)*a*e*xplusd(:, 1)/b**2
          fjacb(:, 3, 1) = signs(3)
       end if
-      if (mod(ideval/100, 10) > 0) then
+      if (mod(ideval/100, 10) /= 0) then
          fjacd(:, 1, 1) = -a*e/b
       end if
 
@@ -55,10 +55,12 @@ program test_rank_selection
    real(dp), parameter :: truth(np) = [5000.0_dp, 0.1_dp, 200.0_dp]
    real(dp), parameter :: start(np) = [16000.0_dp, 0.002_dp, 0.0_dp]
    type(odrpack_model) :: model
-   integer :: i, j, mask, info
+   integer :: i, j, mask, info, istop
    real(dp) :: x(n, m), y(n, q), beta(np), fitted(np), ss
+   real(dp) :: yest(n, q), fjacb(n, np, q), fjacd(n, m, q)
 
    model%fcn => fcn
+   ! Distinct abscissae: 0.01, 0.1, 0.2, ..., 0.9.
    x(1, 1) = 0.01_dp
    do i = 2, n
       x(i, 1) = real(i - 1, dp)/10.0_dp
@@ -77,9 +79,11 @@ program test_rank_selection
          call odr(model, n, m, q, np, beta, y, x, &
                   job=jobs(i), sstol=1.0e-14_dp, maxit=1000, iprint=0, info=info)
          fitted = signs*beta
-         ss = sum((fitted(1)*exp(-x(:, 1)/fitted(2)) + fitted(3) - y(:, 1))**2)
+         call model%fcn(n, m, q, np, 1, beta, x, [1, 1, 1], reshape([1], [1, 1]), &
+                        1, yest, fjacb, fjacd, istop, model%data)
+         ss = sum((yest - y)**2)
 
-         if (info < 1 .or. info > 3 .or. &
+         if (istop /= 0 .or. info < 1 .or. info > 3 .or. &
              .not. all(abs(fitted - truth) <= 1.0e-8_dp*abs(truth)) .or. &
              .not. (ss <= 1.0e-12_dp)) then
             write (*, *) 'job, sign mask, info:', jobs(i), mask, info
