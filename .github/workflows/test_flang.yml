@@ -18,7 +18,7 @@ jobs:
       
       - name: Test debug
         run: |
-          fpm test --profile debug --compiler flang-new
+          fpm test --profile debug --compiler flang-new --verbose
         
   # Matrix test with meson
   test_matrix:
