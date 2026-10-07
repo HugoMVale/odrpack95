@@ -14,7 +14,6 @@ jobs:
         with:
           compiler: flang
           compiler-version: "22"
-          fpm-version: 0.13
           platform: ubuntu-latest
           extra-packages: "openblas pkg-config"
       
