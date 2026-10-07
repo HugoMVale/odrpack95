@@ -1,4 +1,5 @@
 # odrpack
+
 A modernized Fortran package for weighted orthogonal distance regression (ODR).
 
 [![Test](https://github.com/HugoMVale/odrpack95/actions/workflows/test_gcc.yml/badge.svg)](https://github.com/HugoMVale/odrpack95/actions)
@@ -8,8 +9,8 @@ A modernized Fortran package for weighted orthogonal distance regression (ODR).
 
 ## Description
 
-`odrpack` is a package for weighted orthogonal distance regression (ODR), also known as [errors-in-variables regression](https://en.wikipedia.org/wiki/Errors-in-variables_models). 
-It is designed primarily for instances when both the explanatory and response variables have significant errors. 
+`odrpack` is a package for weighted orthogonal distance regression (ODR), also known as [errors-in-variables regression](https://en.wikipedia.org/wiki/Errors-in-variables_models).
+It is designed primarily for instances when both the explanatory and response variables have significant errors.
 The package implements a highly efficient algorithm for minimizing the sum of the squares of the weighted orthogonal
 distances between each data point and the curve described by the model equation, subject to parameter bounds. The nonlinear
 model can be either explicit or implicit. Additionally, `odrpack` can be used to solve the ordinary least squares problem where all of
@@ -33,7 +34,7 @@ use and maintain. The main changes include:
 * [x] Implementation of a C API.
 * [x] Automatic code documentation with FORD.
 * [x] Python bindings, available in the companion repo [odrpack-python](https://github.com/HugoMVale/odrpack-python).
-* [x] Julia bindings, available in the companion repo [Odrpack.jl](https://github.com/HugoMVale/Odrpack.jl). 
+* [x] Julia bindings, available in the companion repo [Odrpack.jl](https://github.com/HugoMVale/Odrpack.jl).
 
 |    Version    | Year |   Standard   |
 |:-------------:|:----:|:------------:|
@@ -41,7 +42,6 @@ use and maintain. The main changes include:
 | ODRPACK95 1.0 | 2004 |  Fortran 95  |
 |  ODRPACK 2.0  | 1992 |  FORTRAN 77  |
 |  ODRPACK 1.0  | 1989 |  FORTRAN 77  |
-
 
 ## Build instructions
 
@@ -118,7 +118,6 @@ To run the tests, do:
 ```sh
 ctest --test-dir builddir
 ```
-
 
 ## Licence
 
