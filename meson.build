@@ -1,7 +1,7 @@
 project(
   'odrpack95',
   ['fortran', 'c'],
-  version: '3.1.0',
+  version: '3.2.0',
   meson_version: '>=1.1',
   license: 'MIT',
   default_options: [
