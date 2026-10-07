@@ -4152,7 +4152,7 @@ contains
                call dtrco(tfjacb, n*q, kp, rcond, u, 1)
                if (rcond <= epsfcn) then
                   elim = .true.
-                  imax = maxloc(u(1:kp), dim=1)
+                  imax = maxloc(abs(u(1:kp)), dim=1)
                   ! IMAX is the column to remove - use DCHEX and fix KPVT
                   if (imax /= kp) then
                      call dchex(tfjacb, n*q, kp, imax, kp, wrk2, n*q, 1, qraux, wrk3, 2)

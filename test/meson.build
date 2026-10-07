@@ -1,6 +1,7 @@
 tests = [
   'error_detection',
   'solution',
+  'rank_selection',
 ]
 
 foreach t : tests
