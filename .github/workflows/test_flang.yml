@@ -13,12 +13,16 @@ jobs:
         uses: gha3mi/setup-fortran-conda@latest
         with:
           compiler: flang
+          compiler-version: "22"
+          fpm-version: 0.13
           platform: ubuntu-latest
           extra-packages: "openblas pkg-config"
       
       - name: Test debug
         run: |
-          fpm test --profile debug --compiler flang-new --verbose
+          fpm --version
+          flang --version
+          fpm test --profile debug --compiler flang-new
         
   # Matrix test with meson
   test_matrix:
