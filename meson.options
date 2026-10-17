@@ -6,3 +6,5 @@ option('build_tests', type: 'boolean', value: false,
        description: 'Build tests')
 option('build_shared', type: 'boolean', value: false,
        description: 'Build shared library')
+option('build_benchmark', type: 'boolean', value: false,
+       description: 'Build BLAS run-time benchmark')

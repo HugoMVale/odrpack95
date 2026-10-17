@@ -10,3 +10,4 @@ _build
 local-scripts
 example/example*.txt
 builddir
+builddir-*

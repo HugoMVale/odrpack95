@@ -126,3 +126,8 @@ if get_option('build_tests')
   subdir('test')
   subdir('c/test')
 endif
+
+# Benchmark
+if get_option('build_benchmark')
+  subdir('benchmark')
+endif
