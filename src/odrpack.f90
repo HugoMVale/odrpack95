@@ -1764,21 +1764,18 @@ contains
       looped = 0
 
       ! Evaluate jacobian using best estimate of function (FS)
-      if ((niter == 1) .and. (anajac .and. chkjac)) then
-         istop = 0
-      else
-         call eval_jac(model, &
-                       anajac, cdjac, &
-                       n, m, np, q, &
-                       betac, beta, stpb, &
-                       ifixb, ifixx, ldifx, &
-                       x, delta, xplusd, stpd, ldstpd, &
-                       ssf, tt, ldtt, neta, fs, &
-                       t, rwork(wrk1i), rwork(wrk2i), rwork(wrk3i), rwork(wrk6i), tempret, &
-                       fjacb, isodr, fjacd, we1, ldwe, ld2we, &
-                       njev, nfev, istop, info, &
-                       lower, upper)
-      end if
+      ! Checked derivatives still require weighting and fixed-column preparation.
+      call eval_jac(model, &
+                    anajac, cdjac, &
+                    n, m, np, q, &
+                    betac, beta, stpb, &
+                    ifixb, ifixx, ldifx, &
+                    x, delta, xplusd, stpd, ldstpd, &
+                    ssf, tt, ldtt, neta, fs, &
+                    t, rwork(wrk1i), rwork(wrk2i), rwork(wrk3i), rwork(wrk6i), tempret, &
+                    fjacb, isodr, fjacd, we1, ldwe, ld2we, &
+                    njev, nfev, istop, info, &
+                    lower, upper)
       if (istop /= 0) then
          info = 51000
          goto 200

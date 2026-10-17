@@ -2,6 +2,7 @@ tests = [
   'error_detection',
   'solution',
   'rank_selection',
+  'checked_jacobian',
 ]
 
 foreach t : tests
