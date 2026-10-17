@@ -54,6 +54,8 @@ BLAS library is locally installed. Alternatively, the subset of required BLAS fu
 available in [external/blas.f](/external/blas.f); it suffices to move the file to the `src`
 folder.
 
+* Using OpenBLAS instead of the reference BLAS gives no significant performance gain (see the [benchmark report](/benchmark/REPORT.md)).
+
 * The subset of required LINPACK functions is available in [src/linpack.f](/src/linpack.f) and
 is already included in the build configuration files. No action is required.
 
